@@ -1,0 +1,10 @@
+{
+  "name": "duqueia",
+  "version": "1.0.0",
+  "description": "Duque IA RAG Chat Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
