@@ -4,6 +4,7 @@
   "description": "Duque IA RAG Chat Server",
   "main": "server.js",
   "scripts": {
+    "build": "pip install -r requirements.txt || pip3 install -r requirements.txt",
     "start": "node server.js"
   },
   "dependencies": {}

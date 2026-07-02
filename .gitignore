@@ -31,8 +31,9 @@ htmlcov/
 *.db
 *.db-journal
 *.db-wal
-agent/duque_ia.db
+!agent/duque_ia.db
 banco.db
+
 
 # Logs e Métricas Locais
 logs/
