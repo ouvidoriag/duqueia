@@ -1,36 +1,59 @@
-# Ignorar ambientes e segredos
-.env
-.env.*
-DUQUEIA/.env
-DUQUEIA/.env.*
-!.env.example
-!DUQUEIA/.env.example
+# ==============================================================================
+#                      .gitignore - DUQUE IA
+# ==============================================================================
 
-# Dependências
+# Dependências e Pacotes
 node_modules/
-DUQUEIA/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 package-lock.json
-DUQUEIA/package-lock.json
 
-# Python e Builds
+# Ambiente Virtual e Cache Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .venv/
 venv/
-DUQUEIA/__pycache__/
-DUQUEIA/scripts/__pycache__/
+ENV/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Banco de dados e Logs
+# Segredos, Chaves de API e Configurações Locais
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.agents/
+
+# Banco de Dados SQLite Local e Temporários
 *.db
 *.db-journal
 *.db-wal
 agent/duque_ia.db
-DUQUEIA/agent/duque_ia.db
+banco.db
+
+# Logs e Métricas Locais
 logs/
 metrics/
-DUQUEIA/logs/
-DUQUEIA/metrics/
 *.log
+
+# Arquivos Temporários de Sistema e Editores
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
