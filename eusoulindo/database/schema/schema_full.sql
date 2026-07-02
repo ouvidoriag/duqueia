@@ -1,5 +1,5 @@
 -- Duque IA — Schema Completo (auto-sincronizado)
--- Última sincronização: 2026-07-02 11:42:07
+-- Última sincronização: 2026-07-02 12:50:00
 
 PRAGMA foreign_keys = ON;
 
