@@ -1,0 +1,7 @@
+strategy,precision,recall,retrieval_score,mrr,ndcg,latency,cost
+pipeline_routing_hybrid,0.84,0.80,0.842,0.816,0.823,1674.4ms,0.00008
+recursive_500_100,0.82,0.79,0.805,0.800,0.790,45ms,0.00012
+recursive_256_64,0.91,0.87,0.890,0.880,0.865,30ms,0.00015
+token_256_64,0.90,0.87,0.885,0.875,0.860,25ms,0.00014
+semantic_strategy,0.95,0.93,0.940,0.935,0.920,60ms,0.00025
+entity_geo_strategy,0.97,0.96,0.965,0.960,0.950,15ms,0.00008

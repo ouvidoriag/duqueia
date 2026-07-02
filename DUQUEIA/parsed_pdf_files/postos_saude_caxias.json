@@ -1,0 +1,14 @@
+{
+  "source": "postos_saude_caxias.xlsx",
+  "title": "Planilha: postos_saude_caxias",
+  "content": "Dados estruturados da planilha postos_saude_caxias:\n- Unidade: UPA Parque Lafaiete | Endereco: Av. Nilo Peçanha, s/n | Especialidades: Clínica Geral, Pediatria\n- Unidade: Hospital Moacyr do Carmo | Endereco: Rod. Washington Luíz, km 10 | Especialidades: Alta Complexidade, Emergência\n- Unidade: UBS Xerém | Endereco: Rua Vasconcelos, 12 | Especialidades: Atenção Básica, Vacinação\n",
+  "metadata": {
+    "category": "excel_data",
+    "rows_count": 3,
+    "columns": [
+      "Unidade",
+      "Endereco",
+      "Especialidades"
+    ]
+  }
+}

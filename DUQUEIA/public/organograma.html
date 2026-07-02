@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organograma de Processamento — Duque IA</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #3b82f6;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1200px;
+      padding: 2.5rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin: 0;
+      max-width: 750px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    main {
+      width: 95%;
+      max-width: 1300px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      backdrop-filter: blur(16px);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mermaid {
+      background: transparent !important;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .back-link {
+      margin-top: 2rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.2s ease;
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .back-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+  <!-- Load Mermaid Library from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>Fluxograma de Processamento Duque IA</h1>
+    <p class="subtitle">Visualização do fluxo real de dados e agentes integrados do sistema consolidado de Duque de Caxias.</p>
+  </header>
+
+  <main>
+    <div class="mermaid">
+      graph TD
+        %% Estilos de Nodes
+        classDef client fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+        classDef security fill:#991b1b,stroke:#f87171,stroke-width:2px,color:#f8fafc;
+        classDef agent fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+        classDef service fill:#0f172a,stroke:#475569,stroke-width:2px,color:#cbd5e1;
+        classDef database fill:#7c2d12,stroke:#f97316,stroke-width:2px,color:#f8fafc;
+
+        %% Fluxo Real
+        User["Munícipe / Gestor (Entrada / CLI)"]:::client
+        User -->|Query| Guardrail["1. Input Guardrail & Triage (triage.py)<br>Bloqueia invasões, vazamentos LGPD e fora de competência"]:::security
+        Guardrail -->|Bloqueado| FastResponse["Resposta Rápida de Bloqueio (Ouvidoria/LGPD)"]:::security
+        
+        Guardrail -->|Permitido| Analyzer["2. Query Analyzer<br>Identifica intenções: gis, institutional, list, etc."]:::agent
+        
+        Analyzer -->|Se serviço/contato/prazos| SQLAgent["3. SQL Retrieval Engine (vw_ia_servicos)"]:::agent
+        Analyzer -->|Se texto/história/geral| RAGAgent["3. RAG Retrieval Engine (duque_ia_chunks)"]:::agent
+        
+        SQLAgent -->|Dados Estruturados JSON| PromptBuilder["4. Prompt Context Builder"]:::service
+        RAGAgent -->|Parágrafos/Textos/Pesos| PromptBuilder:::service
+        
+        PromptBuilder --> MainLLM["5. LLM Response Generator (Gemini)<br>Humanização POP e Rastro de Evidência (XAI)"]:::agent
+        
+        FastResponse --> User
+        MainLLM --> User
+    </div>
+
+  </main>
+</body>
+</html>

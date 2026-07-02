@@ -1,0 +1,874 @@
+{
+    "id": "273ca301-c0df-4f2c-a4a0-cd0938619d78",
+    "type": "form",
+    "data": {
+        "label": "Tipo de manifestação",
+        "description": {
+            "time": 1748287630553,
+            "blocks": [
+                {
+                    "id": "jum1aNmjqR",
+                    "type": "header",
+                    "data": {
+                        "text": "Saiba diferenciar cada tipo de manifestação&nbsp;👇",
+                        "level": 1
+                    }
+                },
+                {
+                    "id": "Rv1jVjO0SN",
+                    "type": "header",
+                    "data": {
+                        "text": "Denúncia",
+                        "level": 3
+                    }
+                },
+                {
+                    "id": "6R0-BRCKKC",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "Ato ilícito cuja prática infrinja uma lei municipal, envolvendo agente público e/ou conduta em território urbano, que exija a atuação fiscalizatória do Poder Executivo municipal."
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "sqcn7TyceX",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "&nbsp;"
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "_gOMgMQTqS",
+                    "type": "header",
+                    "data": {
+                        "text": "Reclamação",
+                        "level": 3
+                    }
+                },
+                {
+                    "id": "CkPGrG2UO8",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "Demonstração de insatisfação relativa aos serviços públicos."
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "coyye7sjfQ",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "&nbsp;"
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "TFnMhu3JF2",
+                    "type": "header",
+                    "data": {
+                        "text": "Sugestão",
+                        "level": 3
+                    }
+                },
+                {
+                    "id": "i6NsFdtPh7",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "Apresentação de ideia ou proposta de melhoria para serviços públicos."
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "nhQ_WO-4qf",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "&nbsp;"
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                },
+                {
+                    "id": "hy-gjFDHce",
+                    "type": "header",
+                    "data": {
+                        "text": "Elogio",
+                        "level": 3
+                    }
+                },
+                {
+                    "id": "oDvxTidnBd",
+                    "type": "paragraph",
+                    "data": {
+                        "text": "Demonstração de reconhecimento ou satisfação com o serviço prestado ou atendimento&nbsp;recebido."
+                    },
+                    "tunes": {
+                        "alignTune": {
+                            "alignment": "left"
+                        }
+                    }
+                }
+            ],
+            "version": "2.30.6"
+        },
+        "questions": [
+            {
+                "id": "uw4Ims5e",
+                "question": "Qual tipo de manifestação você gostaria de realizar? 👇",
+                "isMandatory": true,
+                "field": "qual_tipo_de_manifestacao_voce_gostaria_de_realizar_👇_uw4Ims5e",
+                "answerType": "dropdown",
+                "options": [
+                    "Denúncia",
+                    "Elogio",
+                    "Reclamação",
+                    "Sugestão"
+                ],
+                "multipleAnswer": false,
+                "showAnswerOnCard": false
+            }
+        ]
+    },
+    "state": [
+        {
+            "id": "uw4Ims5e",
+            "question": "Qual tipo de manifestação você gostaria de realizar? 👇",
+            "isMandatory": true,
+            "field": "qual_tipo_de_manifestacao_voce_gostaria_de_realizar_👇_uw4Ims5e",
+            "answerType": "dropdown",
+            "options": [
+                "Denúncia",
+                "Elogio",
+                "Reclamação",
+                "Sugestão"
+            ],
+            "multipleAnswer": false,
+            "showAnswerOnCard": false
+        }
+    ]
+}
+{
+    "id": "8f1696bb-a78f-4ab6-a2e5-9f90f95bc087",
+    "type": "form",
+    "data": {
+        "label": "Reclamação",
+        "description": {
+            "time": 1748289294243,
+            "blocks": [
+                {
+                    "id": "WcePuf-mol",
+                    "type": "header",
+                    "data": {
+                        "text": "",
+                        "level": 2
+                    }
+                }
+            ],
+            "version": "2.30.6"
+        },
+        "questions": [
+            {
+                "id": "oqXBC24R",
+                "question": "Você gostaria de abrir uma reclamação sobre um protocolo não atendido de algum serviço que solicitou pelo Colab?",
+                "isMandatory": true,
+                "field": "voce_gostaria_de_abrir_uma_reclamacao_sobre_um_protocolo_nao_atendido_de_algum_servico_que_solicitou_pelo_colab_oqXBC24R",
+                "answerType": "boolean"
+            },
+            {
+                "id": "NchBGJGj",
+                "question": "Caso sua resposta tenha sido \"sim\", qual é o número do protocolo que você gostaria de abrir uma reclamação?",
+                "isMandatory": false,
+                "field": "caso_sua_resposta_tenha_sido_sim,_qual_e_o_numero_do_protocolo_que_voce_gostaria_de_abrir_uma_reclamacao_NchBGJGj",
+                "answerType": "number"
+            }
+        ]
+    },
+    "state": [
+        {
+            "id": "oqXBC24R",
+            "question": "Você gostaria de abrir uma reclamação sobre um protocolo não atendido de algum serviço que solicitou pelo Colab?",
+            "isMandatory": true,
+            "field": "voce_gostaria_de_abrir_uma_reclamacao_sobre_um_protocolo_nao_atendido_de_algum_servico_que_solicitou_pelo_colab_oqXBC24R",
+            "answerType": "boolean"
+        },
+        {
+            "id": "NchBGJGj",
+            "question": "Caso sua resposta tenha sido \"sim\", qual é o número do protocolo que você gostaria de abrir uma reclamação?",
+            "isMandatory": false,
+            "field": "caso_sua_resposta_tenha_sido_sim,_qual_e_o_numero_do_protocolo_que_voce_gostaria_de_abrir_uma_reclamacao_NchBGJGj",
+            "answerType": "number"
+        }
+    ]
+}
+
+{
+    "id": "20e1d6db-0371-403d-a2a9-600fa4ffba14",
+    "type": "form",
+    "data": {
+        "label": "Temas",
+        "description": "",
+        "questions": [
+            {
+                "isMandatory": true,
+                "id": "qZENmT96",
+                "field": "em_qual_tema_a_sua_manifestacao_se_encaixa_✅_qZENmT96",
+                "question": "Em qual tema a sua manifestação se encaixa? ✅",
+                "answerType": "dropdown",
+                "multipleAnswer": false,
+                "options": [
+                    "Agricultura",
+                    "Assistência Social e Direitos Humanos",
+                    "Assuntos Jurídicos",
+                    "Comunicação Social",
+                    "Controle e Auditoria",
+                    "Criança, Adolescente e Idoso",
+                    "Cultura e Turismo",
+                    "Defesa Civil",
+                    "Direitos à Pessoa com Deficiência",
+                    "Direito da Mulher",
+                    "Direitos e Vantagens do Servidor",
+                    "Educação",
+                    "Empresas e Legalizações",
+                    "Esporte e Lazer",
+                    "Fiscalização Urbana, Regularização e Registro de Imóveis",
+                    "Fiscalização e tributos",
+                    "FUNDEC",
+                    "Governo Municipal e Enterro Gratuito",
+                    "Habitação",
+                    "Inclusão e Acessibilidade",
+                    "Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)",
+                    "Obras, Limpeza Urbana e Braço de Luz",
+                    "Proteção Animal",
+                    "Saúde",
+                    "Segurança, Sinalização, Multas e Tarifa Zero",
+                    "Trabalho, Emprego e Renda",
+                    "Transportes, Serviços Públicos e Troca de Lâmpadas",
+                    "Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)",
+                    "Vetores e Zoonoses (Combate à Dengue, Controle de Pragas, Criação Irregular de Animais e etc.)",
+                    "Vigilância Sanitária"
+                ]
+            }
+        ]
+    },
+    "state": [
+        {
+            "isMandatory": true,
+            "id": "qZENmT96",
+            "field": "em_qual_tema_a_sua_manifestacao_se_encaixa_✅_qZENmT96",
+            "question": "Em qual tema a sua manifestação se encaixa? ✅",
+            "answerType": "dropdown",
+            "multipleAnswer": false,
+            "options": [
+                "Agricultura",
+                "Assistência Social e Direitos Humanos",
+                "Assuntos Jurídicos",
+                "Comunicação Social",
+                "Controle e Auditoria",
+                "Criança, Adolescente e Idoso",
+                "Cultura e Turismo",
+                "Defesa Civil",
+                "Direitos à Pessoa com Deficiência",
+                "Direito da Mulher",
+                "Direitos e Vantagens do Servidor",
+                "Educação",
+                "Empresas e Legalizações",
+                "Esporte e Lazer",
+                "Fiscalização Urbana, Regularização e Registro de Imóveis",
+                "Fiscalização e tributos",
+                "FUNDEC",
+                "Governo Municipal e Enterro Gratuito",
+                "Habitação",
+                "Inclusão e Acessibilidade",
+                "Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)",
+                "Obras, Limpeza Urbana e Braço de Luz",
+                "Proteção Animal",
+                "Saúde",
+                "Segurança, Sinalização, Multas e Tarifa Zero",
+                "Trabalho, Emprego e Renda",
+                "Transportes, Serviços Públicos e Troca de Lâmpadas",
+                "Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)",
+                "Vetores e Zoonoses (Combate à Dengue, Controle de Pragas, Criação Irregular de Animais e etc.)",
+                "Vigilância Sanitária"
+            ]
+        }
+    ]
+}
+{
+    "id": "b76e4aac-2a78-4dad-b2f8-63171a33c1f1",
+    "type": "form",
+    "data": {
+        "label": "Saúde",
+        "description": {
+            "time": 1759282065305,
+            "blocks": [
+                {
+                    "id": "TteseA1ffU",
+                    "type": "header",
+                    "data": {
+                        "text": "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ⚠️ ATENÇÃO ⚠️ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
+                        "level": 1
+                    }
+                },
+                {
+                    "id": "axyJZ-hiBQ",
+                    "type": "header",
+                    "data": {
+                        "text": "Sua manifestação será tratada pela:ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ ",
+                        "level": 2
+                    }
+                },
+                {
+                    "id": "QtHSkn-rvl",
+                    "type": "header",
+                    "data": {
+                        "text": "SECRETARIA MUNICIPAL DE SAÚDE.ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ",
+                        "level": 1
+                    }
+                },
+                {
+                    "id": "QG2NRDCZql",
+                    "type": "header",
+                    "data": {
+                        "text": "Caso o teor não tenha relação com a atuação deste órgão, retorne a tela anterior clicando na seta no canto superior esquerdo.&nbsp;",
+                        "level": 2
+                    }
+                }
+            ],
+            "version": "2.30.6"
+        },
+        "questions": [
+            {
+                "isMandatory": true,
+                "answerType": "dropdown",
+                "options": [
+                    "Carreta dos especialistas",
+                    "CAPS – Centro de Atenção Psicosocial (leslie Sanford Chavin)",
+                    "CAPS AD – Centro de Atenção Psicossocial Álcool e Drogas",
+                    "CAPS Imbariê – Centro de Atenção Psicosocial",
+                    "CAPSIJ – Centro de Atenção Psicosocial Infanto Juvenil",
+                    "CEAPD – Centro de Atenção Ao Portador De Deficiência (CER II)",
+                    "CEATA – Centro de Atenção Total ao Adolescente",
+                    "Centro de Especialidades Odontológicas - CEO Imbariê",
+                    "Centro de Especialidades Odontológicas – CEO Prainha",
+                    "Centro de Especialidades Odontológicas (CEO Centro - CMS)",
+                    "Centro de Especialidades Odontológicas Xerém - CEO",
+                    "Centro de Fisioterapia Pastor Norival Franco",
+                    "Centro de Referência e Atenção Especializada à Saúde da Mulher",
+                    "Centro Especializado De Reabilitação - Cer IV",
+                    "Centro Municipal de Saúde de Duque de Caxias",
+                    "Clínica da Família - Imbariê",
+                    "Fazenda Paraíso",
+                    "Hospital de Imbariê",
+                    "Hospital do Coração São José",
+                    "Hospital do Olho – Júlio Cândido De Brito",
+                    "Hospital Infantil de Parada Angélica Padre Guilherme",
+                    "Hospital Infantil Ismélia da Silveira",
+                    "Hospital Municipal Doutor Moacyr Rodrigues do Carmo",
+                    "Hospital Municipalizado Adão Pereira Nunes",
+                    "Hospital Veterinario",
+                    "Maternidade Municipal Santa Cruz Da Serra",
+                    "Policlínica Hospital Municipal Duque de Caxias",
+                    "Posto Odontológico Professor José de Souza Herdy",
+                    "Residência Terapêutica",
+                    "Residência Terapêutica I",
+                    "Serviço de Atendimento Domiciliar – SAD",
+                    "UBS Abdul Nasser Haikal (Unidade Básica de Saúde Jardim Primavera) / USF Parque Chuno",
+                    "UBS Alayde Cunha / USF Copacabana/ USF Vila Leopoldina",
+                    "UBS Aparecida Tavares / USF Vila São Luiz",
+                    "UBS Barão do Amapá",
+                    "UBS Calundú",
+                    "UBS Cangulo (UBS Cangulo Dr. Iveraldo Carvalho Pessôa)",
+                    "UBS Doutor Antonio Granja",
+                    "UBS Doutor José de Freitas",
+                    "UBS Doutor Saúde - \"BIDI\" (Unidade Básica de Saúde Senhor Benedito Nascimento)",
+                    "UBS Edna Siqueira Salles",
+                    "UBS Enir Angela Biciati Moreira (UBS Santo Antônio)",
+                    "UBS Evangelina Tavares",
+                    "UBS Fatima de Oliveira Thomaz",
+                    "UBS José Carlos Gianes (Unidade Básica de Saúde Vila Canaã)",
+                    "UBS Maria Margarete de Oliveira Dias (Unidade Básica de Saúde Pantanal)",
+                    "UBS Nair Borges Fernandes",
+                    "UBS Nilza Maria Cardoso Rodrigues",
+                    "UBS Rural",
+                    "UBS Sarapuí / USF Sarapuí",
+                    "UBS Vereador Adilson Ribeiro Braga (Unidade Básica de Saúde Bom Retiro)",
+                    "UBS Vila Ideal ",
+                    "Unidade Basica de Saude Capivari",
+                    "UPA Parque Beira Mar (Emergência Clínica Adulto 24h)",
+                    "UPA Parque Lafaiete",
+                    "UPA Sarapuí",
+                    "UPA Walter Garcia (Emergência Pediátrica 24h)",
+                    "UPH Campos Elíseos (Emergência 24h e Ambulatório)",
+                    "UPH Imbariê – Dr Jorge Rodrigues Pereira",
+                    "UPH Parque Equitativa (Emergência 24h e Ambulatório)",
+                    "UPH Pilar – José Moreira Da Silva (Emergência 24h e Ambulatório)",
+                    "UPH Saracuruna – João Pedro Carletti",
+                    "UPH Xerém – José Evangelista de Souza",
+                    "USF Barro Branco",
+                    "USF Carlos Alberto Zagari Koeler (USF Jardim Leal)",
+                    "USF Cidade dos Meninos",
+                    "USF Codora/Vila Maria Helena",
+                    "USF Cristovão Colombo",
+                    "USF Dois Irmãos",
+                    "USF Enfermeira Alaíde Ramos Amasonas (Equipes II e III de Jardim Anhangá)",
+                    "USF Gramacho",
+                    "USF Imbariê",
+                    "USF Jardim Anhangá",
+                    "USF Jardim Gramacho I II III V",
+                    "USF Jardim Gramacho IV",
+                    "USF Jardim Olimpo",
+                    "USF José Olavo De Araújo (Pilar III, IV, V, Antigo Berra Boi)",
+                    "USF Mangueirinha",
+                    "USF Manoel Barcelos (USF Parque Felicidade)",
+                    "USF Maria Dalva Pereira Gomes (USF Centenário)",
+                    "USF Nelson Chaves de Araújo",
+                    "USF Nova Campina",
+                    "USF Otacílio da Silva (USF Olavo Bilac)",
+                    "USF Parada Angélica",
+                    "USF Parada Morabi",
+                    "USF Parque Comercial",
+                    "USF Parque Eldorado",
+                    "USF Parque Esperança",
+                    "USF Parque Paulista",
+                    "USF Pilar I e II",
+                    "USF Santa Lúcia",
+                    "USF Santa Rosa (USF Parque Leal)",
+                    "USF São Bento",
+                    "USF Sebastião de Souza Alves (USF Beira Mar)",
+                    "USF Sérgio de Freitas Américo (UBS Covanca)",
+                    "USF Taquara (Unidade Básica de Saúde da Taquara -  Artur Vinicius Sales)",
+                    "USF Trevo das Missões",
+                    "USF Vila Urussaí",
+                    "Secretaria Municipal da Saúde"
+                ],
+                "multipleAnswer": false,
+                "id": "JgxjcL64",
+                "field": "a_qual_unidade_de_saude_se_refere_a_sua_manifestacao_👇_JgxjcL64",
+                "question": "A qual Unidade de Saúde se refere a sua manifestação? 👇",
+                "fileConfig": {
+                    "maxFileSize": 2,
+                    "maxFiles": 1
+                }
+            },
+            {
+                "question": "A qual assunto de Saúde se refere a sua manifestação?  👇 👇👇",
+                "isMandatory": true,
+                "fileConfig": {
+                    "maxFileSize": 2,
+                    "maxFiles": 1
+                },
+                "answerType": "dropdown",
+                "options": [
+                    "Abuso de Autoridade",
+                    "Acessibilidade em unidades de saúde",
+                    "Aparelho auditivo",
+                    "Atendimento",
+                    "Atendimento à saúde mental",
+                    "Atendimento de urgência e emergência",
+                    "Atendimento domiciliar (home care)",
+                    "Atendimento odontológico",
+                    "Banco de leite materno",
+                    "Cadastro no banco nacional de empregos",
+                    "Campanhas de prevenção e conscientização",
+                    "Conduta irregular de funcionário",
+                    "Criação de unidade de saúde",
+                    "Demora na entrega das lentes",
+                    "Demora no resultado de exames",
+                    "Demora, grosseria ou falta de atendimento",
+                    "Direitos e programas sociais",
+                    "Equipe administrativa",
+                    "Equipe de enfermagem",
+                    "Equipe médica",
+                    "Equipe multidisciplinar (psicologo, terapeuta, fisioterapeuta, etc.)",
+                    "Estrutura, limpeza e materiais da unidade",
+                    "Extravio de pertences (celular, rádio, relógio, bolsa e etc)",
+                    "Falta de comunicação",
+                    "Falta de exames na unidade",
+                    "Falta de maqueiro na unidade",
+                    "Falta de medicamentos e insumos (remédios e fraldas)",
+                    "Falta de médicos especialistas",
+                    "Falta de pagamento",
+                    "Falta de profissionais",
+                    "Fila de espera para procedimentos",
+                    "Fornecimento de próteses e órteses",
+                    "Funcionário",
+                    "Gestão escolar",
+                    "Informação e Orientação pública",
+                    "Internação e transferência hospitalar",
+                    "Marcação de cirurgia",
+                    "Marcação de consulta",
+                    "Marcação de Exame",
+                    "Marcação de exame",
+                    "Maus tratos aos pacientes",
+                    "Projeto institucional de saúde",
+                    "Prontuário médico",
+                    "Saúde da família (ESF)",
+                    "Tempo de atedimento com o psicólogo",
+                    "Tempo de espera em fila SISREG",
+                    "Tempo de espera para atendimento",
+                    "Tempo de espera para cirurgia",
+                    "Tempo de espera para exames",
+                    "Vacinação"
+                ],
+                "multipleAnswer": false,
+                "id": "z93epDYG",
+                "field": "a_qual_assunto_de_saude_se_refere_a_sua_manifestacao_👇_👇👇_z93epDYG"
+            },
+            {
+                "id": "lEVKJNJD",
+                "question": "Caso tenha em mãos, insira o número do seu Cartão SUS",
+                "isMandatory": false,
+                "field": "caso_tenha_em_maos_insira_o_numero_do_seu_cartao_sus_lEVKJNJD",
+                "fileConfig": {
+                    "maxFileSize": 2,
+                    "maxFiles": 1
+                },
+                "confidential": true,
+                "answerType": "open_field",
+                "options": [
+                    null
+                ],
+                "multipleAnswer": false
+            },
+            {
+                "id": "ntWmID7S",
+                "question": "Descreva sua manifestação com o máximo de detalhes possíveis",
+                "isMandatory": true,
+                "field": "descreva_sua_manifestacao_com_o_maximo_de_detalhes_possiveis_ntWmID7S",
+                "answerType": "open_field",
+                "confidential": false
+            },
+            {
+                "id": "4LsneQks",
+                "question": "Caso tenha fotos ou documentos referentes à sua manifestação, anexe-os abaixo",
+                "isMandatory": false,
+                "field": "caso_tenha_fotos_ou_documentos_referentes_a_sua_manifestacao_anexeos_abaixo_4LsneQks",
+                "answerType": "file",
+                "fileConfig": {
+                    "maxFiles": 3,
+                    "maxFileSize": 25,
+                    "type": "ANY"
+                },
+                "confidential": true
+            }
+        ]
+    },
+    "state": [
+        {
+            "isMandatory": true,
+            "answerType": "dropdown",
+            "options": [
+                "Carreta dos especialistas",
+                "CAPS – Centro de Atenção Psicosocial (leslie Sanford Chavin)",
+                "CAPS AD – Centro de Atenção Psicossocial Álcool e Drogas",
+                "CAPS Imbariê – Centro de Atenção Psicosocial",
+                "CAPSIJ – Centro de Atenção Psicosocial Infanto Juvenil",
+                "CEAPD – Centro de Atenção Ao Portador De Deficiência (CER II)",
+                "CEATA – Centro de Atenção Total ao Adolescente",
+                "Centro de Especialidades Odontológicas - CEO Imbariê",
+                "Centro de Especialidades Odontológicas – CEO Prainha",
+                "Centro de Especialidades Odontológicas (CEO Centro - CMS)",
+                "Centro de Especialidades Odontológicas Xerém - CEO",
+                "Centro de Fisioterapia Pastor Norival Franco",
+                "Centro de Referência e Atenção Especializada à Saúde da Mulher",
+                "Centro Especializado De Reabilitação - Cer IV",
+                "Centro Municipal de Saúde de Duque de Caxias",
+                "Clínica da Família - Imbariê",
+                "Fazenda Paraíso",
+                "Hospital de Imbariê",
+                "Hospital do Coração São José",
+                "Hospital do Olho – Júlio Cândido De Brito",
+                "Hospital Infantil de Parada Angélica Padre Guilherme",
+                "Hospital Infantil Ismélia da Silveira",
+                "Hospital Municipal Doutor Moacyr Rodrigues do Carmo",
+                "Hospital Municipalizado Adão Pereira Nunes",
+                "Hospital Veterinario",
+                "Maternidade Municipal Santa Cruz Da Serra",
+                "Policlínica Hospital Municipal Duque de Caxias",
+                "Posto Odontológico Professor José de Souza Herdy",
+                "Residência Terapêutica",
+                "Residência Terapêutica I",
+                "Serviço de Atendimento Domiciliar – SAD",
+                "UBS Abdul Nasser Haikal (Unidade Básica de Saúde Jardim Primavera) / USF Parque Chuno",
+                "UBS Alayde Cunha / USF Copacabana/ USF Vila Leopoldina",
+                "UBS Aparecida Tavares / USF Vila São Luiz",
+                "UBS Barão do Amapá",
+                "UBS Calundú",
+                "UBS Cangulo (UBS Cangulo Dr. Iveraldo Carvalho Pessôa)",
+                "UBS Doutor Antonio Granja",
+                "UBS Doutor José de Freitas",
+                "UBS Doutor Saúde - \"BIDI\" (Unidade Básica de Saúde Senhor Benedito Nascimento)",
+                "UBS Edna Siqueira Salles",
+                "UBS Enir Angela Biciati Moreira (UBS Santo Antônio)",
+                "UBS Evangelina Tavares",
+                "UBS Fatima de Oliveira Thomaz",
+                "UBS José Carlos Gianes (Unidade Básica de Saúde Vila Canaã)",
+                "UBS Maria Margarete de Oliveira Dias (Unidade Básica de Saúde Pantanal)",
+                "UBS Nair Borges Fernandes",
+                "UBS Nilza Maria Cardoso Rodrigues",
+                "UBS Rural",
+                "UBS Sarapuí / USF Sarapuí",
+                "UBS Vereador Adilson Ribeiro Braga (Unidade Básica de Saúde Bom Retiro)",
+                "UBS Vila Ideal ",
+                "Unidade Basica de Saude Capivari",
+                "UPA Parque Beira Mar (Emergência Clínica Adulto 24h)",
+                "UPA Parque Lafaiete",
+                "UPA Sarapuí",
+                "UPA Walter Garcia (Emergência Pediátrica 24h)",
+                "UPH Campos Elíseos (Emergência 24h e Ambulatório)",
+                "UPH Imbariê – Dr Jorge Rodrigues Pereira",
+                "UPH Parque Equitativa (Emergência 24h e Ambulatório)",
+                "UPH Pilar – José Moreira Da Silva (Emergência 24h e Ambulatório)",
+                "UPH Saracuruna – João Pedro Carletti",
+                "UPH Xerém – José Evangelista de Souza",
+                "USF Barro Branco",
+                "USF Carlos Alberto Zagari Koeler (USF Jardim Leal)",
+                "USF Cidade dos Meninos",
+                "USF Codora/Vila Maria Helena",
+                "USF Cristovão Colombo",
+                "USF Dois Irmãos",
+                "USF Enfermeira Alaíde Ramos Amasonas (Equipes II e III de Jardim Anhangá)",
+                "USF Gramacho",
+                "USF Imbariê",
+                "USF Jardim Anhangá",
+                "USF Jardim Gramacho I II III V",
+                "USF Jardim Gramacho IV",
+                "USF Jardim Olimpo",
+                "USF José Olavo De Araújo (Pilar III, IV, V, Antigo Berra Boi)",
+                "USF Mangueirinha",
+                "USF Manoel Barcelos (USF Parque Felicidade)",
+                "USF Maria Dalva Pereira Gomes (USF Centenário)",
+                "USF Nelson Chaves de Araújo",
+                "USF Nova Campina",
+                "USF Otacílio da Silva (USF Olavo Bilac)",
+                "USF Parada Angélica",
+                "USF Parada Morabi",
+                "USF Parque Comercial",
+                "USF Parque Eldorado",
+                "USF Parque Esperança",
+                "USF Parque Paulista",
+                "USF Pilar I e II",
+                "USF Santa Lúcia",
+                "USF Santa Rosa (USF Parque Leal)",
+                "USF São Bento",
+                "USF Sebastião de Souza Alves (USF Beira Mar)",
+                "USF Sérgio de Freitas Américo (UBS Covanca)",
+                "USF Taquara (Unidade Básica de Saúde da Taquara -  Artur Vinicius Sales)",
+                "USF Trevo das Missões",
+                "USF Vila Urussaí",
+                "Secretaria Municipal da Saúde"
+            ],
+            "multipleAnswer": false,
+            "id": "JgxjcL64",
+            "field": "a_qual_unidade_de_saude_se_refere_a_sua_manifestacao_👇_JgxjcL64",
+            "question": "A qual Unidade de Saúde se refere a sua manifestação? 👇",
+            "fileConfig": {
+                "maxFileSize": 2,
+                "maxFiles": 1
+            }
+        },
+        {
+            "question": "A qual assunto de Saúde se refere a sua manifestação?  👇 👇👇",
+            "isMandatory": true,
+            "fileConfig": {
+                "maxFileSize": 2,
+                "maxFiles": 1
+            },
+            "answerType": "dropdown",
+            "options": [
+                "Abuso de Autoridade",
+                "Acessibilidade em unidades de saúde",
+                "Aparelho auditivo",
+                "Atendimento",
+                "Atendimento à saúde mental",
+                "Atendimento de urgência e emergência",
+                "Atendimento domiciliar (home care)",
+                "Atendimento odontológico",
+                "Banco de leite materno",
+                "Cadastro no banco nacional de empregos",
+                "Campanhas de prevenção e conscientização",
+                "Conduta irregular de funcionário",
+                "Criação de unidade de saúde",
+                "Demora na entrega das lentes",
+                "Demora no resultado de exames",
+                "Demora, grosseria ou falta de atendimento",
+                "Direitos e programas sociais",
+                "Equipe administrativa",
+                "Equipe de enfermagem",
+                "Equipe médica",
+                "Equipe multidisciplinar (psicologo, terapeuta, fisioterapeuta, etc.)",
+                "Estrutura, limpeza e materiais da unidade",
+                "Extravio de pertences (celular, rádio, relógio, bolsa e etc)",
+                "Falta de comunicação",
+                "Falta de exames na unidade",
+                "Falta de maqueiro na unidade",
+                "Falta de medicamentos e insumos (remédios e fraldas)",
+                "Falta de médicos especialistas",
+                "Falta de pagamento",
+                "Falta de profissionais",
+                "Fila de espera para procedimentos",
+                "Fornecimento de próteses e órteses",
+                "Funcionário",
+                "Gestão escolar",
+                "Informação e Orientação pública",
+                "Internação e transferência hospitalar",
+                "Marcação de cirurgia",
+                "Marcação de consulta",
+                "Marcação de Exame",
+                "Marcação de exame",
+                "Maus tratos aos pacientes",
+                "Projeto institucional de saúde",
+                "Prontuário médico",
+                "Saúde da família (ESF)",
+                "Tempo de atedimento com o psicólogo",
+                "Tempo de espera em fila SISREG",
+                "Tempo de espera para atendimento",
+                "Tempo de espera para cirurgia",
+                "Tempo de espera para exames",
+                "Vacinação"
+            ],
+            "multipleAnswer": false,
+            "id": "z93epDYG",
+            "field": "a_qual_assunto_de_saude_se_refere_a_sua_manifestacao_👇_👇👇_z93epDYG"
+        },
+        {
+            "id": "lEVKJNJD",
+            "question": "Caso tenha em mãos, insira o número do seu Cartão SUS",
+            "isMandatory": false,
+            "field": "caso_tenha_em_maos_insira_o_numero_do_seu_cartao_sus_lEVKJNJD",
+            "fileConfig": {
+                "maxFileSize": 2,
+                "maxFiles": 1
+            },
+            "confidential": true,
+            "answerType": "open_field",
+            "options": [
+                null
+            ],
+            "multipleAnswer": false
+        },
+        {
+            "id": "ntWmID7S",
+            "question": "Descreva sua manifestação com o máximo de detalhes possíveis",
+            "isMandatory": true,
+            "field": "descreva_sua_manifestacao_com_o_maximo_de_detalhes_possiveis_ntWmID7S",
+            "answerType": "open_field",
+            "confidential": false
+        },
+        {
+            "id": "4LsneQks",
+            "question": "Caso tenha fotos ou documentos referentes à sua manifestação, anexe-os abaixo",
+            "isMandatory": false,
+            "field": "caso_tenha_fotos_ou_documentos_referentes_a_sua_manifestacao_anexeos_abaixo_4LsneQks",
+            "answerType": "file",
+            "fileConfig": {
+                "maxFiles": 3,
+                "maxFileSize": 25,
+                "type": "ANY"
+            },
+            "confidential": true
+        }
+    ]
+}
+
+
+
+                                    ⚠️ ATENÇÃO ⚠️ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+Sua manifestação será tratada pela:ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+SECRETARIA MUNICIPAL DE SAÚDE.ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ
+Caso o teor não tenha relação com a atuação deste órgão, retorne a tela anterior clicando na seta no canto superior esquerdo. 
+A qual Unidade de Saúde se refere a sua manifestação? 👇
+A qual assunto de Saúde se refere a sua manifestação? 👇 👇👇
+Caso tenha em mãos, insira o número do seu Cartão SUS
+Descreva sua manifestação com o máximo de detalhes possíveis
+Caso tenha fotos ou documentos referentes à sua manifestação, anexe-os abaixo
+
+( nessa parte vcamos colcaor so de cidadão ) 
+
+{
+    "id": "e4f19fe3-ad71-41de-9714-5c8fd2f64863",
+    "type": "form",
+    "data": {
+        "label": "Identifique quem está realizando este registro",
+        "description": "",
+        "questions": [
+            {
+                "id": "CaGTmZrh",
+                "question": "Por fim, quem está preenchendo esta manifestação?",
+                "isMandatory": true,
+                "field": "por_fim,_quem_esta_preenchendo_esta_manifestacao_CaGTmZrh",
+                "answerType": "dropdown",
+                "options": [
+                    "Sou cidadão e desejo enviar de forma anônima",
+                    "Sou cidadão e desejo me identificar informando meus dados",
+                    "Sou cidadão e desejo me identificar utilizando meu login do Colab",
+                    "Sou Servidor do Sistema de Ouvidorias e estou registrando para um cidadão que deseja permanecer anônimo",
+                    "Sou Servidor do Sistema de Ouvidorias e estou registrando para um cidadão que deseja se identificar informando seus dados"
+                ],
+                "multipleAnswer": false
+            }
+        ]
+    },
+    "state": [
+        {
+            "id": "CaGTmZrh",
+            "question": "Por fim, quem está preenchendo esta manifestação?",
+            "isMandatory": true,
+            "field": "por_fim,_quem_esta_preenchendo_esta_manifestacao_CaGTmZrh",
+            "answerType": "dropdown",
+            "options": [
+                "Sou cidadão e desejo enviar de forma anônima",
+                "Sou cidadão e desejo me identificar informando meus dados",
+                "Sou cidadão e desejo me identificar utilizando meu login do Colab",
+                "Sou Servidor do Sistema de Ouvidorias e estou registrando para um cidadão que deseja permanecer anônimo",
+                "Sou Servidor do Sistema de Ouvidorias e estou registrando para um cidadão que deseja se identificar informando seus dados"
+            ],
+            "multipleAnswer": false
+        }
+    ]
+}
+
+basicament efica: 
+
+Revise seus dados
+Tipo de manifestação
+Qual tipo de manifestação você gostaria de realizar? 👇	Reclamação
+Reclamação
+Você gostaria de abrir uma reclamação sobre um protocolo não atendido de algum serviço que solicitou pelo Colab?	Não
+Caso sua resposta tenha sido "sim", qual é o número do protocolo que você gostaria de abrir uma reclamação?	-
+Temas
+Em qual tema a sua manifestação se encaixa? ✅	Saúde
+Saúde
+A qual Unidade de Saúde se refere a sua manifestação? 👇	CAPS – Centro de Atenção Psicosocial (leslie Sanford Chavin)
+A qual assunto de Saúde se refere a sua manifestação? 👇 👇👇	Acessibilidade em unidades de saúde
+Caso tenha em mãos, insira o número do seu Cartão SUS	-
+Descreva sua manifestação com o máximo de detalhes possíveis	wfdqewfdsfsdfsd
+Caso tenha fotos ou documentos referentes à sua manifestação, anexe-os abaixo	
+Identifique quem está realizando este registro
+Por fim, quem está preenchendo esta manifestação?	Sou cidadão e desejo enviar de forma anônima
+
+
+
+

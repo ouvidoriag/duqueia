@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duque IA — Atendimento Virtual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:            #f0f4f8;
+      --surface:       #ffffff;
+      --surface-hover: #f7f9fc;
+      --border:        #dde3ec;
+      --accent:        #1d4ed8;
+      --accent-light:  #eff6ff;
+      --accent-hover:  #1e40af;
+      --user-bubble:   #1d4ed8;
+      --bot-bubble:    #ffffff;
+      --text-primary:  #0f172a;
+      --text-secondary:#64748b;
+      --text-on-accent:#ffffff;
+      --green:         #16a34a;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:     0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:     0 12px 40px rgba(0,0,0,.10);
+      --radius-card:   20px;
+      --radius-bubble: 18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* ── Card principal ─────────────────────────────────── */
+    .chat-container {
+      width: 92%;
+      max-width: 780px;
+      height: 88vh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .chat-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(29,78,216,.25);
+      flex-shrink: 0;
+    }
+
+    .title-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: .2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-top: 0.1rem;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(22,163,74,.2);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(22,163,74,.2); }
+      50%       { box-shadow: 0 0 0 5px rgba(22,163,74,.08); }
+    }
+
+    .new-chat-btn {
+      background: var(--accent-light);
+      border: 1px solid #bfdbfe;
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: background .2s, border-color .2s;
+    }
+
+    .new-chat-btn:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+
+    /* ── Área de Mensagens ───────────────────────────────── */
+    .messages-area {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    .messages-area::-webkit-scrollbar { width: 5px; }
+    .messages-area::-webkit-scrollbar-track { background: transparent; }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    /* ── Bolhas ─────────────────────────────────────────── */
+    .message {
+      max-width: 76%;
+      display: flex;
+      flex-direction: column;
+      animation: fade-up .28s ease-out forwards;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { align-self: flex-end; }
+    .message.bot  { align-self: flex-start; }
+
+    .message-bubble {
+      padding: 0.85rem 1.15rem;
+      border-radius: var(--radius-bubble);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user .message-bubble {
+      background: var(--user-bubble);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot .message-bubble {
+      background: var(--bot-bubble);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Markdown rendering */
+    .message-bubble strong { font-weight: 600; }
+    .message-bubble em     { font-style: italic; }
+    .message-bubble p      { margin-bottom: .5rem; }
+    .message-bubble p:last-child { margin-bottom: 0; }
+    .message-bubble ul     { padding-left: 1.2rem; margin-bottom: .5rem; }
+    .message-bubble li     { margin-bottom: .2rem; }
+
+    /* ── Metadados XAI ──────────────────────────────────── */
+    .meta-info {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.35rem;
+      padding: 0 0.2rem;
+    }
+
+    .user .meta-info { justify-content: flex-end; }
+
+    .xai-tag {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metrics-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ── Typing indicator ───────────────────────────────── */
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 0.2rem 0.1rem;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: bounce 1.3s infinite ease-in-out both;
+    }
+    .dot:nth-child(1) { animation-delay: -.3s; }
+    .dot:nth-child(2) { animation-delay: -.15s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); opacity: .4; }
+      40%           { transform: scale(1);  opacity: 1; }
+    }
+
+    /* ── Separador de data ──────────────────────────────── */
+    .date-separator {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin: 0.3rem 0;
+    }
+
+    .date-separator::before,
+    .date-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Área de Input ──────────────────────────────────── */
+    .input-area {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .chat-input::placeholder { color: #a1afbf; }
+
+    .chat-input:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+    }
+
+    .send-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(29,78,216,.28);
+      transition: background .2s, transform .1s, box-shadow .2s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover  { background: var(--accent-hover); box-shadow: 0 4px 14px rgba(29,78,216,.35); }
+    .send-btn:active { transform: scale(0.95); }
+    .send-btn:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-left">
+        <div class="avatar">DI</div>
+        <div class="title-area">
+          <h1>Duque IA</h1>
+          <div class="status-badge">
+            <span class="status-dot"></span>
+            Online — Assistente Oficial
+          </div>
+        </div>
+      </div>
+      <button class="new-chat-btn" id="newChatBtn">Nova conversa</button>
+    </header>
+
+    <!-- Área de Mensagens -->
+    <div class="messages-area" id="messagesArea">
+      <div class="date-separator">Hoje</div>
+      <!-- Boas-vindas renderizada pelo JS -->
+    </div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <input
+        type="text"
+        class="chat-input"
+        id="chatInput"
+        placeholder="Escreva sua mensagem..."
+        autocomplete="off"
+        maxlength="500"
+      >
+      <button class="send-btn" id="sendBtn" title="Enviar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const messagesArea = document.getElementById('messagesArea');
+    const chatInput    = document.getElementById('chatInput');
+    const sendBtn      = document.getElementById('sendBtn');
+    const newChatBtn   = document.getElementById('newChatBtn');
+
+    let sessionId = 'sess_' + Date.now();
+
+    // ── Markdown simplificado ────────────────────────────────────────────────
+    function formatMarkdown(text) {
+      if (!text) return '';
+      let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g,     '<em>$1</em>');
+
+      const paragraphs = html.split('\n\n');
+      html = paragraphs.map(p => {
+        const trimmed = p.trim();
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
+          const items = trimmed.split(/\n[-*•]\s+/);
+          items[0] = items[0].replace(/^[-*•]\s+/, '');
+          return '<ul>' + items.map(li => `<li>${li.trim()}</li>`).join('') + '</ul>';
+        }
+        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+      }).join('');
+
+      return html;
+    }
+
+    // ── Hora atual ───────────────────────────────────────────────────────────
+    function nowTime() {
+      return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // ── Adiciona mensagem ────────────────────────────────────────────────────
+    function appendMessage(sender, text, data = null) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `message ${sender}`;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.innerHTML  = formatMarkdown(text);
+      wrapper.appendChild(bubble);
+
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'meta-info';
+
+      if (sender === 'user') {
+        metaDiv.innerHTML = `<span class="metrics-tag">${nowTime()}</span>`;
+      } else {
+        // Hora
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'metrics-tag';
+        timeSpan.textContent = nowTime();
+        metaDiv.appendChild(timeSpan);
+
+        // Latência
+        if (data?.metrics?.total_time_ms) {
+          const t = document.createElement('span');
+          t.className   = 'xai-tag';
+          t.textContent = `${Math.round(data.metrics.total_time_ms)}ms`;
+          metaDiv.appendChild(t);
+        }
+
+        // Intenção
+        if (data?.intent_detected) {
+          const i = document.createElement('span');
+          i.className   = 'xai-tag';
+          i.textContent = data.intent_detected.replace(/_/g, ' ').toUpperCase();
+          metaDiv.appendChild(i);
+        }
+
+        // Fontes
+        if (data?.sources?.length) {
+          const s = document.createElement('span');
+          s.className   = 'xai-tag';
+          s.textContent = `Fonte: ${data.sources.join(', ')}`;
+          metaDiv.appendChild(s);
+        }
+      }
+
+      wrapper.appendChild(metaDiv);
+      messagesArea.appendChild(wrapper);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    // ── Typing indicator ─────────────────────────────────────────────────────
+    function showTyping() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message bot';
+      wrapper.id        = 'typingIndicator';
+      wrapper.innerHTML = `
+        <div class="message-bubble">
+          <div class="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>`;
+      messagesArea.appendChild(wrapper);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    function removeTyping() {
+      document.getElementById('typingIndicator')?.remove();
+    }
+
+    // ── Enviar mensagem ───────────────────────────────────────────────────────
+    async function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text || sendBtn.disabled) return;
+
+      chatInput.value   = '';
+      sendBtn.disabled  = true;
+      appendMessage('user', text);
+      showTyping();
+
+      try {
+        const res  = await fetch('http://localhost:3000/api/chat', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ message: text, sessionId })
+        });
+
+        const data = await res.json();
+        removeTyping();
+
+        if (data.error) {
+          appendMessage('bot', `Ocorreu um erro: ${data.error}`);
+        } else {
+          appendMessage('bot', data.answer, data);
+        }
+      } catch (err) {
+        removeTyping();
+        appendMessage('bot', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+        console.error(err);
+      } finally {
+        sendBtn.disabled = false;
+        chatInput.focus();
+      }
+    }
+
+    // ── Eventos ──────────────────────────────────────────────────────────────
+    sendBtn.addEventListener('click', handleSend);
+    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+
+    newChatBtn.addEventListener('click', () => {
+      sessionId = 'sess_' + Date.now();
+      messagesArea.innerHTML = '<div class="date-separator">Nova conversa</div>';
+      appendMessage('bot',
+        'Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n' +
+        'Como posso ajudar você hoje? Pergunte sobre secretarias, serviços municipais, endereços ou ouvidoria.'
+      );
+      chatInput.focus();
+    });
+
+    // ── Mensagem inicial ─────────────────────────────────────────────────────
+    appendMessage('bot',
+      'Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n' +
+      'Como posso ajudar você hoje? Pergunte sobre secretarias, serviços municipais, endereços ou ouvidoria.'
+    );
+    chatInput.focus();
+  </script>
+</body>
+</html>

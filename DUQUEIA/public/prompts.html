@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diretrizes e Prompts dos Agentes — Duque IA</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.7);
+      --border-color: rgba(255, 255, 255, 0.06);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.15);
+      --code-bg: #1e293b;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 4rem;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1200px;
+      padding: 3rem 1.5rem 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    main {
+      width: 92%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* Card do Agente */
+    .agent-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .agent-card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 20px 45px -15px var(--accent-glow);
+    }
+
+    .agent-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .agent-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .agent-badge {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-security {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-cognitive {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-validator {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .rules-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .rules-list li {
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+
+    /* Bloco de Código do Prompt */
+    .prompt-block {
+      position: relative;
+      margin-top: 1rem;
+      background: var(--code-bg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .prompt-content {
+      margin: 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--text-primary);
+      border-color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Diretrizes e Prompts de Agentes</h1>
+    <p class="subtitle">Contratos de entrada, saída, diretrizes operacionais e prompts de sistema do pipeline cognitivo Duque IA.</p>
+  </header>
+
+  <main>
+
+    <!-- AGENTE 1: TRIAGEM SEMÂNTICA (triage.py) -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-name">🛡️ 1. Triagem Semântica & Guardrails LGPD/Competência</div>
+        <span class="agent-badge badge-security">Ingress Guardrail</span>
+      </div>
+      <div>
+        <div class="section-title">Comportamento Real do Sistema</div>
+        <ul class="rules-list">
+          <li><strong>LGPD / Privacidade:</strong> Bloqueia consultas buscando CPFs, nomes de reclamantes ou andamento de protocolos de terceiros (ex: vizinho).</li>
+          <li><strong>Competência Municipal:</strong> Rejeita perguntas sobre assuntos de âmbito estadual, federal ou de outros municípios (ex: metrô, previdência federal, rodovias federais).</li>
+          <li><strong>Redirecionamento Ouvidoria (Fallback):</strong> Substitui mensagens genéricas de falha de busca por redirecionamento direto para a Ouvidoria Geral de Duque de Caxias: Telefone 162 ou WhatsApp (21) 99824-5903.</li>
+        </ul>
+        <div class="section-title">Contrato de Saída (JSON de Bloqueio/Resposta Rápida)</div>
+        <div class="prompt-block">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copiar</button>
+          <pre class="prompt-content">{
+  "intent": "LGPD" | "FORA_COMPETENCIA" | "RECLAMACAO_OUVIDORIA" | "AMBIGUO_LUZ" | "RAG_GERAL",
+  "confidence": 1.0,
+  "needs_clarification": true | false
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTE 2: QUERY ANALYZER (main.py) -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-name">🧭 2. Query Analyzer (Roteador de Intenções)</div>
+        <span class="agent-badge badge-cognitive">Roteamento</span>
+      </div>
+      <div>
+        <div class="section-title">Regras e Comportamento</div>
+        <ul class="rules-list">
+          <li>Classifica a query em: `gis` (territorial/geográfico), `institutional` (procedimentos/Carta de Serviços) ou `general` (história/perguntas abertas).</li>
+          <li>Possui mapeamento especial para intenções de listagem global de secretarias, serviços ou cursos (RAG LIST).</li>
+        </ul>
+        <div class="section-title">Instruções de Fallback do Classificador</div>
+        <div class="prompt-block">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copiar</button>
+          <pre class="prompt-content">Analise a pergunta do munícipe de Duque de Caxias e classifique em UMA das categorias:
+- gis (localizações, ruas, limites, mapas, onde fica)
+- institutional (procedimentos, secretarias, IPTU, alvarás, como solicitar)
+- general (explicações gerais, história, perguntas abertas)
+
+Responda APENAS em JSON: {"intent": "gis"|"institutional"|"general", "confidence": 0.0-1.0, "reason": "..."}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTE 3: HYBRID RETRIEVAL (main.py) -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-name">🧠 3. Hybrid Retrieval Engine (SQL + RAG)</div>
+        <span class="agent-badge badge-cognitive">Recuperação</span>
+      </div>
+      <div>
+        <div class="section-title">Regras e Comportamento</div>
+        <ul class="rules-list">
+          <li><strong>SQL Relacional (vw_ia_servicos)</strong>: Caso a query peça termos de serviços (contato, passo a passo, prazos, documentos, etc.), consulta a view relacional trazendo dados oficiais e higienizados.</li>
+          <li><strong>RAG Clássico (duque_ia_chunks)</strong>: Utiliza embeddings (Gemini de 768 dimensões) + overlap de keywords com pesos categorizados (KEYWORD_POLICY).</li>
+          <li>Reranking híbrido ponderado: `similarity = 0.70 * semantic_score + 0.30 * keyword_overlap`.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- AGENTE 4: LLM GENERATOR (main.py) -->
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-name">💬 4. LLM Response Generator (Redator Final)</div>
+        <span class="agent-badge badge-validator">Geração</span>
+      </div>
+      <div>
+        <div class="section-title">Regras e Comportamento</div>
+        <ul class="rules-list">
+          <li><strong>Formatação POP:</strong> Evita saudações redundantes ("Olá! Que bom ter você aqui..."). Formata respostas com dados factuais úteis em **negrito** (endereços, prazos e contatos). Orienta o munícipe a preencher dados essenciais (CPF, endereço completo do fato, fotos, pontos de referência) antes de registrar manifestações.</li>
+          <li><strong>Combate à Alucinação:</strong> Se o contexto recuperado for vazio ou nulo, é obrigado a retornar a mensagem de fallback da Ouvidoria.</li>
+        </ul>
+        <div class="section-title">Prompt de Sistema do Redator</div>
+        <div class="prompt-block">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copiar</button>
+          <pre class="prompt-content">Você é o Duque IA, assistente virtual oficial da Prefeitura de Duque de Caxias - RJ.
+Sua missão é responder com máxima precisão, clareza e empatia institucional.
+Use formatação Markdown rica: negrito, tabelas legíveis e listas limpas.
+
+NUNCA revele dados pessoais como CPF, RG, nomes de reclamantes ou protocolos de terceiros.
+Sempre que a resposta utilizar fontes mistas, inclua no rodapé o Rastro de Evidência (XAI):
+- Fonte SQL: [tabela/view]
+- Fonte RAG: [documento/lei]
+
+Se os dados fornecidos estiverem vazios, responda exatamente com a frase padrão de direcionamento da Ouvidoria.</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function copyPrompt(button) {
+      const code = button.nextElementSibling.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        button.innerText = 'Copiado!';
+        setTimeout(() => {
+          button.innerText = 'Copiar';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>

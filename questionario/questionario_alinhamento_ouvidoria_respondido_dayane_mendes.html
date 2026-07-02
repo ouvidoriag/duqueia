@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duque IA - Questionário de Alinhamento da Ouvidoria</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Outfit:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: rgba(255, 255, 255, 0.95);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.15);
+            --accent: #059669;
+            --accent-glow: rgba(5, 150, 105, 0.15);
+            --warning: #d97706;
+            --danger: #dc2626;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(5, 150, 105, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding: 40px 20px;
+        }
+
+        .wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header block */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            letter-spacing: 1.5px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #0f172a 60%, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Name Identification Card */
+        .name-card {
+            background: linear-gradient(135deg, #ffffff, rgba(37, 99, 235, 0.02));
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .name-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .name-input {
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .name-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* Question Cards */
+        .category-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 40px 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+        }
+
+        .q-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.01);
+        }
+
+        .q-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(37, 99, 235, 0.2);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+            background: var(--bg-card-hover);
+        }
+
+        .q-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .q-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .q-subtext {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        /* Inputs & Options styles */
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            background: #ffffff;
+        }
+
+        select {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 14px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+        }
+
+        .option-box:hover {
+            background: #f8fafc;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .option-box input[type="checkbox"], .option-box input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .option-label {
+            font-size: 14px;
+            color: #334155;
+            user-select: none;
+        }
+
+        /* Yes/No & True/False custom toggle */
+        .toggle-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+            text-align: center;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+        }
+
+        .toggle-btn:hover {
+            background: #f8fafc;
+        }
+
+        .toggle-btn.active-yes {
+            background: rgba(5, 150, 105, 0.08);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .toggle-btn.active-no {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: var(--danger);
+            color: var(--danger);
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.15);
+        }
+
+        /* Ligar Linhas (Matching) style with 3 Colors */
+        .matching-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 16px;
+            position: relative;
+        }
+
+        .matching-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .matching-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+            position: relative;
+        }
+
+        .matching-item:hover {
+            background: #f8fafc;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .matching-item.selected {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.05);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* 3 Different connection colors */
+        .matching-item.linked-color-1 {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+
+        .matching-item.linked-color-2 {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            color: #047857;
+            font-weight: 500;
+        }
+
+        .matching-item.linked-color-3 {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.08);
+            color: #6d28d9;
+            font-weight: 500;
+        }
+
+        .match-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .badge-color-1 { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
+        .badge-color-2 { background: rgba(16, 185, 129, 0.15); color: #059669; }
+        .badge-color-3 { background: rgba(139, 92, 246, 0.15); color: #7c3aed; }
+
+        /* Section "5 Perguntas" */
+        .perguntas-ia-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .pergunta-ia-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .pergunta-ia-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            width: 24px;
+        }
+
+        .pergunta-ia-input {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            transition: all 0.3s;
+        }
+
+        .pergunta-ia-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        /* 3 categories of questions style */
+        .category-questions-block {
+            margin-top: 16px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .category-questions-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .category-questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Humanization Highlight styling */
+        .humanized-name {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Footer / Submit Block */
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding-bottom: 40px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 36px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffffff;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 14px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            z-index: 1000;
+            display: none;
+            font-weight: 600;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Premium Validation Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-container {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--warning);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            font-size: 14.5px;
+            color: var(--text-main);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .unanswered-list {
+            text-align: left;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 180px;
+            overflow-y: auto;
+            font-size: 13px;
+            color: #475569;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .unanswered-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .unanswered-item svg {
+            color: var(--warning);
+            flex-shrink: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+        .btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--primary-glow); }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <header>
+        <span class="header-badge">Alinhamento Estratégico</span>
+        <h1 id="main-header-title">Olá, <span class="humanized-name">DAYANE MENDES</span>! Vamos alinhar o Duque IA?</h1>
+        <p class="subtitle" id="main-header-subtitle">Este questionário servirá de alicerce para blindar a inteligência do Duque IA, com base na sua visão especializada, <span class="humanized-name">DAYANE MENDES</span>.</p>
+    </header>
+
+    <!-- Name Card Identification -->
+    <div class="name-card">
+        <div class="name-card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Identificação do Respondente
+        </div>
+        <input type="text" class="name-input" id="userNameInput" placeholder="Digite seu nome para personalizar o questionário..." oninput="handleNameInput(this.value)" value="DAYANE MENDES">
+    </div>
+
+    <form id="questionario-form">
+
+        <!-- 1. OBJETIVOS E RESULTADOS -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            1. Objetivos e Resultados
+        </div>
+
+        <!-- Q1 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 1 (Enquete)</span>
+            <div class="q-text" id="q1-label"><span class="humanized-name">DAYANE MENDES</span>, na sua opinião, qual é o principal problema que a IA deve resolver para a Ouvidoria?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q1_options" value="Excesso de atendimentos" id="q1_o1" checked="checked">
+                    <span class="option-label">Excesso de atendimentos manuais</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_options" value="Dúvidas repetitivas" id="q1_o2" checked="checked">
+                    <span class="option-label">Dúvidas repetitivas de munícipes</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_options" value="Encaminhamentos incorretos" id="q1_o3" checked="checked">
+                    <span class="option-label">Encaminhamentos incorretos de chamados</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_options" value="Falta de informações ao cidadão" id="q1_o4" checked="checked">
+                    <span class="option-label">Falta de informações claras ao cidadão</span>
+                </label>
+            </div>
+            <textarea id="q1_text" placeholder="Adicione comentários ou detalhes adicionais sobre o principal problema aqui..." value=""></textarea>
+        </div>
+
+        <!-- Q2 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 2 (Enquete - 6 Itens)</span>
+            <div class="q-text" id="q2-label">Para você, <span class="humanized-name">DAYANE MENDES</span>, quais indicadores demonstrariam o sucesso da IA após 6 meses?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Redução de atendimentos humanos" id="q2_o1" checked="checked">
+                    <span class="option-label">Redução de atendimentos humanos na triagem</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Redução do tempo médio de atendimento" id="q2_o2">
+                    <span class="option-label">Redução do tempo médio de atendimento (TMA)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Maior satisfação dos cidadãos" id="q2_o3" checked="checked">
+                    <span class="option-label">Maior índice de satisfação dos cidadãos</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Menos erros de encaminhamento" id="q2_o4" checked="checked">
+                    <span class="option-label">Menos erros de encaminhamento de categorias</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Aumento no numero de feedbacks positivos" id="q2_o5">
+                    <span class="option-label">Aumento no número de elogios registrados</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q2_options" value="Reducao de ligacoes telefonicas repetitivas" id="q2_o6" checked="checked">
+                    <span class="option-label">Redução de ligações telefônicas repetitivas</span>
+                </label>
+            </div>
+            <textarea id="q2_text" placeholder="Comentários sobre métricas e indicadores de sucesso..." value=""></textarea>
+        </div>
+
+        <!-- Q1.3 (New Enquete 1) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 1.3 (Enquete Adicional)</span>
+            <div class="q-text" id="q1_3-label">Qual o canal prioritário para a primeira fase de testes do Duque IA?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q1_3_options" value="WhatsApp" id="q1_3_o1" checked="checked">
+                    <span class="option-label">WhatsApp Corporativo / Oficial</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_3_options" value="Portal Web" id="q1_3_o2">
+                    <span class="option-label">Widget de chat no Portal da Prefeitura</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_3_options" value="Telegram" id="q1_3_o3">
+                    <span class="option-label">Telegram Institucional</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_3_options" value="Aplicativo Duque" id="q1_3_o4">
+                    <span class="option-label">Aplicativo Oficial de Duque de Caxias</span>
+                </label>
+            </div>
+            <textarea id="q1_3_text" placeholder="Observações adicionais sobre canais..." value=""></textarea>
+        </div>
+
+        <!-- Q1.4 (New Enquete 2) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 1.4 (Enquete Adicional)</span>
+            <div class="q-text" id="q1_4-label">Qual é a principal preocupação no primeiro mês pós-lançamento da IA?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q1_4_options" value="Erros de resposta" id="q1_4_o1" checked="checked">
+                    <span class="option-label">Erros de resposta / Alucinações</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_4_options" value="Resistencia interna" id="q1_4_o2">
+                    <span class="option-label">Resistência interna dos servidores</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_4_options" value="Sobrecarga de chamados" id="q1_4_o3">
+                    <span class="option-label">Sobrecarga inesperada de chamados no sistema</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_4_options" value="Adesao do publico" id="q1_4_o4">
+                    <span class="option-label">Adesão ou entendimento do munícipe</span>
+                </label>
+            </div>
+            <textarea id="q1_4_text" placeholder="Observações sobre preocupações..." value=""></textarea>
+        </div>
+
+        <!-- Q1.5 (New Enquete 3) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 1.5 (Enquete Adicional)</span>
+            <div class="q-text" id="q1_5-label">Quem será o principal público-alvo prioritário na primeira semana piloto?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q1_5_options" value="Servidores" id="q1_5_o1" checked="checked">
+                    <span class="option-label">Apenas servidores internos da Ouvidoria</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_5_options" value="Grupo selecionado" id="q1_5_o2">
+                    <span class="option-label">Um grupo fechado de cidadãos testers</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_5_options" value="Gestores" id="q1_5_o3">
+                    <span class="option-label">Prefeito, secretários e administradores</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_5_options" value="População aberta" id="q1_5_o4">
+                    <span class="option-label">Toda a população de Duque de Caxias de forma aberta</span>
+                </label>
+            </div>
+            <textarea id="q1_5_text" placeholder="Observações sobre o público piloto..." value=""></textarea>
+        </div>
+
+        <!-- Q1.6 (New Enquete 4) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 1.6 (Enquete Adicional)</span>
+            <div class="q-text" id="q1_6-label">Qual o nível de flexibilidade desejado para as respostas do Duque IA?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q1_6_options" value="Totalmente literal" id="q1_6_o1">
+                    <span class="option-label">100% literal baseada estritamente nos documentos</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_6_options" value="Flexibilidade moderada" id="q1_6_o2" checked="checked">
+                    <span class="option-label">Flexibilidade moderada para síntese e linguagem amigável</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_6_options" value="Indicacao de links" id="q1_6_o3">
+                    <span class="option-label">Apenas indicação direta de links oficiais</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q1_6_options" value="Respostas padronizadas" id="q1_6_o4">
+                    <span class="option-label">Apenas respostas padrão pré-aprovadas pelo setor</span>
+                </label>
+            </div>
+            <textarea id="q1_6_text" placeholder="Comentários sobre autonomia de respostas..." value=""></textarea>
+        </div>
+
+
+        <!-- 2. ESCOPO E LIMITES -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            2. Escopo e Limites
+        </div>
+
+        <!-- Q3 (3 text fields only) -->
+        <div class="q-card" id="qcard-3">
+            <span class="q-num">Pergunta 3 (Estruturada)</span>
+            <div class="q-text" id="q3-label">Ajude-nos a listar, <span class="humanized-name">DAYANE MENDES</span>: quais são as perguntas mais frequentes recebidas hoje?</div>
+            <div class="perguntas-ia-list" style="margin-top: 16px; margin-bottom: 16px;">
+                <input type="text" class="pergunta-ia-input" id="q3_p1" placeholder="Escreva a Pergunta Frequente 1..." value="Como posso solicitar serviço de limpeza urbana, varrição ou retirada de entulho em minha rua?">
+                <input type="text" class="pergunta-ia-input" id="q3_p2" placeholder="Escreva a Pergunta Frequente 2..." value="Como solicitar troca de lâmpada?">
+                <input type="text" class="pergunta-ia-input" id="q3_p3" placeholder="Escreva a Pergunta Frequente 3..." value="Como faço para agendar uma cirurgia pela rede municipal de saúde?">
+            </div>
+            <textarea id="q3_text" placeholder="Comentários adicionais sobre as demandas mais recorrentes da Ouvidoria..." value=""></textarea>
+        </div>
+
+        <!-- Q4 (with Dropdowns) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 4 (Dropdowns e Lista Suspensa)</span>
+            <div class="q-text" id="q4-label">Com base no seu dia a dia, <span class="humanized-name">DAYANE MENDES</span>, em quais horários a demanda é maior?</div>
+            
+            <div class="q-subtext">Selecione o período de pico do dia:</div>
+            <select id="q4_select_period" name="q4_select_period" value="Manhã (08h às 12h)">
+                <option value="">-- Escolha o Período --</option>
+                <option value="Manhã (08h às 12h)" selected="selected">Manhã (08h às 12h)</option>
+                <option value="Tarde (12h às 18h)">Tarde (12h às 18h)</option>
+                <option value="Noite (18h às 22h)">Noite (18h às 22h)</option>
+                <option value="Madrugada (22h às 08h)">Madrugada (22h às 08h)</option>
+                <option value="Todo o expediente">Expediente integral comercial</option>
+            </select>
+
+            <div class="q-subtext">Selecione o dia da semana com maior volume:</div>
+            <select id="q4_select_day" name="q4_select_day" value="Quarta-feira">
+                <option value="">-- Escolha o Dia --</option>
+                <option value="Segunda-feira">Segunda-feira</option>
+                <option value="Terça-feira">Terça-feira</option>
+                <option value="Quarta-feira" selected="selected">Quarta-feira</option>
+                <option value="Quinta-feira">Quinta-feira</option>
+                <option value="Sexta-feira">Sexta-feira</option>
+                <option value="Finais de semana">Sábados e Domingos</option>
+                <option value="Distribuição igual">Igualmente distribuído</option>
+            </select>
+
+            <textarea id="q4_text" placeholder="Descreva observações ou detalhes adicionais sobre o comportamento do fluxo de atendimento..." value=""></textarea>
+        </div>
+
+        <!-- Q5 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 5 (Enquete - 6 Itens)</span>
+            <div class="q-text" id="q5-label">Defina para nós: o que você autoriza expressamente a IA a fazer?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Informar servicos" id="q5_o1" checked="checked">
+                    <span class="option-label">Informar sobre serviços públicos e locais</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Explicar procedimentos" id="q5_o2" checked="checked">
+                    <span class="option-label">Explicar passo-a-passo de procedimentos</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Consultar informacoes publicas" id="q5_o3" checked="checked">
+                    <span class="option-label">Consultar informações de domínio público</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Orientar o cidadao" id="q5_o4" checked="checked">
+                    <span class="option-label">Orientar a registrar solicitações</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Fornecer contatos" id="q5_o5" checked="checked">
+                    <span class="option-label">Fornecer contatos e telefones de Secretarias</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q5_options" value="Realizar triagem preliminar" id="q5_o6" checked="checked">
+                    <span class="option-label">Realizar triagem preliminar de assuntos</span>
+                </label>
+            </div>
+            <textarea id="q5_text" placeholder="Outras atribuições autorizadas..." value=""></textarea>
+        </div>
+
+        <!-- Q6 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 6 (Enquete - 6 Itens)</span>
+            <div class="q-text" id="q6-label">Por outro lado, <span class="humanized-name">DAYANE MENDES</span>, o que a IA NUNCA deve fazer sob hipótese alguma?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Prometer execucao" id="q6_o1" checked="checked">
+                    <span class="option-label">Prometer execução ou prazos de serviços</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Informar prazos nao oficiais" id="q6_o2" checked="checked">
+                    <span class="option-label">Informar prazos não regulamentados</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Emitir pareceres" id="q6_o3" checked="checked">
+                    <span class="option-label">Emitir pareceres jurídicos ou técnicos</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Interpretar leis" id="q6_o4" checked="checked">
+                    <span class="option-label">Interpretar leis sem uma fonte literal</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Solicitar senhas" id="q6_o5" checked="checked">
+                    <span class="option-label">Solicitar senhas de acesso do munícipe</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q6_options" value="Confirmar segredo de justica" id="q6_o6" checked="checked">
+                    <span class="option-label">Expor andamento de processos sob sigilo</span>
+                </label>
+            </div>
+            <textarea id="q6_text" placeholder="Outras restrições fundamentais de proteção..." value=""></textarea>
+        </div>
+
+        <!-- Q7 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 7 (Enquete - 6 Itens)</span>
+            <div class="q-text" id="q7-label">Quais assuntos você considera cruciais direcionar apenas para atendimento humano?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Denuncias graves" id="q7_o1" checked="checked">
+                    <span class="option-label">Denúncias graves de assédio ou corrupção</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Urgencias de saude" id="q7_o2" checked="checked">
+                    <span class="option-label">Casos de urgência ou emergência de saúde</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Menores e vulneraveis" id="q7_o3" checked="checked">
+                    <span class="option-label">Assuntos de vulnerabilidade ou menores</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Reclamacoes de servidores" id="q7_o4" checked="checked">
+                    <span class="option-label">Reclamações formais contra servidores específicos</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Risco iminente" id="q7_o5" checked="checked">
+                    <span class="option-label">Risco iminente de vida ou desabamento</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q7_options" value="Assuntos juridicos complexos" id="q7_o6" checked="checked">
+                    <span class="option-label">Processos judiciais complexos ativos</span>
+                </label>
+            </div>
+            <textarea id="q7_text" placeholder="Escreva comentários ou justifique a triagem humana para estes casos..." value=""></textarea>
+        </div>
+
+        <!-- Q8 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 8 (Marcar com Exemplos)</span>
+            <div class="q-text" id="q8-label">Em quais situações a IA deve declarar para o munícipe que não possui autorização?</div>
+            
+            <div class="q-subtext">Selecione exemplos práticos de desvio de autorização:</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q8_options" value="Dados sensiveis ou CPFs de terceiros" id="q8_o1" checked="checked">
+                    <span class="option-label">Solicitação de dados sensíveis ou CPFs de terceiros (Foco LGPD)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q8_options" value="Opiniao politica ou partidaria" id="q8_o2" checked="checked">
+                    <span class="option-label">Debates políticos, partidários ou fora do escopo institucional</span>
+                </label>
+            </div>
+
+            <textarea id="q8_text" placeholder="Outras situações onde a IA deve declarar ausência de competência..." value=""></textarea>
+        </div>
+
+
+        <!-- 3. QUALIDADE DA INFORMAÇÃO -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            3. Qualidade da Informação
+        </div>
+
+        <!-- Q9 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 9 (Enquete - 6 Exemplos)</span>
+            <div class="q-text" id="q9-label">Quais são as principais fontes de verdade oficial que a IA deve buscar?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Portal da Prefeitura" id="q9_o1" checked="checked">
+                    <span class="option-label">Portal Oficial da Prefeitura</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Sistema de Ouvidoria" id="q9_o2" checked="checked">
+                    <span class="option-label">Base de Conhecimento da Ouvidoria</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Diario Oficial" id="q9_o3" checked="checked">
+                    <span class="option-label">Diário Oficial do Município</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Secretarias" id="q9_o4" checked="checked">
+                    <span class="option-label">Manuais fornecidos pelas Secretarias</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Cartilha de Servicos" id="q9_o5" checked="checked">
+                    <span class="option-label">Cartilha de Serviços ao Cidadão (LAI)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q9_options" value="Banco de Leis Municipais" id="q9_o6" checked="checked">
+                    <span class="option-label">Banco de Leis e Decretos Municipais</span>
+                </label>
+            </div>
+            <textarea id="q9_text" placeholder="Outras fontes de informação consideradas válidas..." value=""></textarea>
+        </div>
+
+        <!-- Q10 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 10 (Marcar Enquete Hierárquica)</span>
+            <div class="q-text" id="q10-label">Havendo conflito de informações, qual hierarquia de fontes você estabelece?</div>
+            
+            <div class="q-subtext">Selecione o modelo hierárquico preferencial:</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="radio" name="q10_hierarchy" value="Base Ouvidoria primeiro" id="q10_o1" checked="checked">
+                    <span class="option-label">A Base de Conhecimento da Ouvidoria prevalece sobre todas.</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q10_hierarchy" value="Portal da Prefeitura primeiro" id="q10_o2">
+                    <span class="option-label">O Portal Oficial da Prefeitura prevalece sobre cartilhas.</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q10_hierarchy" value="Diario Oficial recente" id="q10_o3">
+                    <span class="option-label">O Diário Oficial mais recente anula manuais anteriores.</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q10_hierarchy" value="Secretaria literal primeiro" id="q10_o4">
+                    <span class="option-label">A palavra direta da Secretaria prevalece sobre o Portal.</span>
+                </label>
+            </div>
+
+            <textarea id="q10_text" placeholder="Descreva regras específicas de precedência de informação..." value=""></textarea>
+        </div>
+
+        <!-- Q11 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 11 (Opções Únicas)</span>
+            <div class="q-text" id="q11-label"><span class="humanized-name">DAYANE MENDES</span>, com qual frequência você prefere que a base de dados seja auditada?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="radio" name="q11_radio" value="Diariamente" id="q11_o1">
+                    <span class="option-label">Diariamente</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q11_radio" value="Semanalmente" id="q11_o2" checked="checked">
+                    <span class="option-label">Semanalmente</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q11_radio" value="Mensalmente" id="q11_o3">
+                    <span class="option-label">Mensalmente</span>
+                </label>
+                <label class="option-box">
+                    <input type="radio" name="q11_radio" value="Outro" id="q11_o4">
+                    <span class="option-label">Outro ritmo sob demanda</span>
+                </label>
+            </div>
+            <textarea id="q11_text" placeholder="Comentários sobre governança de conteúdo..." value=""></textarea>
+        </div>
+
+
+        <!-- 4. EXPERIÊNCIA DO CIDADÃO -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            4. Experiência do Cidadão
+        </div>
+
+        <!-- Q12 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 12 (Personalidade do Duque IA)</span>
+            <div class="q-text" id="q12-label">Qual tom de personalidade você prescreve para a IA dialogar com o munícipe?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q12_options" value="Formal" id="q12_o1">
+                    <span class="option-label">Formal (Polido, institucional e sério)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q12_options" value="Semi-formal" id="q12_o2" checked="checked">
+                    <span class="option-label">Semi-formal (Equilibrado e solícito)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q12_options" value="Amigavel" id="q12_o3">
+                    <span class="option-label">Amigável (Acolhedor e humanizado)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q12_options" value="Objetivo" id="q12_o4">
+                    <span class="option-label">Objetivo (Focado em respostas rápidas e curtas)</span>
+                </label>
+            </div>
+            <textarea id="q12_text" placeholder="Observações adicionais sobre o tom de voz do Duque..." value=""></textarea>
+        </div>
+
+        <!-- Q13 (Tirado o "Recomendado") -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 13 (Sim ou Não)</span>
+            <div class="q-text" id="q13-label">Para você, a IA deve se identificar explicitamente como assistente virtual em todas as mensagens?</div>
+            <div class="toggle-group">
+                <div class="toggle-btn active-yes" id="q13_yes" onclick="setToggle('q13', true)">SIM</div>
+                <div class="toggle-btn" id="q13_no" onclick="setToggle('q13', false)">NÃO</div>
+            </div>
+            <input type="hidden" id="q13_val" name="q13_val" value="SIM">
+            <textarea id="q13_text" placeholder="Justificativa ou regra para identificação..." value=""></textarea>
+        </div>
+
+        <!-- Q14 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 14 (Dissertativa)</span>
+            <div class="q-text" id="q14-label">Como a IA deve confessar ao munícipe quando ela não souber uma informação?</div>
+            <textarea id="q14_text" placeholder="Ex: Pedir desculpas e direcionar ao contato telefônico da Ouvidoria..." value="Não foi possível localizar informações oficiais, atualizadas ou suficientes acerca do assunto informado. Assim, a fim de assegurar a transparência e evitar o repasse de informações imprecisas, orienta-se que a verificação seja realizada diretamente junto ao setor responsável, órgão competente para prestar os devidos esclarecimentos e informações atualizadas.
+
+EXEMPLO: Secretaria Municipal de Fazenda:
+ENDEREÇO: Praça Roberto Silveira, 31, 1° Andar - Jardim Vinte e Cinco de Agosto, Duque de Caxias - RJ, 25071-160
+PRESENCIAL: De segunda à sexta-feira, das 08:00 h às 17:00 h">Não foi possível localizar informações oficiais, atualizadas ou suficientes acerca do assunto informado. Assim, a fim de assegurar a transparência e evitar o repasse de informações imprecisas, orienta-se que a verificação seja realizada diretamente junto ao setor responsável, órgão competente para prestar os devidos esclarecimentos e informações atualizadas.
+
+EXEMPLO: Secretaria Municipal de Fazenda:
+ENDEREÇO: Praça Roberto Silveira, 31, 1° Andar - Jardim Vinte e Cinco de Agosto, Duque de Caxias - RJ, 25071-160
+PRESENCIAL: De segunda à sexta-feira, das 08:00 h às 17:00 h</textarea>
+        </div>
+
+        <!-- Q15 -->
+        <div class="q-card" style="">
+            <span class="q-num">Pergunta 15 (Dissertativa)</span>
+            <div class="q-text" id="q15-label">Como seria o modelo de uma resposta excelente na sua visão?</div>
+            <textarea id="q15_text" style="min-height: 120px;" placeholder="Dê um exemplo prático de um atendimento considerado padrão de excelência na ouvidoria de Duque de Caxias..." value=""></textarea>
+        </div>
+
+
+        <!-- 5. TRIAGEM E ENCAMINHAMENTO -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            5. Triagem e Encaminhamento
+        </div>
+
+        <!-- Q16 (Matching with 3 Toggleable Colors) -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 16 (Ligar Linhas - Associação Frequente)</span>
+            <div class="q-text" id="q16-label">Associe os erros mais comuns cometidos pelos cidadãos aos seus impactos diretos:</div>
+            <div class="q-subtext">Instrução: Clique em um erro à esquerda e depois em um impacto à direita para associar. Clique em uma conexão existente para desfazê-la. São 3 conexões com cores distintas!</div>
+            
+            <div class="matching-container">
+                <div class="matching-column" id="match-col-left">
+                    <div class="matching-item linked-color-1" data-id="L1" onclick="selectMatch('L', 'L1')">1. Escolha de categoria errada <span class="match-badge badge-color-1" id="badge-L1">-&gt; B</span></div>
+                    <div class="matching-item linked-color-2" data-id="L2" onclick="selectMatch('L', 'L2')">2. Endereço incompleto/errôneo <span class="match-badge badge-color-2" id="badge-L2">-&gt; C</span></div>
+                    <div class="matching-item linked-color-3" data-id="L3" onclick="selectMatch('L', 'L3')">3. Falta de documentos básicos <span class="match-badge badge-color-3" id="badge-L3">-&gt; A</span></div>
+                </div>
+                <div class="matching-column" id="match-col-right">
+                    <div class="matching-item linked-color-3" data-id="R1" onclick="selectMatch('R', 'R1')">A. Devolução de processos para correção</div>
+                    <div class="matching-item linked-color-1" data-id="R2" onclick="selectMatch('R', 'R2')">B. Desvio de secretaria e atraso na resposta</div>
+                    <div class="matching-item linked-color-2" data-id="R3" onclick="selectMatch('R', 'R3')">C. Equipes de rua não localizam a ocorrência</div>
+                </div>
+            </div>
+            <input type="hidden" id="matching_val" name="matching_val" value="{&quot;L3&quot;:&quot;R1&quot;,&quot;L1&quot;:&quot;R2&quot;,&quot;L2&quot;:&quot;R3&quot;}">
+            <textarea id="q16_text" placeholder="Explique outras falhas de triagem comuns..." value=""></textarea>
+        </div>
+
+        <!-- Q17 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 17 (Dissertativa)</span>
+            <div class="q-text" id="q17-label">Como a IA pode ajudar a corrigir e mitigar esses erros antes do protocolo ser aberto?</div>
+            <textarea id="q17_text" placeholder="Ex: Perguntar se o endereço tem ponto de referência, validar digitação, etc." style="height: 155px;" value="A IA pode alertar o cidadão sobre a necessidade de complementar informações indispensáveis para a correta análise da demanda  antes mesmo da manifestação ser protocolada, tais como: nome completo, telefone para contato, endereço completo, número do imóvel, data do ocorrido, ponto de referência, fotos, documentos comprobatórios e detalhes relevantes da situação relatada. Além disso, o sistema pode orientar o munícipe em tempo real sobre quais informações ainda estão pendentes, aumentando a precisão das manifestações e facilitando o encaminhamento adequado ao setor competente. ">A IA pode alertar o cidadão sobre a necessidade de complementar informações indispensáveis para a correta análise da demanda  antes mesmo da manifestação ser protocolada, tais como: nome completo, telefone para contato, endereço completo, número do imóvel, data do ocorrido, ponto de referência, fotos, documentos comprobatórios e detalhes relevantes da situação relatada. Além disso, o sistema pode orientar o munícipe em tempo real sobre quais informações ainda estão pendentes, aumentando a precisão das manifestações e facilitando o encaminhamento adequado ao setor competente. </textarea>
+        </div>
+
+        <!-- Q18 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 18 (Dissertativa)</span>
+            <div class="q-text" id="q18-label">Quais secretarias ou setores do município mais geram fluxo na Ouvidoria?</div>
+            <textarea id="q18_text" placeholder="Obras, Saúde, Iluminação, Educação, etc." value="Saúde, Obras, Fazenda, Assistência Social e Direitos Humanos, Urbanismo.">Saúde, Obras, Fazenda, Assistência Social e Direitos Humanos, Urbanismo.</textarea>
+        </div>
+
+
+        <!-- 6. GOVERNANÇA E CONFIANÇA -->
+        <div class="category-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            6. Governança e Confiança
+        </div>
+
+        <!-- Q19 -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 19 (Enquete de Riscos)</span>
+            <div class="q-text" id="q19-label">Na sua visão de risco, quais seriam os erros mais graves que a IA cometeria?</div>
+            <div class="options-grid">
+                <label class="option-box">
+                    <input type="checkbox" name="q19_options" value="Informar algo incorreto" id="q19_o1" checked="checked">
+                    <span class="option-label">Informar dados de serviços errados</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q19_options" value="Encaminhar incorretamente" id="q19_o2" checked="checked">
+                    <span class="option-label">Encaminhar cidadão para canal inútil</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q19_options" value="Inventar informacoes" id="q19_o3" checked="checked">
+                    <span class="option-label">Alucinar/inventar informações (Falsa resposta)</span>
+                </label>
+                <label class="option-box">
+                    <input type="checkbox" name="q19_options" value="Equivocos de lei" id="q19_o4" checked="checked">
+                    <span class="option-label">Gerar interpretações jurídicas equivocadas</span>
+                </label>
+            </div>
+            <textarea id="q19_text" placeholder="Qual o seu maior receio no uso público da IA..." value=""></textarea>
+        </div>
+
+        <!-- Q20 (Tirado o "Obrigatório e Incondicional") -->
+        <div class="q-card">
+            <span class="q-num">Pergunta 20 (Verdadeiro ou Falso)</span>
+            <div class="q-text" id="q20-label"><span class="humanized-name">DAYANE MENDES</span>, você concorda que auditoria humana e filtros anti-alucinação são obrigatórios?</div>
+            <div class="toggle-group">
+                <div class="toggle-btn active-yes" id="q20_yes" onclick="setToggle('q20', true)">VERDADEIRO</div>
+                <div class="toggle-btn" id="q20_no" onclick="setToggle('q20', false)">FALSO</div>
+            </div>
+            <input type="hidden" id="q20_val" name="q20_val" value="SIM">
+            <textarea id="q20_text" placeholder="Comentários sobre regras de validação..." value=""></textarea>
+        </div>
+
+        <!-- BONUS -->
+        <div class="q-card" style="border-color: rgba(5, 150, 105, 0.3); background: rgba(5, 150, 105, 0.02);">
+            <span class="q-num" style="color: var(--accent);">PERGUNTA BÔNUS (Estrutural)</span>
+            <div class="q-text" id="qbonus-label">"Se a IA fosse desligada amanhã, de qual atividade você sentiria mais falta, <span class="humanized-name">DAYANE MENDES</span>?"</div>
+            <textarea id="qbonus_text" style="min-height: 120px;" placeholder="Qual funcionalidade da IA gera o real valor indispensável no dia-a-dia de vocês?" value=""></textarea>
+        </div>
+
+        <!-- SEÇÃO EXTRA: 5 PERGUNTAS QUE FARIAM PARA A IA -->
+        <div class="category-title" style="color: var(--warning); border-color: var(--warning);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Seção Especial: 5 Perguntas Reais
+        </div>
+        <div class="q-card">
+            <div class="q-text" id="qextra-label">Por fim, quais 5 perguntas de teste você faria para desafiar a IA hoje?</div>
+            <div class="perguntas-ia-list">
+                <div class="pergunta-ia-item">
+                    <span class="pergunta-ia-num">1.</span>
+                    <input type="text" class="pergunta-ia-input" id="pergunta_ia_1" placeholder="Ex: Como faço para registrar uma reclamação anônima?" value="Como a Administração Pública deve proceder diante de reclamações recorrentes sobre um mesmo problema que permanece sem solução há meses ou anos?">
+                </div>
+                <div class="pergunta-ia-item">
+                    <span class="pergunta-ia-num">2.</span>
+                    <input type="text" class="pergunta-ia-input" id="pergunta_ia_2" placeholder="Ex: Qual o prazo oficial para resposta da Secretaria de Obras?" value="Qual o canal correto para denunciar som alto e perturbação do sossego?">
+                </div>
+                <div class="pergunta-ia-item">
+                    <span class="pergunta-ia-num">3.</span>
+                    <input type="text" class="pergunta-ia-input" id="pergunta_ia_3" placeholder="Digite a pergunta de teste 3..." value="Como acompanhar o andamento de uma manifestação registrada na Ouvidoria?">
+                </div>
+                <div class="pergunta-ia-item">
+                    <span class="pergunta-ia-num">4.</span>
+                    <input type="text" class="pergunta-ia-input" id="pergunta_ia_4" placeholder="Digite a pergunta de teste 4..." value="Como registrar reclamação sobre atendimento em unidade pública?">
+                </div>
+                <div class="pergunta-ia-item">
+                    <span class="pergunta-ia-num">5.</span>
+                    <input type="text" class="pergunta-ia-input" id="pergunta_ia_5" placeholder="Digite a pergunta de teste 5..." value="Qual o procedimento para solicitar vaga em creche municipal?">
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <footer>
+        <button class="submit-btn" type="button" onclick="saveAndDownloadHTML()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Salvar Respostas (Baixar HTML)
+        </button>
+    </footer>
+</div>
+
+<div class="toast" id="toast-success" style="display: block;">Respostas consolidadas! Baixando arquivo HTML preenchido...</div>
+
+<script>
+    // Name handling and dynamic humanization
+    let activeName = "";
+    
+    function handleNameInput(name) {
+        activeName = name.trim();
+        const headerTitle = document.getElementById('main-header-title');
+        const headerSubtitle = document.getElementById('main-header-subtitle');
+        
+        // Define key spots to humanize
+        const q1Label = document.getElementById('q1-label');
+        const q2Label = document.getElementById('q2-label');
+        const q3Label = document.getElementById('q3-label');
+        const q4Label = document.getElementById('q4-label');
+        const q5Label = document.getElementById('q5-label');
+        const q6Label = document.getElementById('q6-label');
+        const q7Label = document.getElementById('q7-label');
+        const q8Label = document.getElementById('q8-label');
+        const q9Label = document.getElementById('q9-label');
+        const q10Label = document.getElementById('q10-label');
+        const q11Label = document.getElementById('q11-label');
+        const q12Label = document.getElementById('q12-label');
+        const q13Label = document.getElementById('q13-label');
+        const q14Label = document.getElementById('q14-label');
+        const q15Label = document.getElementById('q15-label');
+        const q16Label = document.getElementById('q16-label');
+        const q17Label = document.getElementById('q17-label');
+        const q18Label = document.getElementById('q18-label');
+        const q19Label = document.getElementById('q19-label');
+        const q20Label = document.getElementById('q20-label');
+        const qbonusLabel = document.getElementById('qbonus-label');
+        const qextraLabel = document.getElementById('qextra-label');
+
+        if (activeName) {
+            headerTitle.innerHTML = `Olá, <span class="humanized-name">${activeName}</span>! Vamos alinhar o Duque IA?`;
+            headerSubtitle.innerHTML = `Este questionário servirá de alicerce para blindar a inteligência do Duque IA, com base na sua visão especializada, <span class="humanized-name">${activeName}</span>.`;
+            
+            q1Label && (q1Label.innerHTML = `<span class="humanized-name">${activeName}</span>, na sua opinião, qual é o principal problema que a IA deve resolver para a Ouvidoria?`);
+            q2Label && (q2Label.innerHTML = `Para você, <span class="humanized-name">${activeName}</span>, quais indicadores demonstrariam o sucesso da IA após 6 meses?`);
+            q3Label && (q3Label.innerHTML = `Ajude-nos a listar, <span class="humanized-name">${activeName}</span>: quais são as perguntas mais frequentes recebidas hoje?`);
+            q4Label && (q4Label.innerHTML = `Com base no seu dia a dia, <span class="humanized-name">${activeName}</span>, em quais horários a demanda é maior?`);
+            q5Label && (q5Label.innerHTML = `Defina para nós: o que você autoriza expressamente a IA a fazer?`);
+            q6Label && (q6Label.innerHTML = `Por outro lado, <span class="humanized-name">${activeName}</span>, o que a IA NUNCA deve fazer sob hipótese alguma?`);
+            q7Label && (q7Label.innerHTML = `Quais assuntos você considera cruciais direcionar apenas para atendimento humano?`);
+            q8Label && (q8Label.innerHTML = `Em quais situações a IA deve declarar para o munícipe que não possui autorização?`);
+            q9Label && (q9Label.innerHTML = `Quais são as principais fontes de verdade oficial que a IA deve buscar?`);
+            q10Label && (q10Label.innerHTML = `Havendo conflito de informações, qual hierarquia de fontes você estabelece?`);
+            q11Label && (q11Label.innerHTML = `<span class="humanized-name">${activeName}</span>, com qual frequência você prefere que a base de dados seja auditada?`);
+            q12Label && (q12Label.innerHTML = `Qual tom de personalidade você prescreve para a IA dialogar com o munícipe?`);
+            q13Label && (q13Label.innerHTML = `Para você, a IA deve se identificar explicitamente como assistente virtual em todas as mensagens?`);
+            q14Label && (q14Label.innerHTML = `Como a IA deve confessar ao munícipe quando ela não souber uma informação?`);
+            q15Label && (q15Label.innerHTML = `Como seria o modelo de uma resposta excelente na sua visão?`);
+            q16Label && (q16Label.innerHTML = `Associe os erros mais comuns cometidos pelos cidadãos aos seus impactos diretos:`);
+            q17Label && (q17Label.innerHTML = `Como a IA pode ajudar a corrigir e mitigar esses erros antes do protocolo ser aberto?`);
+            q18Label && (q18Label.innerHTML = `Quais secretarias ou setores do município mais geram fluxo na Ouvidoria?`);
+            q19Label && (q19Label.innerHTML = `Na sua visão de risco, quais seriam os erros mais graves que a IA cometeria?`);
+            q20Label && (q20Label.innerHTML = `<span class="humanized-name">${activeName}</span>, você concorda que auditoria humana e filtros anti-alucinação são obrigatórios?`);
+            qbonusLabel && (qbonusLabel.innerHTML = `"Se a IA fosse desligada amanhã, de qual atividade você sentiria mais falta, <span class="humanized-name">${activeName}</span>?"`);
+            qextraLabel && (qextraLabel.innerHTML = `Por fim, quais 5 perguntas de teste você faria para desafiar a IA hoje?`);
+        } else {
+            headerTitle.innerText = "Olá, Ouvidor! Vamos alinhar o Duque IA?";
+            headerSubtitle.innerText = "Este questionário servirá de alicerce para blindar, calibrar e direcionar a inteligência do Duque IA de Duque de Caxias.";
+            
+            q1Label && (q1Label.innerText = "Qual é o principal problema que a IA deve resolver para a Ouvidoria?");
+            q2Label && (q2Label.innerText = "Quais indicadores demonstrariam que a IA está sendo um sucesso após 6 meses?");
+            q3Label && (q3Label.innerText = "Quais são as perguntas mais frequentes recebidas atualmente pela Ouvidoria?");
+            q4Label && (q4Label.innerText = "Em quais horários a demanda da Ouvidoria é maior e a IA poderia gerar mais impacto?");
+            q5Label && (q5Label.innerText = "O que a IA está expressamente AUTORIZADA a fazer?");
+            q6Label && (q6Label.innerText = "O que a IA NUNCA deve fazer (Regras de Segurança)?");
+            q7Label && (q7Label.innerText = "Quais assuntos devem ser OBRIGATORIAMENTE direcionados para atendimento humano imediato?");
+            q8Label && (q8Label.innerText = "Em quais situações a IA deve informar claramente que não possui autorização para responder?");
+            q9Label && (q9Label.innerText = "Quais são as principais fontes oficiais de verdade que a IA deve utilizar?");
+            q10Label && (q10Label.innerText = "Quando houver informações conflitantes entre sistemas ou documentos, qual fonte deve prevalecer?");
+            q11Label && (q11Label.innerText = "Com que frequência as informações utilizadas pela IA precisam ser auditadas e atualizadas?");
+            q12Label && (q12Label.innerText = "Como deve ser o tom e a personalidade da IA no diálogo com o cidadão?");
+            q13Label && (q13Label.innerText = "A IA deve se identificar explicitamente como Inteligência Artificial em todas as mensagens?");
+            q14Label && (q14Label.innerText = "Como a IA deve se comportar e responder ao cidadão quando NÃO souber uma informação?");
+            q15Label && (q15Label.innerText = "O que caracteriza uma resposta excelente para um cidadão? (Descreva um modelo ideal)");
+            q16Label && (q16Label.innerText = "Associe os erros mais comuns cometidos pelos cidadãos ao buscar atendimento aos seus impactos:");
+            q17Label && (q17Label.innerText = "Como a IA pode ajudar a corrigir e prevenir esses erros antes de o cidadão formalizar o protocolo?");
+            q18Label && (q18Label.innerText = "Quais secretarias ou setores municipais recebem o maior volume de demandas da Ouvidoria?");
+            q19Label && (q19Label.innerText = "Quais seriam os erros mais graves que a IA poderia cometer sob a ótica da Ouvidoria?");
+            q20Label && (q20Label.innerText = "A auditoria humana e os filtros de segurança anti-alucinação são obrigatórios antes de liberar qualquer nova base de dados?");
+            qbonusLabel && (qbonusLabel.innerText = `"Se a IA fosse desligada amanhã, qual atividade da Ouvidoria sentiria mais falta dela?"`);
+            qextraLabel && (qextraLabel.innerText = "Quais seriam 5 perguntas de teste reais que vocês fariam para a IA hoje para testar seus limites?");
+        }
+    }
+
+    // Yes/No and True/False selection logic
+    function setToggle(id, val) {
+        const input = document.getElementById(id + '_val');
+        const btnYes = document.getElementById(id + '_yes');
+        const btnNo = document.getElementById(id + '_no');
+        
+        input.value = val ? "SIM" : "NÃO";
+        
+        if (val) {
+            btnYes.classList.add('active-yes');
+            btnNo.classList.remove('active-no');
+        } else {
+            btnNo.classList.add('active-no');
+            btnYes.classList.remove('active-yes');
+        }
+    }
+
+    // Matching Items selector logic with 3 distinct colors and Toggle-off
+    let selectedItem = null;
+    let selectedSide = null;
+    let links = {}; // format: L1: R2
+
+    const matchColors = {
+        'L1': 'linked-color-1',
+        'L2': 'linked-color-2',
+        'L3': 'linked-color-3'
+    };
+
+    const badgeColors = {
+        'L1': 'badge-color-1',
+        'L2': 'badge-color-2',
+        'L3': 'badge-color-3'
+    };
+
+    function selectMatch(side, id) {
+        const itemElement = document.querySelector(`[data-id="${id}"]`);
+
+        // Check if clicked element is already linked - if so, toggle off/undo the link!
+        if (itemElement.classList.contains('linked-color-1') || 
+            itemElement.classList.contains('linked-color-2') || 
+            itemElement.classList.contains('linked-color-3')) {
+            
+            // Find connection
+            let leftId = null;
+            let rightId = null;
+            
+            if (side === 'L') {
+                leftId = id;
+                rightId = links[leftId];
+            } else {
+                rightId = id;
+                // find key by value
+                leftId = Object.keys(links).find(key => links[key] === rightId);
+            }
+
+            if (leftId && rightId) {
+                // Remove link
+                const colorClass = matchColors[leftId];
+                document.querySelector(`[data-id="${leftId}"]`).classList.remove(colorClass);
+                document.querySelector(`[data-id="${rightId}"]`).classList.remove(colorClass);
+                
+                const badge = document.getElementById('badge-' + leftId);
+                badge.innerText = '';
+                badge.className = 'match-badge';
+                
+                delete links[leftId];
+                document.getElementById('matching_val').value = JSON.stringify(links);
+            }
+            return;
+        }
+        
+        if (selectedItem === null) {
+            // first selection
+            selectedItem = id;
+            selectedSide = side;
+            itemElement.classList.add('selected');
+        } else if (selectedSide === side) {
+            // change selection in same side
+            document.querySelector(`[data-id="${selectedItem}"]`).classList.remove('selected');
+            selectedItem = id;
+            itemElement.classList.add('selected');
+        } else {
+            // match made!
+            const leftId = side === 'L' ? id : selectedItem;
+            const rightId = side === 'R' ? id : selectedItem;
+            
+            // clear old selections styling
+            document.querySelector(`[data-id="${selectedItem}"]`).classList.remove('selected');
+            
+            // Save link
+            links[leftId] = rightId;
+            document.getElementById('matching_val').value = JSON.stringify(links);
+
+            // style links with 3 different colors based on left item ID
+            const colorClass = matchColors[leftId];
+            document.querySelector(`[data-id="${leftId}"]`).classList.add(colorClass);
+            document.querySelector(`[data-id="${rightId}"]`).classList.add(colorClass);
+            
+            // Add styled label
+            const labelMap = { 'R1': 'A', 'R2': 'B', 'R3': 'C' };
+            const badge = document.getElementById('badge-' + leftId);
+            badge.innerText = `-> ${labelMap[rightId]}`;
+            badge.className = `match-badge ${badgeColors[leftId]}`;
+
+            // Reset selection state
+            selectedItem = null;
+            selectedSide = null;
+        }
+    }
+
+    // Function to parse search parameters to pre-fill on reload
+    window.addEventListener('load', () => {
+        // Retrieve and pre-populate respondente name
+        const nameInput = document.getElementById('userNameInput');
+        if(nameInput.getAttribute('value')) {
+            nameInput.value = nameInput.getAttribute('value');
+            handleNameInput(nameInput.value);
+        }
+
+        // Find saved attributes or values embedded and render them visually
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(ta => {
+            if(ta.getAttribute('value')) {
+                ta.value = ta.getAttribute('value');
+            }
+        });
+
+        const inputs = document.querySelectorAll('input[type="text"]');
+        inputs.forEach(ip => {
+            if(ip.id !== 'userNameInput' && ip.getAttribute('value')) {
+                ip.value = ip.getAttribute('value');
+            }
+        });
+
+        const selects = document.querySelectorAll('select');
+        selects.forEach(sel => {
+            if(sel.getAttribute('value')) {
+                sel.value = sel.getAttribute('value');
+            }
+        });
+
+        // Prepopulate radio and checkboxes if they were saved in the DOM as checked
+        const checkedBoxes = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        checkedBoxes.forEach(box => {
+            if(box.hasAttribute('checked')) {
+                box.checked = true;
+            }
+        });
+
+        // Pre-fill hidden switches on load
+        ['q13', 'q20'].forEach(id => {
+            const valEl = document.getElementById(id + '_val');
+            if (valEl && valEl.value) {
+                setToggle(id, valEl.value === 'SIM');
+            }
+        });
+
+        // Load links on load if exists
+        const matchVal = document.getElementById('matching_val').value;
+        if(matchVal) {
+            try {
+                links = JSON.parse(matchVal);
+                const labelMap = { 'R1': 'A', 'R2': 'B', 'R3': 'C' };
+                Object.keys(links).forEach(leftId => {
+                    const rightId = links[leftId];
+                    const colorClass = matchColors[leftId];
+                    document.querySelector(`[data-id="${leftId}"]`).classList.add(colorClass);
+                    document.querySelector(`[data-id="${rightId}"]`).classList.add(colorClass);
+                    const badge = document.getElementById('badge-' + leftId);
+                    badge.innerText = `-> ${labelMap[rightId]}`;
+                    badge.className = `match-badge ${badgeColors[leftId]}`;
+                });
+            } catch(e){}
+        }
+    });
+
+    // Check unanswered questions helper
+    function checkUnansweredQuestions() {
+        let unanswered = [];
+
+        // Check name
+        const nameVal = document.getElementById('userNameInput').value.trim();
+        if(!nameVal) unanswered.push({ num: "Identificação", label: "Nome do Respondente", ref: "userNameInput" });
+
+        // Q1
+        const q1Checked = document.querySelectorAll('input[name="q1_options"]:checked');
+        if(q1Checked.length === 0) unanswered.push({ num: "Pergunta 1", label: "Principal problema a resolver", ref: "q1_o1" });
+
+        // Q2
+        const q2Checked = document.querySelectorAll('input[name="q2_options"]:checked');
+        if(q2Checked.length === 0) unanswered.push({ num: "Pergunta 2", label: "Indicadores de sucesso", ref: "q2_o1" });
+
+        // Q1.3
+        const q13Checked = document.querySelectorAll('input[name="q1_3_options"]:checked');
+        if(q13Checked.length === 0) unanswered.push({ num: "Pergunta 1.3", label: "Canal prioritário de testes", ref: "q1_3_o1" });
+
+        // Q1.4
+        const q14Checked = document.querySelectorAll('input[name="q1_4_options"]:checked');
+        if(q14Checked.length === 0) unanswered.push({ num: "Pergunta 1.4", label: "Principal preocupação", ref: "q1_4_o1" });
+
+        // Q1.5
+        const q15Checked = document.querySelectorAll('input[name="q1_5_options"]:checked');
+        if(q15Checked.length === 0) unanswered.push({ num: "Pergunta 1.5", label: "Público-alvo piloto", ref: "q1_5_o1" });
+
+        // Q1.6
+        const q16Checked = document.querySelectorAll('input[name="q1_6_options"]:checked');
+        if(q16Checked.length === 0) unanswered.push({ num: "Pergunta 1.6", label: "Nível de flexibilidade de resposta", ref: "q1_6_o1" });
+
+        // Q3 (the 3 new text fields)
+        const q3p1 = document.getElementById('q3_p1').value.trim();
+        const q3p2 = document.getElementById('q3_p2').value.trim();
+        const q3p3 = document.getElementById('q3_p3').value.trim();
+        if(!q3p1 || !q3p2 || !q3p3) unanswered.push({ num: "Pergunta 3", label: "As 3 perguntas mais frequentes", ref: "q3_p1" });
+
+        // Q4 dropdowns
+        const q4p = document.getElementById('q4_select_period').value;
+        const q4d = document.getElementById('q4_select_day').value;
+        if(!q4p || !q4d) unanswered.push({ num: "Pergunta 4", label: "Período e dia de maior volume", ref: "q4_select_period" });
+
+        // Q5
+        const q5Checked = document.querySelectorAll('input[name="q5_options"]:checked');
+        if(q5Checked.length === 0) unanswered.push({ num: "Pergunta 5", label: "Autorizações da IA", ref: "q5_o1" });
+
+        // Q6
+        const q6Checked = document.querySelectorAll('input[name="q6_options"]:checked');
+        if(q6Checked.length === 0) unanswered.push({ num: "Pergunta 6", label: "O que a IA nunca deve fazer", ref: "q6_o1" });
+
+        // Q7
+        const q7Checked = document.querySelectorAll('input[name="q7_options"]:checked');
+        if(q7Checked.length === 0) unanswered.push({ num: "Pergunta 7", label: "Direcionamento humano", ref: "q7_o1" });
+
+        // Q8
+        const q8Checked = document.querySelectorAll('input[name="q8_options"]:checked');
+        if(q8Checked.length === 0) unanswered.push({ num: "Pergunta 8", label: "Exemplos de não-autorização", ref: "q8_o1" });
+
+        // Q9
+        const q9Checked = document.querySelectorAll('input[name="q9_options"]:checked');
+        if(q9Checked.length === 0) unanswered.push({ num: "Pergunta 9", label: "Fontes oficiais de verdade", ref: "q9_o1" });
+
+        // Q10
+        const q10Checked = document.querySelector('input[name="q10_hierarchy"]:checked');
+        if(!q10Checked) unanswered.push({ num: "Pergunta 10", label: "Hierarquia de fontes", ref: "q10_o1" });
+
+        // Q11
+        const q11Checked = document.querySelector('input[name="q11_radio"]:checked');
+        if(!q11Checked) unanswered.push({ num: "Pergunta 11", label: "Frequência de auditoria", ref: "q11_o1" });
+
+        // Q12
+        const q12Checked = document.querySelectorAll('input[name="q12_options"]:checked');
+        if(q12Checked.length === 0) unanswered.push({ num: "Pergunta 12", label: "Tom de voz da IA", ref: "q12_o1" });
+
+        // Q13 toggle
+        const q13val = document.getElementById('q13_val').value;
+        if(!q13val) unanswered.push({ num: "Pergunta 13", label: "Identificação como IA", ref: "q13_yes" });
+
+        // Q14
+        const q14val = document.getElementById('q14_text').value.trim();
+        if(!q14val) unanswered.push({ num: "Pergunta 14", label: "Comportamento ao não saber", ref: "q14_text" });
+
+        // Q15
+        const q15val = document.getElementById('q15_text').value.trim();
+        if(!q15val) unanswered.push({ num: "Pergunta 15", label: "Resposta excelente", ref: "q15_text" });
+
+        // Q16 matching links
+        if(Object.keys(links).length < 3) unanswered.push({ num: "Pergunta 16", label: "Ligar linhas (Associações)", ref: "badge-L1" });
+
+        // Q17
+        const q17val = document.getElementById('q17_text').value.trim();
+        if(!q17val) unanswered.push({ num: "Pergunta 17", label: "Correção de erros de munícipes", ref: "q17_text" });
+
+        // Q18
+        const q18val = document.getElementById('q18_text').value.trim();
+        if(!q18val) unanswered.push({ num: "Pergunta 18", label: "Secretarias de maior demanda", ref: "q18_text" });
+
+        // Q19
+        const q19Checked = document.querySelectorAll('input[name="q19_options"]:checked');
+        if(q19Checked.length === 0) unanswered.push({ num: "Pergunta 19", label: "Erros mais graves da IA", ref: "q19_o1" });
+
+        // Q20 toggle
+        const q20val = document.getElementById('q20_val').value;
+        if(!q20val) unanswered.push({ num: "Pergunta 20", label: "Obrigatoriedade de auditoria", ref: "q20_yes" });
+
+        // Qbonus
+        const qbonusval = document.getElementById('qbonus_text').value.trim();
+        if(!qbonusval) unanswered.push({ num: "Pergunta Bônus", label: "Atividade indispensável", ref: "qbonus_text" });
+
+        // Qextra 5 inputs
+        let qextraCount = 0;
+        for(let i=1; i<=5; i++) {
+            if(document.getElementById('pergunta_ia_' + i).value.trim()) qextraCount++;
+        }
+        if(qextraCount < 5) unanswered.push({ num: "Seção Especial", label: "As 5 perguntas de teste reais", ref: "pergunta_ia_1" });
+
+        return unanswered;
+    }
+
+    // Modal Control functions
+    let onValidationConfirm = null;
+
+    function showValidationModal(unansweredList, onConfirm) {
+        const overlay = document.getElementById('validation-modal');
+        const listContainer = document.getElementById('modal-unanswered-list');
+        listContainer.innerHTML = '';
+        
+        unansweredList.forEach(item => {
+            listContainer.innerHTML += `
+                <div class="unanswered-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span><strong>${item.num}:</strong> ${item.label}</span>
+                </div>
+            `;
+        });
+
+        onValidationConfirm = onConfirm;
+        overlay.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('validation-modal').style.display = 'none';
+    }
+
+    function confirmModalSave() {
+        closeModal();
+        if(onValidationConfirm) onValidationConfirm();
+    }
+
+    function scrollToFirstUnanswered(refId) {
+        closeModal();
+        const element = document.getElementById(refId);
+        if(element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Add custom dynamic border glow to notify them
+            const cardParent = element.closest('.q-card') || element.closest('.name-card');
+            if(cardParent) {
+                cardParent.style.borderColor = 'var(--warning)';
+                cardParent.style.boxShadow = '0 0 15px rgba(217, 119, 6, 0.2)';
+                setTimeout(() => {
+                    cardParent.style.borderColor = '';
+                    cardParent.style.boxShadow = '';
+                }, 4000);
+            }
+        }
+    }
+
+    // Elegant serialization and self-downloading HTML with custom filename
+    function saveAndDownloadHTML() {
+        const unanswered = checkUnansweredQuestions();
+        
+        if (unanswered.length > 0) {
+            // Trigger confirmation modal
+            showValidationModal(unanswered, proceedWithDownload);
+        } else {
+            proceedWithDownload();
+        }
+    }
+
+    function proceedWithDownload() {
+        // Show Toast
+        const toast = document.getElementById('toast-success');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+
+        // Get actual DOM HTML
+        let currentHTML = document.documentElement.outerHTML;
+        const parser = new DOMParser();
+        let doc = parser.parseFromString(currentHTML, 'text/html');
+
+        // Capture actual state and inject it to the element attributes so it serializes in the download!
+        
+        // 0. Name input
+        const nameVal = document.getElementById('userNameInput').value;
+        const targetNameInput = doc.getElementById('userNameInput');
+        if(targetNameInput) {
+            targetNameInput.setAttribute('value', nameVal);
+        }
+
+        // 1. Textareas
+        doc.querySelectorAll('textarea').forEach(ta => {
+            const originalTa = document.getElementById(ta.id);
+            if(originalTa) {
+                ta.setAttribute('value', originalTa.value);
+                ta.innerHTML = originalTa.value;
+            }
+        });
+
+        // 2. Text inputs
+        doc.querySelectorAll('input[type="text"]').forEach(ip => {
+            if(ip.id !== 'userNameInput') {
+                const originalIp = document.getElementById(ip.id);
+                if(originalIp) {
+                    ip.setAttribute('value', originalIp.value);
+                }
+            }
+        });
+
+        // 3. Dropdowns (Selects)
+        doc.querySelectorAll('select').forEach(sel => {
+            const originalSel = document.getElementById(sel.id);
+            if(originalSel) {
+                sel.setAttribute('value', originalSel.value);
+                // Hardcode active option selected state in the DOM output
+                Array.from(sel.options).forEach(opt => {
+                    if(opt.value === originalSel.value) {
+                        opt.setAttribute('selected', 'selected');
+                    } else {
+                        opt.removeAttribute('selected');
+                    }
+                });
+            }
+        });
+
+        // 4. Hidden input states
+        ['q13_val', 'q20_val', 'matching_val'].forEach(id => {
+            const orig = document.getElementById(id);
+            const target = doc.getElementById(id);
+            if(orig && target) {
+                target.setAttribute('value', orig.value);
+            }
+        });
+
+        // 5. Checkboxes and Radios
+        const checkboxes = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        checkboxes.forEach(box => {
+            const targetBox = doc.getElementById(box.id);
+            if(targetBox) {
+                if(box.checked) {
+                    targetBox.setAttribute('checked', 'checked');
+                } else {
+                    targetBox.removeAttribute('checked');
+                }
+            }
+        });
+
+        // Generate dynamic HTML download blob with name customizer
+        const outputHTML = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+        const blob = new Blob([outputHTML], { type: "text/html;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        
+        let customFilename = "questionario_alinhamento_ouvidoria_respondido.html";
+        if(nameVal.trim()) {
+            const sanitizedName = nameVal.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+            customFilename = `questionario_alinhamento_ouvidoria_respondido_${sanitizedName}.html`;
+        }
+        
+        link.download = customFilename;
+        link.click();
+    }
+</script>
+
+<!-- Custom Premium Light Validation Modal Markup -->
+<div class="modal-overlay" id="validation-modal" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Respostas Pendentes!
+        </div>
+        <div class="modal-body">
+            Identificamos que algumas perguntas importantes não foram preenchidas por completo. Você pode revisá-las na lista abaixo:
+            <div class="unanswered-list" id="modal-unanswered-list">
+                <div class="unanswered-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span><strong>Pergunta 15:</strong> Resposta excelente</span>
+                </div>
+            
+                <div class="unanswered-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span><strong>Pergunta Bônus:</strong> Atividade indispensável</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" onclick="scrollToFirstUnanswered(onValidationConfirm ? checkUnansweredQuestions()[0].ref : 'userNameInput')">Corrigir Agora</button>
+            <button class="modal-btn btn-confirm" onclick="confirmModalSave()">Salvar Mesmo Assim</button>
+        </div>
+    </div>
+</div>
+
+
+
+</body></html>

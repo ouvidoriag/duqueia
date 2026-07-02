@@ -1,0 +1,1078 @@
+[
+  {
+    "secretaria": "Secretaria de Obras",
+    "branch_ids": [
+      6415,
+      6412,
+      6333,
+      6417,
+      6413,
+      6420,
+      6416,
+      6414,
+      6343
+    ],
+    "servicos": [
+      {
+        "nome": "Remoção de Entulho / Obras",
+        "category_ids": [
+          12820
+        ],
+        "total_solicitacoes": 9697
+      },
+      {
+        "nome": "Capina e Roçagem",
+        "category_ids": [
+          12823
+        ],
+        "total_solicitacoes": 4617
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 4548
+      },
+      {
+        "nome": "Esgoto e Drenagem",
+        "category_ids": [
+          12811
+        ],
+        "total_solicitacoes": 4195
+      },
+      {
+        "nome": "Limpeza Urbana Geral",
+        "category_ids": [
+          12822
+        ],
+        "total_solicitacoes": 3170
+      },
+      {
+        "nome": "Desentupimento (Vacall)",
+        "category_ids": [
+          225675
+        ],
+        "total_solicitacoes": 2916
+      },
+      {
+        "nome": "Limpeza de Logradouro",
+        "category_ids": [
+          12821
+        ],
+        "total_solicitacoes": 1635
+      },
+      {
+        "nome": "Retirada de Entulho",
+        "category_ids": [
+          225678
+        ],
+        "total_solicitacoes": 1415
+      },
+      {
+        "nome": "Manutenção de Esgoto",
+        "category_ids": [
+          12885
+        ],
+        "total_solicitacoes": 1199
+      },
+      {
+        "nome": "Equipe de Obras / Reparos",
+        "category_ids": [
+          225676
+        ],
+        "total_solicitacoes": 1033
+      },
+      {
+        "nome": "Manilha Arriada / Drenagem",
+        "category_ids": [
+          12807
+        ],
+        "total_solicitacoes": 678
+      },
+      {
+        "nome": "Reparo de Ralo e Tampão",
+        "category_ids": [
+          225700
+        ],
+        "total_solicitacoes": 492
+      },
+      {
+        "nome": "Retirada de Lixo",
+        "category_ids": [
+          225680
+        ],
+        "total_solicitacoes": 398
+      },
+      {
+        "nome": "Retirada de Galhos",
+        "category_ids": [
+          225679
+        ],
+        "total_solicitacoes": 391
+      },
+      {
+        "nome": "Colocação de Manilha / Caixa",
+        "category_ids": [
+          225696
+        ],
+        "total_solicitacoes": 197
+      },
+      {
+        "nome": "Limpeza de Rio / Canal",
+        "category_ids": [
+          12809
+        ],
+        "total_solicitacoes": 196
+      },
+      {
+        "nome": "Roçagem (SMMA)",
+        "category_ids": [
+          225677
+        ],
+        "total_solicitacoes": 129
+      },
+      {
+        "nome": "Fiscalização / Passarela",
+        "category_ids": [
+          12814
+        ],
+        "total_solicitacoes": 33
+      },
+      {
+        "nome": "Limpeza Manual de Canal",
+        "category_ids": [
+          225699
+        ],
+        "total_solicitacoes": 28
+      },
+      {
+        "nome": "Reparo em Calçada",
+        "category_ids": [
+          225689
+        ],
+        "total_solicitacoes": 27
+      },
+      {
+        "nome": "Pavimentação / Buracos",
+        "category_ids": [
+          225695
+        ],
+        "total_solicitacoes": 22
+      },
+      {
+        "nome": "Instalação de Braço de Luz",
+        "category_ids": [
+          225698
+        ],
+        "total_solicitacoes": 18
+      },
+      {
+        "nome": "Manutenção de Canteiro",
+        "category_ids": [
+          225697
+        ],
+        "total_solicitacoes": 13
+      },
+      {
+        "nome": "Caça-fio (GPE)",
+        "category_ids": [
+          225690
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Falta de Iluminação",
+        "category_ids": [
+          225672
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Manutenção de Iluminação",
+        "category_ids": [
+          12826
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Troca de Luz",
+        "category_ids": [
+          225669
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Fiscalização de Estacionamento",
+        "category_ids": [
+          12871
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Iluminação Pública (Lâmpada Apagada)",
+        "category_ids": [
+          12870
+        ],
+        "total_solicitacoes": 2
+      },
+      {
+        "nome": "Retirada de Veículo",
+        "category_ids": [
+          225703
+        ],
+        "total_solicitacoes": 2
+      },
+      {
+        "nome": "Sinalização Semafórica",
+        "category_ids": [
+          12840
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Poste Pegando Fogo",
+        "category_ids": [
+          225670
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Sinalização Viária",
+        "category_ids": [
+          12834
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Colocação de Luz",
+        "category_ids": [
+          225673
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Ouvidoria Geral / Teste",
+        "category_ids": [
+          12835
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Manutenção de Poste",
+        "category_ids": [
+          12825
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Secretaria de Transportes",
+    "branch_ids": [
+      6347
+    ],
+    "servicos": [
+      {
+        "nome": "Iluminação Pública (Lâmpada Apagada)",
+        "category_ids": [
+          12870
+        ],
+        "total_solicitacoes": 2324
+      },
+      {
+        "nome": "Manutenção de Iluminação",
+        "category_ids": [
+          12826
+        ],
+        "total_solicitacoes": 906
+      },
+      {
+        "nome": "Iluminação (Lâmpada Acesa Dia)",
+        "category_ids": [
+          12817
+        ],
+        "total_solicitacoes": 211
+      },
+      {
+        "nome": "Iluminação (Lâmpada Piscando)",
+        "category_ids": [
+          12818
+        ],
+        "total_solicitacoes": 163
+      },
+      {
+        "nome": "Iluminação de Praças",
+        "category_ids": [
+          12831
+        ],
+        "total_solicitacoes": 104
+      },
+      {
+        "nome": "Manutenção de Poste",
+        "category_ids": [
+          12825
+        ],
+        "total_solicitacoes": 72
+      },
+      {
+        "nome": "Fiação Elétrica / Risco",
+        "category_ids": [
+          12824
+        ],
+        "total_solicitacoes": 49
+      },
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [
+          12831
+        ],
+        "total_solicitacoes": 39
+      },
+      {
+        "nome": "Colocação de Luz",
+        "category_ids": [
+          225673
+        ],
+        "total_solicitacoes": 6
+      },
+      {
+        "nome": "Instalação de Braço de Luz",
+        "category_ids": [
+          225698
+        ],
+        "total_solicitacoes": 5
+      },
+      {
+        "nome": "Caça-fio (GPE)",
+        "category_ids": [
+          225690
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Manutenção de Esgoto",
+        "category_ids": [
+          12885
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Falta de Iluminação",
+        "category_ids": [
+          225672
+        ],
+        "total_solicitacoes": 2
+      }
+    ]
+  },
+  {
+    "secretaria": "Sem Secretaria",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Iluminação Pública (Lâmpada Apagada)",
+        "category_ids": [
+          12870
+        ],
+        "total_solicitacoes": 339
+      },
+      {
+        "nome": "Manutenção de Iluminação",
+        "category_ids": [
+          12826
+        ],
+        "total_solicitacoes": 246
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 171
+      },
+      {
+        "nome": "Fiscalização / Passarela",
+        "category_ids": [
+          12814
+        ],
+        "total_solicitacoes": 118
+      },
+      {
+        "nome": "Fiscalização de Estacionamento",
+        "category_ids": [
+          12871
+        ],
+        "total_solicitacoes": 117
+      },
+      {
+        "nome": "Esgoto e Drenagem",
+        "category_ids": [
+          12811
+        ],
+        "total_solicitacoes": 50
+      },
+      {
+        "nome": "Sinalização Viária",
+        "category_ids": [
+          12834
+        ],
+        "total_solicitacoes": 44
+      },
+      {
+        "nome": "Limpeza Urbana Geral",
+        "category_ids": [
+          12822
+        ],
+        "total_solicitacoes": 32
+      },
+      {
+        "nome": "Ouvidoria Geral / Teste",
+        "category_ids": [
+          12835
+        ],
+        "total_solicitacoes": 27
+      },
+      {
+        "nome": "Fiação Elétrica / Risco",
+        "category_ids": [
+          12824
+        ],
+        "total_solicitacoes": 23
+      },
+      {
+        "nome": "Iluminação (Lâmpada Piscando)",
+        "category_ids": [
+          12818
+        ],
+        "total_solicitacoes": 22
+      },
+      {
+        "nome": "Segurança / Guarda Municipal",
+        "category_ids": [
+          12836
+        ],
+        "total_solicitacoes": 21
+      },
+      {
+        "nome": "Remoção de Entulho / Obras",
+        "category_ids": [
+          12820
+        ],
+        "total_solicitacoes": 20
+      },
+      {
+        "nome": "Iluminação de Praças",
+        "category_ids": [
+          12831
+        ],
+        "total_solicitacoes": 18
+      },
+      {
+        "nome": "Manutenção de Esgoto",
+        "category_ids": [
+          12885
+        ],
+        "total_solicitacoes": 17
+      },
+      {
+        "nome": "Manilha Arriada / Drenagem",
+        "category_ids": [
+          12807
+        ],
+        "total_solicitacoes": 13
+      },
+      {
+        "nome": "Manutenção de Poste",
+        "category_ids": [
+          12825
+        ],
+        "total_solicitacoes": 10
+      },
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [
+          12831
+        ],
+        "total_solicitacoes": 8
+      },
+      {
+        "nome": "Reparo em Calçada",
+        "category_ids": [
+          225689
+        ],
+        "total_solicitacoes": 7
+      },
+      {
+        "nome": "Capina e Roçagem",
+        "category_ids": [
+          12823
+        ],
+        "total_solicitacoes": 6
+      },
+      {
+        "nome": "Iluminação (Lâmpada Acesa Dia)",
+        "category_ids": [
+          12817
+        ],
+        "total_solicitacoes": 6
+      },
+      {
+        "nome": "Desentupimento (Vacall)",
+        "category_ids": [
+          225675
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Limpeza de Logradouro",
+        "category_ids": [
+          12821
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Limpeza de Rio / Canal",
+        "category_ids": [
+          12809
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Reparo de Ralo e Tampão",
+        "category_ids": [
+          225700
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Instalação de Braço de Luz",
+        "category_ids": [
+          225698
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Equipe de Obras / Reparos",
+        "category_ids": [
+          225676
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Retirada de Semáforo",
+        "category_ids": [
+          12837
+        ],
+        "total_solicitacoes": 2
+      },
+      {
+        "nome": "Sinalização Semafórica",
+        "category_ids": [
+          12840
+        ],
+        "total_solicitacoes": 2
+      },
+      {
+        "nome": "Colocação de Placa",
+        "category_ids": [
+          225681
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Semáforo Defeituoso (Vermelho)",
+        "category_ids": [
+          12838
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Limpeza Manual de Canal",
+        "category_ids": [
+          225699
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Retirada de Fiação Solta",
+        "category_ids": [
+          225667
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Colocação de Manilha / Caixa",
+        "category_ids": [
+          225696
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Retirada de Galhos",
+        "category_ids": [
+          225679
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Troca de Luz",
+        "category_ids": [
+          225669
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Roçagem (SMMA)",
+        "category_ids": [
+          225677
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Pavimentação / Buracos",
+        "category_ids": [
+          225695
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Retirada de Entulho",
+        "category_ids": [
+          225678
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "2ª Residência de Obras A ",
+    "branch_ids": [
+      6414
+    ],
+    "servicos": [
+      {
+        "nome": "Esgoto e Drenagem",
+        "category_ids": [
+          12811
+        ],
+        "total_solicitacoes": 301
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 210
+      },
+      {
+        "nome": "Manutenção de Esgoto",
+        "category_ids": [
+          12885
+        ],
+        "total_solicitacoes": 87
+      },
+      {
+        "nome": "Manilha Arriada / Drenagem",
+        "category_ids": [
+          12807
+        ],
+        "total_solicitacoes": 28
+      },
+      {
+        "nome": "Limpeza de Rio / Canal",
+        "category_ids": [
+          12809
+        ],
+        "total_solicitacoes": 9
+      },
+      {
+        "nome": "Colocação de Manilha / Caixa",
+        "category_ids": [
+          225696
+        ],
+        "total_solicitacoes": 2
+      },
+      {
+        "nome": "Desentupimento (Vacall)",
+        "category_ids": [
+          225675
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Reparo de Ralo e Tampão",
+        "category_ids": [
+          225700
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Secretaria de Segurança",
+    "branch_ids": [
+      6447,
+      6448
+    ],
+    "servicos": [
+      {
+        "nome": "Fiscalização de Estacionamento",
+        "category_ids": [
+          12871
+        ],
+        "total_solicitacoes": 211
+      },
+      {
+        "nome": "Ouvidoria Geral / Teste",
+        "category_ids": [
+          12835
+        ],
+        "total_solicitacoes": 16
+      },
+      {
+        "nome": "Sinalização Viária",
+        "category_ids": [
+          12834
+        ],
+        "total_solicitacoes": 12
+      },
+      {
+        "nome": "Retirada de Veículo",
+        "category_ids": [
+          225703
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 4
+      },
+      {
+        "nome": "Segurança / Guarda Municipal",
+        "category_ids": [
+          12836
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Sinalização (Semáforo Piscando)",
+        "category_ids": [
+          12839
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Reparo em Calçada",
+        "category_ids": [
+          225689
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Sinalização Semafórica",
+        "category_ids": [
+          12840
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Fiscalização / Passarela",
+        "category_ids": [
+          12814
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Secretaria de Urbanismo",
+    "branch_ids": [
+      6342,
+      6346,
+      6411
+    ],
+    "servicos": [
+      {
+        "nome": "Fiscalização / Passarela",
+        "category_ids": [
+          12814
+        ],
+        "total_solicitacoes": 156
+      },
+      {
+        "nome": "Reparo em Calçada",
+        "category_ids": [
+          225689
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Capina e Roçagem",
+        "category_ids": [
+          12823
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Esgoto e Drenagem",
+        "category_ids": [
+          12811
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Outros",
+    "branch_ids": [
+      6449,
+      6305,
+      6264
+    ],
+    "servicos": [
+      {
+        "nome": "Sinalização Viária",
+        "category_ids": [
+          12834
+        ],
+        "total_solicitacoes": 12
+      },
+      {
+        "nome": "Ouvidoria Geral / Teste",
+        "category_ids": [
+          12835
+        ],
+        "total_solicitacoes": 11
+      },
+      {
+        "nome": "Segurança / Guarda Municipal",
+        "category_ids": [
+          12836
+        ],
+        "total_solicitacoes": 8
+      },
+      {
+        "nome": "Sinalização (Semáforo Piscando)",
+        "category_ids": [
+          12839
+        ],
+        "total_solicitacoes": 5
+      },
+      {
+        "nome": "Sinalização Semafórica",
+        "category_ids": [
+          12840
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Fiscalização de Estacionamento",
+        "category_ids": [
+          12871
+        ],
+        "total_solicitacoes": 3
+      },
+      {
+        "nome": "Capina e Roçagem",
+        "category_ids": [
+          12823
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Retirada de Semáforo",
+        "category_ids": [
+          12837
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Limpeza de Logradouro",
+        "category_ids": [
+          12821
+        ],
+        "total_solicitacoes": 1
+      },
+      {
+        "nome": "Semáforo Defeituoso (Vermelho)",
+        "category_ids": [
+          12838
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Gabinete do Subsecretário",
+    "branch_ids": [
+      6344
+    ],
+    "servicos": [
+      {
+        "nome": "Fiscalização / Passarela",
+        "category_ids": [
+          12814
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE MEIO AMBIENTE",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DA ASSISTÊNCIA SOCIAL",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Ouvidoria Setorial de Segurança Pública",
+    "branch_ids": [
+      6697
+    ],
+    "servicos": [
+      {
+        "nome": "Reparo de Asfalto / Pavimentação",
+        "category_ids": [
+          12808
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DA FAZENDA",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "Colab",
+    "branch_ids": [
+      5184
+    ],
+    "servicos": [
+      {
+        "nome": "Esgoto e Drenagem",
+        "category_ids": [
+          12811
+        ],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE PROTEÇÃO ANIMAL",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA GERAL",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE EDUCAÇÃO",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE URBANISMO",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE OBRAS",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DE SEGURANÇA PÚBLICA",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  },
+  {
+    "secretaria": "OUVIDORIA SETORIAL DA SAÚDE",
+    "branch_ids": [],
+    "servicos": [
+      {
+        "nome": "Outros / Zeladoria",
+        "category_ids": [],
+        "total_solicitacoes": 1
+      }
+    ]
+  }
+]

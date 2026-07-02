@@ -1,0 +1,3 @@
+# Adicione uma URL por linha. Linhas começando com '#' são ignoradas.
+https://duquedecaxias.rj.gov.br/
+https://duquedecaxias.rj.gov.br/noticia/prefeitura-de-duque-de-caxias-inaugura-nova-unidade-de-saude/4312

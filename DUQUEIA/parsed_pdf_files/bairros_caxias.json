@@ -1,0 +1,14 @@
+{
+  "source": "bairros_caxias.csv",
+  "title": "Tabela de Dados: bairros_caxias",
+  "content": "Dados estruturados da tabela bairros_caxias:\n- bairro: Jardim Primavera | populacao_estimada: 45000 | zona: 2º Distrito\n- bairro: Xerém | populacao_estimada: 32000 | zona: 4º Distrito\n- bairro: Imbarié | populacao_estimada: 50000 | zona: 3º Distrito\n- bairro: Centro | populacao_estimada: 28000 | zona: 1º Distrito\n",
+  "metadata": {
+    "category": "csv_data",
+    "rows_count": 4,
+    "columns": [
+      "bairro",
+      "populacao_estimada",
+      "zona"
+    ]
+  }
+}

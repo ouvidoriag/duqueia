@@ -1,0 +1,43 @@
+# Configuração de Geração de Embeddings e Chunking para o DUQUE IA
+
+# Configurações globais do modelo de embedding
+embedding_model: "text-embedding-3-small"
+dimensions: 1536
+
+# Estratégias de Chunking disponíveis para Benchmark
+strategies:
+  # Estratégia Clássica de Caracteres Recursivos (500/100)
+  - name: "recursive_500_100"
+    type: "recursive"
+    chunk_size: 500
+    chunk_overlap: 100
+
+  # Estratégia de Caracteres Recursivos menores (256/64)
+  - name: "recursive_256_64"
+    type: "recursive"
+    chunk_size: 256
+    chunk_overlap: 64
+
+  # Estratégia baseada em limite de Tokens
+  - name: "token_256_64"
+    type: "token"
+    chunk_size: 256
+    chunk_overlap: 64
+
+  # Estratégia Semântica baseada na variação de similaridade entre frases vizinhas
+  - name: "semantic_strategy"
+    type: "semantic"
+    buffer_size: 1
+    breakpoint_percentile_threshold: 95
+
+  # Estratégia focada no DUQUE IA (GIS): 1 entidade geográfica = 1 chunk
+  # Entidades: Municipio, Bairro, Setor, Quadra, Lote, Logradouro
+  - name: "entity_geo_strategy"
+    type: "geographical"
+    target_entities:
+      - "municipio"
+      - "bairro"
+      - "setor"
+      - "quadra"
+      - "lote"
+      - "logradouro"

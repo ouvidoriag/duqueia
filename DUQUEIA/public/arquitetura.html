@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Especificação Técnica da Arquitetura — Duque IA</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-color: #0f172a;
+      --secondary-color: #475569;
+      --accent-color: #3b82f6;
+      --accent-light: #eff6ff;
+      --border-color: #cbd5e1;
+      --bg-box: #f8fafc;
+      --text-color: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-color);
+      background-color: #f1f5f9;
+      line-height: 1.5;
+    }
+
+    /* Simulação de Folha A4 para cada página independente */
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      padding: 15mm 15mm;
+      margin: 30px auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cabeçalho do Documento (Apenas na Capa) */
+    .doc-header {
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .doc-title-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .doc-title-area span {
+      font-size: 0.85rem;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--secondary-color);
+    }
+
+    /* Títulos e Seções */
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.3rem;
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+    }
+
+    p {
+      margin: 0 0 0.6rem;
+      font-size: 0.85rem;
+      text-align: justify;
+    }
+
+    /* Grid de Pilares V2 */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin: 0.6rem 0;
+    }
+
+    /* Caixinhas Explicativas Premium */
+    .info-box {
+      background-color: var(--bg-box);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 4px;
+      padding: 0.7rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .info-box-title {
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.2rem;
+    }
+
+    /* Diagrama */
+    .diagram-container {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-grow: 1;
+    }
+
+    .mermaid {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Listas Customizadas */
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: 0.8rem;
+    }
+
+    li {
+      margin-bottom: 0.2rem;
+    }
+
+    /* Regras de Impressão Estritas */
+    @page {
+      size: A4;
+      margin: 0; /* Remove cabeçalhos e rodapés padrão do Chrome */
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000;
+        margin: 0;
+        padding: 0;
+      }
+      .a4-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 15mm 15mm !important; /* Margem da página impressa controlada via CSS */
+        border: none !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        overflow: hidden !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .diagram-container svg {
+        max-height: 230mm !important;
+        width: auto !important;
+        margin: 0 auto !important;
+        display: block !important;
+      }
+    }
+  </style>
+  
+  <!-- Load Mermaid CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true
+      }
+    });
+
+    // Função JavaScript para ajustar escalas e disparar a impressão
+    function prepareAndPrint() {
+      const svgs = document.querySelectorAll('.mermaid svg');
+      svgs.forEach(svg => {
+        svg.style.maxHeight = '230mm';
+        svg.style.height = '230mm';
+        svg.style.width = 'auto';
+        svg.style.margin = '0 auto';
+        svg.setAttribute('height', '100%');
+      });
+
+      setTimeout(() => {
+        window.print();
+      }, 150);
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Botão de impressão (visível apenas na tela) -->
+  <div style="text-align: center; margin-top: 20px; margin-bottom: 10px;" class="no-print">
+    <button onclick="prepareAndPrint()" style="padding: 12px 24px; font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; background-color: #3b82f6; color: white; border: none; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4); transition: transform 0.2s;">
+      🖨️ Formatar e Imprimir Documento (A4)
+    </button>
+  </div>
+
+  <!-- PÁGINA 1: INTRODUÇÃO & CONTEXTO -->
+  <div class="a4-page">
+    <header class="doc-header">
+      <div class="doc-title-area">
+        <span>Prefeitura de Duque de Caxias · Ouvidoria Geral</span>
+        <h1>Especificação Arquitetural Duque IA</h1>
+      </div>
+      <div class="doc-meta">
+        <strong>Status:</strong> Aprovado<br>
+        <strong>Data:</strong> 25 de Junho de 2026<br>
+        <strong>Versão:</strong> V3.0.0
+      </div>
+    </header>
+
+    <section>
+      <h2>1. Contexto e Objetivos de Engenharia</h2>
+      <p>
+        Esta especificação detalha os mecanismos de processamento cognitivo, segurança de dados em conformidade com a LGPD e controle de eficiência de infraestrutura de inteligência artificial implementados na gestão pública de Duque de Caxias:
+      </p>
+      
+      <div class="info-box">
+        <div class="info-box-title">🛡️ Segurança de Entrada (Ingress Guardrail)</div>
+        O tráfego de dados sensíveis exige tratamento de segurança preventiva antes que dados confidenciais pudessem chegar aos logs e aos modelos.
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">🔒 Robustez contra Injeção de SQL e Prompts</div>
+        O LLM não é decisor de segurança. Padrões perigosos (DROP TABLE, etc.) e injeções comportamentais são barrados por regex e triagem determinística em milissegundos.
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">🌐 Sistema Híbrido RAG + SQL</div>
+        O agente principal consegue discernir dinamicamente a necessidade de buscar em base estruturada (vw_ia_servicos) ou base textual de chunks vetoriais.
+      </div>
+    </section>
+
+    <section style="margin-top: 0.5rem;">
+      <h2>2. Pilares de Decisão e Estrutura do Sistema</h2>
+      <p>
+        O sistema de atendimento cognitivo está fundamentado em três pilares integrados de conformidade e isolamento de dados:
+      </p>
+
+      <div class="pillars-grid">
+        <div class="info-box" style="border-color: #3b82f6; margin-bottom: 0;">
+          <div class="info-box-title" style="color: #2563eb;">🧠 Agentes (Cognitivos)</div>
+          Componentes que utilizam inferência neural ou decisão semântica:
+          <ul>
+            <li><strong>Query Analyzer</strong>: Roteamento cognitivo.</li>
+            <li><strong>Triagem Semântica</strong>: Tratamento de ambiguidades.</li>
+            <li><strong>LLM Generator</strong>: Humanização e XAI.</li>
+          </ul>
+        </div>
+
+        <div class="info-box" style="border-color: #64748b; margin-bottom: 0;">
+          <div class="info-box-title" style="color: #475569;">⚙️ Serviços (Determinísticos)</div>
+          Módulos puramente imperativos e programáticos:
+          <ul>
+            <li><strong>SQLite / Supabase</strong>: Camada física de dados.</li>
+            <li><strong>Input/Output Guardrail</strong>: Filtros de segurança.</li>
+            <li><strong>Telemetry logger</strong>: Log de performance e latências.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="info-box" style="border-color: #10b981; margin-top: 0.8rem; margin-bottom: 0;">
+        <div class="info-box-title" style="color: #047857;">🧼 Barreiras de Proteção de Dados (LGPD)</div>
+        <ul>
+          <li><strong>Mascara CPF/PII</strong>: Mascara qualquer dado sensível vindo na query antes que a pergunta seja enviada ao modelo.</li>
+          <li><strong>Bloqueio de Terceiros</strong>: O sistema bloqueia buscas relacionadas a CPFs e andamento de protocolos de vizinhos.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- PÁGINA 2: O FLUXOGRAMA DE PROCESSAMENTO (Isolado) -->
+  <div class="a4-page">
+    <section style="display: flex; flex-direction: column; flex-grow: 1; margin: 0;">
+      <h2>3. Fluxo de Dados Unificado e Processamento</h2>
+      <p>O fluxo sequencial abaixo ilustra o processamento completo de uma requisição pelo Duque IA:</p>
+      
+      <div class="diagram-container">
+        <div class="mermaid">
+          graph TD
+            User["Usuário (Entrada / CLI)"] -->|Query| Ingress["1. Input Guardrail & LGPD Filter<br>(Triagem & Regex)"]
+            Ingress -->|Bloqueado| BlockResponse["Resposta Rápida (Segurança/LGPD)"]
+            Ingress -->|Permitido| Analyzer["2. Query Analyzer<br>(Roteamento de Intenção)"]
+            
+            Analyzer -->|Necessita SQL| SQLRetrieve["3. Recuperador SQL<br>(vw_ia_servicos)"]
+            Analyzer -->|Necessita RAG| RAGRetrieve["3. Recuperador Vetorial<br>(duque_ia_chunks)"]
+            
+            SQLRetrieve -->|JSON Factual| PromptBuilder["4. Prompt Context Builder"]
+            RAGRetrieve -->|Texto Chunks| PromptBuilder
+            
+            PromptBuilder --> LLM["5. LLM Generator<br>(Redação Final com XAI)"]
+            LLM --> Output["6. Resposta Formatada (POP)"]
+            BlockResponse --> User
+            Output --> User
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PÁGINA 3: GLOSSÁRIO TÉCNICO -->
+  <div class="a4-page">
+    <section style="margin: 0;">
+      <h2>4. Glossário Técnico e Componentes Implementados</h2>
+
+      <div class="info-box">
+        <div class="info-box-title">Ingress Guardrail (Filtro de Entrada)</div>
+        O processamento intercepta dados sensíveis de CPFs e padrões maliciosos e realiza o bloqueio imediato, retornando uma resposta padrão sem acionar os endpoints de LLM, otimizando custo.
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">Sistema de Métricas e Logs</div>
+        Salva latência média, total de tokens usados, custo do embedding, score de similaridade e tempo de processamento na pasta `logs/` e `metrics/`.
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">XAI (Explainable AI - Rastro de Evidência)</div>
+        Retorna de forma clara em todas as respostas quais foram as tabelas lógicas (SQL) e arquivos de chunks (RAG) utilizados para construir a resposta final, garantindo a auditabilidade do sistema.
+      </div>
+
+      <div class="info-box">
+        <div class="info-box-title">Diretrizes do POP (Procedimento Operacional Padrão)</div>
+        Formata contatos e prazos em **negrito**, retira saudações redundantes na resposta da IA e orienta o morador sobre dados necessários ao registro antes do Colab.
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>

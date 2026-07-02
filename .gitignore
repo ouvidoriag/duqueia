@@ -1,0 +1,36 @@
+# Ignorar ambientes e segredos
+.env
+.env.*
+DUQUEIA/.env
+DUQUEIA/.env.*
+!.env.example
+!DUQUEIA/.env.example
+
+# Dependências
+node_modules/
+DUQUEIA/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+DUQUEIA/package-lock.json
+
+# Python e Builds
+__pycache__/
+*.pyc
+.venv/
+venv/
+DUQUEIA/__pycache__/
+DUQUEIA/scripts/__pycache__/
+
+# Banco de dados e Logs
+*.db
+*.db-journal
+*.db-wal
+agent/duque_ia.db
+DUQUEIA/agent/duque_ia.db
+logs/
+metrics/
+DUQUEIA/logs/
+DUQUEIA/metrics/
+*.log
