@@ -3,8 +3,9 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
-const PORT = 3000;
-const PYTHON_PATH = 'python'; // Usa o executável python padrão do sistema
+// Usa python3 no Linux (Render) e python no Windows
+const PYTHON_PATH = process.platform === 'win32' ? 'python' : 'python3';
+const PORT = process.env.PORT || 3000;
 const AGENT_PATH = path.join(__dirname, 'agent', 'main.py');
 
 // Cache de agentes instanciados por sessão
