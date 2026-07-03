@@ -244,14 +244,14 @@ class CollectorHandler(BaseHandler):
                 "Você é o DUQUE IA, assistente virtual oficial de Duque de Caxias — RJ.\n"
                 "O cidadão deseja abrir uma manifestação (reclamação, denúncia, elogio ou sugestão).\n"
                 "Sua missão é validar o sentimento dele com simpatia e orientá-lo de forma direta (em até 4 frases) "
-                "de como preencher essa solicitação no aplicativo **Colab**.\n\n"
+                "de como preencher essa solicitação no aplicativo **Colab** ou pelo site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/).\n\n"
                 "INSTRUÇÕES DE PREENCHIMENTO:\n"
                 "1. Com base na reclamação/mensagem do munícipe, diga a ele claramente qual **Tema** e **Assunto** selecionar dentro do Colab. Exemplo:\n"
                 "   - Se for buraco de asfalto/drenagem: Tema **Obras**.\n"
                 "   - Se for capina, roçagem, lixo ou entulho: Tema **Limpeza Urbana**.\n"
                 "   - Se for lâmpada apagada no poste: Tema **Transportes, Serviços Públicos e Troca de Lâmpadas**.\n"
                 "2. Informe os canais da Ouvidoria Geral como alternativa: telefone **(21) 2652-3835** e e-mail **ouvidoria@duquedecaxias.rj.gov.br**.\n"
-                "3. Dica rápida: oriente-o a ter em mãos a foto e o endereço correto para o registro no aplicativo Colab.\n"
+                "3. Dica rápida: oriente-o a ter em mãos a foto e o endereço correto para o registro no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)).\n"
                 "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento."
             )
 
@@ -268,7 +268,7 @@ class CollectorHandler(BaseHandler):
                 # Fallback offline em caso de erro da API
                 answer = (
                     f"Entendi perfeitamente o seu problema. Para registrar essa sua **{label}**, o caminho oficial é através da nossa Ouvidoria Geral de Duque de Caxias. "
-                    f"Você pode registrar diretamente pelo aplicativo **Colab**, pelo site da Prefeitura, ligando para **(21) 2652-3835** ou enviando um e-mail para **ouvidoria@duquedecaxias.rj.gov.br**.\n\n"
+                    f"Você pode registrar diretamente pelo aplicativo **Colab**, no site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/), ligando para **(21) 2652-3835** ou enviando um e-mail para **ouvidoria@duquedecaxias.rj.gov.br**.\n\n"
                     f"**Dica de amigo:** Quando for registrar no Colab, lembre-se de colocar o endereço bem certinho, com ponto de referência e, se tiver, anexar fotos ou vídeos do local. Isso agiliza muito o trabalho da secretaria para resolver o problema!"
                 )
         else:
@@ -295,9 +295,9 @@ class CollectorHandler(BaseHandler):
                 f"Para dar andamento à sua **{label}**, você pode registrá-la diretamente nos canais oficiais da nossa **Ouvidoria Geral de Duque de Caxias**:\n\n"
                 f"• Telefone: **(21) 2652-3835**\n"
                 f"• E-mail: **ouvidoria@duquedecaxias.rj.gov.br**\n"
-                f"• Online: aplicativo **Colab** ou site oficial da Prefeitura.\n\n"
+                f"• Online: aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/).\n\n"
                 f"**Dica de amigo para agilizar o seu atendimento:**\n"
-                f"Ao registrar sua manifestação no aplicativo Colab, procure incluir o **endereço completo do fato** (com ponto de referência), uma **descrição bem detalhada** do que está acontecendo e, se possível, anexe **fotos ou vídeos** bem nítidos do local. Isso nos ajuda a encaminhar o problema muito mais rápido para a secretaria responsável!"
+                f"Ao registrar sua manifestação no Colab, procure incluir o **endereço completo do fato** (com ponto de referência), uma **descrição bem detalhada** do que está acontecendo e, se possível, anexe **fotos ou vídeos** bem nítidos do local. Isso nos ajuda a encaminhar o problema muito mais rápido para a secretaria responsável!"
             )
 
         return {
@@ -337,7 +337,7 @@ class AmbiguityHandler(BaseHandler):
                 if has_address:
                     answer = (
                         "Entendi perfeitamente! Como se trata de um problema de **iluminação pública** (lâmpada apagada ou poste quebrado na rua) "
-                        "e o local já foi identificado, você já pode registrar essa solicitação no aplicativo **Colab** ou pelo site da Prefeitura, selecionando o assunto **Iluminação Pública**.\n\n"
+                        "e o local já foi identificado, você já pode registrar essa solicitação pelo aplicativo **Colab** ou pelo site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/), selecionando o assunto **Iluminação Pública**.\n\n"
                         "A solicitação vai direto para a **Subsecretaria de Iluminação Pública** para agendarem o reparo.\n"
                         "**Uma dica:** Se o poste tiver algum número de identificação marcado nele, informe no aplicativo e envie uma foto do local! Isso ajuda bastante a equipe a localizar o poste certo."
                     )
@@ -372,13 +372,13 @@ class AmbiguityHandler(BaseHandler):
                 "Você poderia me esclarecer se a sua dúvida é sobre **falta de energia elétrica dentro da sua residência** "
                 "ou se é sobre **iluminação pública (como um poste apagado ou lâmpada com problema na rua)**?\n\n"
                 "• Se for **falta de luz na sua casa**, a concessionária responsável é a **Light** (você pode falar com eles pelo WhatsApp no número **(21) 99981-1920** ou pelo telefone **0800-282-0120**).\n"
-                "• Se for **poste apagado ou problema na rua**, o serviço é da Prefeitura! Você pode pedir a manutenção direto pelo aplicativo **Colab** ou ligando para o telefone **(21) 2961-9000** (Subsecretaria de Iluminação Pública)."
+                "• Se for **poste apagado ou problema na rua**, o serviço é da Prefeitura! Você pode pedir a manutenção direto pelo aplicativo **Colab**, no site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/) ou ligando para o telefone **(21) 2961-9000** (Subsecretaria de Iluminação Pública)."
             )
         else:
             answer = (
                 "Para eu te orientar direitinho, a troca de lâmpada que você precisa é **dentro da sua casa (área particular)** "
                 "ou em um **poste de iluminação pública no meio da rua**?\n\n"
-                "• Se for em um **poste da rua**, a Prefeitura faz o serviço! Você pode solicitar a troca registrando o pedido no aplicativo **Colab** ou falando com a Subsecretaria de Iluminação Pública pelo telefone **(21) 2961-9000**.\n"
+                "• Se for em um **poste da rua**, a Prefeitura faz o serviço! Você pode solicitar a troca registrando o pedido no aplicativo **Colab**, no site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/) ou falando com a Subsecretaria de Iluminação Pública pelo telefone **(21) 2961-9000**.\n"
                 "• Se for **dentro de casa**, a manutenção interna e particular fica sob a responsabilidade do próprio morador, tudo bem?"
             )
             
@@ -518,6 +518,7 @@ class RagHandler(BaseHandler):
                 context_blocks.append("=== CONTEXTO COMPLEMENTAR DE APOIO ===\n" + "\n\n".join(complementary_parts))
                 
             context_str = "\n\n".join(context_blocks)
+            agent._last_context = context_str
             is_list_result = any(r.get("is_list_result") for r in relevant_results)
 
             
@@ -533,7 +534,7 @@ class RagHandler(BaseHandler):
                 "DIRETRIZES:\n"
                 "1. Use **negrito** para telefones, endereços e horários.\n"
                 "2. Fale com autoridade e clareza. Jamais use 'pelo que sei', 'não tenho certeza' ou termos de hesitação.\n"
-                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente a abrir uma **Solicitação de Serviço** no aplicativo **Colab** (não reclamação na Ouvidoria), apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Caso contrário ou se o dado não constar no contexto, encaminhe diretamente: Ouvidoria **(21) 2652-3835** ou **ouvidoria@duquedecaxias.rj.gov.br**.\n"
+                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Caso contrário ou se o dado não constar no contexto, encaminhe diretamente: Ouvidoria **(21) 2652-3835** ou **ouvidoria@duquedecaxias.rj.gov.br**.\n"
                 "4. NÃO repita saudações se o diálogo já está em andamento.\n"
                 "5. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'."
             )

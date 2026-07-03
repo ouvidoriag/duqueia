@@ -1,5 +1,5 @@
 # Análise de Arquitetura — DUQUE IA RAG Framework
-> **Atualizado em:** 2026-06-26 | Versão analisada: agent.py 895 linhas · duque_ia.db ~31MB
+> **Atualizado em:** 2026-07-02 | Versão estável pós-auditoria: agent.py · duque_ia.db ~31MB
 
 ---
 
@@ -9,22 +9,23 @@
 DUQUEIA/
 │
 ├── server.js                     # Gateway HTTP Node.js (porta 3000) — gerencia sessões por sessionId
+├── requirements.txt              # Declaração de dependências Python para o Render
+├── package.json                  # Scripts npm e build command de dependências
 │
-├── agent/                        # Camada de Agente Conversacional
-│   ├── main.py                   # CLI / modo-pipe — entry point do processo Python
-│   ├── agent.py                  # DuqueIAAgent — orquestrador principal (895 linhas)
-│   ├── triage.py                 # Triagem 3-camadas: Fast Gate → SQLite Cache → Gemini LLM
-│   ├── router.py                 # Intenções de sistema (identidade, saudação, despedida)
-│   ├── retrieval.py              # Busca híbrida vetorial + keyword + structured (vw_ia_servicos)
-│   ├── guardrails.py             # Input / Privacy / Competency / Legal guardrails
-│   ├── scoring.py                # cosine_similarity, keyword_overlap_score
-│   ├── fallback.py               # Fallback para Ouvidoria e detecção de queries vagas
+├── agent/                        # Camada do Agente Conversacional (Cognitivo)
+│   ├── main.py                   # CLI / modo-pipe — entry point do processo Python (UTF-8 stdin/stdout/stderr)
+│   ├── agent.py                  # DuqueIAAgent — orquestrador principal (passa contexto para output guardrail)
+│   ├── triage.py                 # Triagem de 3 camadas (Fast Gate → SQLite Cache → Gemini LLM)
+│   ├── router.py                 # Roteamento semântico (GIS, INSTITUTIONAL, GENERAL)
+│   ├── retrieval.py              # Dynamic Hybrid RAG (mistura vetor + estruturado classificados por similaridade)
+│   ├── guardrails.py             # Input / Privacy (LGPD) / Competency / Legal / Output guardrails
+│   ├── scoring.py                # similaridade de cosseno (cosseno 85% + keyword overlap 15%)
+│   ├── fallback.py               # Redirecionamento da Ouvidoria Geral (162 / WhatsApp (21) 99824-5903)
 │   ├── confidence.py             # Calibração de confiança pós-retrieval
 │   ├── reranker.py               # Interface BaseReranker / NoOpReranker (extensível)
 │   ├── config.py                 # KEYWORD_POLICY, LIST_INTENT_MAP, EMBEDDING_DIMS
-│   ├── models.py                 # QueryIntent enum
-│   ├── duque_ia.db               # Banco SQLite (chunks + embeddings + cache de triagem + serviços)
-│   └── main_old.py               # ⚠️ CÓDIGO MORTO — versão antiga (103KB), deletar
+│   ├── models.py                 # Enums de intenções
+│   └── duque_ia.db               # Banco SQLite unificado ( chunks 3072 dim + estruturado + cache de triagem )
 │
 ├── ingestion/                    # Pipeline de Ingestão de Dados
 │   ├── parser/
@@ -37,118 +38,61 @@ DUQUEIA/
 │   │   ├── parse_assuntos.py     # Mapeamento assunto×secretaria (Colab)
 │   │   └── populate_structured_services.py # Popula vw_ia_servicos
 │   └── embed/
-│       ├── main.py               # CLI: lê JSONs → chunking → embedding → SQLite
+│       ├── main.py               # lê JSONs → chunking → embedding 3072 dim (resolução absoluta de .env) → SQLite
 │       ├── core.py               # ChunkingStrategies (recursive, token, semantic, geo)
 │       ├── config.py             # Loader de embed_config.yml
 │       └── embed_config.yml      # Configuração da estratégia ativa
 │
-├── utils/
-│   ├── gemini_client.py          # Wrapper Gemini (rotação de chaves, novo SDK e legado)
+├── utils/                        # Utilitários compartilhados
+│   ├── gemini_client.py          # Wrapper Gemini (rotação de chaves baseada em cota/erro)
 │   ├── llm_router.py             # Roteador multi-LLM (parcialmente integrado)
-│   └── groq_client.py            # Cliente Groq (disponível, não integrado no agente)
+│   └── groq_client.py            # Cliente Groq
 │
-├── bancoia/                      # Base de conhecimento bruta
-│   ├── CARTA_DE_SERVICO_*.xlsx   # Carta de Serviços Municipal
-│   ├── OFICIOS/                  # PDFs de ofícios para OCR
-│   └── POP/                      # Procedimentos Operacionais Padrão
+├── eusoulindo/                   # Repositório de dados, DDL do schema e migrações (Source of Truth)
+│   ├── database/                 # DDL, schemas, migrações SQL e scripts de rebuild
+│   ├── datasets/                 # Datasets brutos de planilhas, CSVs e Markdowns sincronizados
+│   ├── documentation/            # Documentação interativa em HTML e diagramas
+│   └── sync.py                   # Sincroniza dados com o restante do projeto
 │
-├── logs/
-│   └── execution.log             # Log de cada turno de conversa
+├── public/                       # Frontend estático do chat
+│   └── chat.html / style.css     # Interface visual do munícipe
 │
-├── metrics/
-│   └── retrieval_performance.csv # Métricas: latência, score, tokens, custo
-│
-├── Makefile                      # Automação do pipeline
-├── .env / .env.example           # Configuração de ambiente
-└── server.js                     # Servidor HTTP Node.js
+├── logs/ & metrics/              # Históricos de execução e métricas de RAG
+└── Makefile                      # Automação do pipeline
 ```
 
 ---
 
-## 2. Fluxo de Execução
+## 2. Fluxo de Execução e Comunicação Node-Python
 
-### A. Pipeline de Ingestão
-```
-[Fontes Brutas] → [Parsers] → [JSONs em parsed_pdf_files/]
-                                         ↓
-[duque_ia.db: duque_ia_chunks] ← [Embedder] ← [Chunking recursive_500_100]
-```
+### A. Fluxo de Comunicação de Processo (stdin/stdout)
+1. O servidor Node.js (`server.js`) escuta requisições POST na rota `/api/chat`.
+2. Para cada sessão, um processo filho Python (`agent/main.py`) é instanciado em modo persistente (`spawn`).
+3. O Node.js escreve a pergunta do munícipe em bytes UTF-8 no stream `stdin` do processo Python.
+4. O processo Python (reconfigurado para UTF-8 em `sys.stdin`, `sys.stdout` e `sys.stderr` para evitar corrupção de acentos no Windows/Linux) processa a pergunta e imprime a resposta estruturada em JSON no `stdout`.
+5. O Node.js bufferiza e extrai o JSON, devolvendo-o para o cliente HTTP.
 
-### B. Pipeline de Retrieval (por turno)
-```
-Pergunta do Munícipe
-  → Fast Gate (regex, 0ms)
-  → Triage Cache SQLite (md5 hash, ~1ms)
-  → Gemini Triage LLM (50-200ms) com histórico dos 2 turnos anteriores
-  → Intenção Detectada:
-      OUVIDORIA_MANIFESTACAO → Agente Coletor (1 dado por vez → Colab)
-      AMBIGUO_LUZ/LAMPADA   → Desambiguação contextual
-      LGPD/JURIDICO/FORA    → Bloqueio direto
-      RAG_GERAL             → Guardrails → Retrieval → LLM → Resposta
-  → SystemIntentHandler (saudação, despedida, identidade, ajuda)
-  → Input Guardrails (SQL/Prompt/Privacy/Competency/Legal)
-  → QueryAnalyzer (intent: LIST / GIS / GENERAL)
-  → retrieve_context():
-      ├── retrieve_full_category() para LIST queries
-      ├── retrieve_structured_service() para queries de serviço
-      └── Busca vetorial: 0.70×cosine + 0.30×keyword_overlap
-  → Retrieval Guardrail (threshold 0.50)
-  → Gemini LLM generate_interaction()
-  → calibrate_confidence()
-  → log_execution_metrics() → logs/ + metrics/
-  → JSON: {answer, sources, confidence, retrieved_chunks, metrics}
-```
+### B. Fluxo de Triagem e Recuperação RAG Híbrida
+1. **Triagem de Intenção**: Fast Gate (regex rápidas) → Cache SQLite de Turnos → Gemini LLM Classifier (com base no histórico do diálogo).
+2. **Roteamento de Handlers**: Se for bloqueado por segurança (LGPD/Jurisdição), cai no `SecurityHandler`. Se faltar dados, cai no `CollectorHandler` (Agente Coletor).
+3. **Recuperação Híbrida Dinâmica (RAG)**: O RAG busca candidatos nas tabelas estruturadas (`services` e `secretarias`) e no banco vetorial (`duque_ia_chunks`). 
+4. **Resolução de Bugs**: O bug de listagem total do CRAS foi removido. Agora, unidades físicas só são recuperadas quando os termos da busca realmente casam com seu nome ou endereço.
+5. **Classificação Unificada**: Todos os candidatos são ordenados juntos sob uma pontuação de similaridade híbrida ajustada (85% cosseno vetorial + 15% overlap de palavras-chave) com boosts de categoria e clínico/saúde.
+6. **Guardrail de Saída**: O `check_output_guardrail` compara a resposta da LLM diretamente contra as fontes oficiais recuperadas, eliminando alucinações e evitando falsos positivos.
 
 ---
 
-## 3. Dependências entre Módulos
+## 3. Robustez Multiplataforma (Windows e Linux)
 
-```
-gemini_client.py ─┬─► agent.py (geração de resposta + triage)
-                  ├─► triage.py (call_triage_llm)
-                  └─► ingestion/embed/main.py (geração de embeddings)
-
-agent.py ─────────┬─► triage.py (perform_triage)
-                  ├─► retrieval.py (retrieve_context)
-                  ├─► router.py (QueryAnalyzer, SystemIntentHandler)
-                  ├─► guardrails.py (4 funções de checagem)
-                  ├─► fallback.py (build_fallback_guidance, is_query_too_vague)
-                  ├─► confidence.py (calibrate_confidence)
-                  ├─► scoring.py (extract_query_keywords)
-                  └─► models.py (QueryIntent)
-```
+*   **Resolução de Caminhos**: Todos os caminhos de arquivos em Python e Node.js utilizam `os.path` e `path.join`, garantindo conversão de separadores de diretório no Windows (`\`) e Linux (`/`).
+*   **sys.path**: O arquivo `agent/main.py` define programaticamente a raiz do projeto como primeira posição do `sys.path`, assegurando que `from agent.xxx` e `from utils.xxx` funcionem de forma idêntica tanto localmente quanto no ambiente Render.
+*   **Tratamento de Encoding**: O processo Python configura explicitamente `sys.stdin`, `sys.stdout` e `sys.stderr` para `utf-8` com substituição de erros, blindando a troca de mensagens contra qualquer colisão de tabela de páginas de códigos local (como CP1252 no Windows).
 
 ---
 
-## 4. Melhorias Recomendadas (Priorizadas)
+## 4. Auditoria de Redundâncias e Código Morto (Fase 1)
 
-### 🔴 Crítico — Ação Imediata
-1. **Deletar `agent/main_old.py`** — 103KB de código morto, risco de confusão
-2. **Consolidar `duque_ia.db` duplicado** — existe em `/DUQUEIA/` (raiz) e em `/DUQUEIA/agent/`
-3. **Remover `sql_query` da resposta JSON pública** — expõe lógica interna ao frontend
-
-### 🟡 Médio — Sprint 2
-4. **Persistir histórico de sessão no SQLite** — `_history` e `_interaction_map` são perdidos no restart
-5. **Expandir `COMPETENCY_TRIGGERS`** — INSS, rodovias BR, Detran estadual não são cobertos
-6. **Adicionar `USE_TRIAGE_LAYER=true` ao `.env.example`**
-
-### 🟢 Melhoria — Sprint 3
-7. **Criar `docker-compose.yml`** para deploy de produção
-8. **Implementar reranker real** (Cross-Encoder via sentence-transformers)
-9. **Benchmark automatizado** das estratégias de chunking
-
----
-
-## 5. Diagnóstico de Maturidade
-
-| Fase | Status |
-|---|---|
-| Fase 1 — Mapeamento e Arquitetura | ✅ Completo |
-| Fase 2 — Chunking (recursive_500_100) | ✅ Funcional |
-| Fase 3 — Retrieval Evaluation (métricas CSV) | ✅ Funcional |
-| Fase 4 — Guardrails (4 tipos + triage + retrieval + output) | ✅ Completo |
-| Fase 5 — Sistema de Métricas | ✅ Completo |
-| Fase 6 — GIS / Bairros | 🟡 Parcial |
-| Fase 7 — Benchmark entre estratégias | 🔴 Pendente |
-| Fase 8 — Produção (Docker) | 🟡 Parcial |
-| Fase 9 — POP / Ouvidoria / Agente Coletor | ✅ Completo |
+*   **`agent/main_old.py`**: Confirmado como deletado e limpo.
+*   **`duque_ia.db`**: Consolidado unicamente na pasta `/agent/duque_ia.db` com embeddings reais de 3072 dimensões.
+*   **`eusoulindo/`**: Identificado como repositório de migrações SQL, datasets e documentação. Deve ser preservado como a fonte de documentação técnica e seeds do banco de dados relacional.
+*   **`scripts/`**: Pasta útil que contém testes diretos de comunicação e chaves. Recomenda-se manter para diagnóstico e validação local antes de commits de produção.

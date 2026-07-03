@@ -1,8 +1,16 @@
 import re
 
 DANGEROUS_PATTERNS = [
-    "drop table", "delete from", "insert into",
-    "ignore as instruções", "ignore todas", "ignore previous"
+    # SQL Injection
+    "drop table", "delete from", "insert into", "update set", "truncate table",
+    "select * from", "union select", "--", ";",
+    # Prompt Injection
+    "ignore as instruções", "ignore todas", "ignore previous",
+    "esqueça tudo", "esqueça o que", "forget everything", "forget all",
+    "act as", "now you are", "pretend you are", "simulate",
+    "jailbreak", "dan mode", "developer mode", "unrestricted mode",
+    "ignore your instructions", "override instructions",
+    "finja ser", "finja que você", "você não é mais", "esqueça suas regras",
 ]
 
 PRIVACY_TRIGGERS = [
@@ -14,7 +22,21 @@ PRIVACY_TRIGGERS = [
 ]
 
 COMPETENCY_TRIGGERS = [
-    r"\bmetrô\b", r"\bmetro\b"
+    # Transporte estadual/federal
+    r"\bmetrô\b", r"\bmetro\b", r"\btrem\b", r"\bsuper\s?via\b",
+    r"\bflumitrânsito\b", r"\bdetran\b",
+    # Rodovias e órgãos federais
+    r"\binss\b", r"\bprev\s?social\b", r"\bprevidência\s+social\b",
+    r"\baposentadoria\b", r"\bbenefício\s+(?:inss|previdência)\b",
+    r"\bimposto\s+de\s+renda\b", r"\birpf\b", r"\breceita\s+federal\b",
+    r"\bcpf\s+(?:do|de|da)\b", r"\bcnpj\b",
+    r"\brodovia\s+(?:br|federal|estadual)\b", r"\bbr-\d{3}\b",
+    r"\bpolicía\s+(?:federal|rodoviária|militar)\b",
+    r"\bjustiça\s+(?:federal|estadual|trabalhista)\b",
+    r"\btribunais?\b",
+    # Outros municípios
+    r"\brio\s+de\s+janeiro\s+(?:cidade|prefeitura)\b",
+    r"\bsão\s+paulo\b", r"\bniterói\b", r"\bnova\s+iguaçu\b",
 ]
 
 LEGAL_TRIGGERS = [
@@ -45,20 +67,22 @@ def check_legal_guardrail(query: str) -> bool:
     return any(re.search(pat, q_lower) for pat in LEGAL_TRIGGERS)
 
 
-def check_output_guardrail(query: str, answer: str, gemini_client) -> bool:
-    """Valida a resposta gerada pela IA contra alucinações ou vazamento de dados usando o Gemini."""
+def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None) -> bool:
+    """Valida a resposta gerada pela IA contra alucinações ou vazamento de dados usando o Gemini, validando contra as fontes oficiais."""
     if len(gemini_client.api_keys) == 0:
         return True # Se estiver local/sem chaves, permite por padrão
         
+    context_str = f"Contexto das fontes oficiais:\n{context}\n\n" if context else ""
+    
     prompt = (
         "Você é o Agente de Blindagem e Auditoria de Respostas do Duque IA.\n"
-        "Sua função é analisar se a resposta gerada para o munícipe está segura e livre de alucinações, "
-        "erros graves ou vazamento de dados confidenciais.\n\n"
+        "Sua função é analisar se a resposta gerada para o munícipe está segura e condizente com as fontes oficiais fornecidas.\n\n"
+        f"{context_str}"
         f"Pergunta do cidadão: \"{query}\"\n"
         f"Resposta gerada pela IA: \"{answer}\"\n\n"
         "Responda EXCLUSIVAMENTE 'PERMITIDO' ou 'BLOQUEADO' com base nas regras:\n"
-        "- BLOQUEADO se a resposta mencionar dados pessoais (CPF, nome completo de terceiro, etc.).\n"
-        "- BLOQUEADO se a resposta tiver inventado fatos (por exemplo, mencionar Junta Militar ou Alistamento se a pergunta for sobre atendimento/conduta geral e não sobre alistamento).\n"
+        "- BLOQUEADO se a resposta mencionar dados pessoais de terceiros (CPF, nome completo de outro cidadão, etc.).\n"
+        "- BLOQUEADO se a resposta contiver fatos inventados ou contradições graves em relação ao contexto das fontes oficiais (ignore pequenas variações de coesão textual).\n"
         "- BLOQUEADO se a resposta for agressiva ou contiver linguagem imprópria.\n"
         "- PERMITIDO caso contrário."
     )

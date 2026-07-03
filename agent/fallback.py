@@ -9,7 +9,7 @@ def build_fallback_guidance(query: str) -> str:
             "• Telefone: **(21) 2652-3835**\n"
             "• E-mail: **ouvidoria@duquedecaxias.rj.gov.br**\n"
             "• Presencial: **Alameda Esmeralda, 206 - Jardim Primavera**\n"
-            "• Aplicativo: **Colab** (disponível para Android e iOS)"
+            "• Aplicativo: **Colab** (baixe no celular ou acesse [duquedecaxias.colab.re](https://duquedecaxias.colab.re/))"
         )
     
     # Resposta genérica informativa e natural

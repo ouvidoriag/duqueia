@@ -3,29 +3,32 @@ import sys
 import json
 import io
 
-# Garante que a saída use UTF-8 no Windows/Pipe de forma segura
+# Garante que a entrada e a saída usem UTF-8 no Windows/Pipe de forma segura
+sys.stdin.reconfigure(encoding="utf-8", errors="replace")
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
-from dotenv import load_dotenv
 
-# Carrega as configurações do ambiente (.env)
-load_dotenv()
+# --- Bootstrap de Caminhos e Ambiente (deve acontecer antes de qualquer import interno) ---
 
-# Garante que a RAIZ do projeto seja o PRIMEIRO item do sys.path.
-# Isso é crítico: quando o Python executa agent/main.py diretamente,
-# ele insere o diretório 'agent/' como sys.path[0], o que quebra
-# os imports 'from agent.xxx import ...' dentro dos módulos filhos.
+# 1. Corrige o sys.path para que a raiz do projeto seja o primeiro item
+#    Isso é crítico: python agent/main.py insere 'agent/' como sys.path[0], quebrando imports
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 _AGENT_DIR = os.path.abspath(os.path.dirname(__file__))
-
-# Remove o diretório 'agent/' do path se estiver lá (inserido automaticamente pelo Python)
 while _AGENT_DIR in sys.path:
     sys.path.remove(_AGENT_DIR)
-
-# Insere a raiz do projeto na primeira posição
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
+
+# 2. Carrega .env com caminho absoluto para garantir leitura correta
+#    independente do diretório de onde o processo foi iniciado
+from dotenv import load_dotenv
+_ENV_PATH = os.path.join(_PROJECT_ROOT, ".env")
+load_dotenv(_ENV_PATH)
+
+
+# (sys.path e .env já foram configurados no bloco Bootstrap acima)
+
 
 # Importa o agente orquestrador principal
 from agent.agent import DuqueIAAgent

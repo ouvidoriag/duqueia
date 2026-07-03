@@ -10,7 +10,7 @@ from agent.triage import perform_triage
 from agent.config import DEFAULT_DB_PATH, EMBEDDING_DIMS
 from agent.models import QueryIntent
 from agent.router import QueryAnalyzer, SystemIntentHandler
-from agent.reranker import BaseReranker, NoOpReranker
+from agent.reranker import BaseReranker, NoOpReranker, GeminiCrossEncoder
 from agent.scoring import extract_query_keywords
 from agent.guardrails import (
     check_input_guardrail,
@@ -40,10 +40,25 @@ class DuqueIAAgent:
     
     def __init__(self, db_path: str = DEFAULT_DB_PATH, reranker: BaseReranker = None):
         self.db_path = db_path
-        self.reranker = reranker if reranker is not None else NoOpReranker()
+        # Reranker de segundo estágio: GeminiCrossEncoder em produção, NoOpReranker offline.
+        # Inicializado após self.using_real — ver linha abaixo.
+        self._reranker_override = reranker
         self.using_real = len(gemini_client.api_keys) > 0
         self.similarity_threshold = 0.50 if self.using_real else 0.25
         self.gemini_client = gemini_client
+        
+        # Ativa Cross-Encoder real em produção; offline usa passthrough NoOp
+        if self._reranker_override is not None:
+            self.reranker = self._reranker_override
+        elif self.using_real:
+            self.reranker = GeminiCrossEncoder(
+                gemini_client=gemini_client,
+                max_candidates=8,   # máximo de chunks avaliados pelo cross-encoder
+                min_candidates=2,   # abaixo disso, pula o reranking
+                score_weight=0.6,   # 60% cross-encoder + 40% hybrid score original
+            )
+        else:
+            self.reranker = NoOpReranker()
         
         # Tabela de roteamento de Handlers
         self.handlers = {
@@ -241,7 +256,8 @@ class DuqueIAAgent:
             
             # Validação do Output Guardrail
             answer = data.get("answer", "")
-            if answer and not check_output_guardrail(user_query, answer, self.gemini_client):
+            last_context = getattr(self, "_last_context", None)
+            if answer and not check_output_guardrail(user_query, answer, self.gemini_client, last_context):
                 # Se a resposta contiver alucinações ou desvios, aplicamos o bloqueio de segurança
                 data["answer"] = (
                     "Desculpe, não consegui formular uma resposta segura ou precisa para sua pergunta. "
@@ -257,6 +273,7 @@ class DuqueIAAgent:
             return res_str
 
     def _respond_raw(self, user_query: str, use_triage: bool = None, context_holder: dict = None) -> str:
+        self._last_context = ""
         start_time = time.time()
 
         if use_triage is None:

@@ -561,8 +561,8 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                         f"Telefone: {phone or 'Não disponível'}\n"
                         f"Funcionamento: {hours or 'Segunda a sexta-feira, das 9h às 17h'}"
                     )
-                    # Verifica se o CRAS se relaciona com as palavras da busca
-                    if any(w in name.lower() or w in addr.lower() or w in q_sub.lower() for w in q_keywords if len(w) >= 3):
+                    # Verifica se o CRAS se relaciona com as palavras da busca (sem o bug do w in q_sub.lower())
+                    if any(w in name.lower() or w in addr.lower() for w in q_keywords if len(w) >= 3):
                         structured_candidates.append({
                             "source": f"unidades (CRAS: {name})",
                             "category": "unidades",
@@ -626,7 +626,8 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
     for c in top_candidates:
         if "similarity" not in c:
             kw_score = calculate_keyword_overlap(extract_query_keywords(query), c["chunk_keywords"])
-            c["similarity"] = round(0.70 * c["semantic_score"] + 0.30 * kw_score, 4)
+            # Formula híbrida ajustada para dar peso prioritário à busca vetorial semântica real (85%)
+            c["similarity"] = round(0.85 * c["semantic_score"] + 0.15 * kw_score, 4)
         
         # Boost de categoria e de contato/localização nos chunks do RAG
         if c.get("category") == "secretarias" and any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
@@ -635,23 +636,32 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             content_lower = c.get("content", "").lower()
             if "endereço" in content_lower or "endereco" in content_lower or "como acessar" in content_lower or "telefone" in content_lower:
                 c["similarity"] = round(c["similarity"] + 0.15, 4)
+                
+        # Boost de saúde para direcionamento clínico/hospitalar
+        if c.get("source") in ["saude.md", "saude.json", "postos_saude_caxias.xlsx"] and any(w in query_normalized for w in ["hospital", "upa", "uph", "emergencia", "emergência", "dor", "medico", "médico", "quebrado", "fratura", "pe ", "pé "]):
+            c["similarity"] = round(c["similarity"] + 0.20, 4)
 
     top_candidates.sort(key=lambda x: x["similarity"], reverse=True)
     reranked = reranker.rerank(query, top_candidates)
     
-    # Merge Final prioritário: Estruturados vêm sempre no topo
-    final_results = []
+    # Merge Híbrido Dinâmico: Junta todos os candidatos estruturados e vetoriais,
+    # ordena pelo score 'similarity' final para garantir que o mais relevante (seja estruturado ou descritivo) suba para o topo.
+    all_candidates = []
     seen_sources = set()
     
     for sc in structured_candidates:
         if sc["source"] not in seen_sources:
             seen_sources.add(sc["source"])
-            final_results.append(sc)
+            all_candidates.append(sc)
             
     for r in reranked:
         if r["source"] not in seen_sources:
             seen_sources.add(r["source"])
-            final_results.append(r)
+            all_candidates.append(r)
             
-    return final_results[:top_k]
+    # Ordena todos juntos pelo score 'similarity' de forma decrescente
+    all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
+    
+    return all_candidates[:top_k]
+
 

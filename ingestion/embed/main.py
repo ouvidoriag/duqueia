@@ -4,9 +4,11 @@ import json
 import sqlite3
 import sys
 from dotenv import load_dotenv
+import os
 
-# Carrega as chaves de API do .env antes de qualquer inicialização
-load_dotenv()
+# Carrega as chaves de API do .env antes de qualquer inicialização da raiz do projeto
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+load_dotenv(os.path.join(_PROJECT_ROOT, ".env"))
 
 # Garante acesso à pasta utils
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
