@@ -9,7 +9,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-from agent.main import DuqueIAAgent
+from agent.agent import DuqueIAAgent, gemini_client
 from agent.triage import perform_triage
 
 class MockTriageGeminiClient:
@@ -18,6 +18,10 @@ class MockTriageGeminiClient:
         self.mocked_intent = mocked_intent
         
     def generate_response(self, prompt, system_instruction=None, **kwargs):
+        # Output guardrail chama com prompt contendo "PERMITIDO" ou "BLOQUEADO"
+        if "PERMITIDO" in prompt or "BLOQUEADO" in prompt:
+            return "PERMITIDO"
+        # Triagem chama com prompt de classificação — retorna o JSON mockado
         return json.dumps({
             "intent": self.mocked_intent,
             "confidence": 0.95,
@@ -60,21 +64,21 @@ def test_priority_conflict_routing():
             "desc": "Ambiguidades de Luz"
         },
         {
-            "intent": "RECLAMACAO_OUVIDORIA",
-            "expected_detected": "ouvidoria_redirection",
-            "desc": "Reclamação ou denúncia vaga direcionada para Ouvidoria"
+            "intent": "OUVIDORIA_MANIFESTACAO",
+            "expected_detected": "ouvidoria_geral_redirect",
+            "desc": "Reclamação ou denúncia direcionada para Ouvidoria"
         }
     ]
     
     for sc in scenarios:
         print(f"\nTestando cenário: {sc['desc']} (Intenção: {sc['intent']})")
         
-        # Injeta o mock client temporariamente
-        from agent.main import gemini_client
-        original_keys = gemini_client.api_keys
+        # Injeta o mock client temporariamente no cliente global
         original_gen = gemini_client.generate_response
+        original_keys = gemini_client.api_keys
         
         mock_client = MockTriageGeminiClient(sc["intent"])
+        # Garante que api_keys nao-vazia para que perform_triage use o LLM mockado
         gemini_client.api_keys = mock_client.api_keys
         gemini_client.generate_response = mock_client.generate_response
         
@@ -92,8 +96,8 @@ def test_priority_conflict_routing():
             print("  -> Status: PASS ✅")
         finally:
             # Restaura o cliente global
-            gemini_client.api_keys = original_keys
             gemini_client.generate_response = original_gen
+            gemini_client.api_keys = original_keys
             
     print("\n   TESTE DE ROTEAMENTO DE PRIORIDADES PASSOU ✅\n")
 

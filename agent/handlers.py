@@ -217,9 +217,17 @@ class CollectorHandler(BaseHandler):
             "reclamacao": "reclamação",
             "geral":      "manifestação",
         }
-        label = _LABELS.get(tipo, "manifestação")
+        
+        # Se a query contém "falar com o prefeito" ou similar, e o tipo veio como "reclamacao" padrão mas a palavra "reclamacao"
+        # não foi dita pelo cidadão, suavizamos para usar "manifestação".
+        query_lower = query.lower()
+        if "prefeito" in query_lower and tipo == "reclamacao" and "reclam" not in query_lower and "denunc" not in query_lower:
+            label = "manifestação"
+        else:
+            label = _LABELS.get(tipo, "manifestação")
         
         # Usando LLM se disponível para gerar uma resposta acolhedora e natural baseada no serviço encontrado
+
         if agent.using_real:
             service_context = ""
             try:
@@ -523,8 +531,9 @@ class RagHandler(BaseHandler):
 
             
             system_instruction = (
-                "Você é o DUQUE IA, assistente virtual oficial de Duque de Caxias — RJ.\n"
-                "Responda de forma humana, calorosa e objetiva. Prefira respostas de 2 a 4 frases — suficientes para ser útil, sem exageros.\n"
+                "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
+                "Sua personalidade deve ser extremamente simpática, calorosa, prestativa e humana (aumente a empatia e use palavras acolhedoras). Responda com um sorriso virtual e gentileza genuína.\n"
+                "Apesar de muito caloroso, seja objetivo e preciso. Prefira respostas de 2 a 4 frases — suficientes para ser muito útil e acolhedor, sem exageros.\n"
                 "\n"
                 "REGRA DE FONTES (CRÍTICO):\n"
                 "- 'INFORMAÇÕES OFICIAIS ESTRUTURADAS' têm precedência absoluta sobre qualquer outro contexto.\n"
@@ -533,8 +542,8 @@ class RagHandler(BaseHandler):
                 "\n"
                 "DIRETRIZES:\n"
                 "1. Use **negrito** para telefones, endereços e horários.\n"
-                "2. Fale com autoridade e clareza. Jamais use 'pelo que sei', 'não tenho certeza' ou termos de hesitação.\n"
-                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Caso contrário ou se o dado não constar no contexto, encaminhe diretamente: Ouvidoria **(21) 2652-3835** ou **ouvidoria@duquedecaxias.rj.gov.br**.\n"
+                "2. Fale com autoridade, clareza e acolhimento. Jamais use 'pelo que sei', 'não tenho certeza' ou termos de hesitação.\n"
+                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente e com muita simpatia a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Caso contrário ou se o dado não constar no contexto, encaminhe diretamente: Ouvidoria **(21) 2652-3835** ou **ouvidoria@duquedecaxias.rj.gov.br**.\n"
                 "4. NÃO repita saudações se o diálogo já está em andamento.\n"
                 "5. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'."
             )
@@ -543,7 +552,7 @@ class RagHandler(BaseHandler):
                 f"Contexto oficial (use SOMENTE estas informações para responder):\n"
                 f"{context_str}\n\n"
                 f"Pergunta do cidadão:\n{effective_query}\n\n"
-                f"Resposta objetiva e precisa:"
+                f"Resposta simpática, calorosa, objetiva e precisa:"
             )
             
             from agent.agent import DuqueIAAgent
@@ -598,6 +607,48 @@ class RagHandler(BaseHandler):
                     f"\n\n*Fonte: {best_match['source']}*"
                 )
             
+        # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) no Top-1 ou com alta similaridade,
+        # anexa os detalhes estruturados de passo a passo e documentos logo abaixo da resposta gerada.
+        extra_info = ""
+        # Só anexa passo a passo se o chunk for o primeiro resultado (mais relevante) ou tiver similaridade muito próxima
+        if relevant_results:
+            top_match = relevant_results[0]
+            if "vw_ia_servicos" in top_match.get("source", "").lower():
+                content = top_match.get("content", "")
+                
+                # Extrai seção de Documentos Necessários
+                doc_match = re.search(r"Documentos Necessários:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
+                docs_text = doc_match.group(1).strip() if doc_match else ""
+                
+                # Extrai seção de Passo a Passo
+                steps_match = re.search(r"Passo a Passo de Acesso:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
+                steps_text = steps_match.group(1).strip() if steps_match else ""
+                
+                if docs_text or steps_text:
+                    extra_info += f"\n\n**Como proceder para solicitar o serviço \"{top_match.get('title')}\":**"
+                    if docs_text:
+                        # Limpa os passos redundantes da lista de documentos se houver
+                        clean_docs = "\n".join(line.strip() for line in docs_text.split("\n") if line.strip() and "Abertura de processo" not in line)
+                        if clean_docs:
+                            extra_info += f"\n\n📋 **Documentos Necessários:**\n{clean_docs}"
+                    if steps_text:
+                        # Reconstrói os passos de forma amigável removendo quebras vazias ou truncadas
+                        clean_steps = []
+                        for line in steps_text.split("\n"):
+                            line_strip = line.strip()
+                            if line_strip:
+                                # Junta linhas que foram divididas pela quebra de palavra errada da planilha
+                                if clean_steps and not line_strip.startswith("Passo"):
+                                    clean_steps[-1] = clean_steps[-1] + " " + line_strip
+                                else:
+                                    clean_steps.append(line_strip)
+                        
+                        extra_info += "\n\n👣 **Passo a Passo:**\n" + "\n".join(clean_steps)
+
+        if extra_info:
+            answer = answer.strip() + extra_info
+
+
         llm_time = time.time() - llm_start
         total_time = time.time() - start_time
         

@@ -76,19 +76,21 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     
     prompt = (
         "Você é o Agente de Blindagem e Auditoria de Respostas do Duque IA.\n"
-        "Sua função é analisar se a resposta gerada para o munícipe está segura e condizente com as fontes oficiais fornecidas.\n\n"
+        "Sua função é analisar se a resposta gerada para o munícipe está segura.\n\n"
         f"{context_str}"
         f"Pergunta do cidadão: \"{query}\"\n"
         f"Resposta gerada pela IA: \"{answer}\"\n\n"
-        "Responda EXCLUSIVAMENTE 'PERMITIDO' ou 'BLOQUEADO' com base nas regras:\n"
-        "- BLOQUEADO se a resposta mencionar dados pessoais de terceiros (CPF, nome completo de outro cidadão, etc.).\n"
-        "- BLOQUEADO se a resposta contiver fatos inventados ou contradições graves em relação ao contexto das fontes oficiais (ignore pequenas variações de coesão textual).\n"
-        "- BLOQUEADO se a resposta for agressiva ou contiver linguagem imprópria.\n"
-        "- PERMITIDO caso contrário."
+        "Responda EXCLUSIVAMENTE 'PERMITIDO' ou 'BLOQUEADO' com base nestas regras ESTRITAS:\n"
+        "- BLOQUEADO SOMENTE SE a resposta mencionar CPF, número de protocolo ou dados pessoais de TERCEIROS (de outras pessoas, não do próprio cidadão).\n"
+        "- BLOQUEADO SOMENTE SE a resposta contiver linguagem agressiva, ofensas ou conteúdo impróprio.\n"
+        "- BLOQUEADO SOMENTE SE a resposta CONTRADISSER EXPLICITAMENTE um fato presente no contexto das fontes oficiais (ex: prazo diferente, endereço diferente).\n"
+        "- PERMITIDO se a resposta orientar sobre canais da Ouvidoria, Colab, telefones de contato, prazos legais gerais ou qualquer informação pública municipal.\n"
+        "- PERMITIDO se o contexto estiver vazio ou parcial — a ausência de contexto NÃO é motivo de bloqueio.\n"
+        "- PERMITIDO caso contrário.\n"
+        "Responda apenas com a palavra PERMITIDO ou BLOQUEADO."
     )
     try:
         verdict = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite").strip().upper()
         return "PERMITIDO" in verdict
     except Exception:
         return True
-

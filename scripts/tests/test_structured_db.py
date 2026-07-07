@@ -10,7 +10,8 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-from agent.main import DuqueIAAgent
+from agent.agent import DuqueIAAgent
+from agent.retrieval import retrieve_context
 
 def test_db_structure():
     db_path = os.path.join(ROOT, "agent", "duque_ia.db")
@@ -63,7 +64,15 @@ def test_db_structure():
     agent = DuqueIAAgent(db_path=db_path)
     print("\nExecutando teste de recuperação estruturada:")
     # Exemplo: Serviço de Libras para Crianças
-    results = agent.retrieve_context("Onde é oferecido o curso de Língua Brasileira de Sinais - Libras?")
+    results = retrieve_context(
+        query="Onde é oferecido o curso de Língua Brasileira de Sinais - Libras?",
+        db_path=db_path,
+        using_real=agent.using_real,
+        similarity_threshold=agent.similarity_threshold,
+        gemini_client=agent.gemini_client,
+        reranker=agent.reranker,
+        top_k=3
+    )
     
     if results:
         print(f"  [OK] Recuperado com sucesso!")

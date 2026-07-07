@@ -9,8 +9,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-from agent.main import DuqueIAAgent
-from agent.main import gemini_client
+from agent.agent import DuqueIAAgent
 from agent.triage import get_cached_triage, save_triage_to_cache
 
 def test_cache_triage():

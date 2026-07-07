@@ -12,7 +12,10 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-from agent.main import DuqueIAAgent, QueryAnalyzer, QueryIntent
+from agent.agent import DuqueIAAgent
+from agent.router import QueryAnalyzer
+from agent.models import QueryIntent
+from agent.retrieval import retrieve_context
 
 def run_retrieval_relevance_tests():
     print("==========================================================")
@@ -201,7 +204,16 @@ def run_retrieval_relevance_tests():
         
         # 2. Testa Retrieval
         t_ret_0 = time.time()
-        retrieved_chunks = agent.retrieve_context(tc['query'], top_k=3, intent_info=analyzer_result)
+        retrieved_chunks = retrieve_context(
+            query=tc['query'],
+            db_path=db_path,
+            using_real=agent.using_real,
+            similarity_threshold=agent.similarity_threshold,
+            gemini_client=agent.gemini_client,
+            reranker=agent.reranker,
+            top_k=3,
+            intent_info=analyzer_result
+        )
         latency = (time.time() - t_ret_0) * 1000
         total_latency_ms += latency
         
