@@ -175,6 +175,13 @@ class DuqueIAAgent:
                     "• Se deseja solicitar troca de lâmpada em **poste na rua**;\n"
                     "• Se é sobre falta de energia na sua **residência** (Light)."
                 )
+            elif "barulho" in query.lower() or "som" in query.lower() or "ruido" in query.lower() or "festa" in query.lower():
+                fallback_msg = (
+                    "Você poderia me esclarecer se o som alto vem de uma **residência particular (como a casa de um vizinho, apartamento ou festa privada)** "
+                    "ou se é de um **evento realizado em espaço público (como um show na rua ou festa em praça)**?\n\n"
+                    "• Se for barulho de **vizinho/residência particular**, ligue para a **Polícia Militar (190)**.\n"
+                    "• Se for **evento ou show na rua/praça pública**, registre o pedido para a **Ordem Urbana** pelo app **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/)."
+                )
                 
             if not self.using_real:
                 return fallback_msg
@@ -184,6 +191,7 @@ class DuqueIAAgent:
                 "A pergunta do cidadão é muito vaga ou ambígua e precisamos que ele forneça mais contexto.\n"
                 "Sua tarefa é gerar uma resposta educada e prestativa solicitando que ele especifique o que deseja saber.\n"
                 "Dê exemplos de opções de forma curta (ex: telefone da secretaria, endereço, informações de um serviço público).\n"
+                "Se a intenção for 'AMBIGUO_BARULHO', pergunte de forma simpática se o barulho vem de um vizinho/residência particular (Polícia 190) ou de um evento público na rua (Ordem Urbana/Colab).\n"
                 "NUNCA fale sobre Ouvidoria, reclamação, denúncia, elogio ou sugestão aqui, pois a intenção dele NÃO é Ouvidoria.\n"
                 "Mantenha a resposta muito curta, objetiva, profissional e sem saudações genéricas."
             )

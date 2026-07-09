@@ -5,13 +5,13 @@
 # de embeddings, testes de recuperação e execução de guardrails.
 #
 # Fontes de Ingestão Suportadas:
-#   - PDFs (raw_pdf_files/) e Markdown (bancoia/)
-#   - Tabelas CSV (raw_csv_files/)
-#   - Planilhas Excel (raw_excel_files/)
-#   - Links da Web / Sites (raw_web_urls/)
+#   - PDFs (data/raw/raw_pdf_files/) e Markdown (data/knowledge/)
+#   - Tabelas CSV (data/raw/raw_csv_files/)
+#   - Planilhas Excel (data/raw/raw_excel_files/)
+#   - Links da Web / Sites (data/raw/raw_web_urls/)
 # ==============================================================================
 
-.PHONY: help setup parse_pdfs parse_csv parse_excel parse_web parse_carta_servico parse_oficios parse_all embed test_retrieval run_agent clean
+.PHONY: help setup parse_pdfs parse_csv parse_excel parse_web parse_carta_servico parse_oficios parse_all embed test_retrieval run_agent clean test_suite test_30
 
 # Exibe o menu de ajuda com os comandos disponíveis e descrições dos scripts
 help:
@@ -20,14 +20,16 @@ help:
 	@echo "=============================================================================="
 	@echo "make setup              - Executa scripts/setup/setup_supabase.py para iniciar o DB"
 	@echo "make parse_pdfs         - Extrai textos de PDFs reais e importa Markdown para JSON"
-	@echo "make parse_csv          - Executa parser de CSVs da pasta raw_csv_files/"
+	@echo "make parse_csv          - Executa parser de CSVs da pasta data/raw/raw_csv_files/"
 	@echo "make parse_excel        - Executa parser de arquivos Excel (.xlsx, .xls)"
-	@echo "make parse_web          - Executa raspagem de sites a partir de raw_web_urls/urls.txt"
-	@echo "make parse_carta_servico- Ingere Carta de Servico Municipal (bancoia/CARTA_DE_SERVICO*.xlsx)"
-	@echo "make parse_oficios      - Ingere PDFs de oficios da pasta bancoia/OFICIOS/"
+	@echo "make parse_web          - Executa raspagem de sites a partir de data/raw/raw_web_urls/urls.txt"
+	@echo "make parse_carta_servico- Ingere Carta de Servico Municipal (data/knowledge/CARTA_DE_SERVICO*.xlsx)"
+	@echo "make parse_oficios      - Ingere PDFs de oficios da pasta data/knowledge/OFICIOS/"
 	@echo "make parse_all          - Executa todos os parsers listados acima sequencialmente"
 	@echo "make embed              - Roda o pipeline de chunking e gravacao no banco SQLite"
 	@echo "make test_retrieval     - Roda os testes de metricas de recuperacao (Precision/Recall)"
+	@echo "make test_suite         - Executa todos os testes de integração e unitários do projeto"
+	@echo "make test_30            - Roda o benchmark de 30 perguntas simulando munícipes"
 	@echo "make test_ask           - Modo interativo de perguntas ao agente"
 	@echo "make run_agent          - Inicializa o agente interativo de Duque de Caxias"
 	@echo "make clean              - Limpa arquivos JSON estruturados temporarios"
@@ -61,11 +63,11 @@ parse_web:
 parse_all: parse_pdfs parse_csv parse_assuntos parse_excel parse_web parse_carta_servico parse_oficios
 	@echo "[Pipeline] Todos os parsers foram executados com sucesso!"
 
-# Ingere a Carta de Servicos Municipal (Excel do bancoia/)
+# Ingere a Carta de Servicos Municipal (Excel do data/knowledge/)
 parse_carta_servico:
 	python ingestion/parser/parse_carta_servico.py
 
-# Ingere os PDFs de Oficios do bancoia/OFICIOS/ (OCR via Gemini Vision)
+# Ingere os PDFs de Oficios do data/knowledge/OFICIOS/ (OCR via Gemini Vision)
 parse_oficios:
 	python ingestion/parser/parse_oficios_ocr.py
 
@@ -91,5 +93,13 @@ run:
 
 # Remove os arquivos JSON gerados no processo de parsing de PDFs e outros formatos
 clean:
-	python -c "import os, shutil; [shutil.rmtree(os.path.join('parsed_pdf_files', d)) for d in os.listdir('parsed_pdf_files') if os.path.isdir(os.path.join('parsed_pdf_files', d)) and d != 'CRIADO']; [os.remove(os.path.join('parsed_pdf_files', f)) for f in os.listdir('parsed_pdf_files') if os.path.isfile(os.path.join('parsed_pdf_files', f))]"
+	python -c "import os, shutil; p_dir = os.path.join('data', 'processed'); [shutil.rmtree(os.path.join(p_dir, d)) for d in os.listdir(p_dir) if os.path.isdir(os.path.join(p_dir, d)) and d != 'CRIADO']; [os.remove(os.path.join(p_dir, f)) for f in os.listdir(p_dir) if os.path.isfile(os.path.join(p_dir, f))]"
+
+# Executa toda a suite de testes integrados do projeto
+test_suite:
+	python scripts/run_all_tests.py
+
+# Executa o benchmark com as 30 perguntas
+test_30:
+	python scripts/test_30_perguntas.py
 

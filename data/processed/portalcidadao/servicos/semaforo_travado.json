@@ -1,0 +1,10 @@
+{
+  "source": "semaforo_travado.md",
+  "title": "Serviço: Semáforo travado",
+  "content": "# Serviço: Semáforo travado\n\n* **ID da Categoria:** 12840\n* **Prazo Médio de Resolução:** 5 dias\n* **Foto é Obrigatória?** Sim\n* **Ponto de Referência é Obrigatório?** Sim\n\n## Formulário de Solicitação\nAo solicitar este serviço pelo aplicativo ou portal, o cidadão deve responder às seguintes perguntas:\n\n\n### Seção: Informações acerca da solicitação\n| Pergunta | Tipo de Resposta | Obrigatória? |\n|---|---|---|\n| Qual o tipo do defeito do semáforo? | dropdown | Sim |\n| Trata-se do conserto de uma botoeira? Se sim, especifique o problema: | dropdown | Sim |\n| Caso tenha selecionado a opção \"outro\",  especifique brevemente o problema da botoeira | Texto livre | Não |\n\n\n---\n*Para registrar esta demanda, acesse o aplicativo Colab ou o portal do cidadão de Duque de Caxias.*\n",
+  "metadata": {
+    "category": "general",
+    "path": "data\\knowledge\\portalcidadao\\servicos\\semaforo_travado.md",
+    "char_count": 777
+  }
+}

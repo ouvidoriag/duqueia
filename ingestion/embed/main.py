@@ -76,7 +76,7 @@ def main():
         print(f"[Embed Error] Erro ao carregar configurações: {e}")
         return
 
-    parsed_dir = "parsed_pdf_files"
+    parsed_dir = os.path.join("data", "processed")
     db_path = os.path.join("agent", "duque_ia.db")
 
     if not os.path.exists(parsed_dir):

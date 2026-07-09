@@ -33,14 +33,14 @@ load_dotenv(os.path.join(ROOT, ".env"))
 from utils.gemini_client import GeminiClient
 
 # ---- Configuracao -----------------------------------------------------------
-OFICIOS_DIR   = os.path.join(ROOT, "bancoia", "OFICIOS")
+OFICIOS_DIR   = os.path.join(ROOT, "data", "knowledge", "OFICIOS")
 DB_PATH       = os.path.join(ROOT, "agent", "duque_ia.db")
 CATEGORY      = "oficio_oficial"
 CHUNK_SIZE    = 800
 CHUNK_OVERLAP = 100
 DELAY_SEC     = 1.0     # pausa maior pra evitar rate limit (visao gasta mais cota)
 BATCH_COMMIT  = 5
-CRIADO_DIR    = os.path.join(ROOT, "bancoia", "CRIADO", "OFICIOS")
+CRIADO_DIR    = os.path.join(ROOT, "data", "knowledge", "CRIADO", "OFICIOS")
 
 
 def extrair_metadados_filename(filename: str) -> dict:

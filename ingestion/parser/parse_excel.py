@@ -3,8 +3,8 @@ import json
 import pandas as pd
 
 def main():
-    raw_dir = "raw_excel_files"
-    parsed_dir = "parsed_pdf_files"
+    raw_dir = os.path.join("data", "raw", "raw_excel_files")
+    parsed_dir = os.path.join("data", "processed")
     
     os.makedirs(raw_dir, exist_ok=True)
     os.makedirs(parsed_dir, exist_ok=True)

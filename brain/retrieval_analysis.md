@@ -29,14 +29,30 @@ No script `test_retrieval_relevance.py`, a similaridade é avaliada de duas form
 1. **Busca Semântica (Embedding Cosine Similarity)**: Mede o ângulo de cosseno entre o vetor da pergunta do munícipe e o vetor do chunk indexado.
 2. **Busca Híbrida (Keyword Match Fallback)**: Pontua com base na ocorrência de palavras-chave da consulta excluindo stopwords estruturadas, atribuindo peso extra (1.5x) para correspondências no título do arquivo de origem.
 
-### Oportunidades de Melhoria:
-* **Evitar Viés de Palavras Comuns**: Filtrar de forma agressiva as stopwords municipais (ex: "Duque", "Caxias", "prefeitura", "secretaria") quando usadas em consultas puras por palavras-chave, pois elas tendem a gerar falsos positivos em todos os documentos.
-* **Cross-Encoder para Reranking**: Implementar um segundo classificador leve para reordenar os top 5 resultados, garantindo que o chunk mais relevante seja o primeiro da lista, eliminando alucinações.
+### Oportunidades de Melhoria e Riscos de Overfitting:
+* **Risco de Overfitting por Regras Estáticas:** Regras de reescrita estáticas (ex: mapear "homem" -> "saúde do homem") trazem alto retorno rápido, mas geram viés e falham se o cidadão usar expressões sinônimas não previstas (ex: "urologia masculina" ou "exame preventivo masculino"). O sistema deve transicionar gradualmente para um modelo LLM Dinâmico de *Query Rewriting* em produção.
+* **Filtros de Metadados baseados em Intenção:** Separar dinamicamente os escopos de busca (Secretarias vs. Carta de Serviços vs. Unidades Físicas) impede a contaminação de domínios, que é a maior responsável por falsos positivos.
 
 ---
 
 ## 3. Configuração dos Guardrails de Segurança (Fase 4)
 
-* **Input Guardrail**: Implementado no `DuqueIAAgent` para bloquear strings perigosas como `ignore as instruções`, `DROP TABLE`, `DELETE FROM` retornando código de erro e confiança `0.0`.
-* **Retrieval Guardrail**: O limite de similaridade é definido em `0.65` para busca vetorial real e `0.25` para busca híbrida por palavra-chave significativa. Se a relevância do melhor resultado for menor que esse limite, o sistema retorna de forma segura: *"Não encontrei informações suficientes para responder."*
-* **Output Guardrail**: Valida a resposta gerada garantindo que seja um JSON estrito no formato homologado, contendo a resposta (`answer`), a lista de fontes utilizadas (`sources`) e o coeficiente de confiança (`confidence`).
+* **Input Guardrail**: Bloqueia injeção de SQL e instruções nocivas diretamente na entrada.
+* **Retrieval Guardrail**: Define um limiar dinâmico. Se a melhor correspondência de similaridade for menor que `0.65` (vetorial) ou `0.25` (híbrido significativo), aborta com a mensagem de fallback da Ouvidoria Geral.
+* **Output Guardrail**: Valida a conformidade da estrutura JSON da resposta antes de enviá-la ao munícipe.
+
+---
+
+## 4. Próxima Etapa: Validação de Alta Confiabilidade (Hard Benchmark)
+
+Com o benchmark atual atingindo **100% de acerto**, o foco transiciona de otimização de pesos para a **robustez da validação**.
+
+### Diretrizes para a Nova Esteira de Testes (Hard Evaluation Set):
+1. **Benchmark de Robustez (Erros e Abreviações):**
+   * Testar tolerância a erros ortográficos comuns (*"secertario"*, *"primaveira"*) e siglas do ecossistema municipal (*"UBS"*, *"UPA"*, *"FUNDEC"*).
+2. **Consultas Adversariais (Ambiguidade):**
+   * Queries incompletas (*"Quem é o secretário?"* ou *"Telefone"*) devem acionar o comportamento de **Agente Coletor** ou pedir esclarecimento, em vez de retornar dados aleatórios.
+3. **Métricas Multidimensionais:**
+   * Medir e documentar adicionalmente: **Recall@5**, **Recall@10**, **MAP** e **F1-Score**.
+4. **Benchmark por Categoria:**
+   * Mapear a performance de forma isolada por área temática (Saúde, Fazenda, Educação, Zeladoria e Ouvidoria) para evitar que a melhoria de um domínio cause regressão silenciosa em outro.

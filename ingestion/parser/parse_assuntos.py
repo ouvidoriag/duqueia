@@ -11,8 +11,8 @@ def slugify(text):
     return text.strip('_')
 
 def main():
-    csv_path = os.path.join("bancoia", "assuntoXsecretaria.csv")
-    parsed_dir = "parsed_pdf_files"
+    csv_path = os.path.join("data", "knowledge", "assuntoXsecretaria.csv")
+    parsed_dir = os.path.join("data", "processed")
     
     if not os.path.exists(csv_path):
         print(f"[Error] Arquivo não encontrado: {csv_path}")

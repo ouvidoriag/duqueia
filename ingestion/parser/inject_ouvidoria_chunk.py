@@ -18,7 +18,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
 DB_PATH = os.path.join(ROOT, "agent", "duque_ia.db")
-MD_PATH = os.path.join(ROOT, "bancoia", "ouvidoria_geral_info.md")
+MD_PATH = os.path.join(ROOT, "data", "knowledge", "ouvidoria_geral_info.md")
 
 SOURCE   = "ouvidoria_geral_info.md"
 CATEGORY = "ouvidoria"

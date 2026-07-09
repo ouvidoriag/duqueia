@@ -5,16 +5,28 @@
 
 ## 1. Diagrama Textual da Arquitetura
 
-```text
-DUQUEIA/
+`DUQUEIA/
 │
 ├── server.js                     # Gateway HTTP Node.js (porta 3000) — gerencia sessões por sessionId
 ├── requirements.txt              # Declaração de dependências Python para o Render
 ├── package.json                  # Scripts npm e build command de dependências
 │
+├── data/                         # DIRETÓRIO UNIFICADO DE DADOS
+│   ├── raw/                      # Dados brutos (CSVs, Excel, PDFs e URLs de input)
+│   │   ├── raw_csv_files/
+│   │   ├── raw_excel_files/
+│   │   ├── raw_pdf_files/
+│   │   └── raw_web_urls/
+│   ├── knowledge/                # Base de conhecimento Markdown (anterior bancoia)
+│   │   ├── CRIADO/
+│   │   ├── IAzeladoria/
+│   │   ├── OFICIOS/
+│   │   └── POP/
+│   └── processed/                # Dados estruturados convertidos em JSON
+│
 ├── agent/                        # Camada do Agente Conversacional (Cognitivo)
 │   ├── main.py                   # CLI / modo-pipe — entry point do processo Python (UTF-8 stdin/stdout/stderr)
-│   ├── agent.py                  # DuqueIAAgent — orquestrador principal (passa contexto para output guardrail)
+│   ├── agent.py                  # DuqueIAAgent — orquestrador principal
 │   ├── triage.py                 # Triagem de 3 camadas (Fast Gate → SQLite Cache → Gemini LLM)
 │   ├── router.py                 # Roteamento semântico (GIS, INSTITUTIONAL, GENERAL)
 │   ├── retrieval.py              # Dynamic Hybrid RAG (mistura vetor + estruturado classificados por similaridade)
@@ -28,35 +40,10 @@ DUQUEIA/
 │   └── duque_ia.db               # Banco SQLite unificado ( chunks 3072 dim + estruturado + cache de triagem )
 │
 ├── ingestion/                    # Pipeline de Ingestão de Dados
-│   ├── parser/
-│   │   ├── parse_pdfs.py         # PDFs via pypdf + Markdown de bancoia/
-│   │   ├── parse_csv.py          # CSVs com Pandas
-│   │   ├── parse_excel.py        # .xlsx/.xls com Pandas + openpyxl
-│   │   ├── parse_web.py          # Web scraping (requests + HTMLParser)
-│   │   ├── parse_carta_servico.py# Carta de Serviços → tabelas normalizadas no SQLite
-│   │   ├── parse_oficios_ocr.py  # OCR de ofícios via Gemini Vision
-│   │   ├── parse_assuntos.py     # Mapeamento assunto×secretaria (Colab)
-│   │   └── populate_structured_services.py # Popula vw_ia_servicos
-│   └── embed/
-│       ├── main.py               # lê JSONs → chunking → embedding 3072 dim (resolução absoluta de .env) → SQLite
-│       ├── core.py               # ChunkingStrategies (recursive, token, semantic, geo)
-│       ├── config.py             # Loader de embed_config.yml
-│       └── embed_config.yml      # Configuração da estratégia ativa
-│
-├── utils/                        # Utilitários compartilhados
-│   ├── gemini_client.py          # Wrapper Gemini (rotação de chaves baseada em cota/erro)
-│   ├── llm_router.py             # Roteador multi-LLM (parcialmente integrado)
-│   └── groq_client.py            # Cliente Groq
-│
-├── eusoulindo/                   # Repositório de dados, DDL do schema e migrações (Source of Truth)
-│   ├── database/                 # DDL, schemas, migrações SQL e scripts de rebuild
-│   ├── datasets/                 # Datasets brutos de planilhas, CSVs e Markdowns sincronizados
-│   ├── documentation/            # Documentação interativa em HTML e diagramas
-│   └── sync.py                   # Sincroniza dados com o restante do projeto
-│
-├── public/                       # Frontend estático do chat
-│   └── chat.html / style.css     # Interface visual do munícipe
-│
+│   ├── parser/                   # Scripts de parsing de dados sob data/raw/ e data/knowledge/
+│   └── embed/                    # Lê JSONs sob data/processed/ -> gera chunks -> embeddings -> SQLite
+├── utils/                        # Utilitários compartilhados (gemini_client, groq_client)
+├── public/                       # Frontend estático do chat (chat.html, style.css)
 ├── logs/ & metrics/              # Históricos de execução e métricas de RAG
 └── Makefile                      # Automação do pipeline
 ```
@@ -92,7 +79,35 @@ DUQUEIA/
 
 ## 4. Auditoria de Redundâncias e Código Morto (Fase 1)
 
-*   **`agent/main_old.py`**: Confirmado como deletado e limpo.
-*   **`duque_ia.db`**: Consolidado unicamente na pasta `/agent/duque_ia.db` com embeddings reais de 3072 dimensões.
-*   **`eusoulindo/`**: Identificado como repositório de migrações SQL, datasets e documentação. Deve ser preservado como a fonte de documentação técnica e seeds do banco de dados relacional.
-*   **`scripts/`**: Pasta útil que contém testes diretos de comunicação e chaves. Recomenda-se manter para diagnóstico e validação local antes de commits de produção.
+*   **`agent/main_old.py`**: Deletado e limpo.
+*   **`duque_ia.db`**: Consolidado unicamente em `/agent/duque_ia.db` com embeddings reais de 3072 dimensões.
+*   **`scripts/`**: Mantido para fins de validação local e diagnóstico rápido de APIs.
+
+---
+
+## 5. RAG Roadmap — Fases de Evolução do DUQUE IA (Meta: 90%+)
+
+Com base nas otimizações prioritárias já homologadas (Metadata Filtering + Stopwords Municipais elevando a taxa de acerto de **63.16%** para **78.95%**), as próximas fases arquiteturais mapeadas para atingir o nível industrial de excelência são:
+
+### 🚀 Fase 1 — Query Rewriting & Sinônimos (Meta: 82-85%)
+1. **Query Rewriting (Reescrita de Consultas via LLM):** 
+   * Traduzir perguntas coloquiais ou abreviadas em termos formais de governança pública antes do retrieval (ex: *"IPTU segunda via"* vira *"segunda via IPTU, imposto predial, Secretaria da Fazenda"*).
+2. **Dicionário Municipal de Sinônimos:**
+   * Mapeamento de termos equivalentes específicos de Duque de Caxias (ex: Posto de Saúde -> UBS/USF/Clínica da Família, Prefeito -> Chefe do Executivo, etc.) integrado ao processamento de palavras-chave BM25.
+3. **Expansão de Metadados na Ingestão:**
+   * Enriquecer chunks com marcações finas: `bairro`, `distrito`, `secretaria_vinculada`, `lideranca`, `prazo_limite` e `canal_digital`.
+
+### 🚀 Fase 2 — Reranker & Fusão de Scores (Meta: 85-90%)
+1. **Cross-Encoder Reranking:**
+   * Integrar o `GeminiCrossEncoder` (ou um modelo local leve como o `MiniLM-L6`) para reordenar os top 15/20 candidatos retornados pelo primeiro estágio híbrido, elevando de forma consistente as métricas de NDCG@3 e MRR.
+2. **RRF (Reciprocal Rank Fusion):**
+   * Implementar a técnica de fusão RRF para combinar de forma ideal as listas ranqueadas vindas do banco vetorial e do motor de busca híbrida por palavra-chave, aumentando a robustez em queries ambíguas.
+
+### 🚀 Fase 3 — Produção Avançada (Meta: >90%)
+1. **Grafo de Conhecimento (Knowledge Graph):**
+   * Mapear explicitamente as entidades da prefeitura (Secretaria ⇄ Liderança ⇄ Equipamento Físico ⇄ Serviços ⇄ Regulamentos). O retrieval navegará as conexões estruturais de forma determinística, ao invés de depender apenas de similaridade de cosseno.
+2. **Query Cache Inteligente:**
+   * Cache de baixa latência (0ms) para consultas repetitivas de alta frequência (IPTU, CRAS, vacinas, horários de atendimento).
+3. **Aprendizado Contínuo com Loop de Feedback:**
+   * Registro histórico de consultas com feedback dos munícipe (join de perguntas, respostas entregues e likes/cliques do usuário).
+

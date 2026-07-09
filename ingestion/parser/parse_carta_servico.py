@@ -33,7 +33,7 @@ import openpyxl
 from utils.gemini_client import GeminiClient
 
 # ---- Configuracao -----------------------------------------------------------
-XLSX_PATH   = os.path.join(ROOT, "bancoia", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
+XLSX_PATH   = os.path.join(ROOT, "data", "knowledge", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
 DB_PATH     = os.path.join(ROOT, "agent", "duque_ia.db")
 SOURCE_NAME = "CARTA_DE_SERVICO_23.05.26.xlsx"
 CATEGORY    = "carta_servicos"

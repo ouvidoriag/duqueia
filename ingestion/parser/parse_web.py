@@ -45,8 +45,8 @@ def extract_text_from_url(url: str) -> str:
         return ""
 
 def main():
-    raw_dir = "raw_web_urls"
-    parsed_dir = "parsed_pdf_files"
+    raw_dir = os.path.join("data", "raw", "raw_web_urls")
+    parsed_dir = os.path.join("data", "processed")
     
     os.makedirs(raw_dir, exist_ok=True)
     os.makedirs(parsed_dir, exist_ok=True)

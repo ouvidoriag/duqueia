@@ -4,7 +4,7 @@
   "description": "Duque IA — Assistente Virtual da Prefeitura de Duque de Caxias (RAG + Node.js + Python)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "python setup_and_run.py || python3 setup_and_run.py",
     "build": "pip install -r requirements.txt || pip3 install -r requirements.txt",
     "dev": "node server.js"
   },

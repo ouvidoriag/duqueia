@@ -258,6 +258,7 @@ class CollectorHandler(BaseHandler):
                 "   - Se for buraco de asfalto/drenagem: Tema **Obras**.\n"
                 "   - Se for capina, roçagem, lixo ou entulho: Tema **Limpeza Urbana**.\n"
                 "   - Se for lâmpada apagada no poste: Tema **Transportes, Serviços Públicos e Troca de Lâmpadas**.\n"
+                "   CRÍTICO: Você deve sugerir APENAS nomes de temas e assuntos reais cadastrados no sistema municipal do Colab. Nunca invente ou crie nomes de temas/assuntos (por exemplo, sugira 'Conduta irregular de funcionário' ou 'Funcionário', nunca invente 'Denúncia contra Servidor').\n"
                 "2. Informe os canais da Ouvidoria Geral como alternativa: telefone **(21) 2652-3835** e e-mail **ouvidoria@duquedecaxias.rj.gov.br**.\n"
                 "3. Dica rápida: oriente-o a ter em mãos a foto e o endereço correto para o registro no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)).\n"
                 "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento."
@@ -324,12 +325,68 @@ class CollectorHandler(BaseHandler):
         }
 
 class AmbiguityHandler(BaseHandler):
-    """Trata conflitos de ambiguidade (luz/lâmpada)."""
+    """Trata conflitos de ambiguidade (luz/lâmpada/barulho) de forma inteligente."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
         intent = triage_info.get("intent")
         elapsed = time.time() - start_time
         
-        # Lógica integrada de verificação de endereços/localização pública
+        # 1. Se o modelo real (Gemini) estiver disponível, gera resposta dinâmica e interpretativa
+        if agent.using_real:
+            history_context = ""
+            if history:
+                history_context = "\n".join([f"Mensagem anterior: {msg}" for msg in history[-4:]])
+                
+            system_instruction = (
+                "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
+                "O cidadão está em uma conversa sobre um assunto ambíguo (falta de luz, troca de lâmpada ou barulho) e precisamos esclarecer ou confirmar a intenção dele.\n"
+                "REGRAS DE CONVERSA:\n"
+                "1. Se a última mensagem do cidadão (ou o histórico recente) permitir inferir com razoável certeza qual é a intenção dele, confirme essa escolha de forma natural e dê as orientações de imediato (sem fazer a pergunta de escolha de novo). Exemplo: se ele diz 'lâmpada' ou 'lâmpada queimada' após perguntarmos se era na casa ou no poste, infira que é iluminação pública. Responda: 'Entendi! Você está falando de uma lâmpada de um poste de iluminação pública, certo? Se for isso, o serviço é realizado pela Prefeitura...'\n"
+                "2. Se ainda for totalmente ambíguo (sem nenhuma pista no histórico), peça esclarecimento de forma amigável, listando as opções de forma clara (ex: falta de luz em casa = Light; poste apagado na rua = Prefeitura).\n"
+                "3. Ao indicar a abertura de chamados para iluminação pública ou manutenção urbana, instrua o cidadão a registrar no aplicativo Colab (duquedecaxias.colab.re) e peça para ele informar:\n"
+                "   - Endereço completo\n"
+                "   - Ponto de referência\n"
+                "   - Número aproximado do poste (se houver)\n"
+                "   - Anexar fotos do local (opcional)\n"
+                "4. Se for barulho de residência/vizinho, direcione estritamente para a Polícia Militar (190). Se for evento/rua, direcione para Ordem Urbana via Colab.\n"
+                "5. Formate informações importantes em **negrito** (números, telefones, links, temas).\n"
+                "6. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
+                "7. Mantenha a resposta curta, objetiva, prestativa e calorosa. Máximo 4 frases."
+            )
+            
+            prompt = (
+                f"Histórico recente de mensagens:\n{history_context}\n\n"
+                f"Mensagem atual do cidadão: \"{query}\"\n"
+                f"Intenção detectada (triagem): {intent}\n"
+                f"Necessita esclarecimento (needs_clarification): {triage_info.get('needs_clarification')}\n\n"
+                f"Gere a resposta humana de orientação ou esclarecimento:"
+            )
+            
+            try:
+                answer = agent.gemini_client.generate_response(
+                    prompt,
+                    system_instruction=system_instruction,
+                    model="gemini-3.1-flash-lite",
+                    temperature=0.2,
+                    max_output_tokens=250
+                ).strip()
+                return {
+                    "answer": answer,
+                    "sources": [],
+                    "confidence": triage_info.get("confidence", 0.9),
+                    "intent_detected": "ambiguity_resolved_dynamic",
+                    "triage_info": triage_info,
+                    "metrics": {
+                        "retrieval_time_ms": 0,
+                        "llm_time_ms": round((time.time() - start_time) * 1000, 2),
+                        "total_time_ms": round((time.time() - start_time) * 1000, 2),
+                        "tokens_used": len(query) // 4 + len(prompt) // 4,
+                        "keywords": extract_query_keywords(query)
+                    }
+                }
+            except Exception as e:
+                print(f"[AmbiguityHandler Warning] Falha na geração dinâmica, usando fallback offline: {e}", file=sys.stderr)
+
+        # 2. Fallback offline tradicional (caso esteja offline)
         if not triage_info.get("needs_clarification"):
             q_lower = query.lower()
             if any(w in q_lower for w in ["poste", "rua", "pública", "publica", "fora", "calçada", "calcada", "dois", "3 postes", "lampada apagada"]):
@@ -374,13 +431,19 @@ class AmbiguityHandler(BaseHandler):
                     }
                 }
         
-        # Caso precise de esclarecimento direto
         if intent == "AMBIGUO_LUZ":
             answer = (
                 "Você poderia me esclarecer se a sua dúvida é sobre **falta de energia elétrica dentro da sua residência** "
                 "ou se é sobre **iluminação pública (como um poste apagado ou lâmpada com problema na rua)**?\n\n"
                 "• Se for **falta de luz na sua casa**, a concessionária responsável é a **Light** (você pode falar com eles pelo WhatsApp no número **(21) 99981-1920** ou pelo telefone **0800-282-0120**).\n"
                 "• Se for **poste apagado ou problema na rua**, o serviço é da Prefeitura! Você pode pedir a manutenção direto pelo aplicativo **Colab**, no site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/) ou ligando para o telefone **(21) 2961-9000** (Subsecretaria de Iluminação Pública)."
+            )
+        elif intent == "AMBIGUO_BARULHO":
+            answer = (
+                "Você poderia me esclarecer se o som alto vem de uma **residência particular (como a casa de um vizinho, apartamento ou festa privada)** "
+                "ou se é de um **evento realizado em espaço público (como um show na rua, praça pública ou festa aberta à população)**?\n\n"
+                "• Se for barulho de **vizinho ou residência particular**, a competência de atendimento é da **Polícia Militar (ligue para 190)**.\n"
+                "• Se for um **evento ou show em espaço público/rua**, a reclamação deve ser registrada para a **Ordem Urbana** da Prefeitura pelo aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/)."
             )
         else:
             answer = (
@@ -502,6 +565,56 @@ class RagHandler(BaseHandler):
             }
             
         relevant_results = [r for r in results if r["similarity"] >= effective_threshold]
+        
+        # 5. Calibração da Confiança (Antecipada)
+        base_score = relevant_results[0]["similarity"]
+        confidence = calibrate_confidence(base_score, query, relevant_results)
+        
+        # Se a confiança for baixa (< 0.60) e estiver online, gera uma pergunta de clarificação em vez de responder incorretamente
+        if base_score < 0.60 and agent.using_real:
+            llm_start = time.time()
+            system_instruction = (
+                "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
+                "A busca obteve baixa confiança e o assunto ou o local exato pode não estar claro.\n"
+                "Sua missão é gerar uma pergunta de confirmação/esclarecimento muito simpática, natural e humana.\n"
+                "Você DEVE citar expressamente o nome do resultado/órgão/local mais provável encontrado no contexto da base de dados e perguntar se o cidadão está falando dele ou de outro assunto/local.\n"
+                "Exemplo: se o cidadão pergunta 'como ir no adão pereira' e o resultado mais provável é 'Hospital Municipal Dr. Adão Pereira Nunes', pergunte: 'Só para confirmar: você está falando do Adão Pereira, o Hospital Municipal Dr. Adão Pereira Nunes, ou de outro local?'\n"
+                "Seja extremamente curto, educado e caloroso. Máximo 2 frases."
+            )
+            prompt = (
+                f"Mensagem do cidadão: \"{query}\"\n"
+                f"Melhor resultado da base (baixa confiança): \"{relevant_results[0].get('title')}\" - \"{relevant_results[0].get('content')[:250]}\"\n\n"
+                f"Gere a pergunta de clarificação/confirmação:"
+            )
+            try:
+                clarification_query = agent.gemini_client.generate_response(
+                    prompt,
+                    system_instruction=system_instruction,
+                    model="gemini-3.1-flash-lite",
+                    temperature=0.2,
+                    max_output_tokens=150
+                ).strip()
+                llm_time = time.time() - llm_start
+                total_time = time.time() - start_time
+                agent.log_execution_metrics(query, retrieval_time, llm_time, total_time, base_score, len(query)//4 + len(prompt)//4, 0.0)
+                return {
+                    "answer": clarification_query,
+                    "sources": [],
+                    "confidence": confidence,
+                    "retrieved_chunks": [],
+                    "intent_detected": "low_confidence_clarification",
+                    "triage_info": triage_info,
+                    "metrics": {
+                        "retrieval_time_ms": round(retrieval_time * 1000, 2),
+                        "llm_time_ms": round(llm_time * 1000, 2),
+                        "total_time_ms": round(total_time * 1000, 2),
+                        "tokens_used": len(query) // 4 + len(prompt) // 4,
+                        "keywords": extract_query_keywords(query)
+                    }
+                }
+            except Exception as e:
+                print(f"[Low Confidence Clarification Warning] Falha na chamada da LLM: {e}", file=sys.stderr)
+
         sources_list = list(set(r["source"] for r in relevant_results))
         
         # 4. Geração de Resposta (LLM ou Fallback Offline)
@@ -511,7 +624,6 @@ class RagHandler(BaseHandler):
         
         if agent.using_real:
             for r in relevant_results:
-
                 source_upper = r['source'].upper()
                 content_block = f"[{r['title']}]:\n{r['content']}"
                 if "SECRETARIAS" in source_upper or "VW_IA_SERVICOS" in source_upper:
@@ -528,7 +640,6 @@ class RagHandler(BaseHandler):
             context_str = "\n\n".join(context_blocks)
             agent._last_context = context_str
             is_list_result = any(r.get("is_list_result") for r in relevant_results)
-
             
             system_instruction = (
                 "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
@@ -540,12 +651,19 @@ class RagHandler(BaseHandler):
                 "- Para endereço, telefone, e-mail e horário: use EXCLUSIVAMENTE os dados estruturados.\n"
                 "- O 'CONTEXTO COMPLEMENTAR' serve apenas para enriquecer com descrições, nunca para substituir dados oficiais.\n"
                 "\n"
-                "DIRETRIZES:\n"
+                "REGRA CRÍTICA DE COMPETÊNCIA — PERTURBAÇÃO DO SOSSEGO / BARULHO:\n"
+                "- Se o cidadão reclamar de barulho, som alto, festa ou algazarra vindo de um **vizinho, residência particular, apartamento ou casa ao lado**: a competência é da **POLÍCIA MILITAR** — oriente-o a ligar para o **190**. NÃO direcione ao Colab, Ordem Urbana ou Ouvidoria para este caso.\n"
+                "- Se o cidadão reclamar de barulho vindo de **evento em espaço público (rua, praça, evento aberto, baile funk)**: direcione à **Ordem Urbana** pelo **Colab** ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)), tema **Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)**.\n"
+                "\n"
+                "DIRETRIZES CONVERSACIONAIS:\n"
                 "1. Use **negrito** para telefones, endereços e horários.\n"
                 "2. Fale com autoridade, clareza e acolhimento. Jamais use 'pelo que sei', 'não tenho certeza' ou termos de hesitação.\n"
-                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente e com muita simpatia a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Caso contrário ou se o dado não constar no contexto, encaminhe diretamente: Ouvidoria **(21) 2652-3835** ou **ouvidoria@duquedecaxias.rj.gov.br**.\n"
-                "4. NÃO repita saudações se o diálogo já está em andamento.\n"
-                "5. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'."
+                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente e com muita simpatia a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Para agilizar o atendimento de zeladoria, lembre o munícipe de informar: endereço completo do fato com ponto de referência, número aproximado do poste (se aplicável) e se puder anexar uma foto no app Colab.\n"
+                "4. Se o cidadão solicitar genericamente os serviços atendidos pela zeladoria urbana ou serviços urbanos, liste de forma clara e organizada os seguintes itens: **Tapa-buraco**, **Limpeza de ruas**, **Capina**, **Roçada**, **Retirada de entulho**, **Coleta de galhos**, **Iluminação pública**, **Desobstrução de bueiros**, **Limpeza de rios e canais**, **Manutenção de praças**.\n"
+                "5. Se o cidadão solicitar o **endereço** de uma secretaria, órgão ou equipamento público (ex: Guarda Municipal, CRAS, etc.), forneça a resposta principal em **negrito** e ofereça proativamente fornecer outros detalhes se ele desejar, como: telefone, horário de funcionamento, como chegar ou serviços oferecidos no local.\n"
+                "6. NÃO repita saudações se o diálogo já está em andamento. Comece a resposta de forma direta e natural.\n"
+                "7. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'.\n"
+                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário'), sem inventar ou parafrasear os botões do formulário."
             )
             
             prompt = (
@@ -567,7 +685,9 @@ class RagHandler(BaseHandler):
                     prompt,
                     system_instruction=system_instruction,
                     model=session_model,
-                    previous_interaction_id=gemini_interaction_id
+                    previous_interaction_id=gemini_interaction_id,
+                    temperature=0.15,
+                    max_output_tokens=350
                 )
                 if new_conv_id and conversation_id:
                     DuqueIAAgent._interaction_map[conversation_id] = new_conv_id

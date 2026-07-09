@@ -14,7 +14,9 @@ DANGEROUS_PATTERNS = [
 ]
 
 PRIVACY_TRIGGERS = [
-    r"\bvizinho\b", r"\bvizinha\b",
+    # Match vizinho/vizinha only if query doesn't mention sound or noise
+    r"\bvizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
+    r"\bvizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
     r"cpf\s+(?:do|de|da)\s+(?:cidadão|cidadao|reclamante|outro|terceiro|vizinho|fulano|sicrano)",
     r"protocolo\s+.*(?:vizinho|outro|terceiro|fulano|vizinha)",
     r"nome\s+(?:dele|dela|do\s+vizinho|do\s+reclamante)",
@@ -80,17 +82,24 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
         f"{context_str}"
         f"Pergunta do cidadão: \"{query}\"\n"
         f"Resposta gerada pela IA: \"{answer}\"\n\n"
-        "Responda EXCLUSIVAMENTE 'PERMITIDO' ou 'BLOQUEADO' com base nestas regras ESTRITAS:\n"
+        "Responda EXCLUSIVAMENTE com a palavra 'PERMITIDO' ou 'BLOQUEADO' com base nestas regras ESTRITAS:\n"
         "- BLOQUEADO SOMENTE SE a resposta mencionar CPF, número de protocolo ou dados pessoais de TERCEIROS (de outras pessoas, não do próprio cidadão).\n"
         "- BLOQUEADO SOMENTE SE a resposta contiver linguagem agressiva, ofensas ou conteúdo impróprio.\n"
-        "- BLOQUEADO SOMENTE SE a resposta CONTRADISSER EXPLICITAMENTE um fato presente no contexto das fontes oficiais (ex: prazo diferente, endereço diferente).\n"
-        "- PERMITIDO se a resposta orientar sobre canais da Ouvidoria, Colab, telefones de contato, prazos legais gerais ou qualquer informação pública municipal.\n"
+        "- BLOQUEADO SOMENTE SE a resposta CONTRADISSER EXPLICITAMENTE um fato presente no contexto das fontes oficiais (ex: prazo diferente cadastrado, endereço diferente cadastrado).\n"
+        "- A ausência de menção direta a termos na fonte oficial NÃO é contradição. Perguntas de continuação (ex: 'qualquer pessoa pode usar?', 'quem tem direito?') sobre programas públicos ou transporte (como Tarifa Zero) ou serviços devem ser sempre PERMITIDAS e nunca bloqueadas por falta de termos no contexto.\n"
+        "- PERMITIDO se a resposta orientar sobre canais da Ouvidoria, Colab, telefones de contato, prazos legais gerais, tarifas, transporte ou qualquer informação pública municipal.\n"
+        "- PERMITIDO se a resposta orientar o cidadão a ligar para a Polícia (190) em casos de barulho de vizinho, festa particular ou perturbação do sossego em residência privada.\n"
         "- PERMITIDO se o contexto estiver vazio ou parcial — a ausência de contexto NÃO é motivo de bloqueio.\n"
         "- PERMITIDO caso contrário.\n"
         "Responda apenas com a palavra PERMITIDO ou BLOQUEADO."
     )
     try:
-        verdict = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite").strip().upper()
+        verdict = gemini_client.generate_response(
+            prompt, 
+            model="gemini-3.1-flash-lite",
+            temperature=0.0,
+            max_output_tokens=10
+        ).strip().upper()
         return "PERMITIDO" in verdict
     except Exception:
         return True

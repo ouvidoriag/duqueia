@@ -1,0 +1,10 @@
+{
+  "source": "posteiluminacao_com_defeitos.md",
+  "title": "Serviço: Poste/iluminação com defeitos",
+  "content": "# Serviço: Poste/iluminação com defeitos\n\n* **ID da Categoria:** 12826\n* **Prazo Médio de Resolução:** 5 dias\n* **Foto é Obrigatória?** Sim\n* **Ponto de Referência é Obrigatório?** Sim\n\n## Formulário de Solicitação\nAo solicitar este serviço pelo aplicativo ou portal, o cidadão deve responder às seguintes perguntas:\n\n\n### Seção: Caso não tenha uma casa em frente ao poste, indique o ponto de referência mais próximo a ele e faça a descrição da fachada.\n| Pergunta | Tipo de Resposta | Obrigatória? |\n|---|---|---|\n| Número da casa ou ponto de referência em frente ao poste com descrição da fachada | Texto livre | Sim |\n| Qual o seu telefone? Inclua o número com o DDD | Número | Sim |\n\n\n---\n*Para registrar esta demanda, acesse o aplicativo Colab ou o portal do cidadão de Duque de Caxias.*\n",
+  "metadata": {
+    "category": "general",
+    "path": "data\\knowledge\\portalcidadao\\servicos\\posteiluminacao_com_defeitos.md",
+    "char_count": 793
+  }
+}

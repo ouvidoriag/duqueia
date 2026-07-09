@@ -628,18 +628,6 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             kw_score = calculate_keyword_overlap(extract_query_keywords(query), c["chunk_keywords"])
             # Formula híbrida ajustada para dar peso prioritário à busca vetorial semântica real (85%)
             c["similarity"] = round(0.85 * c["semantic_score"] + 0.15 * kw_score, 4)
-        
-        # Boost de categoria e de contato/localização nos chunks do RAG
-        if c.get("category") == "secretarias" and any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
-            c["similarity"] = round(c["similarity"] + 0.15, 4)
-        if any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
-            content_lower = c.get("content", "").lower()
-            if "endereço" in content_lower or "endereco" in content_lower or "como acessar" in content_lower or "telefone" in content_lower:
-                c["similarity"] = round(c["similarity"] + 0.15, 4)
-                
-        # Boost de saúde para direcionamento clínico/hospitalar
-        if c.get("source") in ["saude.md", "saude.json", "postos_saude_caxias.xlsx"] and any(w in query_normalized for w in ["hospital", "upa", "uph", "emergencia", "emergência", "dor", "medico", "médico", "quebrado", "fratura", "pe ", "pé "]):
-            c["similarity"] = round(c["similarity"] + 0.20, 4)
 
     top_candidates.sort(key=lambda x: x["similarity"], reverse=True)
     reranked = reranker.rerank(query, top_candidates)
@@ -659,6 +647,52 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             seen_sources.add(r["source"])
             all_candidates.append(r)
             
+    # Aplica boosts e filtros a todos os candidatos mesclados (estruturados e vetoriais)
+    for c in all_candidates:
+        # Boost de categoria e de contato/localização nos chunks do RAG
+        if c.get("category") == "secretarias" and any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
+            c["similarity"] = round(c["similarity"] + 0.15, 4)
+        if any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
+            content_lower = c.get("content", "").lower()
+            if "endereço" in content_lower or "endereco" in content_lower or "como acessar" in content_lower or "telefone" in content_lower:
+                c["similarity"] = round(c["similarity"] + 0.15, 4)
+                
+        # Boost de saúde para direcionamento clínico/hospitalar
+        if c.get("source") in ["saude.md", "saude.json", "postos_saude_caxias.xlsx"] and any(w in query_normalized for w in ["hospital", "upa", "uph", "emergencia", "emergência", "dor", "medico", "médico", "quebrado", "fratura", "pe ", "pé "]):
+            c["similarity"] = round(c["similarity"] + 0.20, 4)
+
+        # ── NOVOS BOOSTS DE INTENÇÃO E FILTROS DE METADADOS ──
+        
+        # 1. Governança e Informações Gerais da Cidade
+        if any(w in query_normalized for w in ["distrito", "prefeito", "historia", "origem", "fundacao", "fundacao"]):
+            if c.get("category") == "general" or "a_cidade" in str(c.get("source")) or "prefeito" in str(c.get("source")):
+                c["similarity"] = round(c["similarity"] + 0.35, 4)
+            # Penaliza carta de serviços para perguntas de geografia/governo geral
+            if c.get("category") == "carta_servicos":
+                c["similarity"] = round(c["similarity"] - 0.25, 4)
+
+        # 2. Lideranças e Estrutura das Secretarias (Quem é o secretário...)
+        if any(w in query_normalized for w in ["secretario", "secretaria", "responsavel pela pasta", "pasta de", "liderança"]):
+            if c.get("category") == "secretarias":
+                c["similarity"] = round(c["similarity"] + 0.35, 4)
+            if c.get("category") == "carta_servicos":
+                c["similarity"] = round(c["similarity"] - 0.30, 4)
+
+        # 3. Impostos, Taxas e Fazenda (IPTU, Alvará, ISS)
+        if any(w in query_normalized for w in ["iptu", "alvara", "iss", "fazenda", "tributo", "imposto"]):
+            if "fazenda" in str(c.get("source")):
+                c["similarity"] = round(c["similarity"] + 0.35, 4)
+            elif c.get("category") == "carta_servicos" and "iptu" not in c.get("content", "").lower() and "alvara" not in c.get("content", "").lower():
+                c["similarity"] = round(c["similarity"] - 0.25, 4)
+
+        # 4. Saúde do Homem / Saúde Geral
+        if "saude do homem" in query_normalized or "saude da mulher" in query_normalized:
+            if "saude" in str(c.get("source")):
+                c["similarity"] = round(c["similarity"] + 0.35, 4)
+            elif c.get("category") == "carta_servicos":
+                # Penaliza outros serviços se a busca for especificamente sobre o programa de saúde do homem na ficha da secretaria
+                c["similarity"] = round(c["similarity"] - 0.20, 4)
+
     # Ordena todos juntos pelo score 'similarity' de forma decrescente
     all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
     

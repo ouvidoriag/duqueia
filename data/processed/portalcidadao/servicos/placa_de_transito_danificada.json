@@ -1,0 +1,10 @@
+{
+  "source": "placa_de_transito_danificada.md",
+  "title": "Serviço: Placa de trânsito danificada",
+  "content": "# Serviço: Placa de trânsito danificada\n\n* **ID da Categoria:** 12834\n* **Prazo Médio de Resolução:** 5 dias\n* **Foto é Obrigatória?** Sim\n* **Ponto de Referência é Obrigatório?** Sim\n\n## Formulário de Solicitação\nAo solicitar este serviço pelo aplicativo ou portal, o cidadão deve responder às seguintes perguntas:\n\n\n### Seção: Qual o tipo de defeito da placa?\n| Pergunta | Tipo de Resposta | Obrigatória? |\n|---|---|---|\n| Qual o tipo de defeito da placa? | dropdown | Sim |\n| Caso tenha selecionado a opção \"outro\" na pergunta acima, descreva o defeito abaixo | Texto livre | Não |\n\n\n---\n*Para registrar esta demanda, acesse o aplicativo Colab ou o portal do cidadão de Duque de Caxias.*\n",
+  "metadata": {
+    "category": "general",
+    "path": "data\\knowledge\\portalcidadao\\servicos\\placa_de_transito_danificada.md",
+    "char_count": 691
+  }
+}

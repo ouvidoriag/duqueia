@@ -16,7 +16,11 @@ KEYWORD_POLICY = {
         "quero": 0.1,
         "saber": 0.1,
         "favor": 0.1,
-        "solicitar": 0.2
+        "solicitar": 0.2,
+        "departamento": 0.1,
+        "coordenadoria": 0.1,
+        "diretoria": 0.1,
+        "subsecretaria": 0.1
     },
     "service": {
         "cras": 2.0,

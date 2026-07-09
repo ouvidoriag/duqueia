@@ -1,0 +1,10 @@
+{
+  "source": "obstrucao_de_calcada_notificacao.md",
+  "title": "Serviço: Obstrução de calçada (notificação)",
+  "content": "# Serviço: Obstrução de calçada (notificação)\n\n* **ID da Categoria:** 12814\n* **Prazo Médio de Resolução:** 10 dias\n* **Foto é Obrigatória?** Sim\n* **Ponto de Referência é Obrigatório?** Sim\n\n## Formulário de Solicitação\nAo solicitar este serviço pelo aplicativo ou portal, o cidadão deve responder às seguintes perguntas:\n\n\n### Seção: Descrição da obstrução.\n| Pergunta | Tipo de Resposta | Obrigatória? |\n|---|---|---|\n| Qual tipo de obstrução você gostaria de reportar? | dropdown | Sim |\n| Qual o seu telefone para contato? | Número | Sim |\n\n\n---\n*Para registrar esta demanda, acesse o aplicativo Colab ou o portal do cidadão de Duque de Caxias.*\n",
+  "metadata": {
+    "category": "general",
+    "path": "data\\knowledge\\portalcidadao\\servicos\\obstrucao_de_calcada_notificacao.md",
+    "char_count": 651
+  }
+}

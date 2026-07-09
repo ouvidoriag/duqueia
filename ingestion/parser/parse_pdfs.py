@@ -91,9 +91,9 @@ def parse_html_to_json(html_path: str) -> dict:
     }
 
 def main():
-    raw_dir = "raw_pdf_files"
-    parsed_dir = "parsed_pdf_files"
-    bancoia_dir = "bancoia"
+    raw_dir = os.path.join("data", "raw", "raw_pdf_files")
+    parsed_dir = os.path.join("data", "processed")
+    bancoia_dir = os.path.join("data", "knowledge")
     
     for d in [raw_dir, parsed_dir]:
         if not os.path.exists(d):

@@ -8,10 +8,41 @@ def log(msg):
     print(f"\n🚀 [DUQUE IA SETUP] {msg}")
 
 def check_requirements():
+    # Detecta e avisa sobre versão do Python
+    version = sys.version_info
+    log(f"Versão do Python detectada: {version.major}.{version.minor}.{version.micro}")
+    if version.major == 3 and version.minor >= 13:
+        log("⚠️  ATENÇÃO: Você está executando uma versão recente do Python (>= 3.13). \n"
+            "   Algumas dependências pesadas de IA (como torch, sentence-transformers, faiss ou onnxruntime) \n"
+            "   podem apresentar incompatibilidades ou falhas de compilação. \n"
+            "   Recomendamos o uso do Python 3.11.x ou 3.12.x para máxima estabilidade em produção.")
+
+    log("Verificando dependências do Python (pip)...")
+    try:
+        # Testa se o pip está disponível
+        subprocess.run([sys.executable, "-m", "pip", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        log("Módulo pip não encontrado. Tentando instalar ensurepip...")
+        try:
+            subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"], check=True)
+        except Exception as e:
+            log(f"Aviso: Não foi possível instalar o pip automaticamente via ensurepip: {e}")
+
+    try:
+        log("Instalando pacotes do requirements.txt via sys.executable...")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+        log("Requisitos do Python instalados com sucesso!")
+    except Exception as e:
+        log(f"Aviso: Falha ao rodar pip install: {e}. Garanta as dependências manualmente.")
+
     log("Verificando dependências do Node.js (npm)...")
     if not os.path.exists("node_modules"):
         log("Pasta node_modules não encontrada. Rodando npm install...")
-        subprocess.run("npm install", shell=True, check=True)
+        try:
+            subprocess.run(["npm", "install"], check=True)
+        except Exception as e:
+            log(f"Erro ao executar npm install: {e}. Tentando com shell=True...")
+            subprocess.run("npm install", shell=True, check=True)
     else:
         log("Dependências do Node já instaladas.")
 
@@ -111,8 +142,12 @@ def setup_database():
 
 def run_server():
     log("Iniciando o Duque IA Chat Server...")
-    # Executa o node server.js e repassa logs de saída diretamente para o console
-    subprocess.run("node server.js", shell=True)
+    # Executa o node server.js sem shell=True por padrão
+    try:
+        subprocess.run(["node", "server.js"], check=True)
+    except Exception as e:
+        log(f"Falha ao iniciar o Node diretamente: {e}. Tentando com shell=True...")
+        subprocess.run("node server.js", shell=True)
 
 if __name__ == "__main__":
     # Verifica se existe o .env

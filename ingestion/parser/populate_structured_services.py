@@ -8,7 +8,7 @@ import re
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-XLSX_PATH = os.path.join(ROOT, "bancoia", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
+XLSX_PATH = os.path.join(ROOT, "data", "knowledge", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
 DB_PATH = os.path.join(ROOT, "agent", "duque_ia.db")
 
 def clean_name(name: str) -> str:
@@ -91,7 +91,7 @@ def populate_structured_services():
 
     if not os.path.exists(XLSX_PATH):
         # Tenta na pasta CRIADO se não estiver no raiz do bancoia
-        alternative_path = os.path.join(ROOT, "bancoia", "CRIADO", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
+        alternative_path = os.path.join(ROOT, "data", "knowledge", "CRIADO", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
         if os.path.exists(alternative_path):
             path = alternative_path
         else:

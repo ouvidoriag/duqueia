@@ -36,6 +36,8 @@ class GeminiClient:
     def __init__(self):
         # Carrega a lista de chaves do arquivo .env
         keys_str = os.getenv("GEMINI_API_KEYS", "")
+        # Remove aspas, barras invertidas e quebras de linha para suportar chaves multilinhas no .env
+        keys_str = keys_str.replace('"', '').replace("'", "").replace("\\", "").replace("\n", "").replace("\r", "")
         all_keys = [k.strip() for k in keys_str.split(",") if k.strip()]
 
         # Filtra chaves Gemini API válidas: AIzaSy... (padrão) e AQ.Ab8RN... (novas chaves de autorização/Auth)
@@ -56,6 +58,8 @@ class GeminiClient:
 
         # Cliente instanciado pelo novo SDK (por chave ativa)
         self._client = None
+
+        self.key_cooldowns = {i: 0.0 for i in range(len(self.api_keys))}
 
         if self.api_keys:
             self._configure_current_key()
@@ -78,18 +82,48 @@ class GeminiClient:
             # Legado: configura globalmente
             genai.configure(api_key=active_key)
 
-    def rotate_key(self):
-        """Rotaciona para a proxima chave de API disponivel na lista."""
+    def rotate_key(self, model_name: str = None):
+        """Rotaciona para a proxima chave de API disponivel que nao esta em cooldown para o modelo."""
         if not self.api_keys:
             return False
-        self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
-        self._configure_current_key()
+        
+        now = time.time()
+        start_idx = self.current_key_index
+        for offset in range(1, len(self.api_keys) + 1):
+            next_idx = (start_idx + offset) % len(self.api_keys)
+            cooldown_key = (next_idx, model_name) if model_name else next_idx
+            if self.key_cooldowns.get(cooldown_key, 0.0) < now:
+                self.current_key_index = next_idx
+                self._configure_current_key()
+                return True
+        
+        # Se todas estao em cooldown para este modelo, falha imediatamente sem sleep para ativar fallback offline rapido
+        raise RuntimeError(f"Todas as chaves de API do Gemini estao em cooldown temporario para o modelo {model_name}.")
+
+    def is_retryable_error(self, e) -> bool:
+        """Determina se o erro é temporário/de cota (retryable) ou de código/chave inválida (não-retryable)."""
+        error_msg = str(e).lower()
+        if isinstance(e, (TypeError, ValueError, KeyError, NameError, AttributeError)):
+            return False
+        non_retryable_phrases = [
+            "unexpected keyword argument",
+            "invalid argument",
+            "api key not valid",
+            "incorrect api key provided",
+            "invalid_api_key",
+            "invalid api key",
+            "not found",
+            "400"
+        ]
+        if any(phrase in error_msg for phrase in non_retryable_phrases):
+            return False
         return True
 
-    def execute_with_rotation(self, func, *args, **kwargs):
+    def execute_with_rotation(self, func, model_name: str = None, *args, **kwargs):
         """
-        Executa uma funcao da API do Gemini. Se falhar com erro de cota
-        ou autenticacao, rotaciona a chave e tenta novamente.
+        Executa uma funcao da API do Gemini com roteamento robusto.
+        Distingue erros de programacao de erros de cota (429/503).
+        Caso ocorra erro temporario, coloca a chave em cooldown para o modelo e rotaciona imediatamente.
         """
         if not self.api_keys:
             raise RuntimeError("Nenhuma chave de API disponivel no sistema.")
@@ -99,19 +133,23 @@ class GeminiClient:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                error_msg = str(e).lower()
-                print(f"[GeminiClient] Erro na tentativa {attempt + 1}: {e}", file=sys.stderr)
-
-                # Rotaciona em casos de cota, autenticacao ou indisponibilidade
-                if any(k in error_msg for k in ["quota", "exhausted", "api key",
-                                                 "invalid", "429", "403", "404",
-                                                 "not found", "unavailable"]):
-                    print("[GeminiClient] Rotacionando chave...", file=sys.stderr)
-                    self.rotate_key()
-                    time.sleep(1.0)
-                else:
-                    self.rotate_key()
-                    time.sleep(1.0)
+                # 1. Classifica o erro
+                if not self.is_retryable_error(e):
+                    print(f"[GeminiClient] ERRO NÃO RECUPERÁVEL: {e}. Abortando execução.", file=sys.stderr)
+                    raise e
+                
+                # 2. Erro recuperável (429, 503, timeout)
+                print(f"[GeminiClient] Erro recuperável na tentativa {attempt + 1}: {e}", file=sys.stderr)
+                
+                # Coloca a chave atual em cooldown de 60 segundos para este modelo
+                cooldown_key = (self.current_key_index, model_name) if model_name else self.current_key_index
+                self.key_cooldowns[cooldown_key] = time.time() + 60.0
+                
+                if attempt == max_attempts - 1:
+                    break
+                
+                # Rotaciona chave imediatamente (se todas estiverem em cooldown, levantará RuntimeError instantâneo)
+                self.rotate_key(model_name=model_name)
 
         raise RuntimeError("Todas as chaves de API falharam ou atingiram limite de cota.")
 
@@ -171,7 +209,7 @@ class GeminiClient:
     # --------------------------------------------------------------------------
     # GERACAO DE TEXTO
     # --------------------------------------------------------------------------
-    def generate_interaction(self, prompt: str, system_instruction: str = None, model: str = None, previous_interaction_id: str = None) -> tuple:
+    def generate_interaction(self, prompt: str, system_instruction: str = None, model: str = None, previous_interaction_id: str = None, temperature: float = None, max_output_tokens: int = None) -> tuple:
         """Gera resposta usando a Interactions API do Gemini e retorna (texto_resposta, new_interaction_id, working_model)."""
         if not self.api_keys:
             return "Desculpe, o sistema esta rodando sem chaves de API ativas.", None, None
@@ -201,24 +239,54 @@ class GeminiClient:
             try:
                 if _USE_NEW_SDK:
                     def _call(m=current_model):
-                        resp = self._client.interactions.create(
-                            model=m,
-                            input=prompt,
-                            previous_interaction_id=valid_interaction_id,
-                            system_instruction=system_instruction
-                        )
-                        return resp.output_text, resp.id
+                        try:
+                            call_kwargs = {
+                                "model": m,
+                                "input": prompt,
+                                "previous_interaction_id": valid_interaction_id,
+                            }
+                            if system_instruction:
+                                call_kwargs["system_instruction"] = system_instruction
+                            resp = self._client.interactions.create(**call_kwargs)
+                            return resp.output_text, resp.id
+                        except Exception as e:
+                            err_msg = str(e).lower()
+                            if "not_found" in err_msg or "404" in err_msg or "method not found" in err_msg or "requested entity was not found" in err_msg:
+                                print(f"[GeminiClient] Interactions API não suportada ou 404 para o modelo {m}. Caindo para generate_content...", file=sys.stderr)
+                                config = {}
+                                if system_instruction:
+                                    config["system_instruction"] = system_instruction
+                                if temperature is not None:
+                                    config["temperature"] = temperature
+                                if max_output_tokens is not None:
+                                    config["max_output_tokens"] = max_output_tokens
+                                resp = self._client.models.generate_content(
+                                    model=m,
+                                    contents=prompt,
+                                    config=genai_types.GenerateContentConfig(**config) if config else None
+                                )
+                                return resp.text, None
+                            raise e
                 else:
                     def _call(m=current_model):
                         model_obj = genai.GenerativeModel(
                             model_name=m,
                             system_instruction=system_instruction
                         )
-                        res = model_obj.generate_content(prompt).text
+                        gen_config = {}
+                        if temperature is not None:
+                            gen_config["temperature"] = temperature
+                        if max_output_tokens is not None:
+                            gen_config["max_output_tokens"] = max_output_tokens
+                        
+                        res = model_obj.generate_content(
+                            prompt,
+                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None
+                        ).text
                         return res, None
 
                 # Executa com rotação de chaves
-                ans, c_id = self.execute_with_rotation(_call)
+                ans, c_id = self.execute_with_rotation(_call, model_name=current_model)
                 return ans, c_id, current_model
             except Exception as e:
                 last_exception = e
@@ -228,7 +296,7 @@ class GeminiClient:
         raise last_exception if last_exception else RuntimeError("Todos os modelos falharam na geração de interação.")
 
 
-    def generate_response(self, prompt: str, system_instruction: str = None, model: str = None) -> str:
+    def generate_response(self, prompt: str, system_instruction: str = None, model: str = None, temperature: float = None, max_output_tokens: int = None) -> str:
         """Gera resposta textual do modelo Gemini com fallback automático de modelos em caso de 429/erros."""
         if not self.api_keys:
             return "Desculpe, o sistema esta rodando sem chaves de API ativas."
@@ -256,6 +324,10 @@ class GeminiClient:
                         config = {}
                         if system_instruction:
                             config["system_instruction"] = system_instruction
+                        if temperature is not None:
+                            config["temperature"] = temperature
+                        if max_output_tokens is not None:
+                            config["max_output_tokens"] = max_output_tokens
                         resp = self._client.models.generate_content(
                             model=m,
                             contents=prompt,
@@ -268,10 +340,18 @@ class GeminiClient:
                             model_name=m,
                             system_instruction=system_instruction
                         )
-                        return model_obj.generate_content(prompt).text
+                        gen_config = {}
+                        if temperature is not None:
+                            gen_config["temperature"] = temperature
+                        if max_output_tokens is not None:
+                            gen_config["max_output_tokens"] = max_output_tokens
+                        return model_obj.generate_content(
+                            prompt,
+                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None
+                        ).text
 
                 # Executa com rotação de chaves para este modelo específico
-                return self.execute_with_rotation(_call)
+                return self.execute_with_rotation(_call, model_name=current_model)
             except Exception as e:
                 last_exception = e
                 print(f"[GeminiClient] Falha com o modelo {current_model}: {e}. Tenta próximo modelo de fallback.", file=sys.stderr)

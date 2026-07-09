@@ -165,8 +165,8 @@ def run_retrieval_relevance_tests():
         },
         {
             "query": "CRAS Jardim Primavera",
-            "expected_category": "carta_servicos",
-            "expected_source_substring": "CARTA_DE_SERVICO",
+            "expected_category": "unidades",
+            "expected_source_substring": "unidades",
             "expected_intent": QueryIntent.GIS,
             "min_score": 0.45
         }

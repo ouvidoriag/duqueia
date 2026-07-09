@@ -1,0 +1,10 @@
+{
+  "source": "capina_e_rocada.md",
+  "title": "Serviço: Capina e roçada",
+  "content": "# Serviço: Capina e roçada\n\n* **ID da Categoria:** 12823\n* **Prazo Médio de Resolução:** 20 dias\n* **Foto é Obrigatória?** Sim\n* **Ponto de Referência é Obrigatório?** Sim\n\n## Formulário de Solicitação\nAo solicitar este serviço pelo aplicativo ou portal, o cidadão deve responder às seguintes perguntas:\n\n\n### Seção: A capina e roçada são realizadas exclusivamente em áreas públicas. Não realizamos esse serviço em terrenos ou áreas particulares.\n| Pergunta | Tipo de Resposta | Obrigatória? |\n|---|---|---|\n| A capina/roçada solicitada é em área pública? | Sim / Não | Sim |\n| Qual o seu telefone para contato? | Número | Sim |\n\n\n---\n*Para registrar esta demanda, acesse o aplicativo Colab ou o portal do cidadão de Duque de Caxias.*\n",
+  "metadata": {
+    "category": "general",
+    "path": "data\\knowledge\\portalcidadao\\servicos\\capina_e_rocada.md",
+    "char_count": 735
+  }
+}

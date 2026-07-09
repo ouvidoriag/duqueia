@@ -7,7 +7,7 @@ import sys
 
 # Modelo e versão do prompt para controle de cache
 MODEL_VERSION = "gemini-3.1-flash-lite"
-PROMPT_VERSION = "triage_v2.0"
+PROMPT_VERSION = "triage_v2.1"
 
 # Lista de intenções válidas e permitidas
 ALLOWED_INTENTS = {
@@ -18,6 +18,7 @@ ALLOWED_INTENTS = {
     "FORA_COMPETENCIA",
     "AMBIGUO_LUZ",
     "AMBIGUO_LAMPADA",
+    "AMBIGUO_BARULHO",
     "RESIDENCIAL",
     "OUVIDORIA_MANIFESTACAO",
     "ESCALONAMENTO_HUMANO",
@@ -43,17 +44,17 @@ FAST_SECURITY_PATTERNS = [
         "Solicitação de CPF de terceiro bloqueada localmente."
     ),
     (
-        r"protocolo\s+.*(?:vizinho|vizinha|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
+        r"protocolo\s+.*(?:vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
         "LGPD",
         "Solicitação de protocolo de terceiro bloqueada localmente."
     ),
     (
-        r"nome\s+(?:dele|dela|do\s+vizinho|da\s+vizinha|do\s+reclamante|do\s+outro|da\s+outra)",
+        r"nome\s+(?:dele|dela|do\s+vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|da\s+vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|do\s+reclamante|do\s+outro|da\s+outra)",
         "LGPD",
         "Solicitação de nome de reclamante/vizinho bloqueada localmente."
     ),
     (
-        r"reclamaç(?:ão|ões|ao)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho|vizinha|outro|terceiro)",
+        r"reclamaç(?:ão|ões|ao)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|terceiro)",
         "LGPD",
         "Solicitação de visualização de reclamações de terceiros bloqueada localmente."
     ),
@@ -88,6 +89,28 @@ FAST_SECURITY_PATTERNS = [
     )
 ]
 
+# Detecta queries de barulho/som onde o cidadão NÃO especifica se a origem é pública ou privada.
+# Deve ficar ABAIXO dos padrões de segurança (LGPD/ESCALONAMENTO) que têm prioridade.
+# Dispara AMBIGUO_BARULHO com needs_clarification=True para acionar o Agente Coletor.
+AMBIGUITY_FAST_PATTERNS = [
+    # Frases ambíguas de barulho sem menção explícita de vizinho/residência privada OU local público
+    (
+        r"(?:tem|tá|ta|tem|há|ha)\s+(?:um|uma|muito|um)\s+(?:barulho|som|algazarra|zoeira|bagunça|bagunceira)\b"
+        r"(?!.*(?:vizinho|vizinha|apartamento|casa\s+(?:do|da|ao\s+lado)|residência|andar))"
+        r"(?!.*(?:rua|praça|largo|parque|show|evento|bar\b|boate))",
+        "AMBIGUO_BARULHO",
+        "Reclamação de barulho sem origem explícita detectada — aguardando esclarecimento."
+    ),
+    # 'barulho insuportavel / excessivo / muito alto' sem local claro
+    (
+        r"barulho\s+(?:insuportáve[l]?|insuportave[l]?|excess[i]?vo|muito\s+alto|absurdo|horríve[l]?|horrivel)"
+        r"(?!.*(?:vizinho|vizinha|apartamento|casa\s+(?:do|da|ao\s+lado)|residência|andar))"
+        r"(?!.*(?:rua|praça|largo|parque|show|evento|bar\b|boate))",
+        "AMBIGUO_BARULHO",
+        "Reclamação de barulho intenso sem origem explícita — aguardando esclarecimento."
+    ),
+]
+
 def check_fast_gate(query: str) -> dict | None:
     """Valida a query usando regras locais de baixíssima latência (0ms)."""
     query_lower = query.lower().strip()
@@ -110,13 +133,24 @@ def check_fast_gate(query: str) -> dict | None:
             "source": "FAST_GATE"
         }
         
-    # Matcher de políticas de segurança / escopo
+    # 1º: Matcher de políticas de segurança / escopo (máxima prioridade)
     for regex, intent, reason in FAST_SECURITY_PATTERNS:
         if re.search(regex, query_lower):
             return {
                 "intent": intent,
                 "confidence": 1.0,
                 "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+    
+    # 2º: Detector de ambiguidade de barulho (sem origem explícita)
+    for regex, intent, reason in AMBIGUITY_FAST_PATTERNS:
+        if re.search(regex, query_lower, re.IGNORECASE):
+            return {
+                "intent": intent,
+                "confidence": 0.90,
+                "needs_clarification": True,
                 "reason": reason,
                 "source": "FAST_GATE"
             }
@@ -221,6 +255,13 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "Você é o Agente de Triagem oficial do Duque IA da Prefeitura de Duque de Caxias.\n"
         "Sua função é classificar a consulta do cidadão em uma intenção municipal estruturada.\n"
         "Analise a consulta atual à luz das mensagens anteriores (se fornecidas no histórico abaixo) para entender o contexto e saber se alguma ambiguidade já foi esclarecida.\n"
+        "\n"
+        "REGRAS DE RESOLUÇÃO DE HISTÓRICO:\n"
+        "- Se o munícipe foi anteriormente questionado sobre uma escolha ambígua (ex: 'é na sua casa ou iluminação pública / poste na rua?', ou 'é barulho de vizinho ou evento público/rua?') e a última mensagem dele é uma resposta a essa pergunta (ex: 'lâmpada', 'é uma lâmpada', 'poste', 'rua', 'é da rua', 'vizinho', 'casa', 'queimada', 'queimanda prora'), NÃO classifique como AMBIGUO. Use o histórico para inferir a intenção e resolver a ambiguidade:\n"
+        "  * Se ele responde 'lâmpada', 'é uma lâmpada', 'poste', 'rua', 'queimada', 'queimanda prora' etc., após perguntarmos de iluminação pública vs residencial, classifique como RAG_GERAL (needs_clarification=false).\n"
+        "  * Se ele responde 'na minha casa', 'no meu quarto', 'minha casa', 'aqui em casa' etc., classifique como RESIDENCIAL (needs_clarification=false).\n"
+        "  * Se ele responde 'vizinho', 'casa ao lado' etc., para barulho, classifique como RAG_GERAL (needs_clarification=false) para que a resposta informe Polícia (190).\n"
+        "  * Se ele responde 'rua', 'show', 'praça' etc., para barulho, classifique como RAG_GERAL (needs_clarification=false) para orientar o Colab.\n"
         "Não responda à pergunta do usuário. Apenas identifique a intenção e classifique-a.\n\n"
         "Categorias permitidas:\n"
         "- SAUDACAO: Cumprimentos simples (oi, olá, bom dia, tchau).\n"
@@ -230,6 +271,12 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- FORA_COMPETENCIA: Assuntos que competem ao Estado ou União (ex: linhas de metrô, rodovias federais).\n"
         "- AMBIGUO_LUZ: Dúvida sobre falta de luz (distribuição Light) ou lâmpada apagada no poste da rua.\n"
         "- AMBIGUO_LAMPADA: Dúvida sobre troca de lâmpada dentro da residência vs poste público de rua.\n"
+        "- AMBIGUO_BARULHO: Reclamação de barulho excessivo, som alto, festas ou algazarra onde NÃO esteja claro se a origem é em local privado (vizinho/residência) ou em local público (rua, praça, evento, bar).\n"
+        "  * Defina needs_clarification=true e intent=AMBIGUO_BARULHO se o cidadão reclamar de barulho/som/festa mas NÃO especificar a origem. Ex: 'tem barulho perto de casa', 'ta tendo festa e não consigo dormir', 'muito barulho aqui na minha rua'.\n"
+        "  * EXCEÇÃO RAG_GERAL: Se o cidadão especificar claramente que é vizinho/residência particular (ex: 'meu vizinho com som alto', 'festa na casa ao lado', 'apartamento do Rildo'), classifique como RAG_GERAL — o RAG direciona para a Polícia (190).\n"
+        "  * EXCEÇÃO RAG_GERAL: Se o cidadão especificar claramente que é evento público/rua/praça (ex: 'show na praça', 'baile funk na rua', 'bar na esquina'), classifique como RAG_GERAL — o RAG direciona para Ordem Urbana/Colab.\n"
+        "  * Exemplo AMBIGUO_BARULHO: 'ta tendo um barulho insuportavel perto da minha casa' → needs_clarification=true (não se sabe se é vizinho ou rua).\n"
+        "  * Exemplo AMBIGUO_BARULHO: 'tem uma festa que não me deixa dormir' → needs_clarification=true (não se sabe se é casa ao lado ou rua).\n"
         "- RESIDENCIAL: Manutenção elétrica interna em área particular ou condomínio privado.\n"
         "- OUVIDORIA_MANIFESTACAO: O cidadão quer registrar uma manifestação oficial na Ouvidoria Geral (reclamação, denúncia, sugestão ou elogio).\n"
         "  * ATENÇÃO (CRÍTICO - ZELADORIA URBANA): Se o cidadão está relatando um problema de zeladoria urbana pela primeira vez (ex: 'tem um buraco na minha rua', 'lixo acumulado na calçada', 'poste apagado na rua') sem mencionar que já fez um pedido anterior ou que possui um protocolo não atendido, classifique como RAG_GERAL. O objetivo é orientá-lo a abrir uma 'Solicitação de Serviço' de zeladoria comum no Colab, e não uma reclamação na Ouvidoria.\n"
@@ -246,7 +293,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         f"Consulta atual do cidadão: \"{query}\"\n\n"
         "Retorne EXCLUSIVAMENTE um objeto JSON válido contendo:\n"
         "{\n"
-        '  "intent": "SAUDACAO"|"IDENTIDADE"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
+        '  "intent": "SAUDACAO"|"IDENTIDADE"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
         '  "tipo_manifestacao": "reclamacao"|"denuncia"|"elogio"|"sugestao"|"geral"|null,\n'
         '  "confidence": 0.0-1.0,\n'
         '  "needs_clarification": true|false,\n'
@@ -255,7 +302,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
     )
     
     try:
-        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite")
+        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=150)
         match = re.search(r'\{.*\}', response_text.replace('\n', ' '), re.DOTALL)
         if match:
             triage_data = json.loads(match.group(0))
@@ -346,7 +393,7 @@ def _add_routing_metadata(triage_res: dict) -> dict:
         triage_res["next_agent"] = "COLLECTOR_HANDLER"
         triage_res["workflow"] = "OUVIDORIA"
         triage_res["clarification_type"] = "OUVIDORIA" if needs_clarification else None
-    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA"]:
+    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO"]:
         triage_res["next_agent"] = "AMBIGUITY_HANDLER"
         triage_res["workflow"] = "AMBIGUITY_RESOLVER"
         triage_res["clarification_type"] = "AMBIGUITY" if needs_clarification else None
