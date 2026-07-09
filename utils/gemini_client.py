@@ -253,7 +253,26 @@ class GeminiClient:
                             err_msg = str(e).lower()
                             if "not_found" in err_msg or "404" in err_msg or "method not found" in err_msg or "requested entity was not found" in err_msg:
                                 print(f"[GeminiClient] Interactions API não suportada ou 404 para o modelo {m}. Caindo para generate_content...", file=sys.stderr)
-                                config = {}
+                                config = {
+                                    "safety_settings": [
+                                        genai_types.SafetySetting(
+                                            category=genai_types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                                            threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                        ),
+                                        genai_types.SafetySetting(
+                                            category=genai_types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                                            threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                        ),
+                                        genai_types.SafetySetting(
+                                            category=genai_types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                                            threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                        ),
+                                        genai_types.SafetySetting(
+                                            category=genai_types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                                            threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                        )
+                                    ]
+                                }
                                 if system_instruction:
                                     config["system_instruction"] = system_instruction
                                 if temperature is not None:
@@ -263,7 +282,7 @@ class GeminiClient:
                                 resp = self._client.models.generate_content(
                                     model=m,
                                     contents=prompt,
-                                    config=genai_types.GenerateContentConfig(**config) if config else None
+                                    config=genai_types.GenerateContentConfig(**config)
                                 )
                                 return resp.text, None
                             raise e
@@ -279,9 +298,16 @@ class GeminiClient:
                         if max_output_tokens is not None:
                             gen_config["max_output_tokens"] = max_output_tokens
                         
+                        legacy_safety = [
+                            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"}
+                        ]
                         res = model_obj.generate_content(
                             prompt,
-                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None
+                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None,
+                            safety_settings=legacy_safety
                         ).text
                         return res, None
 
@@ -321,7 +347,26 @@ class GeminiClient:
             try:
                 if _USE_NEW_SDK:
                     def _call(m=current_model):
-                        config = {}
+                        config = {
+                            "safety_settings": [
+                                genai_types.SafetySetting(
+                                    category=genai_types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                                    threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                ),
+                                genai_types.SafetySetting(
+                                    category=genai_types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+                                    threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                ),
+                                genai_types.SafetySetting(
+                                    category=genai_types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                                    threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                ),
+                                genai_types.SafetySetting(
+                                    category=genai_types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                                    threshold=genai_types.HarmBlockThreshold.BLOCK_ONLY_HIGH
+                                )
+                            ]
+                        }
                         if system_instruction:
                             config["system_instruction"] = system_instruction
                         if temperature is not None:
@@ -331,7 +376,7 @@ class GeminiClient:
                         resp = self._client.models.generate_content(
                             model=m,
                             contents=prompt,
-                            config=genai_types.GenerateContentConfig(**config) if config else None
+                            config=genai_types.GenerateContentConfig(**config)
                         )
                         return resp.text
                 else:
@@ -345,9 +390,17 @@ class GeminiClient:
                             gen_config["temperature"] = temperature
                         if max_output_tokens is not None:
                             gen_config["max_output_tokens"] = max_output_tokens
+                        
+                        legacy_safety = [
+                            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
+                            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"}
+                        ]
                         return model_obj.generate_content(
                             prompt,
-                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None
+                            generation_config=genai.GenerationConfig(**gen_config) if gen_config else None,
+                            safety_settings=legacy_safety
                         ).text
 
                 # Executa com rotação de chaves para este modelo específico
