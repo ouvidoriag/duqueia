@@ -42,12 +42,49 @@ OFFLINE_RULES = [
         "queries": ["Secretaria Municipal de Urbanismo e Habitação"],
         "focus": ["address", "phone"]
     },
+    # C1: Expansão por Especialidade Médica (DEVE VIR ANTES da regra genérica de saúde/medico)
+    # ATENÇÃO: os triggers são testados contra query_norm = normalize_text(query)
+    # normalize_text() remove acentos e converte para minúsculas — todos os padrões devem ser em minúsculo sem acento.
+    {
+        "intent": "service_location",
+        "triggers": [
+            r"\bdermato",           # dermatologista, dermatologia
+            r"\boftalmolog",        # oftalmologista, oftalmologia
+            r"\bcardiolog",         # cardiologista, cardiologia
+            r"\bortopedi",          # ortopedista, ortopedia
+            r"\bneurolog",          # neurologista, neurologia
+            r"\bpneumolog",         # pneumologista, pneumologia
+            r"\bginecol",           # ginecologista, ginecologia (sem acento)
+            r"\burolog",            # urologista, urologia
+            r"\bpsiquiatr",         # psiquiatra, psiquiatria
+            r"\bnefrol",            # nefrologista
+            r"\bgastroenterol",     # gastroenterologista
+            r"\bendocrinol",        # endocrinologista
+            r"\breumatol",          # reumatologista
+            r"\bhematol",           # hematologista
+            r"\binfectol",          # infectologista
+            r"\bproctol",           # proctologista
+            r"\bgeriatr",           # geriatra, geriatria
+            r"\bespecialist",       # especialista, especialidade
+            r"consulta especializada",
+            r"medico especialista",
+        ],
+        "queries": [
+            "Consulta e atendimento com especialidades médicas",
+            "Secretaria Municipal de Saúde",
+            "UBS unidade básica de saúde consulta encaminhamento"
+        ],
+        "focus": ["steps", "address", "phone"]
+    },
     {
         "intent": "secretaria_info",
         "triggers": [r"\bsaude\b", r"\bhomem\b", r"\bmulher\b", r"\bmedico\b", r"\bposto\b"],
         "queries": ["Secretaria Municipal de Saúde", "saúde"],
         "focus": ["address", "phone"]
     },
+
+
+
     {
         "intent": "secretaria_info",
         "triggers": [r"\biptu\b", r"\bfazenda\b", r"\bimposto\b", r"\btributo\b", r"\balvara\b"],
@@ -67,6 +104,23 @@ OFFLINE_RULES = [
         "focus": ["general"]
     }
 ]
+
+# C2: Mapeamento de Bairros/Localidades para expansão de queries de unidades físicas
+LOCALITY_MAP = {
+    "xerem":          ["Xerém", "CRAS Xerém", "UBS Xerém", "Clínica da Família Xerém"],
+    "jardim primavera": ["Jardim Primavera", "CRAS Jardim Primavera", "Hospital Moacyr Rodrigues"],
+    "parque paulista":  ["Parque Paulista", "CRAS Parque Paulista"],
+    "imbaríe":          ["Imbariê", "CRAS Imbariê"],
+    "imbarié":          ["Imbariê", "CRAS Imbariê"],
+    "pilar":            ["Pilar", "CRAS Pilar"],
+    "saracuruna":       ["Saracuruna", "Saracuruna"],
+    "campos elyseos":   ["Campos Elíseos", "Campos Elíseos"],
+    "pantanal":         ["Pantanal"],
+    "centenario":       ["Centenário", "CRAS Centenário"],
+    "centenário":       ["Centenário", "CRAS Centenário"],
+    "25 de agosto":     ["25 de Agosto"],
+}
+
 
 class SemanticRecoveryPlanner:
     def __init__(self, gemini_client):
@@ -127,7 +181,8 @@ class SemanticRecoveryPlanner:
     def _generate_offline_plan(self, query: str, history: list = None) -> dict:
         """Fallback local offline usando o motor declarativo de regras."""
         query_norm = normalize_text(query)
-        
+
+        matched_rule = None
         for rule in OFFLINE_RULES:
             # Verifica se algum trigger da regra casa na query normalizada
             if any(re.search(trigger, query_norm) for trigger in rule["triggers"]):
@@ -137,15 +192,40 @@ class SemanticRecoveryPlanner:
                     for dyn in rule["dynamic"]:
                         if any(re.search(dt, query_norm) for dt in dyn["triggers"]):
                             queries.extend(dyn["add_queries"])
-                return {
+                matched_rule = {
                     "intent": rule["intent"],
                     "queries": queries,
                     "focus": rule["focus"]
                 }
-                
+                break
+
+        # C2: Detecção de Localidade — injeta queries específicas de bairro/localidade
+        locality_queries = []
+        query_lower = query.lower()
+        for locality_key, locality_terms in LOCALITY_MAP.items():
+            # Aceita variações sem acento (ex: "xerem" e "xerém")
+            locality_norm = normalize_text(locality_key)
+            if locality_key in query_lower or locality_norm in query_norm:
+                locality_queries.extend(locality_terms)
+                break
+
+        if matched_rule:
+            if locality_queries:
+                # Coloca queries de localidade no início para priorizar unidades físicas próximas
+                matched_rule["queries"] = locality_queries + matched_rule["queries"]
+            return matched_rule
+
+        if locality_queries:
+            return {
+                "intent": "service_location",
+                "queries": locality_queries + [query],
+                "focus": ["address", "phone"]
+            }
+
         # Caso padrão se nenhuma regra casar
         return {
             "intent": "general",
             "queries": [query],
             "focus": ["general"]
         }
+

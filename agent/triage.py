@@ -1,9 +1,16 @@
-import sqlite3
 import hashlib
 import json
 import re
 import os
 import sys
+from utils.db_client import get_db_connection, query_one, execute_db
+from agent.guardrails import (
+    PROGRAMMING_TRIGGERS,
+    PRIVACY_TRIGGERS,
+    COMPETENCY_TRIGGERS,
+    LEGAL_TRIGGERS,
+    HUMAN_ESCALATION_TRIGGERS
+)
 
 # Modelo e versão do prompt para controle de cache
 MODEL_VERSION = "gemini-3.1-flash-lite"
@@ -24,70 +31,31 @@ ALLOWED_INTENTS = {
     "ESCALONAMENTO_HUMANO",
     "PROGRAMACAO",
     "CONVERSA",
-    "RAG_GERAL"
+    "RAG_GERAL",
+    "POSSIVEL_DENUNCIA",
+    "AUTORIDADE_PUBLICA"
 }
 
 # --------------------------------------------------------------------------
 # FAST GATE / SECURITY POLICIES
 # --------------------------------------------------------------------------
-FAST_SECURITY_PATTERNS = [
-    # PROGRAMACAO: Pedidos de códigos em linguagens de programação
-    (
-        r"\b(?:código|codigo)\s+em\s+(?:python|javascript|java|c\+\+|html|css|php|sql|bash|ruby|rust)\b|\b(?:como\s+programar|gerar\s+codigo)\b",
-        "PROGRAMACAO",
-        "Solicitação de programação bloqueada localmente."
-    ),
-    # LGPD: Pedidos explícitos de dados confidenciais, CPF, nomes de reclamantes ou andamento de terceiros
-    (
-        r"cpf\s+(?:de|do|da|do\s+meu|da\s+minha|de\s+um|de\s+uma)?\s*(?:cidadão|cidadao|reclamante|outro|terceiro|vizinho|vizinha|fulano|sicrano|beltrano|wellington)",
-        "LGPD",
-        "Solicitação de CPF de terceiro bloqueada localmente."
-    ),
-    (
-        r"protocolo\s+.*(?:vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
-        "LGPD",
-        "Solicitação de protocolo de terceiro bloqueada localmente."
-    ),
-    (
-        r"nome\s+(?:dele|dela|do\s+vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|da\s+vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|do\s+reclamante|do\s+outro|da\s+outra)",
-        "LGPD",
-        "Solicitação de nome de reclamante/vizinho bloqueada localmente."
-    ),
-    (
-        r"reclamaç(?:ão|ões|ao)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|terceiro)",
-        "LGPD",
-        "Solicitação de visualização de reclamações de terceiros bloqueada localmente."
-    ),
-    # FORA_COMPETENCIA: Temas federais/estaduais fora da alçada municipal
-    (
-        r"\bmetrô\b|\bmetro\b",
-        "FORA_COMPETENCIA",
-        "Assunto sobre metrô (âmbito estadual) bloqueado localmente."
-    ),
-    # JURIDICO: Tentativa de obter pareceres legais contra a prefeitura
-    (
-        r"formular\s+(?:defesa|parecer|recurso)",
-        "JURIDICO",
-        "Solicitação de defesa ou parecer legal contra a administração pública bloqueada localmente."
-    ),
-    (
-        r"argumentos?\s+contra\s+o\s+poder\s+público",
-        "JURIDICO",
-        "Solicitação de formulação de argumentos jurídicos bloqueada localmente."
-    ),
-    # ESCALONAMENTO_HUMANO: Denúncias de corrupção, suborno, desvio de verbas envolvendo funcionários/secretários
-    (
-        r"desvi(?:o|ando)\s+verba|roub(?:o|ando)|suborn(?:o|ar|ando)|corrupç(?:ão|ao)|\bsecretário\s+roub\w+",
-        "ESCALONAMENTO_HUMANO",
-        "Denúncia grave contra a administração municipal encaminhada para escalonamento humano."
-    ),
-    # ESCALONAMENTO_HUMANO: Ameaças de agressão, violência ou morte (ex: quero matar meu vizinho)
-    (
-        r"\b(?:matar|agredir|bater|violentar|assassinar|morrer|espancar|facada|tiro)\b",
-        "ESCALONAMENTO_HUMANO",
-        "Assuntos sensíveis, ameaças de agressão ou injúria grave encaminhados para escalonamento humano."
-    )
-]
+FAST_SECURITY_PATTERNS = []
+
+for pat in PROGRAMMING_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "PROGRAMACAO", "Solicitação de programação bloqueada localmente."))
+
+for pat in PRIVACY_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "LGPD", "Solicitação de dados/privacidade de terceiro bloqueada localmente."))
+
+for pat in COMPETENCY_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "FORA_COMPETENCIA", "Assunto fora da competência municipal bloqueado localmente."))
+
+for pat in LEGAL_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "JURIDICO", "Solicitação jurídica bloqueada localmente."))
+
+for pat in HUMAN_ESCALATION_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "ESCALONAMENTO_HUMANO", "Assunto sensível ou denúncia encaminhada para escalonamento humano."))
+
 
 # Detecta queries de barulho/som onde o cidadão NÃO especifica se a origem é pública ou privada.
 # Deve ficar ABAIXO dos padrões de segurança (LGPD/ESCALONAMENTO) que têm prioridade.
@@ -109,6 +77,28 @@ AMBIGUITY_FAST_PATTERNS = [
         "AMBIGUO_BARULHO",
         "Reclamação de barulho intenso sem origem explícita — aguardando esclarecimento."
     ),
+]
+
+POSSIVEL_DENUNCIA_FAST_PATTERNS = [
+    (r"\b(?:me\s+(?:\w+\s+)?xingou|me\s+(?:\w+\s+)?xingaram|xingou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de ofensa ou xingamento sofrido."),
+    (r"\b(?:me\s+(?:\w+\s+)?tratou\s+(?:\w+\s+)?mal|me\s+(?:\w+\s+)?trataram\s+(?:\w+\s+)?mal|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratado|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratada)\b", "POSSIVEL_DENUNCIA", "Relato de mau tratamento sofrido."),
+    (r"\b(?:foi\s+(?:\w+\s+)?grosseiro|foi\s+(?:\w+\s+)?grosseira|foram\s+(?:\w+\s+)?grosseiros)\b", "POSSIVEL_DENUNCIA", "Relato de grosseria sofrida."),
+    (r"\b(?:me\s+(?:\w+\s+)?ofendeu|me\s+(?:\w+\s+)?ofenderam|ofendeu\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de ofensa sofrida."),
+    (r"\b(?:foi\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educado|foi\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educada|foram\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educados)\b", "POSSIVEL_DENUNCIA", "Relato de atitude mal educada."),
+    (r"\b(?:me\s+(?:\w+\s+)?humilhou|me\s+(?:\w+\s+)?humilharam|humilhou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de humilhação sofrida."),
+    (r"\b(?:me\s+(?:\w+\s+)?ameaçou|me\s+(?:\w+\s+)?ameaçaram|ameaçou\s+me|me\s+(?:\w+\s+)?ameacou|me\s+(?:\w+\s+)?ameacaram|ameacou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de ameaça sofrida."),
+    (r"\b(?:me\s+(?:\w+\s+)?destratou|me\s+(?:\w+\s+)?destrataram|destratou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de desrespeito sofrido."),
+    (r"\b(?:fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?atendido|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?atendida|mau\s+(?:\w+\s+)?atendimento|atendimento\s+(?:\w+\s+)?ruim)\b", "POSSIVEL_DENUNCIA", "Relato de atendimento inadequado."),
+    (r"\b(?:fui\s+(?:\w+\s+)?vítima|fui\s+(?:\w+\s+)?vitima)\b", "POSSIVEL_DENUNCIA", "Relato de ter sido vítima de algo."),
+    (r"\b(?:aconteceu\s+(?:\w+\s+)?comigo)\b", "POSSIVEL_DENUNCIA", "Relato pessoal de ocorrido.")
+]
+
+AUTORIDADE_PUBLICA_FAST_PATTERNS = [
+    (r"\b(?:quem\s+é\s+o\s+prefeito|quem\s+e\s+o\s+prefeito|quem\s+é\s+o\s+prefeitor|qual\s+o\s+prefeito|qual\s+é\s+o\s+prefeito)\b", "AUTORIDADE_PUBLICA", "Busca direta pelo prefeito."),
+    (r"\b(?:quem\s+é\s+o\s+vice|quem\s+e\s+o\s+vice|quem\s+é\s+a\s+vice|quem\s+e\s+a\s+vice|vice-prefeito|vice\s+prefeito|vice-prefeita|vice\s+prefeita)\b", "AUTORIDADE_PUBLICA", "Busca pelo vice-prefeito."),
+    (r"\b(?:quem\s+é\s+o\s+secretário|quem\s+e\s+o\s+secretario|quem\s+é\s+a\s+secretária|quem\s+e\s+a\s+secretaria|qual\s+o\s+secretário|qual\s+o\s+secretario)\b", "AUTORIDADE_PUBLICA", "Busca por secretário."),
+    (r"\b(?:quem\s+dirige|quem\s+administra|quem\s+comanda|quem\s+ocupa\s+o\s+cargo|responsável\s+pela\s+secretaria|responsavel\s+pela\s+secretaria|responsável\s+pelo\s+órgão|responsavel\s+pelo\s+orgao)\b", "AUTORIDADE_PUBLICA", "Busca pelo responsável de secretaria/órgão."),
+    (r"\b(?:quem\s+é\s+o\s+ouvidor|quem\s+e\s+o\s+ouvidor|quem\s+é\s+o\s+procurador|quem\s+e\s+o\s+procurador|quem\s+é\s+o\s+controlador|quem\s+e\s+o\s+controlador)\b", "AUTORIDADE_PUBLICA", "Busca por autoridades de controle.")
 ]
 
 def check_fast_gate(query: str) -> dict | None:
@@ -143,6 +133,28 @@ def check_fast_gate(query: str) -> dict | None:
                 "reason": reason,
                 "source": "FAST_GATE"
             }
+
+    # 1º B: Relatos de ofensas/xingamentos/mau atendimento (alta prioridade, antes de conversa casual)
+    for regex, intent, reason in POSSIVEL_DENUNCIA_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+
+    # 1º C: Perguntas de autoridades (alta prioridade, antes de conversa casual)
+    for regex, intent, reason in AUTORIDADE_PUBLICA_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
     
     # 2º: Detector de ambiguidade de barulho (sem origem explícita)
     for regex, intent, reason in AMBIGUITY_FAST_PATTERNS:
@@ -162,9 +174,7 @@ def check_fast_gate(query: str) -> dict | None:
 # --------------------------------------------------------------------------
 def init_cache_db(db_path: str):
     """Inicializa a tabela de cache de triagem no SQLite."""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("""
+    execute_db(db_path, """
         CREATE TABLE IF NOT EXISTS triage_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             query_hash TEXT NOT NULL,
@@ -178,8 +188,6 @@ def init_cache_db(db_path: str):
             UNIQUE(query_hash, prompt_version)
         )
     """)
-    conn.commit()
-    conn.close()
 
 def get_query_hash(query: str) -> str:
     """Gera um hash md5 único a partir da query normalizada."""
@@ -191,16 +199,12 @@ def get_cached_triage(db_path: str, query: str) -> dict | None:
     init_cache_db(db_path)
     query_hash = get_query_hash(query)
     try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        cursor.execute(
+        row = query_one(
+            db_path,
             "SELECT intent, confidence, needs_clarification, reason FROM triage_cache "
             "WHERE query_hash = ? AND prompt_version = ? AND model_version = ?",
             (query_hash, PROMPT_VERSION, MODEL_VERSION)
         )
-        row = cursor.fetchone()
-        conn.close()
-        
         if row:
             return {
                 "intent": row[0],
@@ -218,9 +222,8 @@ def save_triage_to_cache(db_path: str, query: str, triage_res: dict):
     init_cache_db(db_path)
     query_hash = get_query_hash(query)
     try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        cursor.execute(
+        execute_db(
+            db_path,
             "INSERT OR REPLACE INTO triage_cache "
             "(query_hash, intent, confidence, needs_clarification, reason, model_version, prompt_version) "
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -234,10 +237,9 @@ def save_triage_to_cache(db_path: str, query: str, triage_res: dict):
                 PROMPT_VERSION
             )
         )
-        conn.commit()
-        conn.close()
     except Exception as e:
         print(f"[Triage Cache Warning] Falha ao gravar cache: {e}", file=sys.stderr)
+
 
 # --------------------------------------------------------------------------
 # CLASSIFICADOR LLM & VALIDAÇÃO
@@ -246,10 +248,9 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
     """Chama o Gemini para classificar a intenção e valida o resultado."""
     history_context = ""
     if history:
-        history_context = "Histórico de mensagens anteriores nesta conversa:\n"
-        for i, msg in enumerate(history, 1):
-            history_context += f"Mensagem anterior {i}: \"{msg}\"\n"
-        history_context += "\n"
+        from agent.memory import ConversationMemory
+        formatted = ConversationMemory.get_context(history, gemini_client)
+        history_context = f"Histórico de mensagens anteriores nesta conversa:\n{formatted}\n\n"
 
     prompt = (
         "Você é o Agente de Triagem oficial do Duque IA da Prefeitura de Duque de Caxias.\n"
@@ -286,6 +287,8 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "  * Exemplo com clarification=false: 'quero reclamar de buraco na rua que já solicitei mês passado' — tipo_manifestacao=reclamacao, assunto=buraco na rua, needs_clarification=false.\n"
         "  * Exemplo com clarification=true: 'quero fazer uma reclamação' — tipo_manifestacao=reclamacao, assunto não especificado, então needs_clarification=true.\n"
         "- ESCALONAMENTO_HUMANO: Denúncias graves contra a administração, desvios de verbas, subornos ou corrupção envolvendo servidores.\n"
+        "- POSSIVEL_DENUNCIA: Relatos de ofensas, xingamentos, ameaças, humilhações, grosserias ou mau atendimento sofrido pelo cidadão (ex: 'o rildo me xingou', 'me trataram mal').\n"
+        "- AUTORIDADE_PUBLICA: Perguntas sobre a identidade de detentores de cargos públicos do município (prefeito, vice-prefeito, secretários, ouvidor, procurador, controlador, etc.).\n"
         "- PROGRAMACAO: Solicitações de codificação, scripts, programação de computadores ou TI em geral (ex: 'me de um codigo em python').\n"
         "- CONVERSA: Bate-papo geral, piadas, conversa fiada, discussões filosóficas ou perguntas sobre o mundo fora do domínio municipal.\n"
         "- RAG_GERAL: Dúvidas específicas de serviços municipais (tapa-buracos, CRAS, IPTU, escolas, cursos FUNDEC, telefones, endereços, iluminação pública resolvida, obras resolvidas).\n\n"
@@ -293,16 +296,17 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         f"Consulta atual do cidadão: \"{query}\"\n\n"
         "Retorne EXCLUSIVAMENTE um objeto JSON válido contendo:\n"
         "{\n"
-        '  "intent": "SAUDACAO"|"IDENTIDADE"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
+        '  "intent": "SAUDACAO"|"IDENTIDADE"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA",\n'
         '  "tipo_manifestacao": "reclamacao"|"denuncia"|"elogio"|"sugestao"|"geral"|null,\n'
         '  "confidence": 0.0-1.0,\n'
         '  "needs_clarification": true|false,\n'
+        '  "rewritten_query": "versão autossuficiente e completa da pergunta atual, resolvendo referências ao histórico (ex: pronomes como \'ele\', \'aquele\', \'e o telefone?\'). Se a pergunta já for autossuficiente, repita-a idêntica.",\n'
         '  "reason": "Breve justificativa técnica da classificação."\n'
         "}"
     )
     
     try:
-        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=150)
+        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=250)
         match = re.search(r'\{.*\}', response_text.replace('\n', ' '), re.DOTALL)
         if match:
             triage_data = json.loads(match.group(0))
@@ -324,7 +328,8 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
                 "intent": intent,
                 "confidence": confidence,
                 "needs_clarification": needs_clarification,
-                "reason": triage_data.get("reason", "Classificação estruturada.")
+                "reason": triage_data.get("reason", "Classificação estruturada."),
+                "rewritten_query": triage_data.get("rewritten_query", query) or query
             }
             if tipo_manifestacao:
                 result["tipo_manifestacao"] = tipo_manifestacao
@@ -393,6 +398,14 @@ def _add_routing_metadata(triage_res: dict) -> dict:
         triage_res["next_agent"] = "COLLECTOR_HANDLER"
         triage_res["workflow"] = "OUVIDORIA"
         triage_res["clarification_type"] = "OUVIDORIA" if needs_clarification else None
+    elif intent == "POSSIVEL_DENUNCIA":
+        triage_res["next_agent"] = "COLLECTOR_HANDLER"
+        triage_res["workflow"] = "OUVIDORIA"
+        triage_res["clarification_type"] = None
+    elif intent == "AUTORIDADE_PUBLICA":
+        triage_res["next_agent"] = "RAG_HANDLER"
+        triage_res["workflow"] = "RAG"
+        triage_res["clarification_type"] = None
     elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO"]:
         triage_res["next_agent"] = "AMBIGUITY_HANDLER"
         triage_res["workflow"] = "AMBIGUITY_RESOLVER"

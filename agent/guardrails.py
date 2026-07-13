@@ -13,14 +13,18 @@ DANGEROUS_PATTERNS = [
     "finja ser", "finja que você", "você não é mais", "esqueça suas regras",
 ]
 
+PROGRAMMING_TRIGGERS = [
+    r"\b(?:código|codigo)\s+em\s+(?:python|javascript|java|c\+\+|html|css|php|sql|bash|ruby|rust)\b|\b(?:como\s+programar|gerar\s+codigo)\b"
+]
+
 PRIVACY_TRIGGERS = [
     # Match vizinho/vizinha only if query doesn't mention sound or noise
     r"\bvizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
     r"\bvizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
-    r"cpf\s+(?:do|de|da)\s+(?:cidadão|cidadao|reclamante|outro|terceiro|vizinho|fulano|sicrano)",
-    r"protocolo\s+.*(?:vizinho|outro|terceiro|fulano|vizinha)",
-    r"nome\s+(?:dele|dela|do\s+vizinho|do\s+reclamante)",
-    r"reclamaç(?:ão|ões)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho)"
+    r"cpf\s+(?:de|do|da|do\s+meu|da\s+minha|de\s+um|de\s+uma)?\s*(?:cidadão|cidadao|reclamante|outro|terceiro|vizinho|vizinha|fulano|sicrano|beltrano|wellington)",
+    r"protocolo\s+.*(?:vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
+    r"nome\s+(?:dele|dela|do\s+vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|da\s+vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|do\s+reclamante|do\s+outro|da\s+outra)",
+    r"reclamaç(?:ão|ões|ao)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|terceiro)"
 ]
 
 COMPETENCY_TRIGGERS = [
@@ -48,6 +52,11 @@ LEGAL_TRIGGERS = [
     r"como\s+a\s+administração\s+pública\s+deve\s+proceder\s+diante\s+de\s+reclamações\s+recorrentes"
 ]
 
+HUMAN_ESCALATION_TRIGGERS = [
+    r"desvi(?:o|ando)\s+verba|roub(?:o|ando)|suborn(?:o|ar|ando)|corrupç(?:ão|ao)|\bsecretário\s+roub\w+",
+    r"\b(?:matar|agredir|bater|violentar|assassinar|morrer|espancar|facada|tiro)\b"
+]
+
 def check_input_guardrail(query: str) -> bool:
     """Verifica se a query do usuário contém algum padrão perigoso de injeção."""
     q_lower = query.lower()
@@ -68,28 +77,46 @@ def check_legal_guardrail(query: str) -> bool:
     q_lower = query.lower()
     return any(re.search(pat, q_lower) for pat in LEGAL_TRIGGERS)
 
-
-def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None) -> bool:
-    """Valida a resposta gerada pela IA contra alucinações ou vazamento de dados usando o Gemini, validando contra as fontes oficiais."""
+def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None, history: list = None, triage_info: dict = None) -> bool:
+    """Valida a resposta gerada pela IA contra alucinações ou vazamento de dados usando o Gemini, validando contra as fontes oficiais, considerando o histórico conversacional e metadados de triagem."""
     if len(gemini_client.api_keys) == 0:
         return True # Se estiver local/sem chaves, permite por padrão
         
     context_str = f"Contexto das fontes oficiais:\n{context}\n\n" if context else ""
     
+    # Formata histórico conversacional
+    history_str = ""
+    if history:
+        history_str = "Histórico conversacional recente:\n" + "\n".join(history) + "\n\n"
+        
+    # Formata informações de triagem
+    triage_str = ""
+    if triage_info:
+        intent = triage_info.get("intent", "N/A")
+        rewritten = triage_info.get("rewritten_query", "")
+        triage_str = f"Metadados de Triagem:\n- Intenção: {intent}\n"
+        if rewritten and rewritten != query:
+            triage_str += f"- Pergunta Reescrevida: {rewritten}\n"
+        triage_str += "\n"
+    
     prompt = (
         "Você é o Agente de Blindagem e Auditoria de Respostas do Duque IA.\n"
         "Sua função é analisar se a resposta gerada para o munícipe está segura.\n\n"
+        f"{history_str}"
+        f"{triage_str}"
         f"{context_str}"
-        f"Pergunta do cidadão: \"{query}\"\n"
+        f"Pergunta atual do cidadão: \"{query}\"\n"
         f"Resposta gerada pela IA: \"{answer}\"\n\n"
         "Responda EXCLUSIVAMENTE com a palavra 'PERMITIDO' ou 'BLOQUEADO' com base nestas regras ESTRITAS:\n"
         "- BLOQUEADO SOMENTE SE a resposta mencionar CPF, número de protocolo ou dados pessoais de TERCEIROS (de outras pessoas, não do próprio cidadão).\n"
         "- BLOQUEADO SOMENTE SE a resposta contiver linguagem agressiva, ofensas ou conteúdo impróprio.\n"
         "- BLOQUEADO SOMENTE SE a resposta CONTRADISSER EXPLICITAMENTE um fato presente no contexto das fontes oficiais (ex: prazo diferente cadastrado, endereço diferente cadastrado).\n"
-        "- A ausência de menção direta a termos na fonte oficial NÃO é contradição. Perguntas de continuação (ex: 'qualquer pessoa pode usar?', 'quem tem direito?') sobre programas públicos ou transporte (como Tarifa Zero) ou serviços devem ser sempre PERMITIDAS e nunca bloqueadas por falta de termos no contexto.\n"
+        "- A ausência de menção direta a termos na fonte oficial NÃO é contradição. Perguntas de continuação (ex: 'qualquer pessoa pode usar?', 'quem tem direito?', 'qual o endereço?') sobre programas públicos ou transporte (como Tarifa Zero) ou serviços municipais devem ser sempre PERMITIDAS e nunca bloqueadas por falta de termos no contexto atual.\n"
+        "- PERMITIDO para perguntas de continuação que se referem a tópicos explicados no histórico conversacional ou na pergunta reescrita (use o histórico conversacional para entender a referência e a pergunta reescrita para validar o contexto real da consulta).\n"
         "- PERMITIDO se a resposta orientar sobre canais da Ouvidoria, Colab, telefones de contato, prazos legais gerais, tarifas, transporte ou qualquer informação pública municipal.\n"
-        "- PERMITIDO se a resposta orientar o cidadão a ligar para a Polícia (190) em casos de barulho de vizinho, festa particular ou perturbação do sossego em residência privada.\n"
-        "- PERMITIDO se o contexto estiver vazio ou parcial — a ausência de contexto NÃO é motivo de bloqueio.\n"
+        "- PERMITIDO se a resposta orientar o cidadão a ligar para a Polícia (190) em caso de barulho de vizinho, festa particular ou perturbação do sossego em residência privada.\n"
+        "- PERMITIDO se o contexto das fontes oficiais estiver vazio ou parcial — a ausência de contexto NÃO é motivo de bloqueio.\n"
+        "- Se o assunto ou tema das fontes oficiais é sobre serviços municipais ou utilidade pública, reduza drasticamente a sensibilidade de contradição para evitar falsos positivos.\n"
         "- PERMITIDO caso contrário.\n"
         "Responda apenas com a palavra PERMITIDO ou BLOQUEADO."
     )

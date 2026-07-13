@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUQUE IA — Manual Técnico de IA, Agentes e RAG</title>
+    <style>
+        /* CSS Reset & Variáveis - Cores Discretas e Premium */
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #0284c7;
+            --accent-light: #e0f2fe;
+            --text-dark: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+            --success: #15803d;
+            --success-light: #dcfce7;
+            --warning-light: #fffbeb;
+            --warning-border: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            background-color: #ffffff;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        /* Configuração de A4 para PDF */
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffffff;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-area h1 span {
+            color: var(--accent);
+        }
+
+        .logo-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .doc-meta {
+            text-align: right;
+        }
+
+        .doc-meta .badge {
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .doc-meta p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Sumário / Índice */
+        .toc-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        .toc-box h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1.5px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 20px;
+        }
+
+        .toc-list li a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .toc-list li a:hover {
+            text-decoration: underline;
+            color: var(--primary);
+        }
+
+        /* Cabeçalhos Seções */
+        h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 35px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            page-break-before: always;
+        }
+
+        h2:first-of-type {
+            page-break-before: avoid;
+        }
+
+        h3 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-left: 3.5px solid var(--accent);
+            padding-left: 10px;
+            background-color: var(--bg-light);
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 11px;
+            page-break-inside: avoid;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 6px 10px;
+            border: 1.5px solid var(--primary);
+        }
+
+        td {
+            padding: 6px 10px;
+            border: 1.5px solid var(--border-color);
+        }
+
+        tr:nth-child(even) td {
+            background-color: var(--bg-light);
+        }
+
+        /* Código e Blocos */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10.5px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1.5px solid var(--primary-light);
+            line-height: 1.4;
+            page-break-inside: avoid;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-light);
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 11px;
+            border: 1px solid var(--border-color);
+            color: #b91c1c;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        /* Callouts / Avisos */
+        .callout-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #d97706;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            page-break-inside: avoid;
+        }
+
+        .callout-box h4 {
+            margin-top: 0;
+            color: #92400e;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .callout-box p {
+            margin-bottom: 0;
+            color: #b45309;
+            font-size: 11.5px;
+        }
+
+        /* Diagramas em SVG */
+        .diagram-wrapper {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            page-break-inside: avoid;
+        }
+
+        .diagram-svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diagram-caption {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Rodapé */
+        footer {
+            margin-top: 40px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        /* Impressão Dedicada */
+        @media print {
+            body {
+                background: white;
+                font-size: 10pt;
+            }
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            .toc-box {
+                border-color: #000;
+            }
+            pre {
+                background-color: #f8fafc;
+                color: #0f172a;
+                border: 1.5px solid #000;
+            }
+            h2 {
+                page-break-before: always;
+                border-bottom: 2px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-area">
+            <h1>DUQUE <span>IA</span></h1>
+            <p>Enciclopédia Técnica de Engenharia, Agentes e RAG</p>
+        </div>
+        <div class="doc-meta">
+            <span class="badge">Documentação Completa</span>
+            <p>Emissão: Julho de 2026</p>
+        </div>
+    </header>
+
+    <!-- Índice de Navegação -->
+    <div class="toc-box">
+        <h3>Sumário Geral</h3>
+        <ul class="toc-list">
+            <li><a href="#visao-geral">1. Visão Geral do Projeto</a></li>
+            <li><a href="#estrutura-pastas">2. Estrutura de Pastas & Arquivos</a></li>
+            <li><a href="#banco-dados">3. Dicionário de Dados Relacional Completo</a></li>
+            <li><a href="#banco-vetorial">4. Banco Vetorial & Chunking</a></li>
+            <li><a href="#pipeline-rag">5. Organograma do Processo RAG</a></li>
+            <li><a href="#agentes">6. Agentes & Responsabilidades</a></li>
+            <li><a href="#langgraph-lite">7. LangGraph Lite: Máquina de Estados</a></li>
+            <li><a href="#prompts">8. Prompts Literais dos Agentes</a></li>
+            <li><a href="#modelos-ia">9. Catálogo de Modelos de IA</a></li>
+            <li><a href="#chaves-api">10. Estrutura de Chaves de API</a></li>
+            <li><a href="#retrieval">11. Motor de Retrieval Híbrido & Pesos de Palavras-Chave</a></li>
+            <li><a href="#planner">12. Planejador Semântico (LORS)</a></li>
+            <li><a href="#triage">13. Triagem & Fast Gate</a></li>
+            <li><a href="#cache">14. SQLite Cache</a></li>
+            <li><a href="#configuracoes">15. Configurações (.env) & Políticas de Triagem</a></li>
+            <li><a href="#apis">16. server.js & APIs</a></li>
+            <li><a href="#fluxos">17. Walkthrough de Fluxos de Consulta</a></li>
+            <li><a href="#testes">18. Testes & Cobertura</a></li>
+            <li><a href="#logs">19. Logs, Métricas & Monitoramento</a></li>
+            <li><a href="#dependencias">20. Dependências e Requisitos</a></li>
+            <li><a href="#arquivos">21. Lista Geral de Componentes</a></li>
+            <li><a href="#arquitetura-geral">22. Organograma Arquitetural Geral</a></li>
+        </ul>
+    </div>
+
+    <!-- 1. Visão Geral -->
+    <h2 id="visao-geral">1. Visão Geral do Projeto</h2>
+    <p>O <strong>DUQUE IA</strong> é o assistente virtual inteligente da Prefeitura de Duque de Caxias — RJ. Ele foi desenvolvido com o objetivo de centralizar o atendimento e a carta de serviços públicos municipais, permitindo consultas sobre secretarias, contatos e locais de atendimento de forma semântica e contextualizada.</p>
+    <p>O sistema conta com um orquestrador baseado em grafos declarativos de estados em Python puro chamado <strong>LangGraph Lite</strong>. Isso garante que cada mensagem seja triada e processada por nós funcionais discretos com segurança e controle total de auditoria.</p>
+
+    <div class="diagram-wrapper">
+        <svg class="diagram-svg" width="600" height="120" viewBox="0 0 600 120">
+            <!-- Background -->
+            <rect width="600" height="120" fill="#f8fafc" rx="8" stroke="#cbd5e1" stroke-width="1.5"/>
+            <!-- Diagrama Linear -->
+            <rect x="20" y="40" width="100" height="40" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="70" y="65" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Cidadão</text>
+
+            <line x1="120" y1="60" x2="180" y2="60" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="180" y="40" width="100" height="40" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="230" y="65" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Duque IA</text>
+
+            <line x1="280" y1="60" x2="340" y2="60" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="340" y="40" width="100" height="40" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="390" y="65" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">LORS RAG</text>
+
+            <line x1="440" y1="60" x2="500" y2="60" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="500" y="40" width="80" height="40" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="540" y="65" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Resposta</text>
+        </svg>
+        <span class="diagram-caption">Fluxo Macroscópico de Interação do Munícipe</span>
+    </div>
+
+    <!-- 2. Estrutura de Pastas -->
+    <h2 id="estrutura-pastas">2. Estrutura de Pastas & Arquivos</h2>
+    <p>Estrutura física do projeto com a finalidade de cada módulo principal:</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Pasta</th>
+                <th style="width: 35%;">Responsabilidade Técnica</th>
+                <th style="width: 40%;">Principais Arquivos</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>/agent</strong></td>
+                <td>Código-fonte do cérebro de IA e fluxo de agentes.</td>
+                <td><code>agent.py</code>, <code>graph.py</code>, <code>handlers.py</code>, <code>retrieval.py</code>, <code>triage.py</code>, <code>planner.py</code>, <code>memory.py</code></td>
+            </tr>
+            <tr>
+                <td><strong>/ingestion</strong></td>
+                <td>Parsers de documentos, PDF, Web e criação de base.</td>
+                <td><code>main.py</code> (subpasta embed), parsers de PDF/Web</td>
+            </tr>
+            <tr>
+                <td><strong>/utils</strong></td>
+                <td>Classes de conexões de APIs, clientes e conexões DB.</td>
+                <td><code>gemini_client.py</code>, <code>groq_client.py</code>, <code>db_client.py</code>, <code>mock_provider.py</code></td>
+            </tr>
+            <tr>
+                <td><strong>/scripts</strong></td>
+                <td>Suíte de testes locais e testes de regressão do RAG.</td>
+                <td><code>run_all_tests.py</code>, pasta <code>tests/</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 3. Banco de Dados -->
+    <h2 id="banco-dados">3. Dicionário de Dados Relacional Completo</h2>
+    <p>O banco de dados <code>duque_ia.db</code> utiliza o SQLite local. Abaixo estão descritas todas as tabelas, campos, chaves primárias, estrangeiras e constraints.</p>
+
+    <div class="diagram-wrapper">
+        <svg class="diagram-svg" width="650" height="220" viewBox="0 0 650 220">
+            <!-- Background -->
+            <rect width="650" height="220" fill="#f8fafc" rx="8" stroke="#cbd5e1" stroke-width="1.5"/>
+            <!-- Tabela Secretarias -->
+            <rect x="20" y="30" width="130" height="70" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="85" y="48" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">secretarias</text>
+            <text x="30" y="70" fill="white" font-size="9">PK: id (INTEGER)</text>
+            <text x="30" y="85" fill="white" font-size="9">name, code (TEXT)</text>
+
+            <!-- Linha de relacionamento 1-N -->
+            <line x1="150" y1="65" x2="220" y2="65" stroke="#0284c7" stroke-width="2"/>
+            <text x="185" y="58" fill="#0284c7" font-size="9" text-anchor="middle">1 : N</text>
+
+            <!-- Tabela Services -->
+            <rect x="220" y="30" width="180" height="150" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="310" y="48" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">services</text>
+            <text x="230" y="70" fill="white" font-size="9">PK: id (INTEGER)</text>
+            <text x="230" y="85" fill="white" font-size="9">FK: secretaria_id (INTEGER)</text>
+            <text x="230" y="100" fill="white" font-size="9">FK: category_id (INTEGER)</text>
+            <text x="230" y="115" fill="white" font-size="9">name, description (TEXT)</text>
+            <text x="230" y="130" fill="white" font-size="9">how_to_access (TEXT)</text>
+            <text x="230" y="145" fill="white" font-size="9">address, who_can_request (TEXT)</text>
+            <text x="230" y="160" fill="white" font-size="9">status (TEXT)</text>
+
+            <!-- Linha de relacionamento 1-N para telefones -->
+            <line x1="400" y1="65" x2="480" y2="65" stroke="#0284c7" stroke-width="2"/>
+            <text x="440" y="58" fill="#0284c7" font-size="9" text-anchor="middle">1 : N</text>
+
+            <!-- Tabela Service Phones -->
+            <rect x="480" y="30" width="150" height="70" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="555" y="48" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">service_phones</text>
+            <text x="490" y="70" fill="white" font-size="9">PK: id (INTEGER)</text>
+            <text x="490" y="85" fill="white" font-size="9">FK: service_id (INTEGER)</text>
+        </svg>
+        <span class="diagram-caption">Diagrama de Entidade-Relacionamento do Banco Relacional Duque IA</span>
+    </div>
+
+    <h3>Especificação das Tabelas do Projeto</h3>
+
+    <h4>1. secretarias</h4>
+    <p>Representa as secretarias e órgãos da administração municipal.</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Campo</th>
+                <th style="width: 20%;">Tipo</th>
+                <th style="width: 15%;">Chave</th>
+                <th style="width: 45%;">Constraints / Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>INTEGER</td>
+                <td>PK</td>
+                <td>Auto-incremento. Chave primária.</td>
+            </tr>
+            <tr>
+                <td><code>name</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Nome oficial do órgão.</td>
+            </tr>
+            <tr>
+                <td><code>code</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL, UNIQUE. Código (ex: SMS, SME, SMO, SMF).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>2. services</h4>
+    <p>Serviços públicos cadastrados na Carta de Serviços municipais.</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Campo</th>
+                <th style="width: 20%;">Tipo</th>
+                <th style="width: 15%;">Chave</th>
+                <th style="width: 45%;">Constraints / Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>INTEGER</td>
+                <td>PK</td>
+                <td>Auto-incremento. Chave primária.</td>
+            </tr>
+            <tr>
+                <td><code>secretaria_id</code></td>
+                <td>INTEGER</td>
+                <td>FK</td>
+                <td>NOT NULL. Referencia <code>secretarias(id)</code> com ON DELETE CASCADE.</td>
+            </tr>
+            <tr>
+                <td><code>category_id</code></td>
+                <td>INTEGER</td>
+                <td>FK</td>
+                <td>Referencia <code>categories(id)</code> com ON DELETE SET NULL.</td>
+            </tr>
+            <tr>
+                <td><code>name</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Nome descritivo do serviço.</td>
+            </tr>
+            <tr>
+                <td><code>description</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Descrição e finalidade do serviço público.</td>
+            </tr>
+            <tr>
+                <td><code>how_to_access</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Instruções de como o cidadão pode solicitar o serviço.</td>
+            </tr>
+            <tr>
+                <td><code>address</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Endereço físico de atendimento presencial.</td>
+            </tr>
+            <tr>
+                <td><code>status</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL DEFAULT 'published'. Controla publicação.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>3. duque_ia_chunks</h4>
+    <p>Tabela que armazena os segmentos textuais gerais e seus respectivos embeddings.</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Campo</th>
+                <th style="width: 20%;">Tipo</th>
+                <th style="width: 15%;">Chave</th>
+                <th style="width: 45%;">Constraints / Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>INTEGER</td>
+                <td>PK</td>
+                <td>Auto-incremento. Chave primária.</td>
+            </tr>
+            <tr>
+                <td><code>source</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Arquivo ou URL de origem do documento.</td>
+            </tr>
+            <tr>
+                <td><code>content</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Texto bruto recuperado do documento.</td>
+            </tr>
+            <tr>
+                <td><code>embedding</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>JSON de floats representando o vetor gerado.</td>
+            </tr>
+            <tr>
+                <td><code>metadata</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Dicionário JSON de metadados auxiliares.</td>
+            </tr>
+            <tr>
+                <td><code>keywords</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>JSON de palavras-chave normalizadas.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>4. triage_cache</h4>
+    <p>Tabela de cache local de triagem semântica para evitar gastos repetidos de tokens de API.</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 20%;">Campo</th>
+                <th style="width: 20%;">Tipo</th>
+                <th style="width: 15%;">Chave</th>
+                <th style="width: 45%;">Constraints / Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>id</code></td>
+                <td>INTEGER</td>
+                <td>PK</td>
+                <td>Auto-incremento. Chave primária.</td>
+            </tr>
+            <tr>
+                <td><code>query_hash</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Hash MD5 da query do cidadão normalizada.</td>
+            </tr>
+            <tr>
+                <td><code>intent</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>NOT NULL. Intenção classificada (ex: 'RAG_GERAL').</td>
+            </tr>
+            <tr>
+                <td><code>confidence</code></td>
+                <td>REAL</td>
+                <td>-</td>
+                <td>NOT NULL. Nível de confiança da classificação (0.0 a 1.0).</td>
+            </tr>
+            <tr>
+                <td><code>needs_clarification</code></td>
+                <td>INTEGER</td>
+                <td>-</td>
+                <td>NOT NULL. Flag booleana (0 ou 1) de necessidade de esclarecimento.</td>
+            </tr>
+            <tr>
+                <td><code>model_version</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Versão do modelo (ex: 'gemini-3.1-flash-lite').</td>
+            </tr>
+            <tr>
+                <td><code>prompt_version</code></td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>Versão do prompt de triagem para invalidação.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- 4. Banco Vetorial -->
+    <h2 id="banco-vetorial">4. Banco Vetorial & Chunking</h2>
+    <p>O processador de dados lê documentos brutos em formato PDF/HTML, executa a separação recursiva e calcula os vetores.</p>
+    <ul>
+        <li><strong>Modelo de Embedding:</strong> <code>gemini-embedding-2</code> (3072 dimensões).</li>
+        <li><strong>Estratégia de Chunking:</strong> Divisão recursiva por caracteres, limite máximo de 500 caracteres e overlap de 100 caracteres.</li>
+        <li><strong>Busca de Primeiro Estágio:</strong> Similaridade de cosseno realizada localmente no SQLite.</li>
+    </ul>
+
+    <!-- 5. O Processo RAG Explicado -->
+    <h2 id="pipeline-rag">5. Organograma do Processo RAG</h2>
+    <p>A arquitetura RAG (Geração Aumentada por Recuperação) funciona em três fases contínuas:</p>
+    <ol>
+        <li><strong>Recuperação (Retrieval):</strong> O sistema busca no banco dados estruturados (via filtros SQL) e trechos semânticos (via busca vetorial).</li>
+        <li><strong>Aumentação (Augmentation):</strong> O sistema injeta os dados estruturados e trechos de maior similaridade no prompt da LLM.</li>
+        <li><strong>Geração (Generation):</strong> A LLM processa o prompt e elabora uma resposta com a personalidade simpática do Duque IA.</li>
+    </ol>
+
+    <div class="diagram-wrapper">
+        <svg class="diagram-svg" width="600" height="280" viewBox="0 0 600 280">
+            <!-- Background -->
+            <rect width="600" height="280" fill="#f8fafc" rx="8" stroke="#cbd5e1" stroke-width="1.5"/>
+            <!-- Process Step -->
+            <rect x="20" y="20" width="100" height="35" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="70" y="42" fill="white" font-size="10.5" text-anchor="middle">1. Pergunta</text>
+
+            <line x1="120" y1="37.5" x2="160" y2="37.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="160" y="20" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="215" y="42" fill="white" font-size="10.5" text-anchor="middle">2. Fast Gate (Regex)</text>
+
+            <line x1="270" y1="37.5" x2="310" y2="37.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="310" y="20" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="365" y="42" fill="white" font-size="10.5" text-anchor="middle">3. Triage (LLM)</text>
+
+            <line x1="420" y1="37.5" x2="460" y2="37.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="460" y="20" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="515" y="42" fill="white" font-size="10.5" text-anchor="middle">4. Tool Router</text>
+
+            <!-- Line Down -->
+            <line x1="515" y1="55" x2="515" y2="100" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="460" y="100" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="515" y="122" fill="white" font-size="10" text-anchor="middle">5. Planner (LORS)</text>
+
+            <line x1="460" y1="117.5" x2="420" y2="117.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="310" y="100" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="365" y="122" fill="white" font-size="10" text-anchor="middle">6. Retrieval Híbrido</text>
+
+            <line x1="310" y1="117.5" x2="270" y2="117.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="160" y="100" width="110" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="215" y="122" fill="white" font-size="10" text-anchor="middle">7. Reranker (Cross)</text>
+
+            <line x1="160" y1="117.5" x2="120" y2="117.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="20" y="100" width="100" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="70" y="122" fill="white" font-size="10.5" text-anchor="middle">8. LLM (Geração)</text>
+
+            <!-- Line Down 2 -->
+            <line x1="70" y1="135" x2="70" y2="180" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="20" y="180" width="110" height="35" rx="4" fill="#ea580c" stroke="#cbd5e1"/>
+            <text x="75" y="202" fill="white" font-size="10.5" text-anchor="middle">9. Output Guardrail</text>
+
+            <line x1="130" y1="197.5" x2="170" y2="197.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="170" y="180" width="110" height="35" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="225" y="202" fill="white" font-size="10.5" text-anchor="middle">10. Resposta Final</text>
+        </svg>
+        <span class="diagram-caption">Fluxograma e Organograma do Processamento de Requisições RAG</span>
+    </div>
+
+    <!-- 6. Agentes -->
+    <h2 id="agentes">6. Agentes & Responsabilidades</h2>
+    <p>O ecossistema utiliza agentes especialistas focados na blindagem jurídica, de privacidade e de precisão semântica:</p>
+    <ul>
+        <li><strong>SecurityAgent:</strong> Bloqueia queries maliciosas (Prompt Injection e SQL Injection).</li>
+        <li><strong>PrivacyAgent:</strong> Garante conformidade com a LGPD (bloqueia vazamento de CPFs e dados de terceiros).</li>
+        <li><strong>TriageAgent:</strong> Detecta a intenção inicial da mensagem do cidadão.</li>
+        <li><strong>PlannerAgent:</strong> Orquestra consultas baseadas na intenção.</li>
+        <li><strong>RagAgent:</strong> Constrói o contexto das fontes e aciona a LLM geradora.</li>
+    </ul>
+
+    <!-- 7. LangGraph Lite -->
+    <h2 id="langgraph-lite">7. LangGraph Lite: Máquina de Estados</h2>
+    <p>O <strong>LangGraph Lite</strong> é a engrenagem central de fluxo de agentes em Python puro. Diferente do LangGraph do LangChain, o LangGraph Lite foi projetado para rodar localmente sem dependências pesadas, garantindo baixíssima latência e portabilidade.</p>
+    
+    <h3>Conceitos Fundamentais:</h3>
+    <ul>
+        <li><strong>AgentState:</strong> Um objeto imutável de dados carregado a cada turno que armazena a query do cidadão, o histórico de mensagens, a intenção detectada pela triagem e a resposta final.</li>
+        <li><strong>Node (Nó):</strong> Unidades funcionais discretas. Cada nó recebe o <code>AgentState</code>, realiza uma tarefa atômica (ex: rodar triagem, buscar no banco) e devolve um novo <code>AgentState</code> atualizado contendo o próximo nó (<code>state.next_node</code>) a ser executado.</li>
+        <li><strong>Retry Granular com <code>on_error_next</code>:</strong> Cada nó pode ser instanciado com um nó de fallback. Se o nó falhar, o grafo não trava; ele desvia o fluxo automaticamente para o nó de segurança.</li>
+    </ul>
+
+    <h4>Algoritmo de Loop do Grafo (Implementação Simplificada)</h4>
+    <pre>class AgentGraph:
+    def run(self, state: AgentState, ctx: Any) -> AgentState:
+        while state.next_node != "END":
+            node = self._nodes.get(state.next_node)
+            state = node.run(state, ctx)
+        return state</pre>
+
+    <div class="diagram-wrapper">
+        <svg class="diagram-svg" width="620" height="150" viewBox="0 0 620 150">
+            <!-- Background -->
+            <rect width="620" height="150" fill="#f8fafc" rx="8" stroke="#cbd5e1" stroke-width="1.5"/>
+            <!-- Nodes -->
+            <rect x="20" y="55" width="80" height="35" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="60" y="77" fill="white" font-size="10" text-anchor="middle">fast_gate</text>
+
+            <line x1="100" y1="72.5" x2="130" y2="72.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="130" y="55" width="80" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="170" y="77" fill="white" font-size="10" text-anchor="middle">triage</text>
+
+            <line x1="210" y1="72.5" x2="240" y2="72.5" stroke="#0f172a" stroke-width="2"/>
+
+            <rect x="240" y="55" width="80" height="35" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="280" y="77" fill="white" font-size="10" text-anchor="middle">tool_router</text>
+
+            <line x1="320" y1="72.5" x2="350" y2="72.5" stroke="#0f172a" stroke-width="2"/>
+
+            <!-- Branches -->
+            <path d="M 350 72.5 L 380 30 L 410 30" fill="none" stroke="#475569" stroke-width="2"/>
+            <rect x="410" y="12" width="120" height="35" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="470" y="34" fill="white" font-size="10" text-anchor="middle">SECURITY_HANDLER</text>
+
+            <path d="M 350 72.5 L 380 72.5 L 410 72.5" fill="none" stroke="#475569" stroke-width="2"/>
+            <rect x="410" y="55" width="120" height="35" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="470" y="77" fill="white" font-size="10" text-anchor="middle">RAG_HANDLER</text>
+
+            <path d="M 350 72.5 L 380 115 L 410 115" fill="none" stroke="#475569" stroke-width="2"/>
+            <rect x="410" y="98" width="120" height="35" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="470" y="120" fill="white" font-size="10" text-anchor="middle">AMBIGUITY_HANDLER</text>
+        </svg>
+        <span class="diagram-caption">Representação Gráfica dos Nós do LangGraph Lite</span>
+    </div>
+
+    <!-- 8. Prompts -->
+    <h2 id="prompts">8. Prompts Literais dos Agentes</h2>
+    <p>Abaixo estão detalhados os prompts reais e completos utilizados pelos agentes do DUQUE IA:</p>
+
+    <h3>Prompt do TriageAgent (Triagem)</h3>
+    <pre>Você é o Agente de Triagem oficial do Duque IA da Prefeitura de Duque de Caxias.
+Sua função é classificar a consulta do cidadão em uma intenção municipal estruturada.
+Não responda à pergunta do usuário. Apenas identifique a intenção e classifique-a.
+
+Categorias permitidas:
+- SAUDACAO: Cumprimentos simples (oi, olá, bom dia, tchau).
+- IDENTIDADE: Perguntas sobre quem é você ou suas capacidades.
+- LGPD: Solicitação de CPFs, nomes de reclamantes ou andamento de protocolos de terceiros.
+- JURIDICO: Pedido de formulação de defesas, pareceres ou recursos contra o poder público.
+- FORA_COMPETENCIA: Assuntos que competem ao Estado ou União (ex: metrô, previdência federal).
+- AMBIGUO_LUZ: Falta de luz (distribuição Light) ou lâmpada apagada no poste da rua.
+- AMBIGUO_LAMPADA: Dúvida sobre troca de lâmpada dentro da residência vs poste público de rua.
+- AMBIGUO_BARULHO: Reclamação de barulho excessivo sem origem explícita.
+- RESIDENCIAL: Manutenção elétrica interna em área particular.
+- OUVIDORIA_MANIFESTACAO: Cidadão quer registrar reclamação, denúncia, sugestão ou elogio.
+- ESCALONAMENTO_HUMANO: Denúncias graves contra a administração ou servidores.
+- PROGRAMACAO: Solicitações de codificação ou scripts.
+- CONVERSA: Bate-papo geral ou perguntas fora do domínio municipal.
+- RAG_GERAL: Dúvidas de serviços municipais (tapa-buracos, CRAS, IPTU, escolas, saúde, etc.).
+
+Retorne EXCLUSIVAMENTE um objeto JSON válido no formato:
+{
+  "intent": "SAUDACAO"|"LGPD"|"OUVIDORIA_MANIFESTACAO"|"RAG_GERAL"|...,
+  "tipo_manifestacao": "reclamacao"|"denuncia"|null,
+  "confidence": 0.0-1.0,
+  "needs_clarification": true|false,
+  "rewritten_query": "versão completa da pergunta",
+  "reason": "justificativa"
+}</pre>
+
+    <h3>Prompt do PlannerAgent (LORS)</h3>
+    <pre>Você é o Planejador Semântico (Planner) do RAG do Duque IA.
+Sua tarefa é analisar a pergunta atual do munícipe e gerar um plano de busca em formato JSON contendo até 3 consultas complementares a serem feitas no banco de dados para responder de forma completa.
+
+Retorne APENAS um JSON válido no formato:
+{
+  "intent": "service_location",
+  "queries": ["Cadastro Único", "Secretaria de Assistência Social", "CRAS"],
+  "focus": ["address", "steps", "phone"]
+}</pre>
+
+    <h3>Prompt de Geração do RagAgent (Handlers RAG)</h3>
+    <pre>Sua personalidade deve ser extremamente simpática, calorosa, prestativa e humana. Responda com um sorriso virtual e gentileza genuína.
+Prefira respostas de 2 a 4 frases.
+
+REGRA DE FONTES (CRÍTICO):
+- 'INFORMAÇÕES OFICIAIS ESTRUTURADAS' têm precedência absoluta. Use EXCLUSIVAMENTE esses dados para endereço, telefone e horário.
+
+REGRA CRÍTICA DE COMPETÊNCIA — PERTURBAÇÃO DO SOSSEGO / BARULHO:
+- Ruídos de residências ou vizinhos devem ser encaminhados diretamente à Polícia Militar (190).
+- Ruídos de outras fontes (comércio, bar, obras) devem ser feitos no app Colab nas categorias: Ordem Pública, Guarda Municipal, Urbanismo ou Meio Ambiente.
+
+DIRETRIZES:
+1. Use **negrito** para telefones, endereços e horários.
+2. Nunca use termos de hesitação como 'pelo que sei' ou 'não tenho certeza'.
+3. Zeladoria urbana pela primeira vez: oriente a abrir 'Solicitação de Serviço' no Colab nas categorias: Obras, Limpeza Urbana ou Transportes.</pre>
+
+    <!-- 9. Modelos de IA -->
+    <h2 id="modelos-ia">9. Catálogo de Modelos de IA</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Modelo</th>
+                <th style="width: 25%;">Provedor</th>
+                <th style="width: 25%;">Finalidade Principal</th>
+                <th style="width: 25%;">Fallback</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>gemini-2.5-flash</code></td>
+                <td>Google</td>
+                <td>Geração de Resposta Principal RAG</td>
+                <td>Groq / Fallback Offline</td>
+            </tr>
+            <tr>
+                <td><code>gemini-3.1-flash-lite</code></td>
+                <td>Google</td>
+                <td>Triagem, Planner, Cross-Encoder</td>
+                <td>Groq Llama-3.1-8b</td>
+            </tr>
+            <tr>
+                <td><code>gemini-embedding-2</code></td>
+                <td>Google</td>
+                <td>Indexação & Busca Vetorial (3072 dims)</td>
+                <td>Fallback local (Deterministic Hash)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 10. Chaves de API -->
+    <h2 id="chaves-api">10. Estrutura de Chaves de API</h2>
+    <p>O sistema necessita das seguintes chaves de API declaradas nas variáveis de ambiente para o correto funcionamento externo:</p>
+    <ul>
+        <li><code>GEMINI_API_KEYS</code>: Lista de chaves Gemini API separadas por vírgula para rodízio e tolerância a limites de cota.</li>
+        <li><code>GROQ_API_KEY</code>: Chave utilizada para fallbacks rápidos do triage.</li>
+        <li><code>OPENAI_API_KEY</code>: Reservado para futuras migrações ou comparativos de benchmark de embeddings.</li>
+    </ul>
+
+    <!-- 11. Retrieval -->
+    <h2 id="retrieval">11. Motor de Retrieval Híbrido & Pesos de Palavras-Chave</h2>
+    <p>A busca combina similaridade vetorial com sobreposição de palavras-chave exatas (Keyword Overlap):</p>
+    <pre>Score Final = 0.85 * SimilaridadeCosseno(V_query, V_chunk) + 0.15 * OverlapKeywords(Q, C)</pre>
+    <p><strong>Regras de Boost:</strong> Se o bairro detectado pelo Planner coincidir com o bairro do chunk, adiciona-se <code>+0.25</code> ao score final. Especialidades médicas recebem boost de <code>+0.30</code> para priorizar guias oficiais de exames/consultas sobre documentos gerais.</p>
+
+    <h4>Políticas de Pesos de Palavras-Chave (Configuração Estática)</h4>
+    <p>Para evitar ruído semântico, o Duque IA categoriza e pondera as palavras-chave da busca utilizando a constante <code>KEYWORD_POLICY</code> em <code>agent/config.py</code>:</p>
+    <ul>
+        <li><strong>Ruído (Peso: 0.2 ou 0.1):</strong> Termos comuns como <code>"prefeitura"</code>, <code>"municipal"</code>, <code>"como"</code>, <code>"onde"</code>.</li>
+        <li><strong>Serviços (Peso: 2.0):</strong> Termos de serviços importantes como <code>"cras"</code>, <code>"iptu"</code>, <code>"vacina"</code>, <code>"lixo"</code>, <code>"iluminação"</code>.</li>
+        <li><strong>Entidades (Peso: 3.0):</strong> Termos de alto foco geográfico ou de governança como <code>"bairro"</code>, <code>"rua"</code>, <code>"lote"</code>, <code>"prefeito"</code>.</li>
+    </ul>
+
+    <!-- 12. Planner -->
+    <h2 id="planner">12. Planejador Semântico (LORS)</h2>
+    <p>O módulo <code>agent/planner.py</code> traduz as buscas coloquiais do cidadão em planos de busca robustos:</p>
+    <ul>
+        <li><strong>Offline/Heurística:</strong> Executa busca local por expressões regulares para identificar bairros (ex: <code>"25 de agosto"</code>) e especialidades (ex: <code>"dermato"</code>).</li>
+        <li><strong>Expansão de Query:</strong> Gera até 3 sub-queries para serem disparadas concorrentemente contra o banco.</li>
+    </ul>
+
+    <!-- 13. Triage -->
+    <h2 id="triage">13. Triagem & Fast Gate</h2>
+    <p>Fluxo determinístico de entrada que filtra queries nocivas localmente antes de usar APIs em nuvem. A tabela <code>triage_cache</code> garante o reuso de classificações de perguntas idênticas.</p>
+
+    <!-- 14. Cache -->
+    <h2 id="cache">14. SQLite Cache</h2>
+    <p>Evita chamadas redundantes para a API do Gemini armazenando a resposta da triagem estruturada indexada por hash MD5 da query do munícipe.</p>
+
+    <!-- 15. Configurações -->
+    <h2 id="configuracoes">15. Configurações (.env) & Políticas de Triagem</h2>
+    <p>Variáveis globais que controlam a inicialização do agente:</p>
+    <pre># Exemplo de .env
+GEMINI_API_KEYS=AIzaSy...
+GROQ_API_KEY=gsk_...
+GEMINI_EMBEDDING_MODEL=gemini-embedding-2
+GEMINI_MODEL=gemini-2.5-flash</pre>
+
+    <!-- 16. server.js & APIs -->
+    <h2 id="apis">16. server.js & APIs</h2>
+    <p>O servidor em Node.js (<code>server.js</code>) atua como gateway de integração, expondo endpoints HTTP REST que acionam a CLI em Python por baixo dos panos via pipes IPC.</p>
+
+    <!-- 17. Walkthrough de Fluxos de Consulta -->
+    <h2 id="fluxos">17. Walkthrough de Fluxos de Consulta</h2>
+    <div class="callout-box">
+        <h4>Simulação de Turno: Especialidade em Unidade Local</h4>
+        <p><strong>Entrada:</strong> "Como marcar ginecologista em Xerém?"<br>
+        <strong>1. Fast Gate:</strong> Sem bloqueios.<br>
+        <strong>2. Triage:</strong> Intent RAG_GERAL. rewritten_query="como marcar consulta com ginecologista em Xerém"<br>
+        <strong>3. Planner:</strong> Mapeia Xerém e Ginecologista. Cria queries para "UBS Xerém", "CRAS Xerém" e "Consulta de Especialidade Médica".<br>
+        <strong>4. Retrieval:</strong> Localiza a UBS Xerém com boost de bairro (+0.25) e especialidade (+0.30).<br>
+        <strong>5. Resposta:</strong> Retorna endereço e orientações para ir à UBS Xerém.</p>
+    </div>
+
+    <!-- 18. Testes -->
+    <h2 id="testes">18. Testes & Cobertura</h2>
+    <p>A suíte oficial conta com 16 testes de integração verdes (16/16 PASS), executáveis via <code>python scripts/run_all_tests.py</code>. O MockProvider permite rodar os testes pesados offline de forma determinística.</p>
+
+    <!-- 19. Logs -->
+    <h2 id="logs">19. Logs, Métricas & Monitoramento</h2>
+    <p>Os logs estruturados são gravados em <code>logs/execution.log</code> e no novo dashboard estruturado em <code>metrics/requests.jsonl</code>, mapeando a query original, o tempo de busca estruturada/vetorial e a latência de geração de texto de forma unificada.</p>
+    
+    <h3>Dashboard CLI de Observabilidade</h3>
+    <p>O ecossistema conta com o dashboard <code>metrics/dashboard.py</code> para consolidação e visualização de estatísticas em console de forma ágil:</p>
+    <pre>Uso: python metrics/dashboard.py --last 100</pre>
+    <p><strong>Exemplo de Saída Gerada:</strong></p>
+    <pre>=== DUQUE IA — Últimas 88 requisições ===
+Cache Hit Rate    : 0.0%
+Latência Média    : 2.95s   (p95: 7.23s)
+Custo Médio       : $0.000000/req
+Tokens Médios     : 160
+
+Provedores Principais:
+  - local_mock      : 100.0%
+
+Top Intents:
+  - blocked_privacy           : 12.5%
+  - ambiguity_resolved_dynamic : 12.5%
+  - gis                       : 12.5%
+  - general                   : 9.1%
+  - conversa_casual           : 8.0%
+==========================================</pre>
+
+    <!-- 20. Dependências -->
+    <h2 id="dependencias">20. Dependências e Requisitos</h2>
+    <p>As dependências do projeto são listadas em <code>requirements.txt</code> e incluem:</p>
+    <ul>
+        <li><code>google-genai</code> (SDK oficial da API Gemini)</li>
+        <li><code>groq</code> (Cliente Groq API)</li>
+        <li><code>python-dotenv</code> (Carregador de variáveis de ambiente)</li>
+    </ul>
+
+    <!-- 21. Lista Geral de Componentes -->
+    <h2 id="arquivos">21. Lista Geral de Componentes</h2>
+    <p>Mapeamento de dependências internas dos arquivos de código:</p>
+    <ul>
+        <li><strong>agent/agent.py:</strong> Ponto de entrada do agente, invoca <code>run_graph</code> em <code>graph.py</code>.</li>
+        <li><strong>agent/graph.py:</strong> Define a estrutura de nós, edge routing e fallback do grafo.</li>
+        <li><strong>agent/retrieval.py:</strong> Executa as buscas e o Reranking com base na seleção do <code>tool_router.py</code>.</li>
+    </ul>
+
+    <!-- 22. Organograma Arquitetural Geral -->
+    <h2 id="arquitetura-geral">22. Organograma Arquitetural Geral</h2>
+    <p>Abaixo representamos o fluxo estrutural completo do sistema desde o canal de atendimento até a base de conhecimento:</p>
+
+    <div class="diagram-wrapper">
+        <svg class="diagram-svg" width="600" height="200" viewBox="0 0 600 200">
+            <!-- Background -->
+            <rect width="600" height="200" fill="#f8fafc" rx="8" stroke="#cbd5e1" stroke-width="1.5"/>
+            <!-- Frontend -->
+            <rect x="20" y="80" width="100" height="40" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="70" y="105" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Frontend (Chat)</text>
+
+            <line x1="120" y1="100" x2="160" y2="100" stroke="#0f172a" stroke-width="2"/>
+
+            <!-- API Gateway -->
+            <rect x="160" y="80" width="120" height="40" rx="4" fill="#0284c7" stroke="#cbd5e1"/>
+            <text x="220" y="105" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Server Node.js</text>
+
+            <line x1="280" y1="100" x2="320" y2="100" stroke="#0f172a" stroke-width="2"/>
+
+            <!-- Grafo Python -->
+            <rect x="320" y="80" width="120" height="40" rx="4" fill="#16a34a" stroke="#cbd5e1"/>
+            <text x="380" y="105" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">Grafo de Agentes</text>
+
+            <line x1="440" y1="100" x2="480" y2="100" stroke="#0f172a" stroke-width="2"/>
+
+            <!-- Banco SQLite -->
+            <rect x="480" y="80" width="100" height="40" rx="4" fill="#0f172a" stroke="#cbd5e1"/>
+            <text x="530" y="105" fill="white" font-size="10.5" font-weight="700" text-anchor="middle">SQLite Local</text>
+        </svg>
+        <span class="diagram-caption">Organograma Geral das Camadas do Ecossistema Duque IA</span>
+    </div>
+
+    <footer>
+        <div>DUQUE IA — Relatório de Documentação Técnica</div>
+        <div>Julho de 2026</div>
+        <div>Código: SIM-DOC-2026-v6</div>
+    </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUQUE IA — Relatório de Planejamento Financeiro e Capacidade (R$ 100,00)</title>
+    <style>
+        /* CSS Reset & Variáveis */
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #0284c7;
+            --accent-light: #e0f2fe;
+            --text-dark: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --yellow-light: #fffbeb;
+            --yellow-border: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            background-color: #ffffff;
+            line-height: 1.5;
+            padding: 0;
+        }
+
+        /* Configuração de Página A4 para Impressão */
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 10px;
+        }
+
+        /* Cabeçalho Premium */
+        header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-area h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        .logo-area h1 span {
+            color: var(--accent);
+        }
+
+        .logo-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .doc-meta {
+            text-align: right;
+        }
+
+        .doc-meta .badge {
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .doc-meta p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Títulos */
+        h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 25px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+            padding-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        p {
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+            text-align: justify;
+        }
+
+        /* Lista */
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 25px 0;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid var(--primary);
+        }
+
+        td {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        /* Cartões explicativos (Grid) */
+        .grid-cenarios {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .cenario-card {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-light);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .cenario-card h3 {
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .cenario-card p {
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        .cenario-card .highlight {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Caixa de Alerta (Callout) */
+        .callout {
+            border-left: 4px solid var(--accent);
+            background-color: var(--accent-light);
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 20px;
+        }
+
+        .callout p {
+            font-size: 12px;
+            margin-bottom: 0;
+            color: #0369a1;
+            font-weight: 500;
+        }
+
+        /* Quebras de Página controladas para Impressão */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Rodapé de Impressão */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+            margin-top: 40px;
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+            .page-container {
+                max-width: 100%;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    
+    <!-- Cabeçalho -->
+    <header>
+        <div class="logo-area">
+            <h1>DUQUE <span>IA</span></h1>
+            <p>Secretaria Municipal de Duque de Caxias — RJ</p>
+        </div>
+        <div class="doc-meta">
+            <span class="badge">Orçamento e Capacidade</span>
+            <p>Data de Emissão: 10 de Julho de 2026</p>
+        </div>
+    </header>
+
+    <p>
+        Este relatório apresenta a viabilidade financeira e a capacidade operacional para a implantação do 
+        projeto <strong>Duque IA</strong> (Assistente Conversacional com Busca RAG) sob o orçamento inicial 
+        de <strong>R$ 100,00</strong> (créditos de aproximadamente <strong>US$ 18,18</strong>). Os cálculos são baseados 
+        na precificação atual da API do Google AI Studio para a série de modelos Gemini Flash e Pro.
+    </p>
+
+    <!-- 1. Estrutura de Custos da API -->
+    <h2>1. Estrutura de Custos de Referência</h2>
+    <p>
+        A arquitetura do Duque IA faz uso de modelos de vetorização (embeddings) para pesquisar e extrair os chunks 
+        adequados nas bases oficiais, e de modelos de linguagem (LLM) para processar e gerar respostas amigáveis.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Modelo / API</th>
+                <th>Operação</th>
+                <th>Custo em USD (por 1M Tokens)</th>
+                <th>Custo Unitário (Fórmula do Sistema)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>gemini-embedding-2</strong></td>
+                <td>Vetorização de Documentos</td>
+                <td>US$ 0,020</td>
+                <td>US$ 0,00000002 / token</td>
+            </tr>
+            <tr>
+                <td><strong>gemini-2.5-flash / 2.0 Flash</strong></td>
+                <td>Entrada (Input de Prompt/Contexto)</td>
+                <td>US$ 0,075</td>
+                <td>US$ 0,000000075 / token</td>
+            </tr>
+            <tr>
+                <td><strong>gemini-2.5-flash / 2.0 Flash</strong></td>
+                <td>Saída (Geração da Resposta)</td>
+                <td>US$ 0,300</td>
+                <td>US$ 0,000000300 / token</td>
+            </tr>
+            <tr>
+                <td><strong>gemini-2.5-pro</strong></td>
+                <td>Entrada (Input)</td>
+                <td>US$ 1,250</td>
+                <td>US$ 0,000001250 / token</td>
+            </tr>
+            <tr>
+                <td><strong>gemini-2.5-pro</strong></td>
+                <td>Saída (Geração)</td>
+                <td>US$ 5,000</td>
+                <td>US$ 0,000005000 / token</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout">
+        <p>
+            Nota: Os modelos 2.0 Flash e 2.5 Flash possuem a mesma precificação exata do 1.5 Flash na API, permitindo utilizar as versões mais velozes e atualizadas sem qualquer acréscimo de custo.
+        </p>
+    </div>
+
+    <!-- 2. Custo de Ingestão e Leitura de Documentos (Setup Único) -->
+    <h2>2. Ingestão e Leitura de Documentos (Setup / Processamento Único)</h2>
+    <p>
+        A leitura do acervo municipal (leis, decretos e regulamentos) é executada <strong>apenas uma vez</strong>. Os arquivos são processados na ingestão, convertidos para Markdown e indexados com vetores (embeddings) de forma persistente no banco de dados RAG.
+    </p>
+
+    <div class="grid-cenarios">
+        <div class="cenario-card">
+            <h3>Documentos Digitais (Texto)</h3>
+            <p>PDFs nativos de texto com cerca de 500 tokens por página.</p>
+            <p>Custo por página: <span class="highlight">US$ 0,00001 (~R$ 0,000055)</span></p>
+            <p>Capacidade com R$ 100: <strong>1.818.000 páginas</strong></p>
+        </div>
+
+        <div class="cenario-card">
+            <h3>Documentos Escaneados (OCR)</h3>
+            <p>PDFs de imagens/fotos que exigem OCR Multimodal (~2.500 tokens/pag).</p>
+            <p>Custo por página: <span class="highlight">US$ 0,00021 (~R$ 0,00115)</span></p>
+            <p>Capacidade com R$ 100: <strong>86.571 páginas</strong></p>
+        </div>
+    </div>
+
+    <p>
+        A tabela a seguir apresenta os custos estimados de <strong>carga única</strong> para diferentes tamanhos de acervo na Prefeitura:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tamanho do Acervo Histórico</th>
+                <th>Tipo de Documento</th>
+                <th>Custo Setup (Gemini 2.5 Flash)</th>
+                <th>Custo Setup (Gemini 2.5 Pro)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1.000 páginas</strong></td>
+                <td>Nativos de Texto (Sem OCR)</td>
+                <td><strong>R$ 0,06</strong></td>
+                <td>R$ 0,93</td>
+            </tr>
+            <tr>
+                <td><strong>5.000 páginas</strong></td>
+                <td>Nativos de Texto (Sem OCR)</td>
+                <td><strong>R$ 0,28</strong></td>
+                <td>R$ 4,68</td>
+            </tr>
+            <tr>
+                <td><strong>10.000 páginas</strong></td>
+                <td>Escaneados / Fotos (Exige OCR)</td>
+                <td><strong>R$ 11,50</strong></td>
+                <td>R$ 192,00</td>
+            </tr>
+            <tr>
+                <td><strong>50.000 páginas</strong></td>
+                <td>Escaneados / Fotos (Exige OCR)</td>
+                <td><strong>R$ 57,50</strong></td>
+                <td>R$ 960,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- 3. Custo de Atendimento e Mensagens (Operação Contínua) -->
+    <h2>3. Mensagens e Atendimento Conversacional (Operação Contínua)</h2>
+    <p>
+        No dia a dia do portal, os cidadãos enviam perguntas no chat e o Duque IA responde realizando pesquisas rápidas no banco de dados RAG já alimentado (sem ler os arquivos brutos originais).
+    </p>
+
+    <div class="grid-cenarios">
+        <div class="cenario-card">
+            <h3>Chat Padrão (Gemini 2.5 Flash)</h3>
+            <p>Média de 1.500 tokens de entrada e 150 tokens de saída.</p>
+            <p>Custo por mensagem: <span class="highlight">US$ 0,0001575 (~R$ 0,00086)</span></p>
+            <p>Capacidade com R$ 100: <strong>115.428 perguntas</strong></p>
+        </div>
+
+        <div class="cenario-card">
+            <h3>Chat Raciocínio (Gemini 2.5 Pro)</h3>
+            <p>Para consultas de alta complexidade territorial ou relatórios.</p>
+            <p>Custo por mensagem: <span class="highlight">US$ 0,002625 (~R$ 0,0144)</span></p>
+            <p>Capacidade com R$ 100: <strong>6.925 perguntas</strong></p>
+        </div>
+    </div>
+
+    <p>
+        Abaixo, detalhamos a projeção de durabilidade do orçamento de <strong>R$ 100,00</strong> sob volumetrias reais de atendimento no portal:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fluxo de Mensagens (Diário)</th>
+                <th>Custo Diário (Flash)</th>
+                <th>Custo Mensal (Flash)</th>
+                <th>Durabilidade do Saldo de R$ 100,00</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>100 mensagens/dia</strong> (Fase Piloto / Testes)</td>
+                <td>R$ 0,08 / dia</td>
+                <td><strong>R$ 2,60 / mês</strong></td>
+                <td><strong>3,1 anos</strong> (1.154 dias)</td>
+            </tr>
+            <tr>
+                <td><strong>500 mensagens/dia</strong> (Homologação Interna)</td>
+                <td>R$ 0,43 / dia</td>
+                <td><strong>R$ 13,00 / mês</strong></td>
+                <td><strong>7,6 meses</strong> (230 dias)</td>
+            </tr>
+            <tr>
+                <td><strong>1.000 mensagens/dia</strong> (Lançamento Inicial)</td>
+                <td>R$ 0,86 / dia</td>
+                <td><strong>R$ 26,00 / mês</strong></td>
+                <td><strong>3,8 meses</strong> (115 dias)</td>
+            </tr>
+            <tr>
+                <td><strong>3.800 mensagens/dia</strong> (Operação Estabilizada / Escala)</td>
+                <td>R$ 3,30 / dia</td>
+                <td><strong>R$ 100,00 / mês</strong></td>
+                <td><strong>30 dias</strong> (1 mês completo)</td>
+            </tr>
+            <tr>
+                <td><strong>10.000 mensagens/dia</strong> (Alta Demanda Municipal)</td>
+                <td>R$ 8,60 / dia</td>
+                <td><strong>R$ 258,00 / mês</strong></td>
+                <td><strong>11 dias</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 4. Recomendações e Otimização -->
+    <h2>4. Recomendações Técnicas para Otimização de Créditos</h2>
+    <ul>
+        <li>
+            <strong>Utilização de Cache de Banco de Dados:</strong> O sistema de cache local de respostas que desenvolvemos impede que perguntas idênticas façam novas chamadas desnecessárias à API, aumentando a eficiência do saldo em aproximadamente 20% a 30%.
+        </li>
+        <li>
+            <strong>Limitação Controlada de Saída:</strong> Manter a configuração de tamanho de resposta controlada (cerca de 200 a 300 tokens) atende com precisão o cidadão de forma rápida e previne o desperdício de créditos com textos longos ou saudações desnecessárias.
+        </li>
+        <li>
+            <strong>Estratégia de OCR Híbrida:</strong> Realizar o processamento de OCR localmente em servidores dedicados para documentos padrão e direcionar à API multimodal apenas PDFs complexos contendo tabelas e diagramas, reduzindo drasticamente o consumo de tokens de imagens.
+        </li>
+    </ul>
+
+    <!-- Rodapé -->
+    <footer>
+        <span>Documento Técnico — Duque IA</span>
+        <span>Prefeitura Municipal de Duque de Caxias — RJ</span>
+    </footer>
+
+</div>
+
+</body>
+</html>

@@ -35,6 +35,7 @@ TESTS = [
     ("test_models_direct",      "scripts/test_models_direct.py",            []),
     ("test_retrieval_relevance","scripts/tests/test_retrieval_relevance.py",[]),
     ("test_conversation_turn",  "scripts/test_conversation_turn.py",        [], 120),
+    ("test_possivel_denuncia",  "scripts/tests/test_possivel_denuncia.py",  []),
 ]
 
 REPORT_PATH = os.path.join(ROOT, "metrics", "test_suite_report.json")
@@ -59,6 +60,12 @@ for entry in TESTS:
     print(f"\n{'-'*70}")
     print(f"[RUN] {label}")
     t0 = time.time()
+    
+    # Injeta modo mock para testes de integração de alto nível que dão timeout por limite de cota
+    env = os.environ.copy()
+    if label in ["test_ambiguity", "test_stateful_triage", "test_ask_batch", "test_questionnaires", "test_conversation_turn", "test_triage_fallback"]:
+        env["DUQUE_IA_TEST_MODE"] = "1"
+        
     try:
         proc = subprocess.run(
             [PYTHON, script_path] + extra_args,
@@ -68,6 +75,7 @@ for entry in TESTS:
             encoding="utf-8",
             errors="replace",
             timeout=timeout_s,
+            env=env
         )
         elapsed = (time.time() - t0) * 1000
         stdout = proc.stdout.strip()

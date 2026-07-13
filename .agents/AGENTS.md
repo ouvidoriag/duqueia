@@ -185,7 +185,7 @@ Crie e mantenha: .env.example e docker-compose.yml.
 - Emitir a negativa por falta de competência da prefeitura de Duque de Caxias.
 
 ### Fallback e Direcionamento
-- Substituir mensagens genéricas de falha de busca por redirecionamento direto para a Ouvidoria Geral de Duque de Caxias: Telefone **162** ou WhatsApp **(21) 99824-5903**.
+- Substituir mensagens genéricas de falha de busca por redirecionamento direto para a Ouvidoria Geral de Duque de Caxias: Telefone **(21) 2652-3835** ou WhatsApp **(21) 99824-5903**.
 
 ### Triagem de Esclarecimento Contextual (Agente Coletor)
 - Se a triagem indicar que falta contexto (`needs_clarification: true`), o sistema deve acionar o comportamento de **Agente Coletor** antes de direcionar o munícipe à Ouvidoria Geral ou realizar buscas no RAG.
@@ -196,4 +196,8 @@ Crie e mantenha: .env.example e docker-compose.yml.
 ### Boas Práticas do POP
 - Evitar saudações redundantes ("Olá! Que bom ter você aqui...").
 - Formatar respostas com dados factuais úteis em **negrito** (endereços, prazos e contatos).
-- Orientar o munícipe a preencher dados essenciais (CPF, endereço completo do fato, fotos, pontos de referência) antes de registrar manifestações na plataforma Colab.
+- Orientar o munícipe a preencher dados essenciais (CPF, endereço completo do fato, fotos, pontos de referência) antes de registrar manifestações na plataforma Colab.
+
+### Verificação Preventiva e Reuso de Código
+- Sempre analise minuciosamente a estrutura de pastas do projeto (`/data`, `/scripts`, `/agent`, `/ingestion`) e os scripts existentes antes de criar novos arquivos ou recriar lógicas de negócio.
+- Evite redundâncias e dê preferência por estender e reaproveitar parsers, indexadores, ferramentas e suítes de testes que já se encontram implementados no projeto.

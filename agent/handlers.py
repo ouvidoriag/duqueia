@@ -2,7 +2,7 @@ import re
 import json
 import time
 import sys
-from agent.config import DEFAULT_DB_PATH
+from agent.config import DEFAULT_DB_PATH, OUVIDORIA_CONTACTS
 from agent.scoring import extract_query_keywords
 from agent.fallback import build_fallback_guidance, is_query_too_vague
 from agent.confidence import calibrate_confidence
@@ -63,13 +63,14 @@ def rewrite_query_with_history(query: str, history: list, gemini_client) -> str:
             
         if entity:
             resolved_heuristic = f"Qual é o {intent_type} da secretaria de {entity}?"
-            print(f"[Heuristic Rewriter] Resolvido offline: '{query}' -> '{resolved_heuristic}'")
+            print(f"[Heuristic Rewriter] Resolvido offline: '{query}' -> '{resolved_heuristic}'", file=sys.stderr)
 
     # Se estiver offline ou sem chave, usa a heurística local se resolvida
     if not gemini_client or len(gemini_client.api_keys) == 0:
         return resolved_heuristic if resolved_heuristic else query
         
-    history_context = "\n".join([f"Mensagem anterior: {msg}" for msg in history[-3:]])
+    from agent.memory import ConversationMemory
+    history_context = ConversationMemory.get_context(history, gemini_client)
     
     prompt = (
         "Dada uma conversa recente e uma pergunta atual que pode conter pronomes de continuidade, "
@@ -111,7 +112,7 @@ class SecurityHandler(BaseHandler):
             ans = "Por motivos de segurança e privacidade (LGPD), não tenho autorização para fornecer dados pessoais, CPFs ou andamento de solicitações de terceiros. Por favor, consulte o andamento de suas próprias solicitações nos canais oficiais identificados."
             intent_detected = "blocked_privacy"
         elif intent == "ESCALONAMENTO_HUMANO":
-            ans = "Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **(21) 2652-3835**, e-mail **ouvidoria@duquedecaxias.rj.gov.br** ou presencialmente na **Alameda Esmeralda, 206 - Jardim Primavera**."
+            ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
             intent_detected = "human_escalation"
         elif intent == "FORA_COMPETENCIA":
             ans = "Esta pergunta não está inserida nos temas que são de responsabilidade da Prefeitura de Duque de Caxias. O metrô, por exemplo, é um transporte de âmbito estadual, e não compete à prefeitura municipal."
@@ -146,27 +147,40 @@ class ConversationHandler(BaseHandler):
         
         # Resposta padrão fallback
         if intent == "SAUDACAO":
-            ans = ("Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n"
-                   "Como posso ajudar você hoje? Pode perguntar sobre secretarias, serviços municipais, "
-                   "endereços, ouvidoria ou qualquer outro assunto relacionado à prefeitura.")
+            if not history:
+                ans = ("Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n"
+                       "Como posso ajudar você hoje? Pode perguntar sobre secretarias, serviços municipais, "
+                       "endereços, ouvidoria ou qualquer outro assunto relacionado à prefeitura.")
+            else:
+                ans = "Claro! Como posso ajudar você hoje com mais alguma informação ou serviço da Prefeitura de Duque de Caxias?"
             intent_detected = "saudacao"
         else:
-            ans = "Olá! Sou o Duque IA, assistente virtual de Duque de Caxias. Estou aqui para tirar dúvidas sobre secretarias, IPTU, Ouvidoria e outros serviços da nossa cidade. Como posso ajudar com Duque de Caxias hoje?"
+            ans = "Estou aqui para tirar dúvidas sobre secretarias, IPTU, Ouvidoria e outros serviços da nossa cidade. Como posso ajudar com Duque de Caxias hoje?"
             intent_detected = "conversa_casual"
 
         if agent.using_real:
             try:
                 if intent == "SAUDACAO":
-                    sys_instruct = (
-                        "Você é o Duque IA, assistente virtual da Prefeitura de Duque de Caxias.\n"
-                        "O munícipe enviou uma saudação. Responda de forma calorosa e descontraída, no mesmo tom dele, "
-                        "e pergunte em que pode ajudar. Seja breve: máximo 2 frases."
-                    )
+                    if not history:
+                        sys_instruct = (
+                            "Você é o Duque IA, assistente virtual da Prefeitura de Duque de Caxias.\n"
+                            "O munícipe enviou uma saudação inicial. Responda de forma muito calorosa, descontraída e "
+                            "diga: 'Olá! Sou o DUQUE IA, assistente virtual da Prefeitura de Duque de Caxias. Como posso ajudar você hoje?'"
+                        )
+                    else:
+                        sys_instruct = (
+                            "Você é o Duque IA, assistente virtual da Prefeitura de Duque de Caxias.\n"
+                            "O diálogo já está em andamento (não é a primeira interação). O munícipe enviou uma saudação ou quer retomar.\n"
+                            "NUNCA use saudações como 'Olá!', 'Oi!', 'Bom dia!' ou qualquer frase de boas-vindas inicial.\n"
+                            "Responda diretamente e de forma casual, mostrando-se à disposição (ex: 'Claro, em que posso ajudar?', 'À disposição, o que você precisa?', 'Pode falar, como posso ajudar?').\n"
+                            "Seja muito breve: no máximo 1 ou 2 frases."
+                        )
                 else:
                     sys_instruct = (
                         "Você é o Duque IA, assistente virtual da Prefeitura de Duque de Caxias.\n"
-                        "O cidadão fez um bate-papo informal. Responda de forma simpática e curta (máximo 3 frases), "
-                        "lembre-o com leveza que sua especialidade é Duque de Caxias (serviços, secretarias, endereços)."
+                        "O cidadão fez um bate-papo informal ou casual. Responda de forma simpática e curta (máximo 3 frases).\n"
+                        "NUNCA use saudações redundantes ou inicie a resposta com 'Olá!' ou 'Oi!' se o diálogo já começou.\n"
+                        "Lembre-o com leveza que sua especialidade é Duque de Caxias (serviços, secretarias, endereços)."
                     )
                 ans = agent.gemini_client.generate_response(query, system_instruction=sys_instruct, model="gemini-3.1-flash-lite").strip()
             except Exception:
@@ -191,6 +205,61 @@ class CollectorHandler(BaseHandler):
     """Trata fluxos de Ouvidoria (reclamação, denúncia, sugestão, elogio) e triagem incremental."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
         elapsed = time.time() - start_time
+        intent = triage_info.get("intent")
+        
+        # Tratamento especial para relatos de possível conduta inadequada / ofensas (POSSIVEL_DENUNCIA)
+        if intent == "POSSIVEL_DENUNCIA":
+            if agent.using_real:
+                system_instruction = (
+                    "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
+                    "O cidadão fez um relato indicando que sofreu ofensas, xingamentos, ameaças, humilhações ou mau atendimento (possível denúncia).\n"
+                    "Sua missão é responder com muita empatia, acolher o relato sem assumir que houve irregularidade, e explicar de forma clara:\n"
+                    "1. Se esse fato ocorreu durante um atendimento de órgão, servidor ou serviço da Prefeitura de Duque de Caxias, ele pode registrar uma reclamação ou denúncia oficial na Ouvidoria Geral.\n"
+                    "2. Convide-o de forma simpática a informar em qual órgão, secretaria ou unidade da Prefeitura ocorreu o fato, ou se envolve algum servidor, para que você possa orientar os próximos passos específicos.\n"
+                    "3. Mantenha a resposta concisa (máximo 4 frases), acolhedora e vá direto ao ponto (sem saudações redundantes)."
+                )
+                prompt = (
+                    f"Mensagem do cidadão: \"{query}\"\n\n"
+                    f"Gere a resposta acolhedora de orientação:"
+                )
+                try:
+                    answer = agent.gemini_client.generate_response(
+                        prompt,
+                        system_instruction=system_instruction,
+                        model="gemini-3.1-flash-lite",
+                        temperature=0.15,
+                        max_output_tokens=250
+                    ).strip()
+                except Exception:
+                    answer = (
+                        "Sinto muito pelo ocorrido. Se essa situação aconteceu com um servidor público municipal "
+                        "ou durante um atendimento da Prefeitura de Duque de Caxias, você pode registrar uma manifestação "
+                        "(reclamação ou denúncia) nos canais oficiais da nossa Ouvidoria Geral.\n\n"
+                        "Para eu te orientar sobre como proceder, poderia me informar em qual **secretaria, posto ou órgão** isso ocorreu?"
+                    )
+            else:
+                answer = (
+                    "Sinto muito pelo ocorrido. Se essa situação aconteceu com um servidor público municipal "
+                    "ou durante um atendimento da Prefeitura de Duque de Caxias, você pode registrar uma manifestação "
+                    "(reclamação ou denúncia) nos canais oficiais da nossa Ouvidoria Geral.\n\n"
+                    "Para eu te orientar sobre como proceder, poderia me informar em qual **secretaria, posto ou órgão** isso ocorreu?"
+                )
+                
+            return {
+                "answer": answer,
+                "sources": [],
+                "confidence": triage_info.get("confidence", 0.95),
+                "intent_detected": "possivel_denuncia_redirect",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(query)
+                }
+            }
+
         tipo = triage_info.get("tipo_manifestacao", "geral")
         
         if triage_info.get("needs_clarification"):
@@ -251,16 +320,16 @@ class CollectorHandler(BaseHandler):
             system_instruction = (
                 "Você é o DUQUE IA, assistente virtual oficial de Duque de Caxias — RJ.\n"
                 "O cidadão deseja abrir uma manifestação (reclamação, denúncia, elogio ou sugestão).\n"
-                "Sua missão é validar o sentimento dele com simpatia e orientá-lo de forma direta (em até 4 frases) "
-                "de como preencher essa solicitação no aplicativo **Colab** ou pelo site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/).\n\n"
+                f"Sua missão é validar o sentimento dele com simpatia e orientá-lo de forma direta (em até 4 frases) "
+                f"de como preencher essa solicitação no aplicativo **Colab** ou pelo site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}).\n\n"
                 "INSTRUÇÕES DE PREENCHIMENTO:\n"
                 "1. Com base na reclamação/mensagem do munícipe, diga a ele claramente qual **Tema** e **Assunto** selecionar dentro do Colab. Exemplo:\n"
                 "   - Se for buraco de asfalto/drenagem: Tema **Obras**.\n"
                 "   - Se for capina, roçagem, lixo ou entulho: Tema **Limpeza Urbana**.\n"
                 "   - Se for lâmpada apagada no poste: Tema **Transportes, Serviços Públicos e Troca de Lâmpadas**.\n"
                 "   CRÍTICO: Você deve sugerir APENAS nomes de temas e assuntos reais cadastrados no sistema municipal do Colab. Nunca invente ou crie nomes de temas/assuntos (por exemplo, sugira 'Conduta irregular de funcionário' ou 'Funcionário', nunca invente 'Denúncia contra Servidor').\n"
-                "2. Informe os canais da Ouvidoria Geral como alternativa: telefone **(21) 2652-3835** e e-mail **ouvidoria@duquedecaxias.rj.gov.br**.\n"
-                "3. Dica rápida: oriente-o a ter em mãos a foto e o endereço correto para o registro no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)).\n"
+                f"2. Informe os canais da Ouvidoria Geral como alternativa: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}** e e-mail **{OUVIDORIA_CONTACTS['email']}**.\n"
+                f"3. Dica rápida: oriente-o a ter em mãos a foto e o endereço correto para o registro no Colab ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']})).\n"
                 "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento."
             )
 
@@ -277,7 +346,7 @@ class CollectorHandler(BaseHandler):
                 # Fallback offline em caso de erro da API
                 answer = (
                     f"Entendi perfeitamente o seu problema. Para registrar essa sua **{label}**, o caminho oficial é através da nossa Ouvidoria Geral de Duque de Caxias. "
-                    f"Você pode registrar diretamente pelo aplicativo **Colab**, no site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/), ligando para **(21) 2652-3835** ou enviando um e-mail para **ouvidoria@duquedecaxias.rj.gov.br**.\n\n"
+                    f"Você pode registrar diretamente pelo aplicativo **Colab**, no site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}), ligando para o telefone **{OUVIDORIA_CONTACTS['telefone']}**, enviando mensagem para o WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}** ou enviando um e-mail para **{OUVIDORIA_CONTACTS['email']}**.\n\n"
                     f"**Dica de amigo:** Quando for registrar no Colab, lembre-se de colocar o endereço bem certinho, com ponto de referência e, se tiver, anexar fotos ou vídeos do local. Isso agiliza muito o trabalho da secretaria para resolver o problema!"
                 )
         else:
@@ -302,9 +371,10 @@ class CollectorHandler(BaseHandler):
             answer = (
                 f"{sugerido_txt}"
                 f"Para dar andamento à sua **{label}**, você pode registrá-la diretamente nos canais oficiais da nossa **Ouvidoria Geral de Duque de Caxias**:\n\n"
-                f"• Telefone: **(21) 2652-3835**\n"
-                f"• E-mail: **ouvidoria@duquedecaxias.rj.gov.br**\n"
-                f"• Online: aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/).\n\n"
+                f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
+                f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+                f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
+                f"• Online: aplicativo **Colab** ou site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}).\n\n"
                 f"**Dica de amigo para agilizar o seu atendimento:**\n"
                 f"Ao registrar sua manifestação no Colab, procure incluir o **endereço completo do fato** (com ponto de referência), uma **descrição bem detalhada** do que está acontecendo e, se possível, anexe **fotos ou vídeos** bem nítidos do local. Isso nos ajuda a encaminhar o problema muito mais rápido para a secretaria responsável!"
             )
@@ -347,11 +417,22 @@ class AmbiguityHandler(BaseHandler):
                 "   - Ponto de referência\n"
                 "   - Número aproximado do poste (se houver)\n"
                 "   - Anexar fotos do local (opcional)\n"
-                "4. Se for barulho de residência/vizinho, direcione estritamente para a Polícia Militar (190). Se for evento/rua, direcione para Ordem Urbana via Colab.\n"
+                "4. Se for barulho de residência/espaço particular, direcione estritamente para a Polícia Militar (190), pois a Prefeitura não intervém nesses locais. Se for em espaço público, instrua a abrir no Colab e escolher a categoria/tema correta:\n"
+                "   - Ordem Pública: Ruídos de bares, restaurantes, locutores e comércios em geral;\n"
+                "   - Guarda Municipal: Ruídos de veículos não oficiais (som automotivo/paredão);\n"
+                "   - Urbanismo: Ruídos de obras em andamento;\n"
+                "   - Meio Ambiente: Demais casos de poluição sonora.\n"
                 "5. Formate informações importantes em **negrito** (números, telefones, links, temas).\n"
                 "6. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
                 "7. Mantenha a resposta curta, objetiva, prestativa e calorosa. Máximo 4 frases."
             )
+            
+            if history:
+                system_instruction += (
+                    "\nREGRA DE CONVERSA EM ANDAMENTO:\n"
+                    "- A conversa já está em andamento. NUNCA comece a resposta com saudações, saudações de boas-vindas, ou cumprimentos (como 'Olá', 'Oi', 'Bom dia', 'Tudo bem', 'Que bom ver você', etc.).\n"
+                    "- Vá direto para o assunto."
+                )
             
             prompt = (
                 f"Histórico recente de mensagens:\n{history_context}\n\n"
@@ -440,10 +521,14 @@ class AmbiguityHandler(BaseHandler):
             )
         elif intent == "AMBIGUO_BARULHO":
             answer = (
-                "Você poderia me esclarecer se o som alto vem de uma **residência particular (como a casa de um vizinho, apartamento ou festa privada)** "
-                "ou se é de um **evento realizado em espaço público (como um show na rua, praça pública ou festa aberta à população)**?\n\n"
-                "• Se for barulho de **vizinho ou residência particular**, a competência de atendimento é da **Polícia Militar (ligue para 190)**.\n"
-                "• Se for um **evento ou show em espaço público/rua**, a reclamação deve ser registrada para a **Ordem Urbana** da Prefeitura pelo aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/)."
+                "Você poderia me esclarecer se o som alto vem de uma **residência particular ou espaço particular (como a casa de um vizinho, apartamento ou festa privada)** "
+                "ou se é de outra origem (como comércio, bar, show ou veículo na rua)?\n\n"
+                "• Se for ruído proveniente de **residências ou espaços particulares**, a competência de atendimento é exclusiva da **Polícia Militar (ligue para 190)**, pois a Prefeitura não tem competência legal para intervir nesses casos.\n"
+                "• Se for proveniente de outras fontes, o registro deve ser feito pelo aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/) selecionando a categoria correta:\n"
+                "  - **Ordem Pública**: Bares, restaurantes, comércios e locutores;\n"
+                "  - **Guarda Municipal**: Veículos não oficiais (som automotivo/paredão);\n"
+                "  - **Urbanismo**: Obras em andamento;\n"
+                "  - **Meio Ambiente**: Demais casos de poluição sonora."
             )
         else:
             answer = (
@@ -510,21 +595,92 @@ class ProgramacaoHandler(BaseHandler):
 class RagHandler(BaseHandler):
     """Handler principal para consultas informativas via RAG."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
+        # C0: Verificação de Autoridade Pública no catálogo
+        if triage_info.get("intent") == "AUTORIDADE_PUBLICA":
+            try:
+                from agent.authorities_catalog import AUTHORITIES
+                # Normaliza query
+                q_clean = query.lower().strip()
+                q_clean = re.sub(r'^[¿\?¡\!]+|[¿\?¡\!]+$', '', q_clean)
+                q_clean = re.sub(r'^(?:quem\s+é\s+o\s+|quem\s+é\s+a\s+|quem\s+é\s+|quem\s+e\s+o\s+|quem\s+e\s+a\s+|quem\s+e\s+|qual\s+o\s+|qual\s+a\s+|qual\s+é\s+o\s+|qual\s+é\s+a\s+|qual\s+e\s+o\s+|qual\s+e\s+a\s+|quem\s+dirige\s+o\s+|quem\s+dirige\s+a\s+|quem\s+dirige\s+|quem\s+administra\s+o\s+|quem\s+administra\s+a\s+|quem\s+administra\s+|quem\s+comanda\s+o\s+|quem\s+comanda\s+a\s+|quem\s+comanda\s+|quem\s+ocupa\s+o\s+cargo\s+de\s+|quem\s+ocupa\s+o\s+cargo\s+da\s+|quem\s+ocupa\s+o\s+cargo\s+de\s*|o\s+responsável\s+pela\s+|o\s+responsavel\s+pela\s+|o\s+responsável\s+pelo\s+|o\s+responsavel\s+pelo\s+)', '', q_clean).strip()
+                
+                # Normalizador de acentos local
+                def _normalize_accents(text: str) -> str:
+                    repls = {
+                        'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a',
+                        'é': 'e', 'ê': 'e', 'í': 'i', 'ó': 'o',
+                        'ô': 'o', 'õ': 'o', 'ú': 'u', 'ç': 'c'
+                    }
+                    t = text.lower()
+                    for src, dst in repls.items():
+                        t = t.replace(src, dst)
+                    return t
+                
+                q_normalized = _normalize_accents(q_clean)
+                auth = None
+                
+                # Busca ordenada por tamanho decrescente para evitar falso-positivo (ex: 'prefeito' em 'vice-prefeito')
+                sorted_keys = sorted(AUTHORITIES.keys(), key=len, reverse=True)
+                for key in sorted_keys:
+                    key_norm = _normalize_accents(key)
+                    if key_norm == q_normalized or key_norm in q_normalized or q_normalized in key_norm:
+                        auth = AUTHORITIES[key]
+                        break
+                
+                if auth:
+                    nome = auth["nome"]
+                    cargo = auth["cargo"]
+                    fonte = auth["fonte"]
+                    
+                    answer = (
+                        f"O {cargo} de Duque de Caxias é **{nome}**.\n\n"
+                        f"Essa informação consta na estrutura oficial da Prefeitura.\n\n"
+                        f"Se desejar, também posso informar quem são os outros secretários municipais, a estrutura administrativa ou o contato de alguma secretaria específica.\n\n"
+                        f"*(Informação obtida na estrutura administrativa oficial da Prefeitura — **{fonte}**)*"
+                    )
+                    
+                    elapsed = time.time() - start_time
+                    agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
+                    return {
+                        "answer": answer,
+                        "sources": [fonte],
+                        "confidence": 1.0,
+                        "intent_detected": "AUTORIDADE_PUBLICA",
+                        "triage_info": triage_info,
+                        "metrics": {
+                            "retrieval_time_ms": 0,
+                            "llm_time_ms": 0,
+                            "total_time_ms": round(elapsed * 1000, 2),
+                            "tokens_used": 0,
+                            "keywords": extract_query_keywords(query)
+                        }
+                    }
+            except Exception as e:
+                print(f"[RagHandler Authority Catalog Error] {e}", file=sys.stderr)
+
         from agent.router import QueryAnalyzer
         
-        # Reescreve a query com o histórico se aplicável para resolver pronomes e continuity queries
+        # A1: Usa rewritten_query já gerada pela triagem (fusão Triage+Rewriter = -1 chamada LLM)
+        # Só chama o rewriter separado se a triagem não veio do LLM (ex: FAST_GATE, SQLITE_CACHE)
         effective_query = query
-        if history:
+        triage_source = triage_info.get("source", "")
+        triage_rewritten = triage_info.get("rewritten_query", "")
+        if triage_rewritten and triage_rewritten.strip() and triage_source == "GEMINI_LLM":
+            effective_query = triage_rewritten.strip()
+        elif history:
             effective_query = rewrite_query_with_history(query, history, agent.gemini_client)
+
         
         # 1. Análise da Query (Roteamento/Informações adicionais)
         intent_info = QueryAnalyzer.analyze(effective_query, agent.gemini_client)
         
         # 2. Busca RAG Híbrida
         retrieval_start = time.time()
+        tools_selected = triage_info.get("tools_selected")
         results = retrieve_context(
             effective_query, agent.db_path, agent.using_real, agent.similarity_threshold,
-            agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info
+            agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info,
+            tools_selected=tools_selected
         )
         
         # Se a busca falhar com o limite padrão, tenta recuperar buscando com a query concatenada em último caso
@@ -532,7 +688,8 @@ class RagHandler(BaseHandler):
             search_query = f"{query} {' '.join(history[-2:])}"
             history_results = retrieve_context(
                 search_query, agent.db_path, agent.using_real, agent.similarity_threshold,
-                agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info
+                agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info,
+                tools_selected=tools_selected
             )
             if history_results and (not results or history_results[0].get("similarity", 0.0) > results[0].get("similarity", 0.0)):
                 results = history_results
@@ -570,50 +727,45 @@ class RagHandler(BaseHandler):
         base_score = relevant_results[0]["similarity"]
         confidence = calibrate_confidence(base_score, query, relevant_results)
         
-        # Se a confiança for baixa (< 0.60) e estiver online, gera uma pergunta de clarificação em vez de responder incorretamente
-        if base_score < 0.60 and agent.using_real:
-            llm_start = time.time()
-            system_instruction = (
-                "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
-                "A busca obteve baixa confiança e o assunto ou o local exato pode não estar claro.\n"
-                "Sua missão é gerar uma pergunta de confirmação/esclarecimento muito simpática, natural e humana.\n"
-                "Você DEVE citar expressamente o nome do resultado/órgão/local mais provável encontrado no contexto da base de dados e perguntar se o cidadão está falando dele ou de outro assunto/local.\n"
-                "Exemplo: se o cidadão pergunta 'como ir no adão pereira' e o resultado mais provável é 'Hospital Municipal Dr. Adão Pereira Nunes', pergunte: 'Só para confirmar: você está falando do Adão Pereira, o Hospital Municipal Dr. Adão Pereira Nunes, ou de outro local?'\n"
-                "Seja extremamente curto, educado e caloroso. Máximo 2 frases."
-            )
-            prompt = (
-                f"Mensagem do cidadão: \"{query}\"\n"
-                f"Melhor resultado da base (baixa confiança): \"{relevant_results[0].get('title')}\" - \"{relevant_results[0].get('content')[:250]}\"\n\n"
-                f"Gere a pergunta de clarificação/confirmação:"
-            )
-            try:
-                clarification_query = agent.gemini_client.generate_response(
-                    prompt,
-                    system_instruction=system_instruction,
-                    model="gemini-3.1-flash-lite",
-                    temperature=0.2,
-                    max_output_tokens=150
-                ).strip()
-                llm_time = time.time() - llm_start
-                total_time = time.time() - start_time
-                agent.log_execution_metrics(query, retrieval_time, llm_time, total_time, base_score, len(query)//4 + len(prompt)//4, 0.0)
-                return {
-                    "answer": clarification_query,
-                    "sources": [],
-                    "confidence": confidence,
-                    "retrieved_chunks": [],
-                    "intent_detected": "low_confidence_clarification",
-                    "triage_info": triage_info,
-                    "metrics": {
-                        "retrieval_time_ms": round(retrieval_time * 1000, 2),
-                        "llm_time_ms": round(llm_time * 1000, 2),
-                        "total_time_ms": round(total_time * 1000, 2),
-                        "tokens_used": len(query) // 4 + len(prompt) // 4,
-                        "keywords": extract_query_keywords(query)
-                    }
+        # A2: Clarificação de Baixa Confiança Off-LLM (sem chamada extra à API)
+        # Usa o título e categoria do Top-1 para gerar pergunta de confirmação local.
+        if base_score < 0.60:
+            top_title = relevant_results[0].get("title", "")
+            top_category = relevant_results[0].get("category", "")
+            if top_title and top_category in ("carta_servicos", "secretarias", "unidades"):
+                clarification_query = (
+                    f"Só para confirmar: você está perguntando sobre **\"{top_title}\"**, "
+                    f"ou sobre outro serviço/local? Me diga mais detalhes para eu te ajudar melhor! 😊"
+                )
+            elif top_title:
+                clarification_query = (
+                    f"Poderia esclarecer um pouco mais sua dúvida? "
+                    f"O assunto mais próximo que encontrei foi **\"{top_title}\"** — é sobre isso ou sobre algo diferente?"
+                )
+            else:
+                clarification_query = (
+                    "Poderia detalhar um pouco mais sua dúvida? "
+                    "Não encontrei uma correspondência exata — quanto mais específico você for, melhor posso te ajudar!"
+                )
+            total_time = time.time() - start_time
+            agent.log_execution_metrics(query, retrieval_time, 0, total_time, base_score, 0, 0.0)
+            return {
+                "answer": clarification_query,
+                "sources": [],
+                "confidence": confidence,
+                "retrieved_chunks": [],
+                "intent_detected": "low_confidence_clarification",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": round(retrieval_time * 1000, 2),
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(total_time * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(query)
                 }
-            except Exception as e:
-                print(f"[Low Confidence Clarification Warning] Falha na chamada da LLM: {e}", file=sys.stderr)
+            }
+
+
 
         sources_list = list(set(r["source"] for r in relevant_results))
         
@@ -652,8 +804,12 @@ class RagHandler(BaseHandler):
                 "- O 'CONTEXTO COMPLEMENTAR' serve apenas para enriquecer com descrições, nunca para substituir dados oficiais.\n"
                 "\n"
                 "REGRA CRÍTICA DE COMPETÊNCIA — PERTURBAÇÃO DO SOSSEGO / BARULHO:\n"
-                "- Se o cidadão reclamar de barulho, som alto, festa ou algazarra vindo de um **vizinho, residência particular, apartamento ou casa ao lado**: a competência é da **POLÍCIA MILITAR** — oriente-o a ligar para o **190**. NÃO direcione ao Colab, Ordem Urbana ou Ouvidoria para este caso.\n"
-                "- Se o cidadão reclamar de barulho vindo de **evento em espaço público (rua, praça, evento aberto, baile funk)**: direcione à **Ordem Urbana** pelo **Colab** ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)), tema **Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)**.\n"
+                "- Ruídos provenientes de residências ou espaços particulares deverão ser encaminhados diretamente à autoridade policial competente (ligue **190**), não havendo intervenção por parte da Prefeitura.\n"
+                "- Para poluição sonora de outras fontes (comércio, bar, obras, veículo na rua, etc.), a solicitação deve ser feita exclusivamente via Ouvidoria pelo aplicativo Colab, orientando o cidadão a selecionar a categoria correta:\n"
+                "  * **Ordem Pública**: Ruídos de bares, restaurantes, locutores e comércios em geral;\n"
+                "  * **Guarda Municipal**: Ruídos de veículos não oficiais (ex: som automotivo/paredão);\n"
+                "  * **Urbanismo**: Ruídos de obras em andamento;\n"
+                "  * **Meio Ambiente**: Demais casos de poluição sonora.\n"
                 "\n"
                 "DIRETRIZES CONVERSACIONAIS:\n"
                 "1. Use **negrito** para telefones, endereços e horários.\n"
@@ -663,8 +819,15 @@ class RagHandler(BaseHandler):
                 "5. Se o cidadão solicitar o **endereço** de uma secretaria, órgão ou equipamento público (ex: Guarda Municipal, CRAS, etc.), forneça a resposta principal em **negrito** e ofereça proativamente fornecer outros detalhes se ele desejar, como: telefone, horário de funcionamento, como chegar ou serviços oferecidos no local.\n"
                 "6. NÃO repita saudações se o diálogo já está em andamento. Comece a resposta de forma direta e natural.\n"
                 "7. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'.\n"
-                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário'), sem inventar ou parafrasear os botões do formulário."
+                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário', sem inventar ou parafrasear os botões do formulário)."
             )
+            
+            if history:
+                system_instruction += (
+                    "\nREGRA DE CONVERSA EM ANDAMENTO:\n"
+                    "- A conversa já está em andamento. NUNCA comece a resposta com saudações, saudações de boas-vindas, ou cumprimentos (como 'Olá', 'Oi', 'Bom dia', 'Tudo bem', 'Que bom ver você', etc.).\n"
+                    "- Vá direto para o assunto e inicie a resposta diretamente com os dados factuais solicitados."
+                )
             
             prompt = (
                 f"Contexto oficial (use SOMENTE estas informações para responder):\n"
@@ -687,7 +850,7 @@ class RagHandler(BaseHandler):
                     model=session_model,
                     previous_interaction_id=gemini_interaction_id,
                     temperature=0.15,
-                    max_output_tokens=350
+                    max_output_tokens=800
                 )
                 if new_conv_id and conversation_id:
                     DuqueIAAgent._interaction_map[conversation_id] = new_conv_id
@@ -695,6 +858,28 @@ class RagHandler(BaseHandler):
                         DuqueIAAgent._model_sessions[conversation_id] = working_model
             except Exception as e:
                 print(f"[Gemini Interaction Warning] Falha na chamada da LLM (usando fallback offline): {e}", file=sys.stderr)
+                if base_score < effective_threshold:
+                    answer = build_fallback_guidance(query)
+                else:
+                    best_match = relevant_results[0]
+                    clean_content = best_match["content"].strip()
+                    if "FONTE OFICIAL ESTRUTURADA" in clean_content:
+                        answer = (
+                            f"**{best_match['title']}**\n\n"
+                            + clean_content +
+                            f"\n\n*Fonte: {best_match['source']} (Dados Oficiais)*"
+                        )
+                    else:
+                        sentences = [s.strip() for s in clean_content.split("\n") if s.strip()]
+                        answer = (
+                            f"**{best_match['title']}**\n\n"
+                            + "\n".join(f"- {s}" for s in sentences[:5]) +
+                            f"\n\n*Fonte: {best_match['source']} (Fallback Offline)*"
+                        )
+        else:
+            if base_score < effective_threshold:
+                answer = build_fallback_guidance(query)
+            else:
                 best_match = relevant_results[0]
                 clean_content = best_match["content"].strip()
                 if "FONTE OFICIAL ESTRUTURADA" in clean_content:
@@ -708,24 +893,8 @@ class RagHandler(BaseHandler):
                     answer = (
                         f"**{best_match['title']}**\n\n"
                         + "\n".join(f"- {s}" for s in sentences[:5]) +
-                        f"\n\n*Fonte: {best_match['source']} (Fallback Offline)*"
+                        f"\n\n*Fonte: {best_match['source']}*"
                     )
-        else:
-            best_match = relevant_results[0]
-            clean_content = best_match["content"].strip()
-            if "FONTE OFICIAL ESTRUTURADA" in clean_content:
-                answer = (
-                    f"**{best_match['title']}**\n\n"
-                    + clean_content +
-                    f"\n\n*Fonte: {best_match['source']} (Dados Oficiais)*"
-                )
-            else:
-                sentences = [s.strip() for s in clean_content.split("\n") if s.strip()]
-                answer = (
-                    f"**{best_match['title']}**\n\n"
-                    + "\n".join(f"- {s}" for s in sentences[:5]) +
-                    f"\n\n*Fonte: {best_match['source']}*"
-                )
             
         # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) no Top-1 ou com alta similaridade,
         # anexa os detalhes estruturados de passo a passo e documentos logo abaixo da resposta gerada.
@@ -765,6 +934,16 @@ class RagHandler(BaseHandler):
                         
                         extra_info += "\n\n👣 **Passo a Passo:**\n" + "\n".join(clean_steps)
 
+        # Só anexa passo a passo se o título do serviço estiver mencionado na resposta da LLM
+        # Isso evita anexar "como solicitar" de um serviço que a LLM nem sequer citou na resposta!
+        if extra_info and relevant_results:
+            top_match = relevant_results[0]
+            top_title = top_match.get("title", "")
+            ignore_parts = ["de", "e", "do", "da", "para", "com", "em", "um", "uma", "o", "a", "no", "na", "ao", "ou", "se", "por"]
+            title_keywords = [w.lower() for w in re.findall(r'\b\w{3,20}\b', top_title) if w.lower() not in ignore_parts]
+            if title_keywords and not any(w in answer.lower() for w in title_keywords):
+                extra_info = ""
+
         if extra_info:
             answer = answer.strip() + extra_info
 
@@ -775,6 +954,9 @@ class RagHandler(BaseHandler):
         # 5. Calibração da Confiança
         base_score = relevant_results[0]["similarity"]
         confidence = calibrate_confidence(base_score, query, relevant_results)
+        
+        top_hybrid_score = relevant_results[0].get("hybrid_score_original", base_score)
+        top_cross_score = relevant_results[0].get("cross_encoder_score", 0.0)
         
         # 6. Métricas
         tokens_usados = len(query) // 4 + sum(len(r["content"]) for r in relevant_results) // 4
@@ -838,6 +1020,10 @@ class RagHandler(BaseHandler):
                 "vector_candidates": len(results),
                 "official_sources": len([s for s in sources_list if "SECRETARIAS" in s.upper() or "VW_IA_SERVICOS" in s.upper()]),
                 "response_source": "structured" if structured_hit and not complementary_parts else ("hybrid" if structured_hit else "complementary"),
-                "query_was_rewritten": effective_query != query
+                "query_was_rewritten": effective_query != query,
+                "hybrid_score": round(top_hybrid_score, 4),
+                "cross_score": round(top_cross_score, 4),
+                "similarity_score": round(base_score, 4),
+                "cost_usd": embedding_cost
             }
         }

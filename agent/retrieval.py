@@ -1,9 +1,9 @@
 import sys
 import os
 import json
-import sqlite3
 import re
 import unicodedata
+from utils.db_client import get_db_connection, query_db, query_one
 from agent.models import QueryIntent
 from agent.scoring import (
     cosine_similarity,
@@ -188,15 +188,12 @@ def retrieve_full_category(db_path: str, category: str, filter_field: str = "cat
             "is_list_result": True
         }]
 
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute(
+    rows = query_db(
+        db_path,
         f"SELECT DISTINCT source, category, content, metadata FROM duque_ia_chunks "
         f"WHERE {filter_field} = ? ORDER BY source",
         (category,)
     )
-    rows = cursor.fetchall()
-    conn.close()
 
     results = []
     seen_keys = set()
@@ -223,8 +220,6 @@ def retrieve_full_category(db_path: str, category: str, filter_field: str = "cat
 
 def retrieve_structured_service(db_path: str, query: str, query_keywords: list, using_real: bool) -> list:
     """Busca estruturada nas tabelas normalizadas de serviços com normalização de termos de ação e fuzzy matching."""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
     
     # 1. Filtra palavras de ação, pronomes e ruído estrutural
     action_words = [
@@ -245,7 +240,6 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
             search_words.append("tapa")
             
     if not search_words:
-        conn.close()
         return []
         
     conditions = []
@@ -261,105 +255,104 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
         FROM vw_ia_servicos
         WHERE {" OR ".join(conditions)}
     """
-    try:
-        cursor.execute(sql, params)
-        rows = cursor.fetchall()
-    except sqlite3.OperationalError as e:
-        print(f"[Structured Retrieval Error] View vw_ia_servicos não disponível: {e}", file=sys.stderr)
-        conn.close()
-        return []
-        
-    results = []
-    for row in rows:
-        s_id, sec_name, sec_code, s_name, cat, desc, how, who, wait, deadline, cost, norm = row
-        
-        match_score = 0.0
-        # Normalização para comparação sem acento
-        s_name_norm = ''.join(c for c in unicodedata.normalize('NFKD', s_name.lower()) if not unicodedata.combining(c))
-        desc_norm = ''.join(c for c in unicodedata.normalize('NFKD', desc.lower()) if not unicodedata.combining(c)) if desc else ""
-        
-        for w in search_words:
-            w_norm = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
-            if w_norm in s_name_norm:
-                # Dá um peso significativamente maior se corresponder ao termo exato do serviço
-                if w_norm == "buraco" and "buraco" in s_name_norm:
-                    match_score += 4.0
-                else:
-                    match_score += 2.0
-            elif desc_norm and w_norm in desc_norm:
-                if w_norm == "buraco" and "buraco" in desc_norm:
-                    match_score += 2.0
-                else:
-                    match_score += 1.0
-                
-        if match_score == 0.0:
-            continue
-            
-        cursor.execute("SELECT phone FROM service_phones WHERE service_id = ?", (s_id,))
-        phones = [r[0] for r in cursor.fetchall()]
-        
-        cursor.execute("SELECT email FROM service_emails WHERE service_id = ?", (s_id,))
-        emails = [r[0] for r in cursor.fetchall()]
-        
-        cursor.execute("SELECT link FROM service_links WHERE service_id = ?", (s_id,))
-        links = [r[0] for r in cursor.fetchall()]
-        
-        cursor.execute("SELECT step_number, description FROM service_steps WHERE service_id = ? ORDER BY step_number", (s_id,))
-        steps = [f"Passo {num}: {d}" for num, d in cursor.fetchall()]
-        
-        cursor.execute("SELECT document_name FROM service_documents WHERE service_id = ?", (s_id,))
-        docs = [r[0] for r in cursor.fetchall()]
-        
-        # Busca o endereço físico da secretaria responsável pelo serviço
-        sec_address = "Não cadastrado"
-        cursor.execute("SELECT address FROM secretarias WHERE name = ? OR code = ?", (sec_name, sec_code))
-        sec_row = cursor.fetchone()
-        if sec_row and sec_row[0]:
-            sec_address = sec_row[0]
-            
-        content_parts = [
-            "[FONTE OFICIAL ESTRUTURADA]",
-            "Tipo: Carta de Serviços Oficiais",
-            "Confiabilidade: Máxima (Auditado)",
-            "Última Atualização: 2026-07-01",
-            "",
-            f"Serviço Oficial: {s_name}",
-            f"Secretaria Responsável: {sec_name} ({sec_code})",
-            f"Endereço de Atendimento: {sec_address}",
-            f"Descrição: {desc}",
-            f"Quem pode solicitar: {who}",
-            f"Prazo Máximo: {deadline}",
-            f"Custo: {cost}"
-        ]
-        if phones:
-            content_parts.append(f"Telefones de Contato: {', '.join(phones)}")
-        if emails:
-            content_parts.append(f"E-mails de Contato: {', '.join(emails)}")
-        if links:
-            content_parts.append(f"Links / Canais Digitais: {', '.join(links)}")
-        if docs:
-            content_parts.append("Documentos Necessários:\n" + "\n".join(f"- {d}" for d in docs))
-        if steps:
-            content_parts.append("Passo a Passo de Acesso:\n" + "\n".join(steps))
-            
-        structured_text = "\n".join(content_parts)
-        
-        base_score = 0.50 if using_real else 0.35
-        calibrated_score = min(base_score + (match_score * 0.15), 0.98)
-        
-        results.append({
-            "source": f"vw_ia_servicos (ID: {s_id})",
-            "category": "carta_servicos",
-            "content": structured_text,
-            "title": s_name,
-            "semantic_score": calibrated_score,
-            "similarity": calibrated_score,
-            "chunk_keywords": search_words
-        })
-
-        
-    conn.close()
     
+    results = []
+    with get_db_connection(db_path) as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(sql, params)
+            rows = cursor.fetchall()
+        except Exception as e:
+            print(f"[Structured Retrieval Error] View vw_ia_servicos não disponível: {e}", file=sys.stderr)
+            return []
+            
+        for row in rows:
+            s_id, sec_name, sec_code, s_name, cat, desc, how, who, wait, deadline, cost, norm = row
+            
+            match_score = 0.0
+            # Normalização para comparação sem acento
+            s_name_norm = ''.join(c for c in unicodedata.normalize('NFKD', s_name.lower()) if not unicodedata.combining(c))
+            desc_norm = ''.join(c for c in unicodedata.normalize('NFKD', desc.lower()) if not unicodedata.combining(c)) if desc else ""
+            
+            for w in search_words:
+                w_norm = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
+                if w_norm in s_name_norm:
+                    # Dá um peso significativamente maior se corresponder ao termo exato do serviço
+                    if w_norm == "buraco" and "buraco" in s_name_norm:
+                        match_score += 4.0
+                    else:
+                        match_score += 2.0
+                elif desc_norm and w_norm in desc_norm:
+                    if w_norm == "buraco" and "buraco" in desc_norm:
+                        match_score += 2.0
+                    else:
+                        match_score += 1.0
+                    
+            if match_score == 0.0:
+                continue
+                
+            cursor.execute("SELECT phone FROM service_phones WHERE service_id = ?", (s_id,))
+            phones = [r[0] for r in cursor.fetchall()]
+            
+            cursor.execute("SELECT email FROM service_emails WHERE service_id = ?", (s_id,))
+            emails = [r[0] for r in cursor.fetchall()]
+            
+            cursor.execute("SELECT link FROM service_links WHERE service_id = ?", (s_id,))
+            links = [r[0] for r in cursor.fetchall()]
+            
+            cursor.execute("SELECT step_number, description FROM service_steps WHERE service_id = ? ORDER BY step_number", (s_id,))
+            steps = [f"Passo {num}: {d}" for num, d in cursor.fetchall()]
+            
+            cursor.execute("SELECT document_name FROM service_documents WHERE service_id = ?", (s_id,))
+            docs = [r[0] for r in cursor.fetchall()]
+            
+            # Busca o endereço físico da secretaria responsável pelo serviço
+            sec_address = "Não cadastrado"
+            cursor.execute("SELECT address FROM secretarias WHERE name = ? OR code = ?", (sec_name, sec_code))
+            sec_row = cursor.fetchone()
+            if sec_row and sec_row[0]:
+                sec_address = sec_row[0]
+                
+            content_parts = [
+                "[FONTE OFICIAL ESTRUTURADA]",
+                "Tipo: Carta de Serviços Oficiais",
+                "Confiabilidade: Máxima (Auditado)",
+                "Última Atualização: 2026-07-01",
+                "",
+                f"Serviço Oficial: {s_name}",
+                f"Secretaria Responsável: {sec_name} ({sec_code})",
+                f"Endereço de Atendimento: {sec_address}",
+                f"Descrição: {desc}",
+                f"Quem pode solicitar: {who}",
+                f"Prazo Máximo: {deadline}",
+                f"Custo: {cost}"
+            ]
+            if phones:
+                content_parts.append(f"Telefones de Contato: {', '.join(phones)}")
+            if emails:
+                content_parts.append(f"E-mails de Contato: {', '.join(emails)}")
+            if links:
+                content_parts.append(f"Links / Canais Digitais: {', '.join(links)}")
+            if docs:
+                content_parts.append("Documentos Necessários:\n" + "\n".join(f"- {d}" for d in docs))
+            if steps:
+                content_parts.append("Passo a Passo de Acesso:\n" + "\n".join(steps))
+                
+            structured_text = "\n".join(content_parts)
+            
+            base_score = 0.50 if using_real else 0.35
+            calibrated_score = min(base_score + (match_score * 0.15), 0.98)
+            
+            results.append({
+                "source": f"vw_ia_servicos (ID: {s_id})",
+                "category": "carta_servicos",
+                "content": structured_text,
+                "title": s_name,
+                "semantic_score": calibrated_score,
+                "similarity": calibrated_score,
+                "chunk_keywords": search_words
+            })
+            
     seen_ids = set()
     unique_results = []
     for r in results:
@@ -367,14 +360,10 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
             seen_ids.add(r["source"])
             unique_results.append(r)
             
-    # Ordena os resultados estruturados pelo score de match de forma decrescente
-    unique_results.sort(key=lambda x: x["similarity"], reverse=True)
     return unique_results
 
 def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: list) -> list:
     """Busca estruturada na tabela de secretarias por nome ou sigla/código com ordenação de relevância, fuzzy e aliases."""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
     
     # 1. Resolve Aliases e Apelidos populares na query inteira com fronteiras de palavra exatas
     query_lower = query.lower()
@@ -393,112 +382,112 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
         search_words.append(resolved_keyword)
         
     if not search_words:
-        conn.close()
         return []
         
     # Obtém a lista de siglas existentes para fuzzy matching
     existing_codes = []
     existing_names = []
-    try:
-        cursor.execute("SELECT code, name FROM secretarias;")
-        for c_row in cursor.fetchall():
-            existing_codes.append(c_row[0])
-            existing_names.append(c_row[1])
-    except Exception:
-        pass
-
-    # 2. Corrige erros de digitação (Fuzzy Matching) usando Levenshtein
-    fuzzy_words = []
-    for w in search_words:
-        # Tenta bater com algum código (sigla) primeiro
-        matched_code = find_fuzzy_match(w, existing_codes, max_distance=1)
-        if matched_code:
-            fuzzy_words.append(matched_code)
-            continue
-        # Tenta bater com palavras contidas nos nomes das secretarias
-        words_in_names = []
-        for name in existing_names:
-            words_in_names.extend([part.strip("(),.-") for part in name.split() if len(part) >= 3])
-        matched_name_word = find_fuzzy_match(w, list(set(words_in_names)), max_distance=2)
-        if matched_name_word:
-            fuzzy_words.append(matched_name_word)
-        else:
-            fuzzy_words.append(w)
-
-    search_words = list(set(fuzzy_words))
-
-    # 3. Monta a SQL com ordenação de relevância exata de código
-    conditions = []
-    params = []
     
-    # Parâmetros para o ORDER BY CASE
-    first_term = search_words[0].upper() if search_words else ""
-    order_params = [first_term, first_term, f"{first_term}%", f"%{first_term}%"]
-    
-    for w in search_words:
-        conditions.append("(name LIKE ? OR code LIKE ?)")
-        params.extend([f"%{w}%", f"%{w}%"])
+    with get_db_connection(db_path) as conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT code, name FROM secretarias;")
+            for c_row in cursor.fetchall():
+                existing_codes.append(c_row[0])
+                existing_names.append(c_row[1])
+        except Exception:
+            pass
+
+        # 2. Corrige erros de digitação (Fuzzy Matching) usando Levenshtein
+        fuzzy_words = []
+        for w in search_words:
+            # Tenta bater com algum código (sigla) primeiro
+            matched_code = find_fuzzy_match(w, existing_codes, max_distance=1)
+            if matched_code:
+                fuzzy_words.append(matched_code)
+                continue
+            # Tenta bater com palavras contidas nos nomes das secretarias
+            words_in_names = []
+            for name in existing_names:
+                words_in_names.extend([part.strip("(),.-") for part in name.split() if len(part) >= 3])
+            matched_name_word = find_fuzzy_match(w, list(set(words_in_names)), max_distance=2)
+            if matched_name_word:
+                fuzzy_words.append(matched_name_word)
+            else:
+                fuzzy_words.append(w)
+
+        search_words = list(set(fuzzy_words))
+
+        # 3. Monta a SQL com ordenação de relevância exata de código
+        conditions = []
+        params = []
         
-    sql = f"""
-        SELECT id, name, code, address, phone, email, working_hours
-        FROM secretarias
-        WHERE {" OR ".join(conditions)}
-        ORDER BY
-        CASE
-            WHEN code = ? THEN 1
-            WHEN name = ? THEN 2
-            WHEN code LIKE ? THEN 3
-            WHEN name LIKE ? THEN 4
-            ELSE 5
-        END
-    """
-    
-    # Junta os parâmetros de filtro com os parâmetros do ORDER BY CASE
-    final_params = params + order_params
-    
-    try:
-        cursor.execute(sql, final_params)
-        rows = cursor.fetchall()
-    except sqlite3.OperationalError:
-        conn.close()
-        return []
+        # Parâmetros para o ORDER BY CASE
+        first_term = search_words[0].upper() if search_words else ""
+        order_params = [first_term, first_term, f"{first_term}%", f"%{first_term}%"]
         
-    results = []
-    for idx, row in enumerate(rows):
-        sec_id, name, code, address, phone, email, hours = row
-        if not address and not phone and not email:
-            continue
+        for w in search_words:
+            conditions.append("(name LIKE ? OR code LIKE ?)")
+            params.extend([f"%{w}%", f"%{w}%"])
             
-        content_parts = [
-            "[FONTE OFICIAL ESTRUTURADA]",
-            "Tipo: Dados Cadastrais / Órgão Municipal",
-            "Confiabilidade: Máxima (Auditado)",
-            "Última Atualização: 2026-07-01",
-            "",
-            f"Órgão Oficial: {name} ({code})",
-            f"Endereço Oficial: {address or 'Não cadastrado'}",
-            f"Telefone de Contato: {phone or 'Não cadastrado'}",
-            f"E-mail de Contato: {email or 'Não cadastrado'}",
-            f"Horário de Funcionamento: {hours or 'Segunda a sexta-feira, das 9h às 17h'}"
-        ]
-        structured_text = "\n".join(content_parts)
+        sql = f"""
+            SELECT id, name, code, address, phone, email, working_hours
+            FROM secretarias
+            WHERE {" OR ".join(conditions)}
+            ORDER BY
+            CASE
+                WHEN code = ? THEN 1
+                WHEN name = ? THEN 2
+                WHEN code LIKE ? THEN 3
+                WHEN name LIKE ? THEN 4
+                ELSE 5
+            END
+        """
         
-        # Atribui score ligeiramente decrescente com base na ordenação de relevância do SQL
-        score = round(0.99 - (idx * 0.01), 2)
+        # Junta os parâmetros de filtro com os parâmetros do ORDER BY CASE
+        final_params = params + order_params
         
-        results.append({
-            "source": f"secretarias (ID: {sec_id})",
-            "category": "secretarias",
-            "content": structured_text,
-            "title": name,
-            "semantic_score": score,
-            "similarity": score,
-            "chunk_keywords": search_words
-        })
-    conn.close()
-    return results
+        try:
+            cursor.execute(sql, final_params)
+            rows = cursor.fetchall()
+        except Exception:
+            return []
+            
+        results = []
+        for idx, row in enumerate(rows):
+            sec_id, name, code, address, phone, email, hours = row
+            if not address and not phone and not email:
+                continue
+                
+            content_parts = [
+                "[FONTE OFICIAL ESTRUTURADA]",
+                "Tipo: Dados Cadastrais / Órgão Municipal",
+                "Confiabilidade: Máxima (Auditado)",
+                "Última Atualização: 2026-07-01",
+                "",
+                f"Órgão Oficial: {name} ({code})",
+                f"Endereço Oficial: {address or 'Não cadastrado'}",
+                f"Telefone de Contato: {phone or 'Não cadastrado'}",
+                f"E-mail de Contato: {email or 'Não cadastrado'}",
+                f"Horário de Funcionamento: {hours or 'Segunda a sexta-feira, das 9h às 17h'}"
+            ]
+            structured_text = "\n".join(content_parts)
+            
+            # Atribui score ligeiramente decrescente com base na ordenação de relevância do SQL
+            score = round(0.99 - (idx * 0.01), 2)
+            
+            results.append({
+                "source": f"secretarias (ID: {sec_id})",
+                "category": "secretarias",
+                "content": structured_text,
+                "title": name,
+                "semantic_score": score,
+                "similarity": score,
+                "chunk_keywords": search_words
+            })
+        return results
 
-def retrieve_context(query: str, db_path: str, using_real: bool, similarity_threshold: float, gemini_client, reranker, top_k: int = 3, intent_info: dict = None) -> list:
+def retrieve_context(query: str, db_path: str, using_real: bool, similarity_threshold: float, gemini_client, reranker, top_k: int = 3, intent_info: dict = None, tools_selected: list = None) -> list:
     """Busca híbrida baseada na arquitetura LORS: orquestração multi-query gerada pela LLM/Planner."""
     if not os.path.exists(db_path):
         print(f"[Agent Error] Banco de dados não encontrado em {db_path}", file=sys.stderr)
@@ -514,6 +503,11 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                 list_cfg.get("db_filter_field", "category"),
                 query=query
             )
+
+    # Define quais ferramentas executar com base na seleção do Roteador de Ferramentas
+    run_structured = tools_selected is None or "structured_db" in tools_selected
+    run_geo = tools_selected is None or "geo_units" in tools_selected
+    run_vector = tools_selected is None or "faq_chunks" in tools_selected
 
     # 1. Aciona o Planejador Semântico (LORS)
     from agent.planner import SemanticRecoveryPlanner
@@ -531,25 +525,24 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         q_keywords = extract_query_keywords(q_sub)
         
         # A) Busca Estruturada de Secretarias
-        if any(ind in q_sub.lower() for ind in ["secretaria", "endereco", "endereço", "telefone", "contato", "email", "onde", "localizacao", "smo", "smu", "sms", "sme", "smf"]):
+        if run_structured and any(ind in q_sub.lower() for ind in ["secretaria", "endereco", "endereço", "telefone", "contato", "email", "onde", "localizacao", "smo", "smu", "sms", "sme", "smf"]):
             struct_sec = retrieve_structured_secretaria(db_path, q_sub, q_keywords)
             structured_candidates.extend(struct_sec)
             
         # B) Busca Estruturada de Serviços
-        struct_res = retrieve_structured_service(db_path, q_sub, q_keywords, using_real)
-        structured_candidates.extend(struct_res)
-        
+        if run_structured:
+            struct_res = retrieve_structured_service(db_path, q_sub, q_keywords, using_real)
+            structured_candidates.extend(struct_res)
+            
         # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na nova tabela secretaria_unidades
-        if any(ind in q_sub.lower() for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
+        if run_geo and any(ind in q_sub.lower() for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
             try:
-                cursor.execute("""
+                rows_unidades = query_db(db_path, """
                     SELECT u.name, u.address, u.phone, u.working_hours, s.name
                     FROM secretaria_unidades u
                     JOIN secretarias s ON u.secretaria_id = s.id
                 """)
-                for name, addr, phone, hours, sec_name in cursor.fetchall():
+                for name, addr, phone, hours, sec_name in rows_unidades:
                     structured_text = (
                         "[FONTE OFICIAL ESTRUTURADA]\n"
                         "Tipo: Unidade de Atendimento Local (CRAS/Posto)\n"
@@ -574,47 +567,44 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                         })
             except Exception as e:
                 print(f"[LORS Unidades Error] Falha na busca de unidades físicas: {e}", file=sys.stderr)
-            conn.close()
 
         # D) Busca Vetorial/Descritiva (Chunks gerais de documentos)
-        query_vector = gemini_client.get_embedding(q_sub, is_query=True) if using_real else None
-        
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        cursor.execute("SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
-        rows = cursor.fetchall()
-        conn.close()
-        
-        for row in rows:
-            source, category, content, emb_str, meta_str, kw_str = row
+        if run_vector:
+            query_vector = gemini_client.get_embedding(q_sub, is_query=True) if using_real else None
             try:
-                meta = json.loads(meta_str) if meta_str else {}
-            except Exception:
-                meta = {}
-            try:
-                chunk_keywords = json.loads(kw_str) if kw_str else []
-            except Exception:
-                chunk_keywords = []
+                rows_chunks = query_db(db_path, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
+                for row in rows_chunks:
+                    source, category, content, emb_str, meta_str, kw_str = row
+                    try:
+                        meta = json.loads(meta_str) if meta_str else {}
+                    except Exception:
+                        meta = {}
+                    try:
+                        chunk_keywords = json.loads(kw_str) if kw_str else []
+                    except Exception:
+                        chunk_keywords = []
 
-            title = meta.get("title", source)
+                    title = meta.get("title", source)
 
-            if using_real and query_vector:
-                try:
-                    emb = json.loads(emb_str)
-                    semantic_score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
-                except Exception:
-                    semantic_score = 0.0
-            else:
-                semantic_score = calculate_keyword_score(q_sub, content, title)
+                    if using_real and query_vector:
+                        try:
+                            emb = json.loads(emb_str)
+                            semantic_score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
+                        except Exception:
+                            semantic_score = 0.0
+                    else:
+                        semantic_score = calculate_keyword_score(q_sub, content, title)
 
-            vector_candidates.append({
-                "source": source,
-                "category": category,
-                "content": content,
-                "semantic_score": semantic_score,
-                "chunk_keywords": chunk_keywords,
-                "title": title
-            })
+                    vector_candidates.append({
+                        "source": source,
+                        "category": category,
+                        "content": content,
+                        "semantic_score": semantic_score,
+                        "chunk_keywords": chunk_keywords,
+                        "title": title
+                    })
+            except Exception as e:
+                print(f"[LORS Chunks Error] Falha na busca vetorial de chunks: {e}", file=sys.stderr)
 
     # 3. Consolidação e Deduplicação dos Resultados do LORS
     # Ordena chunks vetoriais pelo score semântico decrescente
@@ -693,9 +683,44 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                 # Penaliza outros serviços se a busca for especificamente sobre o programa de saúde do homem na ficha da secretaria
                 c["similarity"] = round(c["similarity"] - 0.20, 4)
 
+        # C1: Boost para queries de especialidades médicas
+        # Prioriza chunks de saúde com "especialidade" ou "encaminhamento" e penaliza programas escolares
+        MEDICAL_SPECIALTY_TERMS = [
+            "dermato", "oftalmolog", "cardiolog", "ortopedia", "neurolog", "pneumolog",
+            "ginecolog", "urolog", "psiquiatr", "nefrol", "gastroenterol", "endocrinol",
+            "reumatol", "hemat", "infectolog", "proctolog", "geriatr", "especialist",
+            "consulta especializada", "medico especialista"
+        ]
+        if any(term in query_normalized for term in MEDICAL_SPECIALTY_TERMS):
+            content_lower = c.get("content", "").lower()
+            title_lower = c.get("title", "").lower()
+            if any(x in content_lower or x in title_lower for x in ["especialidade", "encaminhamento", "ubs", "unidade basica", "regulacao"]):
+                c["similarity"] = round(c["similarity"] + 0.30, 4)
+            # Penaliza fortemente chunks de programas escolares (causa raiz do bug do dermatologista)
+            if any(x in title_lower or x in content_lower for x in ["escola", "escolar", "programa saude na escola", "pse"]):
+                c["similarity"] = round(c["similarity"] - 0.40, 4)
+
+        # C2: Boost de Localidade — aumenta relevância de chunks que mencionam o bairro/localidade da query
+        KNOWN_LOCALITIES = [
+            "xerem", "xerém", "jardim primavera", "parque paulista",
+            "imbarie", "imbariê", "pilar", "saracuruna",
+            "campos eliseos", "campos elíseos", "pantanal", "centenario",
+            "centenário", "25 de agosto"
+        ]
+        for loc in KNOWN_LOCALITIES:
+            if loc in query_normalized:
+                loc_norm = ''.join(c2 for c2 in unicodedata.normalize('NFKD', loc.lower()) if not unicodedata.combining(c2))
+                content_norm = ''.join(c2 for c2 in unicodedata.normalize('NFKD', c.get("content", "").lower()) if not unicodedata.combining(c2))
+                if loc_norm in content_norm or loc_norm in ''.join(
+                    c2 for c2 in unicodedata.normalize('NFKD', c.get("title", "").lower()) if not unicodedata.combining(c2)
+                ):
+                    c["similarity"] = round(c["similarity"] + 0.25, 4)
+                break
+
     # Ordena todos juntos pelo score 'similarity' de forma decrescente
     all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
     
     return all_candidates[:top_k]
+
 
 

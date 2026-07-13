@@ -350,7 +350,10 @@
           </div>
         </div>
       </div>
-      <button class="new-chat-btn" id="newChatBtn">Nova conversa</button>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <a href="/dashboard.html" class="new-chat-btn" style="text-decoration: none; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); display: inline-flex; align-items: center;">Dashboard</a>
+        <button class="new-chat-btn" id="newChatBtn">Nova conversa</button>
+      </div>
     </header>
 
     <!-- Área de Mensagens -->
@@ -396,9 +399,10 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
+      html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" loading="lazy" style="max-width:100%; border-radius:8px; margin: 8px 0; display:block;">');
+      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       html = html.replace(/\*(.*?)\*/g,     '<em>$1</em>');
-      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
 
       const paragraphs = html.split('\n\n');

@@ -1,13 +1,22 @@
 import os
 import json
-import sqlite3
 import re
 import sys
 import time
 
 from utils.gemini_client import GeminiClient
+from utils.db_client import execute_db, query_one
 from agent.triage import perform_triage
-from agent.config import DEFAULT_DB_PATH, EMBEDDING_DIMS
+from agent.config import (
+    DEFAULT_DB_PATH,
+    EMBEDDING_DIMS,
+    OUVIDORIA_CONTACTS,
+    USE_TRIAGE_LAYER,
+    PRIVACY_BLOCKED_MESSAGE,
+    COMPETENCY_BLOCKED_MESSAGE,
+    LEGAL_BLOCKED_MESSAGE,
+    SECURITY_BLOCKED_MESSAGE
+)
 from agent.models import QueryIntent
 from agent.router import QueryAnalyzer, SystemIntentHandler
 from agent.reranker import BaseReranker, NoOpReranker, GeminiCrossEncoder
@@ -31,6 +40,7 @@ from agent.handlers import (
     ProgramacaoHandler,
     RagHandler
 )
+
 
 # Instancia o cliente globalmente
 gemini_client = GeminiClient()
@@ -82,6 +92,16 @@ class DuqueIAAgent:
         # Garante a existência e validação da metadata de embeddings
         self._initialize_and_validate_embedding_metadata()
 
+        # Dispara verificação de saúde dos provedores em background (1x por processo)
+        if not hasattr(DuqueIAAgent, "_provider_health"):
+            DuqueIAAgent._provider_health = {}
+            import threading
+            def check_health():
+                from utils.provider_health import ProviderHealthChecker
+                DuqueIAAgent._provider_health = ProviderHealthChecker.check_all()
+            threading.Thread(target=check_health, daemon=True).start()
+
+
     def _initialize_and_validate_embedding_metadata(self):
         """Valida se o provedor e modelo de embedding gravado na DB é idêntico ao configurado no cliente."""
         if not os.path.exists(self.db_path):
@@ -91,9 +111,7 @@ class DuqueIAAgent:
         current_model = gemini_client.embedding_model_name if self.using_real else "deterministic_hash_768"
         current_dimension = EMBEDDING_DIMS.get(current_model, 768)
         
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        cursor.execute("""
+        execute_db(self.db_path, """
         CREATE TABLE IF NOT EXISTS embedding_metadata (
             provider TEXT,
             model TEXT,
@@ -102,13 +120,11 @@ class DuqueIAAgent:
         );
         """)
         
-        cursor.execute("SELECT provider, model, dimension FROM embedding_metadata LIMIT 1")
-        row = cursor.fetchone()
+        row = query_one(self.db_path, "SELECT provider, model, dimension FROM embedding_metadata LIMIT 1")
         
         if not row:
-            cursor.execute("INSERT INTO embedding_metadata (provider, model, dimension) VALUES (?, ?, ?)",
-                           (current_provider, current_model, current_dimension))
-            conn.commit()
+            execute_db(self.db_path, "INSERT INTO embedding_metadata (provider, model, dimension) VALUES (?, ?, ?)",
+                       (current_provider, current_model, current_dimension))
         else:
             db_provider, db_model, db_dimension = row
             if db_dimension != current_dimension:
@@ -118,7 +134,7 @@ class DuqueIAAgent:
                 print("  Recomendado reexecutar o pipeline de ingestão: 'make embed'", file=sys.stderr)
             elif db_model != current_model:
                 print(f"[Info] Modelo de embedding alterado: Banco={db_model}, Cliente={current_model} (dimensões compatíveis: {current_dimension})", file=sys.stderr)
-        conn.close()
+
 
     def log_execution_metrics(self, user_query: str, retrieval_time: float, llm_time: float, 
                               total_time: float, similarity_score: float, tokens_usados: int, 
@@ -257,22 +273,41 @@ class DuqueIAAgent:
     def respond(self, user_query: str, use_triage: bool = None, conversation_id: str = None) -> str:
         """Wrapper para gerenciar o estado da conversa e responder JSON com validação de Output Guardrail."""
         context_holder = {"conversation_id": conversation_id}
+        
+        # Obtém o histórico conversacional anterior à execução atual
+        hist = None
+        cid = conversation_id or context_holder.get("conversation_id")
+        if cid and hasattr(DuqueIAAgent, "_history") and cid in DuqueIAAgent._history:
+            hist = DuqueIAAgent._history[cid]
+            
         res_str = self._respond_raw(user_query, use_triage, context_holder)
+        # Atualiza a ID da sessão caso tenha sido gerada dinamicamente no respond_raw
+        cid = context_holder.get("conversation_id")
         try:
             data = json.loads(res_str)
-            data["conversation_id"] = context_holder["conversation_id"]
+            data["conversation_id"] = cid
             
             # Validação do Output Guardrail
             answer = data.get("answer", "")
             last_context = getattr(self, "_last_context", None)
-            if answer and not check_output_guardrail(user_query, answer, self.gemini_client, last_context):
+            triage_info = data.get("triage_info", None)
+            
+            if answer and not check_output_guardrail(
+                query=user_query,
+                answer=answer,
+                gemini_client=self.gemini_client,
+                context=last_context,
+                history=hist,
+                triage_info=triage_info
+            ):
                 # Se a resposta contiver alucinações ou desvios, aplicamos o bloqueio de segurança
                 data["answer"] = (
                     "Desculpe, não consegui formular uma resposta segura ou precisa para sua pergunta. "
                     "Para registrar sua solicitação ou denúncia com total segurança, você pode falar diretamente com a nossa **Ouvidoria Geral de Duque de Caxias**:\n\n"
-                    "• Telefone: **(21) 2652-3835**\n"
-                    "• E-mail: **ouvidoria@duquedecaxias.rj.gov.br**\n"
-                    "• Online: aplicativo **Colab** ou site oficial da Prefeitura."
+                    f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
+                    f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+                    f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
+                    f"• Online: aplicativo **Colab** ou site oficial da Prefeitura."
                 )
                 data["intent_detected"] = "output_guardrail_blocked"
                 
@@ -285,7 +320,7 @@ class DuqueIAAgent:
         start_time = time.time()
 
         if use_triage is None:
-            use_triage = os.getenv("USE_TRIAGE_LAYER", "false").lower() == "true"
+            use_triage = USE_TRIAGE_LAYER
 
         conversation_id = context_holder.get("conversation_id") if context_holder else None
         if not conversation_id:
@@ -293,47 +328,74 @@ class DuqueIAAgent:
             if context_holder:
                 context_holder["conversation_id"] = conversation_id
 
-        # ---------------------------------------------------------------- #
-        # 0. A. Camada de Triagem Semântica Leve
-        # ---------------------------------------------------------------- #
-        triage_info = None
-        if use_triage:
-            hist = None
-            if conversation_id and hasattr(DuqueIAAgent, "_history") and conversation_id in DuqueIAAgent._history:
-                hist = DuqueIAAgent._history[conversation_id]
+        # Extrai o histórico no início para estar sempre disponível
+        hist = None
+        if conversation_id and hasattr(DuqueIAAgent, "_history") and conversation_id in DuqueIAAgent._history:
+            hist = DuqueIAAgent._history[conversation_id]
 
-            triage_info = perform_triage(self.db_path, user_query, gemini_client, history=hist)
-            
-            # Se a triagem identificou um handler específico, delega para ele
-            next_agent = triage_info.get("next_agent")
-            if next_agent and next_agent in self.handlers:
-                handler = self.handlers[next_agent]
-                
-                # Executa o handler correspondente
-                result_dict = handler.execute(
+        # ---------------------------------------------------------------- #
+        # 0. Grafo de Estados (LangGraph Lite)                              #
+        #    Substitui o fluxo imperativo quando use_triage=True.           #
+        #    O grafo executa: fast_gate → triage → handler correto          #
+        # ---------------------------------------------------------------- #
+        if use_triage:
+            try:
+                from agent.graph import run_graph
+                result_dict = run_graph(
                     query=user_query,
-                    triage_info=triage_info,
-                    agent=self,
                     conversation_id=conversation_id,
-                    start_time=start_time,
-                    history=hist
+                    history=hist or [],
+                    agent=self
                 )
-                
-                # Registra histórico completo com pergunta e resposta formatadas
+                # Registra histórico
                 if conversation_id and hasattr(DuqueIAAgent, "_history"):
                     prev = DuqueIAAgent._history.get(conversation_id, [])
                     ans_text = result_dict.get("answer", "")
                     DuqueIAAgent._history[conversation_id] = (
                         prev + [f"Munícipe: {user_query}", f"DUQUE IA: {ans_text}"]
-                    )[-6:] # Mantém as últimas 3 rodadas de diálogo completas
-                
+                    )[-6:]
                 return json.dumps(result_dict, ensure_ascii=False, indent=2)
+            except Exception as graph_err:
+                # Fallback seguro: se o grafo falhar catastroficamente, cai no fluxo legado
+                print(f"[Graph CRITICAL] Falha no grafo principal: {graph_err}. Usando fluxo legado.", file=sys.stderr)
+                import traceback
+                traceback.print_exc(file=sys.stderr)
+
+
 
         # ---------------------------------------------------------------- #
         # 0. B. Camada de Intenções de Sistema
         # ---------------------------------------------------------------- #
         system_intent = SystemIntentHandler.detect(user_query)
         if system_intent:
+            intent_label = system_intent.get("intent_label")
+            # Se a intenção for de saudação ou apresentação, mas já existir histórico na conversa,
+            # nós forçamos a passagem pelo ConversationHandler dinâmico para evitar saudações repetidas/Olá!
+            if (intent_label in ["saudacao", "apresentacao"]) and hist:
+                triage_info_conv = {
+                    "intent": "SAUDACAO" if intent_label == "saudacao" else "CONVERSA",
+                    "confidence": system_intent["confidence"],
+                    "next_agent": "CONVERSATION_HANDLER",
+                    "workflow": "CHAT",
+                    "clarification_type": None
+                }
+                handler = self.handlers["CONVERSATION_HANDLER"]
+                result_dict = handler.execute(
+                    query=user_query,
+                    triage_info=triage_info_conv,
+                    agent=self,
+                    conversation_id=conversation_id,
+                    start_time=start_time,
+                    history=hist
+                )
+                if conversation_id and hasattr(DuqueIAAgent, "_history"):
+                    prev = DuqueIAAgent._history.get(conversation_id, [])
+                    ans_text = result_dict.get("answer", "")
+                    DuqueIAAgent._history[conversation_id] = (
+                        prev + [f"Munícipe: {user_query}", f"DUQUE IA: {ans_text}"]
+                    )[-6:]
+                return json.dumps(result_dict, ensure_ascii=False, indent=2)
+
             elapsed = time.time() - start_time
             return json.dumps({
                 "answer": system_intent["response"],
@@ -357,7 +419,7 @@ class DuqueIAAgent:
             elapsed = time.time() - start_time
             self.log_execution_metrics(user_query, 0, 0, elapsed, 0, 0, 0)
             return json.dumps({
-                "answer": "Requisição bloqueada por motivos de segurança (Input Guardrail).",
+                "answer": SECURITY_BLOCKED_MESSAGE,
                 "sources": [],
                 "confidence": 0.0,
                 "intent_detected": "blocked",
@@ -373,7 +435,7 @@ class DuqueIAAgent:
         if check_privacy_guardrail(user_query):
             elapsed = time.time() - start_time
             return json.dumps({
-                "answer": "Por motivos de segurança e privacidade (LGPD), não tenho autorização para fornecer dados pessoais, CPFs ou andamento de solicitações de terceiros. Por favor, consulte o andamento de suas próprias solicitações nos canais oficiais identificados.",
+                "answer": PRIVACY_BLOCKED_MESSAGE,
                 "sources": [],
                 "confidence": 0.0,
                 "intent_detected": "blocked_privacy",
@@ -389,7 +451,7 @@ class DuqueIAAgent:
         if check_competency_guardrail(user_query):
             elapsed = time.time() - start_time
             return json.dumps({
-                "answer": "Esta pergunta não está inserida nos temas que são de responsabilidade da Prefeitura de Duque de Caxias. O metrô, por exemplo, é um transporte de âmbito estadual, e não compete à prefeitura municipal.",
+                "answer": COMPETENCY_BLOCKED_MESSAGE,
                 "sources": [],
                 "confidence": 0.0,
                 "intent_detected": "out_of_competency",
@@ -405,7 +467,7 @@ class DuqueIAAgent:
         if check_legal_guardrail(user_query):
             elapsed = time.time() - start_time
             return json.dumps({
-                "answer": "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes.",
+                "answer": LEGAL_BLOCKED_MESSAGE,
                 "sources": [],
                 "confidence": 0.0,
                 "intent_detected": "blocked_legal",

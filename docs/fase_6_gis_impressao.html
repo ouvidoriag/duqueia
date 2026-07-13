@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUQUE IA — Guia de Planejamento de IA Geográfica (GIS)</title>
+    <style>
+        /* CSS Reset & Variáveis */
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #0284c7;
+            --accent-light: #e0f2fe;
+            --text-dark: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --bg-light: #f8fafc;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --yellow-light: #fffbeb;
+            --yellow-border: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            background-color: #ffffff;
+            line-height: 1.5;
+            padding: 0;
+        }
+
+        /* Configuração de Página A4 para Impressão */
+        @page {
+            size: A4 portrait;
+            margin: 15mm;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        /* Cabeçalho Premium */
+        header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-area h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        .logo-area h1 span {
+            color: var(--accent);
+        }
+
+        .logo-area p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .doc-meta {
+            text-align: right;
+        }
+
+        .doc-meta .badge {
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .doc-meta p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Título Principal */
+        .title-block {
+            margin-bottom: 20px;
+        }
+
+        .title-block h2 {
+            font-size: 22px;
+            color: var(--primary-light);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .title-block p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Seções de Conteúdo */
+        .section-box {
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            background-color: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-number {
+            background-color: var(--accent);
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        .section-header h3 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .section-body {
+            padding: 15px;
+        }
+
+        .section-body p {
+            font-size: 12px;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checklist li {
+            font-size: 11.5px;
+            margin-bottom: 6px;
+            padding-left: 22px;
+            position: relative;
+            color: var(--text-dark);
+        }
+
+        .checklist li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid var(--text-muted);
+            border-radius: 3px;
+        }
+
+        /* Callouts / Warnings */
+        .alert-box {
+            background-color: var(--yellow-light);
+            border-left: 4px solid var(--yellow-border);
+            padding: 12px 15px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .alert-box h4 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .alert-box p {
+            font-size: 11px;
+            color: #b45309;
+        }
+
+        /* Visualizador de Mapa (SVG) */
+        .map-wrapper {
+            display: flex;
+            gap: 20px;
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            align-items: center;
+            page-break-inside: avoid;
+        }
+
+        .map-svg {
+            width: 200px;
+            height: 220px;
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .map-legend {
+            flex: 1;
+        }
+
+        .map-legend h4 {
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Código / payloads */
+        pre {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            margin: 10px 0;
+            overflow-x: auto;
+            color: #0f172a;
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 6px 8px;
+            border: 1px solid var(--primary);
+        }
+
+        td {
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        tr:nth-child(even) td {
+            background-color: var(--bg-light);
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Rodapé de Página */
+        footer {
+            margin-top: 30px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        /* Customização de impressão dedicada */
+        @media print {
+            body {
+                background: white;
+                font-size: 11pt;
+            }
+            .page-container {
+                max-width: 100%;
+                width: 100%;
+            }
+            .section-box {
+                border-color: #475569;
+                margin-bottom: 15px;
+            }
+            .checklist li::before {
+                border-color: #000000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+    <header>
+        <div class="logo-area">
+            <h1>DUQUE <span>IA</span></h1>
+            <p>Sistema de Informações Municipais — Duque de Caxias</p>
+        </div>
+        <div class="doc-meta">
+            <span class="badge">Planejamento Territorial</span>
+            <p>Emissão: 10 de Julho de 2026</p>
+        </div>
+    </header>
+
+    <div class="title-block">
+        <h2>FASE 6 — Preparação para o DUQUE IA (GIS)</h2>
+        <p>Diretrizes sobre importação espacial (GeoJSON), mapeamento de distritos/bairros e base de perguntas do munícipe.</p>
+    </div>
+
+    <!-- Seção 1: O que é o Mapeamento GIS -->
+    <div class="section-box">
+        <div class="section-header">
+            <span class="section-number">1</span>
+            <h3>Entendendo o Mapeamento Territorial</h3>
+        </div>
+        <div class="section-body">
+            <p>Duque de Caxias é dividido politicamente em <strong>4 Distritos</strong> que contêm diversos bairros oficiais. A IA precisa ter o mapa mental do município para não recomendar um serviço de saúde de Xerém (4º Distrito) para quem mora no Centro (1º Distrito), a mais de 30 km de distância.</p>
+
+            <div class="map-wrapper">
+                <!-- Ilustração do Mapa Espacial de Duque de Caxias em SVG -->
+                <svg class="map-svg" viewBox="0 0 100 120">
+                    <!-- Fundo / Limites do Município (Simulação da forma vertical alongada de Caxias) -->
+                    <rect x="0" y="0" width="100" height="120" fill="#f1f5f9" rx="3" />
+                    <!-- Distrito 4 (Xerém) - Norte -->
+                    <path d="M 15 10 L 85 10 L 75 45 L 25 40 Z" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5" />
+                    <text x="50" y="25" font-size="6" font-weight="700" fill="#0369a1" text-anchor="middle">4º D. (Xerém)</text>
+                    
+                    <!-- Distrito 3 (Imbariê) - Centro-Norte -->
+                    <path d="M 25 40 L 75 45 L 80 70 L 30 65 Z" fill="#cbd5e1" stroke="#475569" stroke-width="1.5" />
+                    <text x="52" y="55" font-size="6" font-weight="700" fill="#334155" text-anchor="middle">3º D. (Imbariê)</text>
+                    
+                    <!-- Distrito 2 (Campos Elíseos) - Centro-Sul -->
+                    <path d="M 30 65 L 80 70 L 70 95 L 20 90 Z" fill="#fed7aa" stroke="#ea580c" stroke-width="1.5" />
+                    <text x="50" y="80" font-size="6" font-weight="700" fill="#c2410c" text-anchor="middle">2º D. (C. Elíseos)</text>
+                    
+                    <!-- Distrito 1 (Centro) - Sul -->
+                    <path d="M 20 90 L 70 95 L 60 115 L 30 115 Z" fill="#bbf7d0" stroke="#16a34a" stroke-width="1.5" />
+                    <text x="45" y="105" font-size="6" font-weight="700" fill="#15803d" text-anchor="middle">1º D. (Centro)</text>
+                </svg>
+
+                <div class="map-legend">
+                    <h4>Divisão Distrital de Caxias</h4>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #bae6fd;"></div>
+                        <span><strong>4º Distrito:</strong> Xerém, Mantiquira, Santa Cruz da Serra (Limites de Serra)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #cbd5e1;"></div>
+                        <span><strong>3º Distrito:</strong> Imbariê, Santa Lúcia, Parada Angélica</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #fed7aa;"></div>
+                        <span><strong>2º Distrito:</strong> Campos Elíseos, Saracuruna, Jardim Primavera</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #bbf7d0;"></div>
+                        <span><strong>1º Distrito:</strong> Centro, 25 de Agosto, Gramacho, Lote XV</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção 2: Validação GeoJSON -->
+    <div class="section-box">
+        <div class="section-header">
+            <span class="section-number">2</span>
+            <h3>Parser e Importação GeoJSON</h3>
+        </div>
+        <div class="section-body">
+            <p>O validador deve receber arquivos GeoJSON contendo <strong>FeatureCollections</strong>. O script verificará se as feições geométricas correspondem a polígonos válidos e se as propriedades do GeoJSON fornecem as chaves de metadados mínimas necessárias.</p>
+            <ul class="checklist">
+                <li>Validar geometria fechada de polígonos (primeiro e último ponto idênticos).</li>
+                <li>Garantir a conversão do CRS padrão da prefeitura para a projeção geográfica **WGS 84 (EPSG:4326)**.</li>
+                <li>Importar e associar o ID da feição para a base SQLite local de Chunks Geográficos.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="page-break"></div> <!-- Forçar quebra de página limpa para impressão A4 -->
+
+    <!-- Seção 3: Perguntas do Munícipe (Exemplos de Teste) -->
+    <div class="section-box">
+        <div class="section-header">
+            <span class="section-number">3</span>
+            <h3>Perguntas de Teste Geográfico (Base RAG/GIS)</h3>
+        </div>
+        <div class="section-body">
+            <p>O RAG Geográfico deve ser submetido a baterias de testes contendo as seguintes consultas comuns de cidadãos, respondendo sempre com base na proximidade do fato:</p>
+            
+            <table class="query-table">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Tipo de Consulta</th>
+                        <th style="width: 35%;">Exemplo de Pergunta do Munícipe</th>
+                        <th style="width: 30%;">Comportamento Esperado da IA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Proximidade de Unidade</strong></td>
+                        <td><em>"Moro em Xerém, qual o CRAS mais perto de mim?"</em></td>
+                        <td>Identificar o bairro (Xerém) e retornar o **CRAS Xerém** (Endereço e Contatos).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Serviço Distrital</strong></td>
+                        <td><em>"Quero marcar consulta com dermatologista perto de Imbariê."</em></td>
+                        <td>Indicar as unidades de saúde da região do **3º Distrito** que prestam atendimento.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Competência Territorial</strong></td>
+                        <td><em>"Como faço para chegar na UPA de Nova Iguaçu?"</em></td>
+                        <td>Bloquear o RAG e emitir a recusa padrão por **fora de competência municipal**.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Área e Estatística</strong></td>
+                        <td><em>"Qual a área total do bairro Jardim Primavera?"</em></td>
+                        <td>Retornar o dado em m²/km² contido na propriedade `area_m2` do GeoJSON.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Limites de Bairro</strong></td>
+                        <td><em>"O bairro Lote XV faz parte de Caxias?"</em></td>
+                        <td>Responder que faz parte do município limítrofe de **Belford Roxo**, indicando os canais daquela prefeitura.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Seção 4: Schema das Tabelas SQL -->
+    <div class="section-box">
+        <div class="section-header">
+            <span class="section-number">4</span>
+            <h3>Schema das Tabelas SQLite de Geoprocessamento</h3>
+        </div>
+        <div class="section-body">
+            <p>Estrutura a ser injetada no banco <code>duque_ia.db</code> para dar suporte às consultas geográficas:</p>
+            <pre>CREATE TABLE IF NOT EXISTS geo_bairros (
+    id TEXT PRIMARY KEY,
+    nome TEXT NOT NULL UNIQUE,
+    distrito_id INTEGER NOT NULL,
+    populacao_estimada INTEGER,
+    area_m2 REAL,
+    geometria_wkt TEXT -- Representação WKT (Well-Known Text) do Polígono
+);
+
+CREATE TABLE IF NOT EXISTS geo_distritos (
+    id INTEGER PRIMARY KEY,
+    nome TEXT NOT NULL UNIQUE,
+    populacao_total INTEGER
+);</pre>
+        </div>
+    </div>
+
+    <footer>
+        <div>DUQUE IA — Gestão 2026</div>
+        <div>Página 2 de 2</div>
+        <div>Código de Controle: SIM-GIS-FASE6-MAPA</div>
+    </footer>
+</div>
+
+</body>
+</html>

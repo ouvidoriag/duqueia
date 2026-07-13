@@ -34,6 +34,18 @@ class GeminiClient:
     """
 
     def __init__(self):
+        # ── Bloco 1: MockProvider automático em modo de teste ──────────────────
+        # Se DUQUE_IA_TEST_MODE=1, substitui toda a lógica por respostas mock
+        # sem qualquer chamada de rede. Isso elimina TIMEOUTs nos testes.
+        if os.getenv("DUQUE_IA_TEST_MODE", "").strip() == "1":
+            from utils.mock_provider import MockLLMProvider
+            mock = MockLLMProvider()
+            self.__class__ = mock.__class__
+            self.__dict__.update(mock.__dict__)
+            print("[GeminiClient] DUQUE_IA_TEST_MODE=1 — usando MockLLMProvider (zero rede).", file=sys.stderr)
+            return
+        # ───────────────────────────────────────────────────────────────────────
+
         # Carrega a lista de chaves do arquivo .env
         keys_str = os.getenv("GEMINI_API_KEYS", "")
         # Remove aspas, barras invertidas e quebras de linha para suportar chaves multilinhas no .env
@@ -66,6 +78,8 @@ class GeminiClient:
         else:
             print("[GeminiClient] AVISO: Nenhuma chave de API configurada. "
                   "Sistema rodara em modo offline (fallback local).")
+
+
 
     def _configure_current_key(self):
         """Configura a chave ativa atual no SDK do Google."""
@@ -239,16 +253,31 @@ class GeminiClient:
             try:
                 if _USE_NEW_SDK:
                     def _call(m=current_model):
+                        # Valida o ID de interação dinamicamente com base na chave ativa atual
+                        valid_id = None
+                        if previous_interaction_id and not previous_interaction_id.startswith("sess_"):
+                            if ":" in previous_interaction_id:
+                                try:
+                                    key_idx_str, actual_id = previous_interaction_id.split(":", 1)
+                                    if int(key_idx_str) == self.current_key_index:
+                                        valid_id = actual_id
+                                except ValueError:
+                                    pass
+                            else:
+                                # Sem prefixo: usa apenas se for a primeira chave (índice 0)
+                                if self.current_key_index == 0:
+                                    valid_id = previous_interaction_id
+
                         try:
                             call_kwargs = {
                                 "model": m,
                                 "input": prompt,
-                                "previous_interaction_id": valid_interaction_id,
+                                "previous_interaction_id": valid_id,
                             }
                             if system_instruction:
                                 call_kwargs["system_instruction"] = system_instruction
                             resp = self._client.interactions.create(**call_kwargs)
-                            return resp.output_text, resp.id
+                            return resp.output_text, f"{self.current_key_index}:{resp.id}"
                         except Exception as e:
                             err_msg = str(e).lower()
                             if "not_found" in err_msg or "404" in err_msg or "method not found" in err_msg or "requested entity was not found" in err_msg:

@@ -1,7 +1,14 @@
 import os
 
 # Caminho padrão do banco de dados
-DEFAULT_DB_PATH = os.path.join(os.path.dirname(__file__), "duque_ia.db")
+DEFAULT_DB_PATH = os.path.abspath(os.getenv("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "duque_ia.db")))
+
+# Configurações de execução e ambiente
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
+USE_TRIAGE_LAYER = os.getenv("USE_TRIAGE_LAYER", "true").lower() == "true"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2")
 
 # Política categorizada de pesos de keywords
 KEYWORD_POLICY = {
@@ -90,3 +97,42 @@ EMBEDDING_DIMS = {
     "text-embedding-3-small": 1536,
     "deterministic_hash_768": 768,
 }
+
+# Dados de contato centralizados da Ouvidoria Geral
+OUVIDORIA_CONTACTS = {
+    "telefone": "(21) 2652-3835",
+    "whatsapp": "(21) 99824-5903",
+    "email": "ouvidoria@duquedecaxias.rj.gov.br",
+    "presencial": "Alameda Esmeralda, 206 - Jardim Primavera",
+    "colab_url": "https://duquedecaxias.colab.re",
+    "colab_url_clean": "duquedecaxias.colab.re"
+}
+
+# Mensagens de segurança e fallback padronizadas
+PRIVACY_BLOCKED_MESSAGE = (
+    "Por motivos de segurança e privacidade (LGPD), não tenho autorização para fornecer dados pessoais, "
+    "CPFs ou andamento de solicitações de terceiros. Por favor, consulte o andamento de suas próprias solicitações "
+    "nos canais oficiais identificados."
+)
+
+COMPETENCY_BLOCKED_MESSAGE = (
+    "Esta pergunta não está inserida nos temas que são de responsabilidade da Prefeitura de Duque de Caxias. "
+    "O metrô, por exemplo, é um transporte de âmbito estadual, e não compete à prefeitura municipal."
+)
+
+LEGAL_BLOCKED_MESSAGE = (
+    "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, "
+    "nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes."
+)
+
+SECURITY_BLOCKED_MESSAGE = "Requisição bloqueada por motivos de segurança (Input Guardrail)."
+
+HUMAN_ESCALATION_MESSAGE = (
+    f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. "
+    "Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente "
+    f"sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, "
+    f"WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** "
+    f"ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
+)
+
+
