@@ -592,6 +592,97 @@ class ProgramacaoHandler(BaseHandler):
         }
 
 
+def extract_service_details(content: str) -> dict:
+    details = {}
+    
+    # 1. Formato estruturado (vw_ia_servicos)
+    if "[FONTE OFICIAL ESTRUTURADA]" in content:
+        # Endereço de Atendimento
+        addr_match = re.search(r"Endereço de Atendimento:\s*(.*)", content)
+        if addr_match:
+            addr = addr_match.group(1).strip()
+            if addr and addr.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["endereco"] = addr
+                
+        # Telefones de Contato
+        phone_match = re.search(r"Telefones de Contato:\s*(.*)", content)
+        if phone_match:
+            phone = phone_match.group(1).strip()
+            if phone and phone.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["telefones"] = phone
+                
+        # E-mails de Contato
+        email_match = re.search(r"E-mails de Contato:\s*(.*)", content)
+        if email_match:
+            email = email_match.group(1).strip()
+            if email and email.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["emails"] = email
+                
+        # Links / Canais Digitais
+        links_match = re.search(r"Links / Canais Digitais:\s*(.*)", content)
+        if links_match:
+            links = links_match.group(1).strip()
+            if links and links.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["links"] = links
+                
+        # Documentos Necessários
+        doc_match = re.search(r"Documentos Necessários:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
+        if doc_match:
+            docs = doc_match.group(1).strip()
+            clean_docs = "\n".join(line.strip() for line in docs.split("\n") if line.strip() and "Abertura de processo" not in line)
+            if clean_docs:
+                details["documentos"] = clean_docs
+                
+        # Passo a Passo de Acesso
+        steps_match = re.search(r"Passo a Passo de Acesso:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
+        if steps_match:
+            steps = steps_match.group(1).strip()
+            clean_steps = []
+            for line in steps.split("\n"):
+                line_strip = line.strip()
+                if line_strip:
+                    if clean_steps and not line_strip.startswith("Passo"):
+                        clean_steps[-1] = clean_steps[-1] + " " + line_strip
+                    else:
+                        clean_steps.append(line_strip)
+            if clean_steps:
+                details["passo_a_passo"] = "\n".join(clean_steps)
+    else:
+        # 2. Formato serializado de planilha Excel (ex: CARTA_DE_SERVICO)
+        # Exemplo: Servico: Teste Rápido de Gravidez | Orgao responsavel: ... | Como acessar: ...
+        how_match = re.search(r"Como acessar:\s*([^|]+)", content)
+        if how_match:
+            how = how_match.group(1).strip()
+            if how and how.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["passo_a_passo"] = f"Passo 1: {how}"
+                
+        links_match = re.search(r"(?:Links|Canais Digitais|Link):\s*([^|]+)", content)
+        if links_match:
+            lnk = links_match.group(1).strip()
+            if lnk and lnk.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["links"] = lnk
+                
+        phone_match = re.search(r"(?:Telefone|Telefones):\s*([^|]+)", content)
+        if phone_match:
+            phn = phone_match.group(1).strip()
+            if phn and phn.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["telefones"] = phn
+                
+        email_match = re.search(r"(?:E-mail|Email|E-mails):\s*([^|]+)", content)
+        if email_match:
+            eml = email_match.group(1).strip()
+            if eml and eml.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["emails"] = eml
+                
+        addr_match = re.search(r"(?:Endereço|Endereco|Local):\s*([^|]+)", content)
+        if addr_match:
+            adr = addr_match.group(1).strip()
+            if adr and adr.lower() not in ("não cadastrado", "não disponível", "nan", ""):
+                details["endereco"] = adr
+                
+    return details
+
+
 class RagHandler(BaseHandler):
     """Handler principal para consultas informativas via RAG."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
@@ -833,53 +924,30 @@ class RagHandler(BaseHandler):
                         f"\n\n*Fonte: {best_match['source']}*"
                     )
             
-        # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) no Top-1 ou com alta similaridade,
-        # anexa os detalhes estruturados de passo a passo e documentos logo abaixo da resposta gerada.
+
+        # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) ou planilha (CARTA_DE_SERVICO) no Top-1,
+        # anexa todos os detalhes estruturados/extraídos disponíveis logo abaixo da resposta gerada.
         extra_info = ""
-        # Só anexa passo a passo se o chunk for o primeiro resultado (mais relevante) ou tiver similaridade muito próxima
         if relevant_results:
             top_match = relevant_results[0]
-            if "vw_ia_servicos" in top_match.get("source", "").lower():
+            if "vw_ia_servicos" in top_match.get("source", "").lower() or "carta_de_servico" in top_match.get("source", "").lower():
                 content = top_match.get("content", "")
+                details = extract_service_details(content)
                 
-                # Extrai seção de Documentos Necessários
-                doc_match = re.search(r"Documentos Necessários:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
-                docs_text = doc_match.group(1).strip() if doc_match else ""
-                
-                # Extrai seção de Passo a Passo
-                steps_match = re.search(r"Passo a Passo de Acesso:\n(.*?)(?=\n\n|\n[A-Z]|$)", content, re.DOTALL)
-                steps_text = steps_match.group(1).strip() if steps_match else ""
-                
-                if docs_text or steps_text:
-                    extra_info += f"\n\n**Como proceder para solicitar o serviço \"{top_match.get('title')}\":**"
-                    if docs_text:
-                        # Limpa os passos redundantes da lista de documentos se houver
-                        clean_docs = "\n".join(line.strip() for line in docs_text.split("\n") if line.strip() and "Abertura de processo" not in line)
-                        if clean_docs:
-                            extra_info += f"\n\n📋 **Documentos Necessários:**\n{clean_docs}"
-                    if steps_text:
-                        # Reconstrói os passos de forma amigável removendo quebras vazias ou truncadas
-                        clean_steps = []
-                        for line in steps_text.split("\n"):
-                            line_strip = line.strip()
-                            if line_strip:
-                                # Junta linhas que foram divididas pela quebra de palavra errada da planilha
-                                if clean_steps and not line_strip.startswith("Passo"):
-                                    clean_steps[-1] = clean_steps[-1] + " " + line_strip
-                                else:
-                                    clean_steps.append(line_strip)
-                        
-                        extra_info += "\n\n👣 **Passo a Passo:**\n" + "\n".join(clean_steps)
-
-        # Só anexa passo a passo se o título do serviço estiver mencionado na resposta da LLM
-        # Isso evita anexar "como solicitar" de um serviço que a LLM nem sequer citou na resposta!
-        if extra_info and relevant_results:
-            top_match = relevant_results[0]
-            top_title = top_match.get("title", "")
-            ignore_parts = ["de", "e", "do", "da", "para", "com", "em", "um", "uma", "o", "a", "no", "na", "ao", "ou", "se", "por"]
-            title_keywords = [w.lower() for w in re.findall(r'\b\w{3,20}\b', top_title) if w.lower() not in ignore_parts]
-            if title_keywords and not any(w in answer.lower() for w in title_keywords):
-                extra_info = ""
+                if details:
+                    extra_info += f"\n\n**Informações adicionais sobre \"{top_match.get('title')}\":**"
+                    if "endereco" in details:
+                        extra_info += f"\n📍 **Endereço de Atendimento:** {details['endereco']}"
+                    if "telefones" in details:
+                        extra_info += f"\n📞 **Telefone:** {details['telefones']}"
+                    if "emails" in details:
+                        extra_info += f"\n✉️ **E-mail:** {details['emails']}"
+                    if "links" in details:
+                        extra_info += f"\n🌐 **Canais Digitais/Links:** {details['links']}"
+                    if "documentos" in details:
+                        extra_info += f"\n\n📋 **Documentos Necessários:**\n{details['documentos']}"
+                    if "passo_a_passo" in details:
+                        extra_info += f"\n\n👣 **Passo a Passo:**\n{details['passo_a_passo']}"
 
         if extra_info:
             answer = answer.strip() + extra_info

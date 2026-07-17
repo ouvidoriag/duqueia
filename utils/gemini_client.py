@@ -693,8 +693,18 @@ class GeminiClient:
                         return True
                     raise ValueError("Nenhum dado de áudio retornado pelo modelo de TTS.")
 
-                # Executa com rotação de chaves visando alta tolerância a falhas
-                success = self.execute_with_rotation(_call_tts, model_name="gemini-3.1-flash-tts-preview")
+                # Executa com rotação de chaves visando alta tolerância a falhas e timeout rígido de 10s
+                import concurrent.futures
+                success = False
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(self.execute_with_rotation, _call_tts, model_name="gemini-3.1-flash-tts-preview")
+                    try:
+                        success = future.result(timeout=10.0)
+                    except concurrent.futures.TimeoutError:
+                        print("[GeminiClient] Timeout de 10s atingido na Interactions API (TTS). Cancelando e usando fallback...", file=sys.stderr)
+                    except Exception as tts_err:
+                        print(f"[GeminiClient] Erro na thread de TTS: {tts_err}", file=sys.stderr)
+
                 if success:
                     print(f"[GeminiClient] Áudio nativo do Gemini (WAV) gerado com a voz '{selected_voice}' em {output_path_wav}", file=sys.stderr)
                     return f"{filename_prefix}.wav"

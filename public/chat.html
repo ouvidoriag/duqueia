@@ -611,6 +611,32 @@
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       html = html.replace(/\*(.*?)\*/g,     '<em>$1</em>');
 
+      // Linkificação inteligente de texto puro (evitando tags HTML existentes)
+      const parts = html.split(/(<[^>]+>)/g);
+      for (let i = 0; i < parts.length; i++) {
+        if (parts[i] && !parts[i].startsWith('<')) {
+          let textSeg = parts[i];
+          
+          // 1. URLs (ex: https://...)
+          textSeg = textSeg.replace(/(https?:\/\/[^\s<,]+)/g, '<a href="$1" target="_blank">$1</a>');
+          
+          // 2. E-mails (ex: contato@...)
+          textSeg = textSeg.replace(/\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g, '<a href="mailto:$1" target="_blank">$1</a>');
+          
+          // 3. Telefones (ex: 0800 000 3627 ou (21) 2652-3835)
+          textSeg = textSeg.replace(/\b(0800\s*\d{3}\s*\d{4}|\(?\d{2}\)?\s*9?\d{4}[-\s]?\d{4})\b/g, '<a href="tel:$1">$1</a>');
+          
+          // 4. Endereços (ex: Praça Roberto Silveira, N° 31 - Jardim 25 de Agosto)
+          const addrRegex = /(Rua|Avenida|Av\.|Praça|Praca|Alameda|Rodovia|Rod\.)\s+([A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*(?:\s+(?:de|da|do|dos|das|e|o|a)\s+[A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*|\s+[A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*)*)(?:,?\s*(?:[Nn]?[°º\s]*\d+|s\/n|S\/N))?/g;
+          textSeg = textSeg.replace(addrRegex, (match) => {
+            const cleanQuery = encodeURIComponent(match.replace(/[\n\r]+/g, ' ').trim() + ', Duque de Caxias - RJ');
+            return `<a href="https://www.google.com/maps/search/?api=1&query=${cleanQuery}" target="_blank">${match}</a>`;
+          });
+          
+          parts[i] = textSeg;
+        }
+      }
+      html = parts.join('');
 
       const paragraphs = html.split('\n\n');
       html = paragraphs.map(p => {
