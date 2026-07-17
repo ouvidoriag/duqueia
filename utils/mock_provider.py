@@ -101,7 +101,7 @@ RAG_RESPONSES = {
     ),
     "ouvidoria": (
         "A **Ouvidoria Geral de Duque de Caxias** pode ser acessada pelos canais: "
-        "📞 Telefone: **(21) 2652-3835** | WhatsApp: **(21) 99824-5903** "
+        "📞 Telefone: **(21) 2652-3835** "
         "Você também pode registrar sua manifestação pelo app **Colab**."
     ),
     "default": (

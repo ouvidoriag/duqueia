@@ -30,8 +30,9 @@ load_dotenv(_ENV_PATH)
 # (sys.path e .env já foram configurados no bloco Bootstrap acima)
 
 
-# Importa o agente orquestrador principal
+# Importa o agente orquestrador principal e o roteador de voz
 from agent.agent import DuqueIAAgent
+from voice.voice_router import VoiceRouter
 
 def main():
     # Detecta se está rodando em modo interativo (terminal) ou via pipe (server.js / testes)
@@ -43,6 +44,7 @@ def main():
         print("==========================================================")
 
     agent = DuqueIAAgent()
+    router = VoiceRouter(agent=agent)
     db_path = agent.db_path
 
     if not os.path.exists(db_path):
@@ -80,7 +82,7 @@ def main():
                     print("[Nova sessão iniciada]")
                 continue
 
-            raw = agent.respond(query, use_triage=True, conversation_id=conversation_id)
+            raw = router.process_input(query, conversation_id=conversation_id)
 
             try:
                 data = json.loads(raw)

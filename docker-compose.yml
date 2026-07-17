@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  duque-ia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: duque_ia_app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./metrics:/app/metrics
+    env_file:
+      - .env
+    restart: always

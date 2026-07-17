@@ -60,7 +60,7 @@ def test_priority_conflict_routing():
         },
         {
             "intent": "AMBIGUO_LUZ",
-            "expected_detected": "ambiguity_resolved",
+            "expected_detected": "ambiguity_resolved_dynamic",
             "desc": "Ambiguidades de Luz"
         },
         {

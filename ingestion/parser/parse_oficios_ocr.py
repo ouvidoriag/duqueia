@@ -34,7 +34,7 @@ from utils.gemini_client import GeminiClient
 
 # ---- Configuracao -----------------------------------------------------------
 OFICIOS_DIR   = os.path.join(ROOT, "data", "knowledge", "OFICIOS")
-DB_PATH       = os.path.join(ROOT, "agent", "duque_ia.db")
+DB_PATH       = os.path.join(ROOT, "data", "db", "duque_ia.db")
 CATEGORY      = "oficio_oficial"
 CHUNK_SIZE    = 800
 CHUNK_OVERLAP = 100

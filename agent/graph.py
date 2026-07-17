@@ -85,9 +85,14 @@ class Node:
     on_error_next: Optional[str] = None  # nó de fallback se este falhar
 
     def run(self, state: AgentState, ctx: Any) -> AgentState:
+        t0 = time.time()
         state.record_node(self.name)
         try:
-            return self.fn(state, ctx)
+            res = self.fn(state, ctx)
+            elapsed = round((time.time() - t0) * 1000, 2)
+            if state.nodes_executed:
+                state.nodes_executed[-1]["duration_ms"] = elapsed
+            return res
         except Exception as exc:
             state.record_error(self.name, exc)
             print(f"[Graph Error] Nó '{self.name}' falhou: {exc}", file=sys.stderr)
@@ -171,7 +176,7 @@ def node_triage(state: AgentState, ctx: GraphContext) -> AgentState:
     from agent.triage import perform_triage
 
     triage = perform_triage(
-        db_path=ctx.db_path,
+        db_path=ctx.agent.db_cache,
         query=state.query,
         gemini_client=ctx.agent.gemini_client,
         history=state.history
@@ -257,6 +262,10 @@ def node_rag(state: AgentState, ctx: GraphContext) -> AgentState:
     return _run_handler(state, ctx, "RAG_HANDLER")
 
 
+def node_authority(state: AgentState, ctx: GraphContext) -> AgentState:
+    return _run_handler(state, ctx, "AUTHORITY_HANDLER")
+
+
 # ---------------------------------------------------------------------------
 # Factory: build the default Duque IA graph
 # ---------------------------------------------------------------------------
@@ -281,6 +290,7 @@ def build_duque_ia_graph() -> AgentGraph:
     graph.add_node(Node("PRIVATE_RESPONSIBILITY_HANDLER", node_private,      on_error_next="END"))
     graph.add_node(Node("PROGRAMACAO_HANDLER",           node_programacao,   on_error_next="END"))
     graph.add_node(Node("RAG_HANDLER",                   node_rag,           on_error_next="END"))
+    graph.add_node(Node("AUTHORITY_HANDLER",             node_authority,     on_error_next="END"))
 
     graph.set_entry("fast_gate")
     return graph

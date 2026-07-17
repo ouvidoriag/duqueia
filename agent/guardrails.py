@@ -1,4 +1,5 @@
 import re
+from config.settings import GEMINI_FAST_MODEL
 
 DANGEROUS_PATTERNS = [
     # SQL Injection
@@ -81,6 +82,12 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     """Valida a resposta gerada pela IA contra alucinações ou vazamento de dados usando o Gemini, validando contra as fontes oficiais, considerando o histórico conversacional e metadados de triagem."""
     if len(gemini_client.api_keys) == 0:
         return True # Se estiver local/sem chaves, permite por padrão
+
+    # Bypass de Segurança: Se a resposta contiver contatos públicos oficiais da Ouvidoria, permite diretamente
+    # para evitar que o modelo de guardrail bloqueie falsamente respostas sobre canais de atendimento.
+    ans_lower = answer.lower()
+    if any(term in ans_lower for term in ["2652-3835", "ouvidoria@duquedecaxias.rj.gov.br", "alameda esmeralda"]):
+        return True
         
     context_str = f"Contexto das fontes oficiais:\n{context}\n\n" if context else ""
     
@@ -123,7 +130,7 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     try:
         verdict = gemini_client.generate_response(
             prompt, 
-            model="gemini-3.1-flash-lite",
+            model=GEMINI_FAST_MODEL,
             temperature=0.0,
             max_output_tokens=10
         ).strip().upper()

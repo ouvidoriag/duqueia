@@ -6,9 +6,13 @@ import time
 
 from utils.gemini_client import GeminiClient
 from utils.db_client import execute_db, query_one
+from storage import storage_manager
 from agent.triage import perform_triage
-from agent.config import (
-    DEFAULT_DB_PATH,
+from config.settings import (
+    DATABASE_MAIN,
+    DATABASE_VECTOR,
+    DATABASE_CACHE,
+    DATABASE_TELEMETRY,
     EMBEDDING_DIMS,
     OUVIDORIA_CONTACTS,
     USE_TRIAGE_LAYER,
@@ -38,7 +42,8 @@ from agent.handlers import (
     AmbiguityHandler,
     PrivateResponsibilityHandler,
     ProgramacaoHandler,
-    RagHandler
+    RagHandler,
+    AuthorityHandler
 )
 
 
@@ -48,8 +53,14 @@ gemini_client = GeminiClient()
 class DuqueIAAgent:
     """Agente de Atendimento Virtual RAG Inteligente para Duque de Caxias."""
     
-    def __init__(self, db_path: str = DEFAULT_DB_PATH, reranker: BaseReranker = None):
+    def __init__(self, db_path: str = DATABASE_MAIN, reranker: BaseReranker = None):
         self.db_path = db_path
+        self.db_main = DATABASE_MAIN
+        self.db_vector = DATABASE_VECTOR
+        self.db_cache = DATABASE_CACHE
+        self.db_telemetry = DATABASE_TELEMETRY
+        self.storage = storage_manager
+        
         # Reranker de segundo estágio: GeminiCrossEncoder em produção, NoOpReranker offline.
         # Inicializado após self.using_real — ver linha abaixo.
         self._reranker_override = reranker
@@ -78,7 +89,8 @@ class DuqueIAAgent:
             "AMBIGUITY_HANDLER": AmbiguityHandler(),
             "PRIVATE_RESPONSIBILITY_HANDLER": PrivateResponsibilityHandler(),
             "PROGRAMACAO_HANDLER": ProgramacaoHandler(),
-            "RAG_HANDLER": RagHandler()
+            "RAG_HANDLER": RagHandler(),
+            "AUTHORITY_HANDLER": AuthorityHandler()
         }
         
         os.makedirs(os.path.join(os.path.dirname(self.db_path), "..", "logs"), exist_ok=True)
@@ -89,29 +101,20 @@ class DuqueIAAgent:
         if not hasattr(DuqueIAAgent, "_model_sessions"):
             DuqueIAAgent._model_sessions = {}
         
-        # Garante a existência e validação da metadata de embeddings
+        # Garante a existência e validação da metadata de embeddings no vector.db
         self._initialize_and_validate_embedding_metadata()
-
-        # Dispara verificação de saúde dos provedores em background (1x por processo)
-        if not hasattr(DuqueIAAgent, "_provider_health"):
-            DuqueIAAgent._provider_health = {}
-            import threading
-            def check_health():
-                from utils.provider_health import ProviderHealthChecker
-                DuqueIAAgent._provider_health = ProviderHealthChecker.check_all()
-            threading.Thread(target=check_health, daemon=True).start()
 
 
     def _initialize_and_validate_embedding_metadata(self):
         """Valida se o provedor e modelo de embedding gravado na DB é idêntico ao configurado no cliente."""
-        if not os.path.exists(self.db_path):
+        if not os.path.exists(self.db_vector):
             return
             
         current_provider = "gemini" if self.using_real else "local_hash"
         current_model = gemini_client.embedding_model_name if self.using_real else "deterministic_hash_768"
         current_dimension = EMBEDDING_DIMS.get(current_model, 768)
         
-        execute_db(self.db_path, """
+        execute_db(self.db_vector, """
         CREATE TABLE IF NOT EXISTS embedding_metadata (
             provider TEXT,
             model TEXT,
@@ -120,10 +123,10 @@ class DuqueIAAgent:
         );
         """)
         
-        row = query_one(self.db_path, "SELECT provider, model, dimension FROM embedding_metadata LIMIT 1")
+        row = query_one(self.db_vector, "SELECT provider, model, dimension FROM embedding_metadata LIMIT 1")
         
         if not row:
-            execute_db(self.db_path, "INSERT INTO embedding_metadata (provider, model, dimension) VALUES (?, ?, ?)",
+            execute_db(self.db_vector, "INSERT INTO embedding_metadata (provider, model, dimension) VALUES (?, ?, ?)",
                        (current_provider, current_model, current_dimension))
         else:
             db_provider, db_model, db_dimension = row

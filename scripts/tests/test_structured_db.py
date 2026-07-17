@@ -12,9 +12,10 @@ sys.path.insert(0, ROOT)
 
 from agent.agent import DuqueIAAgent
 from agent.retrieval import retrieve_context
+from config.settings import DATABASE_MAIN
 
 def test_db_structure():
-    db_path = os.path.join(ROOT, "agent", "duque_ia.db")
+    db_path = DATABASE_MAIN
     print("==========================================================")
     print("    VALIDAÇÃO DO BANCO DE DADOS ESTRUTURADO DO DUQUE IA    ")
     print("==========================================================")

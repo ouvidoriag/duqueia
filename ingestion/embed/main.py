@@ -15,6 +15,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 from utils.gemini_client import GeminiClient
 from config import load_config
 from core import ChunkingStrategies
+from config.settings import DATABASE_VECTOR
+from storage import storage_manager
 
 # Instancia o cliente globalmente para reúso de chaves
 gemini_client = GeminiClient()
@@ -44,24 +46,15 @@ def extract_keywords_heuristics(text: str) -> list:
     return sorted_words[:12]
 
 def save_to_sqlite(db_path: str, source: str, category: str, content: str, embedding: list, metadata: dict, keywords: list):
-    """Insere o chunk de documento no banco SQLite."""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-    INSERT INTO duque_ia_chunks (source, category, content, embedding, metadata, keywords)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (
+    """Insere o chunk de documento no banco SQLite usando o repositório."""
+    storage_manager.vector.insert_chunk(
         source,
         category,
         content,
         json.dumps(embedding),
         json.dumps(metadata, ensure_ascii=False),
         json.dumps(keywords, ensure_ascii=False)
-    ))
-    
-    conn.commit()
-    conn.close()
+    )
 
 def main():
     parser = argparse.ArgumentParser(description="DUQUE IA - Pipeline de Ingestão e Geração de Embeddings")
@@ -77,7 +70,7 @@ def main():
         return
 
     parsed_dir = os.path.join("data", "processed")
-    db_path = os.path.join("agent", "duque_ia.db")
+    db_path = DATABASE_VECTOR
 
     if not os.path.exists(parsed_dir):
         print(f"[Embed Error] Pasta {parsed_dir} não encontrada. Execute 'make parse_pdfs' primeiro.")
@@ -101,12 +94,7 @@ def main():
     # Remove apenas os chunks das fontes que serão reinseridas (não apaga carta_servicos/oficio_oficial)
     if os.path.exists(db_path) and sources_to_reingest:
         try:
-            conn = sqlite3.connect(db_path)
-            placeholders = ",".join("?" for _ in sources_to_reingest)
-            conn.cursor().execute(f"DELETE FROM duque_ia_chunks WHERE source IN ({placeholders});",
-                                  list(sources_to_reingest))
-            conn.commit()
-            conn.close()
+            storage_manager.vector.delete_chunks_by_sources(list(sources_to_reingest))
             print(f"[Embed Main] Limpeza seletiva: {len(sources_to_reingest)} fontes removidas (carta_servicos e ofícios preservados).")
         except Exception as e:
             print(f"[Embed Warning] Não foi possível limpar seletivamente: {e}")

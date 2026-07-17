@@ -12,7 +12,6 @@
 | Canal | Contato |
 |---|---|
 | Telefone | (21) 2652-3835 |
-| WhatsApp | (21) 99824-5903 |
 | E-mail | ouvidoria@duquedecaxias.rj.gov.br |
 | Plataforma Digital | https://duquedecaxias.colab.re/ |
 | Presencial | Alameda Esmeralda, 206 — Jardim Primavera, Duque de Caxias — RJ |
@@ -78,7 +77,6 @@ Denúncias de **som alto, perturbação do sossego, barulho excessivo de bares, 
 
 - **Pelo Colab:** Selecione o tema **Meio Ambiente** e o assunto **Fiscalização legal de poluição sonora** ou **Fiscalização de bares e casas noturnas**.
 - **Por telefone:** Ligue para a Ouvidoria Geral: **(21) 2652-3835**.
-- **WhatsApp:** **(21) 99824-5903**.
 
 A fiscalização é realizada pela **Secretaria Municipal de Meio Ambiente** ou pela **Secretaria Municipal de Segurança Pública**.
 
@@ -92,4 +90,4 @@ O cidadão pode registrar manifestações de forma **anônima**. O sigilo da ide
 
 ## Palavras-chave para Busca Vetorial
 
-ouvidoria, ouvidoria geral, ouvidoria de duque de caxias, canal de reclamação, registrar reclamação, protocolo ouvidoria, prazo ouvidoria, 30 dias, lei 13460, poluição sonora, som alto, perturbação do sossego, barulho excessivo, fiscalização de bar, denúncia, sugestão, elogio, reclamação anônima, acompanhar protocolo, telefone ouvidoria, whatsapp ouvidoria, colab, presencial ouvidoria, alameda esmeralda, horário ouvidoria.
+ouvidoria, ouvidoria geral, ouvidoria de duque de caxias, canal de reclamação, registrar reclamação, protocolo ouvidoria, prazo ouvidoria, 30 dias, lei 13460, poluição sonora, som alto, perturbação do sossego, barulho excessivo, fiscalização de bar, denúncia, sugestão, elogio, reclamação anônima, acompanhar protocolo, telefone ouvidoria, colab, presencial ouvidoria, alameda esmeralda, horário ouvidoria.

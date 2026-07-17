@@ -2,7 +2,7 @@ import re
 import json
 import time
 import sys
-from agent.config import DEFAULT_DB_PATH, OUVIDORIA_CONTACTS
+from config.settings import DEFAULT_DB_PATH, OUVIDORIA_CONTACTS
 from agent.scoring import extract_query_keywords
 from agent.fallback import build_fallback_guidance, is_query_too_vague
 from agent.confidence import calibrate_confidence
@@ -595,69 +595,6 @@ class ProgramacaoHandler(BaseHandler):
 class RagHandler(BaseHandler):
     """Handler principal para consultas informativas via RAG."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
-        # C0: Verificação de Autoridade Pública no catálogo
-        if triage_info.get("intent") == "AUTORIDADE_PUBLICA":
-            try:
-                from agent.authorities_catalog import AUTHORITIES
-                # Normaliza query
-                q_clean = query.lower().strip()
-                q_clean = re.sub(r'^[¿\?¡\!]+|[¿\?¡\!]+$', '', q_clean)
-                q_clean = re.sub(r'^(?:quem\s+é\s+o\s+|quem\s+é\s+a\s+|quem\s+é\s+|quem\s+e\s+o\s+|quem\s+e\s+a\s+|quem\s+e\s+|qual\s+o\s+|qual\s+a\s+|qual\s+é\s+o\s+|qual\s+é\s+a\s+|qual\s+e\s+o\s+|qual\s+e\s+a\s+|quem\s+dirige\s+o\s+|quem\s+dirige\s+a\s+|quem\s+dirige\s+|quem\s+administra\s+o\s+|quem\s+administra\s+a\s+|quem\s+administra\s+|quem\s+comanda\s+o\s+|quem\s+comanda\s+a\s+|quem\s+comanda\s+|quem\s+ocupa\s+o\s+cargo\s+de\s+|quem\s+ocupa\s+o\s+cargo\s+da\s+|quem\s+ocupa\s+o\s+cargo\s+de\s*|o\s+responsável\s+pela\s+|o\s+responsavel\s+pela\s+|o\s+responsável\s+pelo\s+|o\s+responsavel\s+pelo\s+)', '', q_clean).strip()
-                
-                # Normalizador de acentos local
-                def _normalize_accents(text: str) -> str:
-                    repls = {
-                        'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a',
-                        'é': 'e', 'ê': 'e', 'í': 'i', 'ó': 'o',
-                        'ô': 'o', 'õ': 'o', 'ú': 'u', 'ç': 'c'
-                    }
-                    t = text.lower()
-                    for src, dst in repls.items():
-                        t = t.replace(src, dst)
-                    return t
-                
-                q_normalized = _normalize_accents(q_clean)
-                auth = None
-                
-                # Busca ordenada por tamanho decrescente para evitar falso-positivo (ex: 'prefeito' em 'vice-prefeito')
-                sorted_keys = sorted(AUTHORITIES.keys(), key=len, reverse=True)
-                for key in sorted_keys:
-                    key_norm = _normalize_accents(key)
-                    if key_norm == q_normalized or key_norm in q_normalized or q_normalized in key_norm:
-                        auth = AUTHORITIES[key]
-                        break
-                
-                if auth:
-                    nome = auth["nome"]
-                    cargo = auth["cargo"]
-                    fonte = auth["fonte"]
-                    
-                    answer = (
-                        f"O {cargo} de Duque de Caxias é **{nome}**.\n\n"
-                        f"Essa informação consta na estrutura oficial da Prefeitura.\n\n"
-                        f"Se desejar, também posso informar quem são os outros secretários municipais, a estrutura administrativa ou o contato de alguma secretaria específica.\n\n"
-                        f"*(Informação obtida na estrutura administrativa oficial da Prefeitura — **{fonte}**)*"
-                    )
-                    
-                    elapsed = time.time() - start_time
-                    agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
-                    return {
-                        "answer": answer,
-                        "sources": [fonte],
-                        "confidence": 1.0,
-                        "intent_detected": "AUTORIDADE_PUBLICA",
-                        "triage_info": triage_info,
-                        "metrics": {
-                            "retrieval_time_ms": 0,
-                            "llm_time_ms": 0,
-                            "total_time_ms": round(elapsed * 1000, 2),
-                            "tokens_used": 0,
-                            "keywords": extract_query_keywords(query)
-                        }
-                    }
-            except Exception as e:
-                print(f"[RagHandler Authority Catalog Error] {e}", file=sys.stderr)
-
         from agent.router import QueryAnalyzer
         
         # A1: Usa rewritten_query já gerada pela triagem (fusão Triage+Rewriter = -1 chamada LLM)
@@ -795,8 +732,8 @@ class RagHandler(BaseHandler):
             
             system_instruction = (
                 "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
-                "Sua personalidade deve ser extremamente simpática, calorosa, prestativa e humana (aumente a empatia e use palavras acolhedoras). Responda com um sorriso virtual e gentileza genuína.\n"
-                "Apesar de muito caloroso, seja objetivo e preciso. Prefira respostas de 2 a 4 frases — suficientes para ser muito útil e acolhedor, sem exageros.\n"
+                "Sua personalidade deve ser extremamente simpática, calorosa, prestativa e humana (aumente a empatia e use palavras acolhedoras). Responda com extrema gentileza genuína, mas NUNCA use saudações redundantes ou frases artificiais como 'Com um sorriso', 'Com um sorriso virtual', 'Olá! Que bom ter você por aqui!' ou saudações repetidas.\n"
+                "Apesar de muito caloroso, seja objetivo, preciso e direto. Prefira respostas de 2 a 4 frases — suficientes para ser muito útil e acolhedor, sem exageros.\n"
                 "\n"
                 "REGRA DE FONTES (CRÍTICO):\n"
                 "- 'INFORMAÇÕES OFICIAIS ESTRUTURADAS' têm precedência absoluta sobre qualquer outro contexto.\n"
@@ -1025,5 +962,207 @@ class RagHandler(BaseHandler):
                 "cross_score": round(top_cross_score, 4),
                 "similarity_score": round(base_score, 4),
                 "cost_usd": embedding_cost
+            }
+        }
+
+
+class AuthorityHandler(BaseHandler):
+    """Handler especializado em responder consultas sobre autoridades municipais."""
+    def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
+        import unicodedata
+        import difflib
+        from agent.authorities_catalog import AUTHORITIES
+
+        elapsed = time.time() - start_time
+        
+        # 1. Normalizador robusto de acentos usando unicodedata e equivalência de gênero
+        def _normalize(text: str) -> str:
+            text = unicodedata.normalize("NFKD", text)
+            t = "".join(c for c in text if not unicodedata.combining(c)).lower().strip()
+            t = t.replace("secretaria", "secretario")
+            t = t.replace("prefeita", "prefeito")
+            t = re.sub(r'\s+de\s+duque\s+de\s+caxias\b|\s+duque\s+de\s+caxias\b', '', t)
+            return t.strip()
+
+        # 2. Parser de prefixos de perguntas de autoridades (apenas pronomes e verbos de pergunta)
+        AUTHORITY_PATTERNS = [
+            "quem é o",
+            "quem é a",
+            "quem é",
+            "quem e o",
+            "quem e a",
+            "quem e",
+            "qual é o",
+            "qual é a",
+            "qual é",
+            "qual e o",
+            "qual e a",
+            "qual e",
+            "quem dirige o",
+            "quem dirige a",
+            "quem dirige",
+            "quem administra o",
+            "quem administra a",
+            "quem administra",
+            "quem comanda o",
+            "quem comanda a",
+            "quem comanda",
+            "quem ocupa o cargo de",
+            "quem ocupa o cargo da",
+            "quem ocupa o cargo",
+            "o responsável pela",
+            "o responsavel pela",
+            "o responsável pelo",
+            "o responsavel pelo",
+            "qual o",
+            "qual a",
+        ]
+
+        q_clean = query.lower().strip()
+        q_clean = re.sub(r'^[¿\?¡\!]+|[¿\?¡\!]+$', '', q_clean).strip() # remove pontuações finais/iniciais
+
+        # Strip prefixes
+        for pattern in AUTHORITY_PATTERNS:
+            if q_clean.startswith(pattern):
+                q_clean = q_clean[len(pattern):].strip()
+                break
+
+        q_normalized = _normalize(q_clean)
+        auth = None
+
+        # 3. Busca por similaridade combinada (Token/Word Overlap + Character-level SequenceMatcher)
+        q_norm_words = set(q_normalized.split())
+        stopwords = {"de", "da", "do", "o", "a", "em", "para", "quem", "e"}
+        q_clean_words = q_norm_words - stopwords
+
+        best_match_key = None
+        best_match_score = 0.0
+
+        for key in AUTHORITIES.keys():
+            key_norm = _normalize(key)
+            key_norm_words = set(key_norm.split())
+            key_clean_words = key_norm_words - stopwords
+            
+            # Similaridade por interseção de palavras
+            word_score = 0.0
+            if key_clean_words:
+                intersection = q_clean_words.intersection(key_clean_words)
+                word_score = len(intersection) / len(key_clean_words)
+                
+            # Similaridade por caracteres (difflib)
+            char_score = difflib.SequenceMatcher(None, q_normalized, key_norm).ratio()
+            
+            # Score combinado: 70% peso nas palavras estruturais, 30% nos caracteres
+            combined_score = 0.7 * word_score + 0.3 * char_score
+            
+            # Boost especial para substrings exatas
+            if key_norm == q_normalized or (len(key_norm) > 3 and key_norm in q_normalized) or (len(q_normalized) > 3 and q_normalized in key_norm):
+                combined_score = max(combined_score, 0.90)
+                
+            if combined_score > best_match_score:
+                best_match_score = combined_score
+                best_match_key = key
+
+        # Só consideramos correspondência se o score combinado for alto (ex: >= 0.70)
+        if best_match_key and best_match_score >= 0.70:
+            auth = AUTHORITIES[best_match_key]
+
+        if auth:
+            nome = auth["nome"]
+            cargo = auth["cargo"]
+            fonte = auth["fonte"]
+
+            # Recupera a versão do catálogo se disponível
+            try:
+                from agent.authorities_catalog import CATALOG_VERSION
+            except ImportError:
+                CATALOG_VERSION = "2026-07-13"
+
+            # 4. Geração de sugestões dinâmicas baseadas no cargo/órgão encontrado
+            cargo_lower = cargo.lower()
+            sugestoes = []
+            
+            if "prefeito" in cargo_lower:
+                sugestoes = [
+                    "• Quem é a **Vice-Prefeita** de Duque de Caxias",
+                    "• Quais são as **Secretarias Municipais** da Prefeitura",
+                    "• Qual o endereço da **Prefeitura Municipal**"
+                ]
+            elif "saude" in cargo_lower or "saúde" in cargo_lower:
+                sugestoes = [
+                    "• Qual o endereço ou contato da **Secretaria de Saúde**",
+                    "• Quais são os **Hospitais Municipais** e unidades de saúde 24h",
+                    "• Como entrar em contato com a **Ouvidoria do SUS**"
+                ]
+            elif "obras" in cargo_lower:
+                sugestoes = [
+                    "• Qual o telefone ou canal da **Secretaria de Obras**",
+                    "• Como solicitar serviço de **Tapa-Buraco** ou drenagem de via",
+                    "• Onde fica a sede da Secretaria de Obras"
+                ]
+            elif "educa" in cargo_lower:
+                sugestoes = [
+                    "• Como entrar em contato com a **Secretaria de Educação**",
+                    "• Onde obter informações sobre matrícula escolar em creche municipal",
+                    "• Lista de escolas municipais de Duque de Caxias"
+                ]
+            elif "fazenda" in cargo_lower or "finança" in cargo_lower or "orcamento" in cargo_lower:
+                sugestoes = [
+                    "• Como solicitar a segunda via do **IPTU**",
+                    "• Qual o endereço ou contato da **Secretaria de Fazenda**",
+                    "• Como consultar taxas municipais"
+                ]
+            else:
+                # Sugestões dinâmicas genéricas baseadas no órgão
+                orgao = cargo.split(" de ")[-1] if " de " in cargo else "órgão"
+                sugestoes = [
+                    f"• Qual o endereço e contato da **Secretaria de {orgao}**",
+                    f"• Quais os serviços públicos prestados pela **Secretaria de {orgao}**",
+                    "• Como registrar uma solicitação oficial a esta secretaria no Colab"
+                ]
+
+            sugestoes_str = "\n".join(sugestoes)
+
+            answer = (
+                f"O {cargo} de Duque de Caxias é **{nome}**.\n\n"
+                f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
+                f"Caso deseje, posso informar também:\n"
+                f"{sugestoes_str}"
+            )
+            
+            agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
+            return {
+                "answer": answer,
+                "sources": [fonte],
+                "confidence": 1.0,
+                "intent_detected": "AUTORIDADE_PUBLICA",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(query)
+                }
+            }
+        
+        # Fallback offline se nada for encontrado (usa cópia genérica segura)
+        answer = (
+            "Não encontrei a autoridade correspondente na base oficial estática do município.\n\n"
+            "Se for um cargo em uma secretaria, por favor me informe o nome da secretaria para eu tentar buscar nos documentos gerais."
+        )
+        agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
+        return {
+            "answer": answer,
+            "sources": [],
+            "confidence": 0.0,
+            "intent_detected": "AUTORIDADE_PUBLICA",
+            "triage_info": triage_info,
+            "metrics": {
+                "retrieval_time_ms": 0,
+                "llm_time_ms": 0,
+                "total_time_ms": round(elapsed * 1000, 2),
+                "tokens_used": 0,
+                "keywords": extract_query_keywords(query)
             }
         }

@@ -172,7 +172,7 @@ def run_retrieval_relevance_tests():
         }
     ]
     
-    db_path = os.path.join(ROOT, "agent", "duque_ia.db")
+    db_path = os.path.join(ROOT, "data", "db", "duque_ia.db")
     agent = DuqueIAAgent(db_path=db_path)
     
     results = []

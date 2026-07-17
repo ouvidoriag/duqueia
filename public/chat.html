@@ -23,11 +23,67 @@
       --text-secondary:#64748b;
       --text-on-accent:#ffffff;
       --green:         #16a34a;
+      --libras:        #0369a1;
+      --libras-light:  #e0f2fe;
       --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
       --shadow-md:     0 4px 16px rgba(0,0,0,.08);
       --shadow-lg:     0 12px 40px rgba(0,0,0,.10);
       --radius-card:   20px;
       --radius-bubble: 18px;
+    }
+
+    /* ── VLibras: Ícone de acessibilidade no header (apenas ícone) ── */
+    .libras-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .libras-toggle-btn:hover {
+      border-color: var(--libras);
+      color: var(--libras);
+      background: var(--libras-light);
+    }
+    .libras-toggle-btn.active {
+      background: var(--libras);
+      border-color: var(--libras);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(3,105,161,.3);
+    }
+    .libras-toggle-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── VLibras: Barra de status (modo ativo) ───────────────── */
+    .libras-status-bar {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: var(--libras);
+      color: #fff;
+      font-size: 0.73rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      animation: slideDown 0.3s ease;
+    }
+    .libras-status-bar.visible { display: flex; }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,17 +132,49 @@
     .avatar {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 1rem;
-      color: #fff;
       box-shadow: 0 4px 10px rgba(29,78,216,.25);
       flex-shrink: 0;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.08);
+    }
+
+    /* Modal de Zoom da Foto */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+    .image-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    .image-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .image-modal.active img {
+      transform: scale(1);
     }
 
     .title-area h1 {
@@ -333,6 +421,37 @@
     .send-btn:hover  { background: var(--accent-hover); box-shadow: 0 4px 14px rgba(29,78,216,.35); }
     .send-btn:active { transform: scale(0.95); }
     .send-btn:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
+
+    .mic-btn {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(16,185,129,.28);
+      transition: background .2s, transform .1s, box-shadow .2s;
+      flex-shrink: 0;
+    }
+
+    .mic-btn:hover { background: #059669; box-shadow: 0 4px 14px rgba(16,185,129,.35); }
+    .mic-btn:active { transform: scale(0.95); }
+    .mic-btn:disabled { background: #a7f3d0; cursor: not-allowed; box-shadow: none; }
+    .mic-btn.recording {
+      background: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239,68,68,.35);
+      animation: pulse-mic 1.5s infinite;
+    }
+
+    @keyframes pulse-mic {
+      0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(239,68,68,.6); }
+      50% { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(239,68,68,0); }
+    }
   </style>
 </head>
 <body>
@@ -341,7 +460,7 @@
     <!-- Header -->
     <header class="chat-header">
       <div class="header-left">
-        <div class="avatar">DI</div>
+        <img class="avatar" src="/fotoperfil.png" alt="Duque IA">
         <div class="title-area">
           <h1>Duque IA</h1>
           <div class="status-badge">
@@ -351,10 +470,24 @@
         </div>
       </div>
       <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <!-- Botão VLibras: ícone de mãos, abre o widget ao clicar -->
+        <button class="libras-toggle-btn" id="librasToggleBtn" title="Acessibilidade em Libras">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <!-- mão aberta / gesto de Libras -->
+            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
+            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+          </svg>
+        </button>
         <a href="/dashboard.html" class="new-chat-btn" style="text-decoration: none; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); display: inline-flex; align-items: center;">Dashboard</a>
         <button class="new-chat-btn" id="newChatBtn">Nova conversa</button>
       </div>
     </header>
+    <!-- Barra de status Libras (fica visível quando modo ativo) -->
+    <div class="libras-status-bar" id="librasStatusBar">
+      🪧 Modo Libras ativo — as respostas serão traduzidas automaticamente pelo VLibras
+    </div>
 
     <!-- Área de Mensagens -->
     <div class="messages-area" id="messagesArea">
@@ -372,6 +505,16 @@
         autocomplete="off"
         maxlength="500"
       >
+      <button class="mic-btn" id="micBtn" title="Gravar Áudio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+      </button>
       <button class="send-btn" id="sendBtn" title="Enviar">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2.5"
@@ -383,13 +526,77 @@
     </div>
   </div>
 
+  <!-- Modal de Zoom da Foto -->
+  <div id="imageModal" class="image-modal">
+    <img id="modalImg" src="" alt="Zoom da Foto">
+  </div>
+
+  <!-- VLibras Widget (Governo Federal) -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
   <script>
-    const messagesArea = document.getElementById('messagesArea');
-    const chatInput    = document.getElementById('chatInput');
-    const sendBtn      = document.getElementById('sendBtn');
-    const newChatBtn   = document.getElementById('newChatBtn');
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+
+  <script>
+    const messagesArea    = document.getElementById('messagesArea');
+    const chatInput       = document.getElementById('chatInput');
+    const sendBtn         = document.getElementById('sendBtn');
+    const newChatBtn      = document.getElementById('newChatBtn');
+    const librasToggleBtn = document.getElementById('librasToggleBtn');
+    const librasStatusBar = document.getElementById('librasStatusBar');
 
     let sessionId = 'sess_' + Date.now();
+
+    // ── VLibras: Modo de acessibilidade ─────────────────────────────────────
+    let librasMode = false;
+
+    librasToggleBtn.addEventListener('click', () => {
+      librasMode = !librasMode;
+      librasToggleBtn.classList.toggle('active', librasMode);
+      librasStatusBar.classList.toggle('visible', librasMode);
+      librasToggleBtn.title = librasMode
+        ? 'Desativar modo Libras'
+        : 'Ativar modo Libras — todas as respostas serão traduzidas para Libras';
+      // Ao ativar, abre o widget VLibras direto
+      if (librasMode) {
+        const accessBtn = document.querySelector('[vw-access-button]');
+        if (accessBtn) setTimeout(() => accessBtn.click(), 200);
+      }
+    });
+
+    /**
+     * Traduz um texto para Libras via widget VLibras / portal vlibras.gov.br
+     */
+    function translateToLibras(text) {
+      const plainText = text
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/#{1,6}\s/g, '')
+        .replace(/`/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .replace(/[-*•]\s/g, '')
+        .trim();
+
+      if (!plainText) return;
+
+      // Tenta injetar no campo de texto do widget VLibras nativo
+      const inputField = document.querySelector('.vw-text-input, [vw-translate-field], input[placeholder*="Libras"], .vw-input');
+      if (inputField) {
+        inputField.value = plainText;
+        inputField.dispatchEvent(new Event('input',  { bubbles: true }));
+        inputField.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        // Fallback: abre no portal vlibras.gov.br
+        const encoded = encodeURIComponent(plainText.substring(0, 500));
+        window.open(`https://vlibras.gov.br/?text=${encoded}`, '_blank', 'width=900,height=650,noopener');
+      }
+    }
 
     // ── Markdown simplificado ────────────────────────────────────────────────
     function formatMarkdown(text) {
@@ -433,6 +640,31 @@
       bubble.className = 'message-bubble';
       bubble.innerHTML  = formatMarkdown(text);
       wrapper.appendChild(bubble);
+
+      // Renderiza áudio do usuário se disponível
+      if (sender === 'user' && data?.local_audio_url) {
+        const audioContainer = document.createElement('div');
+        audioContainer.style.marginTop = '8px';
+        audioContainer.innerHTML = `
+          <audio controls src="${data.local_audio_url}" style="width: 100%; max-width: 250px; height: 32px; filter: brightness(0.9); display: block; outline: none;"></audio>
+        `;
+        bubble.appendChild(audioContainer);
+      }
+
+      // Renderiza áudio de resposta do bot se disponível
+      if (sender === 'bot' && data?.response_audio_url) {
+        const audioContainer = document.createElement('div');
+        audioContainer.style.marginTop = '8px';
+        audioContainer.innerHTML = `
+          <audio controls src="${data.response_audio_url}" style="width: 100%; max-width: 250px; height: 32px; display: block; outline: none;"></audio>
+        `;
+        bubble.appendChild(audioContainer);
+      }
+
+      // Se modo Libras estiver ativo, traduz automaticamente a resposta
+      if (sender === 'bot' && text && librasMode) {
+        setTimeout(() => translateToLibras(text), 600);
+      }
 
       const metaDiv = document.createElement('div');
       metaDiv.className = 'meta-info';
@@ -550,7 +782,167 @@
       'Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n' +
       'Como posso ajudar você hoje? Pergunte sobre secretarias, serviços municipais, endereços ou ouvidoria.'
     );
-    chatInput.focus();
+    // ── Zoom da Foto de Perfil (Lightbox) ────────────────────────────────────
+    const avatarImg = document.querySelector('.avatar');
+    const imageModal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+
+    avatarImg.addEventListener('click', () => {
+      modalImg.src = avatarImg.src;
+      imageModal.classList.add('active');
+    });
+
+    imageModal.addEventListener('click', () => {
+      imageModal.classList.remove('active');
+    });
+
+    // ── Gravação de Áudio (MediaRecorder) ────────────────────────────────────
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const micBtn = document.getElementById('micBtn');
+
+    micBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.addEventListener('dataavailable', event => {
+            audioChunks.push(event.data);
+          });
+
+          mediaRecorder.addEventListener('stop', async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const localAudioUrl = URL.createObjectURL(audioBlob);
+
+            showTyping();
+            micBtn.disabled = true;
+            sendBtn.disabled = true;
+
+            // Mostra áudio local no histórico de conversas imediatamente
+            appendMessage('user', '🎙️ *Mensagem de áudio enviada*', { local_audio_url: localAudioUrl });
+
+            try {
+              // Converte o WebM gravado pelo navegador para WAV PCM 16-bit linear no client-side.
+              // Isso garante 100% de compatibilidade e velocidade de processamento na File API do Gemini.
+              const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+              const arrayBuffer = await audioBlob.arrayBuffer();
+              const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+              const wavBlob = bufferToWav(audioBuffer);
+
+              const reader = new FileReader();
+              reader.readAsDataURL(wavBlob);
+              reader.onloadend = async () => {
+                const base64Audio = reader.result;
+
+                try {
+                  const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ audio: base64Audio, sessionId })
+                  });
+
+                  const data = await res.json();
+                  removeTyping();
+
+                  if (data.error) {
+                    appendMessage('bot', `Ocorreu um erro: ${data.error}`);
+                  } else {
+                    appendMessage('bot', data.answer, data);
+                  }
+                } catch (err) {
+                  removeTyping();
+                  appendMessage('bot', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
+                  console.error(err);
+                } finally {
+                  micBtn.disabled = false;
+                  sendBtn.disabled = false;
+                }
+              };
+            } catch (convErr) {
+              removeTyping();
+              appendMessage('bot', 'Erro ao processar e converter o áudio no navegador.');
+              console.error(convErr);
+              micBtn.disabled = false;
+              sendBtn.disabled = false;
+            }
+          });
+
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.classList.add('recording');
+          micBtn.title = "Parar Gravação";
+        } catch (err) {
+          alert('Não foi possível acessar o microfone. Verifique as permissões de gravação de áudio do seu navegador.');
+          console.error(err);
+        }
+      } else {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        isRecording = false;
+        micBtn.classList.remove('recording');
+        micBtn.title = "Gravar Áudio";
+      }
+    });
+
+    // ── Helper: Converte AudioBuffer para arquivo WAV 16-bit PCM Linear ─────────
+    function bufferToWav(buffer) {
+      const numOfChan = buffer.numberOfChannels;
+      const length = buffer.length * numOfChan * 2 + 44;
+      const bufferArr = new ArrayBuffer(length);
+      const view = new DataView(bufferArr);
+      const channels = [];
+      let offset = 0;
+      let pos = 0;
+
+      function setUint16(data) {
+        view.setUint16(pos, data, true);
+        pos += 2;
+      }
+
+      function setUint32(data) {
+        view.setUint32(pos, data, true);
+        pos += 4;
+      }
+
+      // RIFF header
+      setUint32(0x46464952); // "RIFF"
+      setUint32(length - 8); // file length - 8
+      setUint32(0x45564157); // "WAVE"
+
+      // fmt chunk
+      setUint32(0x20746d66); // "fmt "
+      setUint32(16);         // chunk size
+      setUint16(1);          // uncompressed linear PCM
+      setUint16(numOfChan);
+      setUint32(buffer.sampleRate);
+      setUint32(buffer.sampleRate * numOfChan * 2); // byte rate
+      setUint16(numOfChan * 2); // block align
+      setUint16(16); // bits per sample
+
+      // data chunk
+      setUint32(0x61746164); // "data"
+      setUint32(length - pos - 4); // chunk size
+
+      for (let i = 0; i < numOfChan; i++) {
+        channels.push(buffer.getChannelData(i));
+      }
+
+      while (pos < length) {
+        for (let i = 0; i < numOfChan; i++) {
+          let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+          sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+          view.setInt16(pos, sample, true);
+          pos += 2;
+        }
+        offset++;
+      }
+
+      return new Blob([bufferArr], { type: 'audio/wav' });
+    }
   </script>
 </body>
 </html>

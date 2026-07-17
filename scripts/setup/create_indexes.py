@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "agent", "duque_ia.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "db", "duque_ia.db")
 DB_PATH = os.path.abspath(DB_PATH)
 
 def create_indexes():

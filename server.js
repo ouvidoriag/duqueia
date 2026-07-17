@@ -26,6 +26,9 @@ const MIME_TYPES = {
   '.ico':  'image/x-icon',
   '.png':  'image/png',
   '.svg':  'image/svg+xml',
+  '.mp3':  'audio/mpeg',
+  '.webm': 'audio/webm',
+  '.wav':  'audio/wav',
 };
 
 // ── Gerenciamento de sessões ──────────────────────────────────────────────────
@@ -202,12 +205,25 @@ const server = http.createServer((req, res) => {
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body);
-        const message = (payload.message || '').trim();
+        let message = (payload.message || '').trim();
         const sessionId = (payload.sessionId || 'default').replace(/[^a-zA-Z0-9_-]/g, '');
+
+        if (payload.audio) {
+          const base64Data = payload.audio.split(';base64,').pop();
+          const uploadDir = path.join(__dirname, 'public', 'uploads');
+          if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+          }
+          const ext = payload.audio.startsWith('data:audio/wav') ? 'wav' : 'webm';
+          const audioFilename = `input_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+          const audioPath = path.join(uploadDir, audioFilename);
+          fs.writeFileSync(audioPath, Buffer.from(base64Data, 'base64'));
+          message = audioPath;
+        }
 
         if (!message) {
           res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
-          res.end(JSON.stringify({ error: 'Mensagem não pode ser vazia.' }));
+          res.end(JSON.stringify({ error: 'Mensagem ou áudio não pode ser vazio.' }));
           return;
         }
 
@@ -365,6 +381,36 @@ const server = http.createServer((req, res) => {
  */
 function serveStaticContent(req, res, fileEntry) {
   const acceptEncoding = req.headers['accept-encoding'] || '';
+  const range = req.headers.range;
+  const isAudio = ['.mp3', '.wav', '.webm'].includes(fileEntry.ext);
+
+  if (isAudio && range) {
+    // Processa Range Request para compatibilidade total com players de áudio (Chrome, Safari, etc.)
+    const totalLength = fileEntry.raw.length;
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : totalLength - 1;
+
+    if (start >= totalLength || end >= totalLength) {
+      res.writeHead(416, { 'Content-Range': `bytes */${totalLength}` });
+      return res.end();
+    }
+
+    const chunksize = (end - start) + 1;
+    const slice = fileEntry.raw.slice(start, end + 1);
+
+    res.writeHead(206, {
+      'Content-Range': `bytes ${start}-${end}/${totalLength}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': fileEntry.contentType,
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    return res.end(slice);
+  }
+
   const headers = {
     'Content-Type': fileEntry.contentType
   };
@@ -375,7 +421,8 @@ function serveStaticContent(req, res, fileEntry) {
     headers['Cache-Control'] = 'public, max-age=31536000, immutable';
   }
 
-  if (acceptEncoding.includes('gzip')) {
+  // Não comprima arquivos de áudio já comprimidos nativamente
+  if (!isAudio && acceptEncoding.includes('gzip')) {
     headers['Content-Encoding'] = 'gzip';
     res.writeHead(200, headers);
     res.end(fileEntry.gzipped);

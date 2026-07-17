@@ -17,7 +17,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
-DB_PATH = os.path.join(ROOT, "agent", "duque_ia.db")
+DB_PATH = os.path.join(ROOT, "data", "db", "duque_ia.db")
 MD_PATH = os.path.join(ROOT, "data", "knowledge", "ouvidoria_geral_info.md")
 
 SOURCE   = "ouvidoria_geral_info.md"

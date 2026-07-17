@@ -1,5 +1,5 @@
 import re
-from agent.config import KEYWORD_POLICY
+from config.settings import KEYWORD_POLICY
 
 def cosine_similarity(vec_a: list, vec_b: list) -> float:
     """Calcula a similaridade de cosseno entre dois vetores."""

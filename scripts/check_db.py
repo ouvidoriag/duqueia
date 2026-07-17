@@ -1,6 +1,6 @@
 import sqlite3, json
 
-conn = sqlite3.connect('agent/duque_ia.db')
+conn = sqlite3.connect('data/db/duque_ia.db')
 c = conn.cursor()
 
 # Lista todas as tabelas

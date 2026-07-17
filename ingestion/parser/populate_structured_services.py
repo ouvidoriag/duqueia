@@ -8,8 +8,10 @@ import re
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, ROOT)
 
+from config.settings import DATABASE_MAIN
+
 XLSX_PATH = os.path.join(ROOT, "data", "knowledge", "CARTA_DE_SERVICO_AJUSTE_23.05.26.xlsx")
-DB_PATH = os.path.join(ROOT, "agent", "duque_ia.db")
+DB_PATH = DATABASE_MAIN
 
 def clean_name(name: str) -> str:
     return name.strip() if name else ""

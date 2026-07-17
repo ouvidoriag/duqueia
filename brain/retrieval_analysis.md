@@ -30,8 +30,8 @@ No script `test_retrieval_relevance.py`, a similaridade é avaliada de duas form
 2. **Busca Híbrida (Keyword Match Fallback)**: Pontua com base na ocorrência de palavras-chave da consulta excluindo stopwords estruturadas, atribuindo peso extra (1.5x) para correspondências no título do arquivo de origem.
 
 ### Oportunidades de Melhoria e Riscos de Overfitting:
-* **Risco de Overfitting por Regras Estáticas:** Regras de reescrita estáticas (ex: mapear "homem" -> "saúde do homem") trazem alto retorno rápido, mas geram viés e falham se o cidadão usar expressões sinônimas não previstas (ex: "urologia masculina" ou "exame preventivo masculino"). O sistema deve transicionar gradualmente para um modelo LLM Dinâmico de *Query Rewriting* em produção.
-* **Filtros de Metadados baseados em Intenção:** Separar dinamicamente os escopos de busca (Secretarias vs. Carta de Serviços vs. Unidades Físicas) impede a contaminação de domínios, que é a maior responsável por falsos positivos.
+* **Risco de Overfitting por Regras Estáticas:** Regras de reescrita estáticas trazem alto retorno rápido, mas geram viés e falham se o cidadão usar expressões sinônimas não previstas. O sistema deve transicionar gradualmente para um modelo LLM Dinâmico de *Query Rewriting* em produção.
+* **Filtros de Metadados baseados em Intenção:** Separar dinamicamente os escopos de busca (Secretarias vs. Carta de Serviços vs. Unidades Físicas) impede a contaminação de domínios.
 
 ---
 
@@ -40,19 +40,3 @@ No script `test_retrieval_relevance.py`, a similaridade é avaliada de duas form
 * **Input Guardrail**: Bloqueia injeção de SQL e instruções nocivas diretamente na entrada.
 * **Retrieval Guardrail**: Define um limiar dinâmico. Se a melhor correspondência de similaridade for menor que `0.65` (vetorial) ou `0.25` (híbrido significativo), aborta com a mensagem de fallback da Ouvidoria Geral.
 * **Output Guardrail**: Valida a conformidade da estrutura JSON da resposta antes de enviá-la ao munícipe.
-
----
-
-## 4. Próxima Etapa: Validação de Alta Confiabilidade (Hard Benchmark)
-
-Com o benchmark atual atingindo **100% de acerto**, o foco transiciona de otimização de pesos para a **robustez da validação**.
-
-### Diretrizes para a Nova Esteira de Testes (Hard Evaluation Set):
-1. **Benchmark de Robustez (Erros e Abreviações):**
-   * Testar tolerância a erros ortográficos comuns (*"secertario"*, *"primaveira"*) e siglas do ecossistema municipal (*"UBS"*, *"UPA"*, *"FUNDEC"*).
-2. **Consultas Adversariais (Ambiguidade):**
-   * Queries incompletas (*"Quem é o secretário?"* ou *"Telefone"*) devem acionar o comportamento de **Agente Coletor** ou pedir esclarecimento, em vez de retornar dados aleatórios.
-3. **Métricas Multidimensionais:**
-   * Medir e documentar adicionalmente: **Recall@5**, **Recall@10**, **MAP** e **F1-Score**.
-4. **Benchmark por Categoria:**
-   * Mapear a performance de forma isolada por área temática (Saúde, Fazenda, Educação, Zeladoria e Ouvidoria) para evitar que a melhoria de um domínio cause regressão silenciosa em outro.

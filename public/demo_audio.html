@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duque IA — Demonstração por Áudio (Voz)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:            #f0f4f8;
+      --surface:       #ffffff;
+      --surface-hover: #f7f9fc;
+      --border:        #dde3ec;
+      --accent:        #1d4ed8;
+      --accent-light:  #eff6ff;
+      --accent-hover:  #1e40af;
+      --user-bubble:   #1d4ed8;
+      --bot-bubble:    #ffffff;
+      --text-primary:  #0f172a;
+      --text-secondary:#64748b;
+      --text-on-accent:#ffffff;
+      --green:         #16a34a;
+      --libras:        #0369a1;
+      --libras-light:  #e0f2fe;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:     0 4px 16px rgba(0,0,0,.08);
+      --shadow-lg:     0 12px 40px rgba(0,0,0,.10);
+      --radius-card:   20px;
+      --radius-bubble: 18px;
+    }
+
+    /* ── VLibras: Ícone de acessibilidade no header ── */
+    .libras-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .libras-toggle-btn:hover {
+      border-color: var(--libras);
+      color: var(--libras);
+      background: var(--libras-light);
+    }
+    .libras-toggle-btn.active {
+      background: var(--libras);
+      border-color: var(--libras);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(3,105,161,.3);
+    }
+    .libras-toggle-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ── VLibras: Barra de status (modo ativo) ── */
+    .libras-status-bar {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1rem;
+      background: var(--libras);
+      color: #fff;
+      font-size: 0.73rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      animation: slideDown 0.3s ease;
+    }
+    .libras-status-bar.visible { display: flex; }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      width: 92%;
+      max-width: 780px;
+      height: 88vh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(29,78,216,.25);
+      flex-shrink: 0;
+      object-fit: cover;
+    }
+
+    .title-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: .2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-top: 0.1rem;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px rgba(22,163,74,.2);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(22,163,74,.2); }
+      50%       { box-shadow: 0 0 0 5px rgba(22,163,74,.08); }
+    }
+
+    .demo-badge {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      color: #b45309;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .messages-area {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background: var(--bg);
+    }
+
+    .messages-area::-webkit-scrollbar { width: 5px; }
+    .messages-area::-webkit-scrollbar-track { background: transparent; }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .message {
+      max-width: 76%;
+      display: flex;
+      flex-direction: column;
+      animation: fade-up .28s ease-out forwards;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user { align-self: flex-end; }
+    .message.bot  { align-self: flex-start; }
+
+    .message-bubble {
+      padding: 0.85rem 1.15rem;
+      border-radius: var(--radius-bubble);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user .message-bubble {
+      background: var(--user-bubble);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot .message-bubble {
+      background: var(--bot-bubble);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 0.35rem;
+      padding: 0 0.2rem;
+    }
+
+    .user .meta-info { justify-content: flex-end; }
+
+    .xai-tag {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .metrics-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .date-separator {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin: 0.3rem 0;
+    }
+
+    .date-separator::before,
+    .date-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .input-area {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .chat-input::placeholder { color: #a1afbf; }
+
+    .send-btn, .mic-btn {
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .send-btn {
+      background: var(--accent);
+      box-shadow: 0 3px 10px rgba(29,78,216,.28);
+    }
+
+    .mic-btn {
+      background: #10b981;
+      box-shadow: 0 3px 10px rgba(16,185,129,.28);
+    }
+
+    .audio-player-mock {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      margin-top: 8px;
+      min-width: 200px;
+    }
+
+    .bot .audio-player-mock {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+    }
+
+    .play-icon-mock {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.8rem;
+      transition: transform 0.1s;
+    }
+    .play-icon-mock:active {
+      transform: scale(0.85);
+    }
+
+    .play-icon-mock.playing {
+      background: #ef4444 !important;
+      color: white !important;
+    }
+
+    .user .play-icon-mock {
+      background: white;
+      color: var(--accent);
+    }
+
+    .wave-animation-mock {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 16px;
+      flex: 1;
+    }
+
+    .wave-bar {
+      width: 3px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 2px;
+      height: 30%;
+      transition: height 0.15s ease;
+    }
+
+    .bot .wave-bar {
+      background: var(--text-secondary);
+    }
+
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar {
+      animation: wave-bounce 0.8s ease-in-out infinite alternate;
+    }
+
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(1) { animation-delay: 0.1s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(2) { animation-delay: 0.3s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(4) { animation-delay: 0.5s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(6) { animation-delay: 0.15s; }
+    .play-icon-mock.playing + .wave-animation-mock .wave-bar:nth-child(7) { animation-delay: 0.35s; }
+
+    @keyframes wave-bounce {
+      0%   { height: 20%; }
+      100% { height: 100%; }
+    }
+
+    .duration-mock {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <header class="chat-header">
+      <div class="header-left">
+        <img class="avatar" src="/fotoperfil.png" alt="Duque IA">
+        <div class="title-area">
+          <h1>Duque IA</h1>
+          <div class="status-badge">
+            <span class="status-dot"></span>
+            <span>Online — Assistente por Voz</span>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="libras-toggle-btn" id="librasToggleBtn" title="Acessibilidade em Libras">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
+            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+          </svg>
+        </button>
+        <span class="demo-badge">Demo Áudio Offline</span>
+      </div>
+    </header>
+    <div class="libras-status-bar" id="librasStatusBar">
+      🪧 Modo Libras ativo — as respostas serão traduzidas automaticamente pelo VLibras
+    </div>
+
+    <div class="messages-area" id="messagesArea">
+      <div class="date-separator">Hoje</div>
+
+      <!-- Interação 1 -->
+      <div class="message bot">
+        <div class="message-bubble">
+          Olá! Sou o <strong>DUQUE IA</strong>, assistente virtual da Prefeitura de Duque de Caxias. Como posso ajudar você hoje por áudio?
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_welcome.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:07</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:00</span>
+        </div>
+      </div>
+
+      <div class="message user">
+        <div class="message-bubble">
+          🎙️ Áudio enviado pelo munícipe
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_user_q1.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:03</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:01</span>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-bubble">
+          O telefone da <strong>Ouvidoria Geral de Duque de Caxias</strong> é <strong>(21) 2652-3835</strong>.
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_a1.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:09</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:01</span>
+          <span class="xai-tag">Latência: 120ms</span>
+          <span class="xai-tag">Fonte: ouvidoria_geral_info.md</span>
+        </div>
+      </div>
+
+      <!-- Interação 2 -->
+      <div class="message user">
+        <div class="message-bubble">
+          🎙️ Áudio enviado pelo munícipe
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_user_q2.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:02</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:02</span>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-bubble">
+          A sede da prefeitura fica na <strong>Alameda Esmeralda, 206, Jardim Primavera</strong>. O horário de funcionamento é das <strong>9h às 17h</strong>.
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_a2.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:09</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:02</span>
+          <span class="xai-tag">Latência: 98ms</span>
+          <span class="xai-tag">Fonte: ouvidoria_geral_info.md</span>
+        </div>
+      </div>
+
+      <!-- Interação 3 -->
+      <div class="message user">
+        <div class="message-bubble">
+          🎙️ Áudio enviado pelo munícipe
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_user_q3.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:03</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:03</span>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-bubble">
+          Para solicitar serviços de <strong>iluminação pública</strong> (lâmpada queimada), você pode ligar diretamente para a Secretaria de Serviços Públicos pelo número <strong>(21) 2773-0717</strong>.
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_a3.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:08</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:03</span>
+          <span class="xai-tag">Latência: 110ms</span>
+          <span class="xai-tag">Fonte: assunto_secretaria_secretaria_municipal_de_transportes_e_serviços_públicos.md</span>
+        </div>
+      </div>
+
+      <!-- Interação 4 -->
+      <div class="message user">
+        <div class="message-bubble">
+          🎙️ Áudio enviado pelo munícipe
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_user_q4.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:03</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:04</span>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-bubble">
+          O hospital de referência infantil da cidade é o <strong>Hospital Municipal Infantil Mário Covas</strong>, localizado no bairro <strong>Vinte e Cinco de Agosto</strong>.
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_a4.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:05</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:04</span>
+          <span class="xai-tag">Latência: 145ms</span>
+          <span class="xai-tag">Fonte: postos_saude_caxias.json</span>
+        </div>
+      </div>
+
+      <!-- Interação 5 -->
+      <div class="message user">
+        <div class="message-bubble">
+          🎙️ Áudio enviado pelo munícipe
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_user_q5.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:03</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:05</span>
+        </div>
+      </div>
+
+      <div class="message bot">
+        <div class="message-bubble">
+          Para matricular alunos na rede municipal, as inscrições acontecem anualmente pelo portal <strong>Matrícula Fácil Duque de Caxias</strong>. O prazo para 2026 encerra em novembro.
+          <div class="audio-player-mock">
+            <div class="play-icon-mock" data-audio="/audio/demo_bot_a5.wav">▶</div>
+            <div class="wave-animation-mock">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+            <div class="duration-mock">0:08</div>
+          </div>
+        </div>
+        <div class="meta-info">
+          <span class="metrics-tag">12:05</span>
+          <span class="xai-tag">Latência: 112ms</span>
+          <span class="xai-tag">Fonte: assunto_secretaria_secretaria_municipal_de_educação.md</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="input-area">
+      <input type="text" class="chat-input" placeholder="Clique no botão de Play (▶) para ouvir os áudios oficiais..." disabled>
+      <button class="mic-btn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+      </button>
+      <button class="send-btn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- VLibras Widget (Governo Federal) -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+
+  <script>
+    const librasToggleBtn = document.getElementById('librasToggleBtn');
+    const librasStatusBar = document.getElementById('librasStatusBar');
+    let librasMode = false;
+
+    librasToggleBtn.addEventListener('click', () => {
+      librasMode = !librasMode;
+      librasToggleBtn.classList.toggle('active', librasMode);
+      librasStatusBar.classList.toggle('visible', librasMode);
+      
+      const accessBtn = document.querySelector('[vw-access-button]');
+      if (accessBtn && librasMode) {
+        setTimeout(() => accessBtn.click(), 200);
+      }
+    });
+
+    // ── Reprodutor de Áudio Real com Arquivos WAV Físicos ──
+    const playButtons = document.querySelectorAll('.play-icon-mock');
+    let activeAudio = null;
+    let activeBtn = null;
+
+    playButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const audioSrc = btn.getAttribute('data-audio');
+        if (!audioSrc) return;
+
+        // Se já está tocando este mesmo áudio, para ele
+        if (activeAudio && activeBtn === btn) {
+          activeAudio.pause();
+          activeAudio = null;
+          resetVoiceUI();
+          return;
+        }
+
+        // Se há outra música ativa, para ela
+        if (activeAudio) {
+          activeAudio.pause();
+          resetVoiceUI();
+        }
+
+        // Toca o áudio real
+        activeBtn = btn;
+        btn.innerHTML = '⏹';
+        btn.classList.add('playing');
+
+        const audio = new Audio(audioSrc);
+        activeAudio = audio;
+
+        audio.play().catch(err => {
+          console.warn("Erro ao tocar áudio real:", err);
+          resetVoiceUI();
+        });
+
+        audio.onended = () => {
+          activeAudio = null;
+          resetVoiceUI();
+        };
+
+        audio.onerror = () => {
+          activeAudio = null;
+          resetVoiceUI();
+        };
+      });
+    });
+
+    function resetVoiceUI() {
+      if (activeBtn) {
+        activeBtn.innerHTML = '▶';
+        activeBtn.classList.remove('playing');
+        activeBtn = null;
+      }
+    }
+  </script>
+
+</body>
+</html>

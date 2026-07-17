@@ -8,7 +8,7 @@ def setup_database():
     print("==========================================================")
     
     # 1. Configuração do SQLite Local (Fallback de Desenvolvimento)
-    sqlite_path = os.path.join("agent", "duque_ia.db")
+    sqlite_path = os.path.join("data", "db", "duque_ia.db")
     os.makedirs(os.path.dirname(sqlite_path), exist_ok=True)
     
     print(f"Criando/Conectando ao banco de dados SQLite local em: {sqlite_path}")

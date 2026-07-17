@@ -4,6 +4,9 @@ import requests
 import json
 import sys
 import io
+from dotenv import load_dotenv
+
+load_dotenv()
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 

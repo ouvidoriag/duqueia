@@ -1,0 +1,9 @@
+CREATE INDEX IF NOT EXISTS idx_services_secretaria ON services(secretaria_id);
+CREATE INDEX IF NOT EXISTS idx_services_category ON services(category_id);
+CREATE INDEX IF NOT EXISTS idx_phones_service ON service_phones(service_id);
+CREATE INDEX IF NOT EXISTS idx_emails_service ON service_emails(service_id);
+CREATE INDEX IF NOT EXISTS idx_links_service ON service_links(service_id);
+CREATE INDEX IF NOT EXISTS idx_steps_service ON service_steps(service_id);
+CREATE INDEX IF NOT EXISTS idx_documents_service ON service_documents(service_id);
+CREATE INDEX IF NOT EXISTS idx_priorities_service ON service_priorities(service_id);
+CREATE INDEX IF NOT EXISTS idx_unidades_secretaria ON secretaria_unidades(secretaria_id);

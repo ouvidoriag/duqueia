@@ -6,6 +6,12 @@ def get_db_connection(db_path: str):
     """Gerenciador de contexto para conexões do SQLite."""
     conn = sqlite3.connect(db_path)
     try:
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA journal_mode = WAL;")
+        cursor.execute("PRAGMA synchronous = NORMAL;")
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        cursor.execute("PRAGMA temp_store = MEMORY;")
+        cursor.execute("PRAGMA cache_size = -20000;")
         yield conn
     finally:
         conn.close()

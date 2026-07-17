@@ -33,17 +33,20 @@ class GroqClient:
             print("[GroqClient] AVISO: pacote 'groq' não instalado. Execute: pip install groq", file=sys.stderr)
             self._client = None
             self.api_key = None
+            self.api_keys = []
             return
 
         self.api_key = os.getenv("GROQ_API_KEY", "")
         if not self.api_key:
             print("[GroqClient] AVISO: GROQ_API_KEY não configurada no .env", file=sys.stderr)
             self._client = None
+            self.api_keys = []
             return
 
         masked = self.api_key[:8] + "..." + self.api_key[-8:]
         print(f"[GroqClient] Inicializado com chave: {masked}", file=sys.stderr)
         self._client = Groq(api_key=self.api_key)
+        self.api_keys = [self.api_key]
         self.generation_model_name = os.getenv("GROQ_MODEL", _GROQ_MODELS["fast"])
         self.quality_model_name = os.getenv("GROQ_QUALITY_MODEL", _GROQ_MODELS["quality"])
 

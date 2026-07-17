@@ -11,6 +11,8 @@ from agent.scoring import (
     calculate_keyword_score,
     calculate_keyword_overlap
 )
+from config.settings import DATABASE_VECTOR
+from storage import storage_manager
 
 # Algoritmo de Distância de Levenshtein leve para Fuzzy Matching offline
 def Levenshtein_distance(s1: str, s2: str) -> int:
@@ -188,12 +190,7 @@ def retrieve_full_category(db_path: str, category: str, filter_field: str = "cat
             "is_list_result": True
         }]
 
-    rows = query_db(
-        db_path,
-        f"SELECT DISTINCT source, category, content, metadata FROM duque_ia_chunks "
-        f"WHERE {filter_field} = ? ORDER BY source",
-        (category,)
-    )
+    rows = storage_manager.vector.get_chunks_by_category(category, filter_field)
 
     results = []
     seen_keys = set()
@@ -221,11 +218,12 @@ def retrieve_full_category(db_path: str, category: str, filter_field: str = "cat
 def retrieve_structured_service(db_path: str, query: str, query_keywords: list, using_real: bool) -> list:
     """Busca estruturada nas tabelas normalizadas de serviços com normalização de termos de ação e fuzzy matching."""
     
-    # 1. Filtra palavras de ação, pronomes e ruído estrutural
+    # 1. Filtra palavras de ação, pronomes, preposições e ruído estrutural comum
     action_words = [
         "como", "solicitar", "fazer", "quero", "preciso", "saber", "favor", "onde", "para", "pedir", 
         "registrar", " reclamar", "reclamacao", "denuncia", "denunciar", "obter", "emitir", "tirar", 
-        "segunda", "via", "telefone", "contato", "endereco"
+        "segunda", "via", "telefone", "contato", "endereco", "com", "qual", "quais", "quem", "sobre", 
+        "atendimento", "entro", "entrar", "servico", "serviço", "geral", "informacao", "informações"
     ]
     entity_words = ["rua", "ruas", "avenida", "avenidas", "bairro", "bairros", "distrito", "lote", "lotes", "quadra", "quadras", "numero", "num"]
     
@@ -524,8 +522,11 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
     for q_sub in plan_queries:
         q_keywords = extract_query_keywords(q_sub)
         
+        # Normaliza a sub-query para remover acentos e facilitar o batimento de palavras-chave
+        q_sub_norm = "".join(c for c in unicodedata.normalize('NFKD', q_sub.lower()) if not unicodedata.combining(c))
+        
         # A) Busca Estruturada de Secretarias
-        if run_structured and any(ind in q_sub.lower() for ind in ["secretaria", "endereco", "endereço", "telefone", "contato", "email", "onde", "localizacao", "smo", "smu", "sms", "sme", "smf"]):
+        if run_structured and any(ind in q_sub_norm for ind in ["secretaria", "endereco", "telefone", "contato", "email", "onde", "localizacao", "smo", "smu", "sms", "sme", "smf", "smasdh", "smas", "assistencia"]):
             struct_sec = retrieve_structured_secretaria(db_path, q_sub, q_keywords)
             structured_candidates.extend(struct_sec)
             
@@ -535,7 +536,7 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             structured_candidates.extend(struct_res)
             
         # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na nova tabela secretaria_unidades
-        if run_geo and any(ind in q_sub.lower() for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
+        if run_geo and any(ind in q_sub_norm for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
             try:
                 rows_unidades = query_db(db_path, """
                     SELECT u.name, u.address, u.phone, u.working_hours, s.name
@@ -572,7 +573,7 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         if run_vector:
             query_vector = gemini_client.get_embedding(q_sub, is_query=True) if using_real else None
             try:
-                rows_chunks = query_db(db_path, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
+                rows_chunks = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
                 for row in rows_chunks:
                     source, category, content, emb_str, meta_str, kw_str = row
                     try:

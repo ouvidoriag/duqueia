@@ -1,7 +1,7 @@
 import sys
 import re
 import json
-from agent.config import LIST_INTENT_MAP
+from config.settings import LIST_INTENT_MAP
 from agent.models import QueryIntent
 
 _SYSTEM_INTENTS = {

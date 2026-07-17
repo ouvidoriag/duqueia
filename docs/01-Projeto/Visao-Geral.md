@@ -13,7 +13,6 @@ O **Duque IA** é o assistente virtual oficial e plataforma RAG da Prefeitura Mu
 - **Segurança e Privacidade (LGPD)**: O sistema proíbe o fornecimento de CPFs, nomes de reclamantes e andamentos de protocolos de terceiros.
 - **Redirecionamento Claro**: Se as informações não forem encontradas, o sistema redireciona o munícipe diretamente para os canais da Ouvidoria Geral:
   - Telefone: **(21) 2652-3835**
-  - WhatsApp: **(21) 99824-5903**
   - E-mail: **ouvidoria@duquedecaxias.rj.gov.br**
 
 ---

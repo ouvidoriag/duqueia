@@ -4,6 +4,8 @@ import re
 import os
 import sys
 from utils.db_client import get_db_connection, query_one, execute_db
+from storage import storage_manager
+from config.settings import GEMINI_FAST_MODEL
 from agent.guardrails import (
     PROGRAMMING_TRIGGERS,
     PRIVACY_TRIGGERS,
@@ -13,7 +15,7 @@ from agent.guardrails import (
 )
 
 # Modelo e versão do prompt para controle de cache
-MODEL_VERSION = "gemini-3.1-flash-lite"
+MODEL_VERSION = GEMINI_FAST_MODEL
 PROMPT_VERSION = "triage_v2.1"
 
 # Lista de intenções válidas e permitidas
@@ -196,46 +198,25 @@ def get_query_hash(query: str) -> str:
 
 def get_cached_triage(db_path: str, query: str) -> dict | None:
     """Busca o resultado da triagem no cache SQLite."""
-    init_cache_db(db_path)
     query_hash = get_query_hash(query)
     try:
-        row = query_one(
-            db_path,
-            "SELECT intent, confidence, needs_clarification, reason FROM triage_cache "
-            "WHERE query_hash = ? AND prompt_version = ? AND model_version = ?",
-            (query_hash, PROMPT_VERSION, MODEL_VERSION)
-        )
-        if row:
-            return {
-                "intent": row[0],
-                "confidence": float(row[1]),
-                "needs_clarification": bool(row[2]),
-                "reason": row[3],
-                "source": "SQLITE_CACHE"
-            }
+        return storage_manager.cache.get_cached_triage(query_hash, PROMPT_VERSION, MODEL_VERSION)
     except Exception as e:
         print(f"[Triage Cache Warning] Falha ao ler cache: {e}", file=sys.stderr)
     return None
 
 def save_triage_to_cache(db_path: str, query: str, triage_res: dict):
     """Salva o resultado da triagem no cache SQLite."""
-    init_cache_db(db_path)
     query_hash = get_query_hash(query)
     try:
-        execute_db(
-            db_path,
-            "INSERT OR REPLACE INTO triage_cache "
-            "(query_hash, intent, confidence, needs_clarification, reason, model_version, prompt_version) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (
-                query_hash,
-                triage_res["intent"],
-                triage_res["confidence"],
-                1 if triage_res["needs_clarification"] else 0,
-                triage_res.get("reason", ""),
-                MODEL_VERSION,
-                PROMPT_VERSION
-            )
+        storage_manager.cache.save_triage_to_cache(
+            query_hash,
+            triage_res["intent"],
+            triage_res["confidence"],
+            1 if triage_res["needs_clarification"] else 0,
+            triage_res.get("reason", ""),
+            MODEL_VERSION,
+            PROMPT_VERSION
         )
     except Exception as e:
         print(f"[Triage Cache Warning] Falha ao gravar cache: {e}", file=sys.stderr)
@@ -403,7 +384,7 @@ def _add_routing_metadata(triage_res: dict) -> dict:
         triage_res["workflow"] = "OUVIDORIA"
         triage_res["clarification_type"] = None
     elif intent == "AUTORIDADE_PUBLICA":
-        triage_res["next_agent"] = "RAG_HANDLER"
+        triage_res["next_agent"] = "AUTHORITY_HANDLER"
         triage_res["workflow"] = "RAG"
         triage_res["clarification_type"] = None
     elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO"]:

@@ -216,7 +216,7 @@ def modo_interativo(agent: DuqueIAAgent):
             print("  Encerrando o DUQUE IA. Ate logo!")
             break
         elif pergunta.lower() == "info":
-            inspecionar_banco(agent.db_path)
+            inspecionar_banco(agent.db_vector)
             continue
         elif pergunta.lower() == "batch":
             modo_bateria(agent)
@@ -238,12 +238,12 @@ def main():
     print("               Prefeitura de Duque de Caxias")
     print("=" * 70)
 
+    from config.settings import DATABASE_MAIN, DATABASE_VECTOR
     # Inicializa o agente
-    db_path = os.path.join(ROOT, "agent", "duque_ia.db")
-    agent = DuqueIAAgent(db_path=db_path)
+    agent = DuqueIAAgent(db_path=DATABASE_MAIN)
 
     # Inspeciona o banco
-    inspecionar_banco(db_path)
+    inspecionar_banco(DATABASE_VECTOR)
 
     # Verifica argumentos de linha de comando
     if len(sys.argv) > 1:
