@@ -15,18 +15,18 @@ from config.settings import DATABASE_MAIN
 conn = sqlite3.connect(DATABASE_MAIN)
 cursor = conn.cursor()
 
-# Search for services matching gravidez
+# Search for services matching Moradia/TRM
 cursor.execute("""
-    SELECT servico_id, secretaria_nome, servico_nome, descricao, como_acessar 
-    FROM vw_ia_servicos 
-    WHERE servico_nome LIKE '%gravidez%' OR descricao LIKE '%gravidez%'
+    SELECT id, name, waiting_time, regulation_norm 
+    FROM services 
+    WHERE name LIKE '%Moradia%' OR description LIKE '%Moradia%' OR name LIKE '%TRM%'
 """)
 rows = cursor.fetchall()
-print("--- vw_ia_servicos matching '%gravidez%' ---")
+print("--- services matching Moradia/TRM ---")
 for r in rows:
-    print(f"ID: {r[0]} | Sec: {r[1]} | Name: {r[2]}")
-    print(f"Desc: {r[3]}")
-    print(f"How: {r[4]}")
+    print(f"ID: {r[0]} | Name: {r[1]}")
+    print(f"Waiting Time: {r[2]}")
+    print(f"Regulation Norm: {r[3]}")
     print("-" * 50)
     
     # Query additional details

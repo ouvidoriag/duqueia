@@ -48,19 +48,10 @@ def find_fuzzy_match(word: str, targets: list, max_distance: int = 2) -> str | N
 # Dicionário de Aliases/Sinônimos populares das Secretarias para match offline rápido
 SECRETARIA_ALIASES = {
     "smo": "obras",
-    "obras": "obras",
     "smu": "urbanismo",
-    "semuh": "urbanismo",
-    "urbanismo": "urbanismo",
-    "urbanizmo": "urbanismo",
-    "sms": "saúde",
-    "saude": "saúde",
-    "saúde": "saúde",
-    "sme": "educação",
-    "educacao": "educação",
-    "educação": "educação",
+    "sms": "saude",
+    "sme": "educacao",
     "smf": "fazenda",
-    "fazenda": "fazenda",
     "smma": "meio ambiente",
     "meio ambiente": "meio ambiente",
     "fundec": "educação",
@@ -718,9 +709,19 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                     c["similarity"] = round(c["similarity"] + 0.25, 4)
                 break
 
+        # Trava de Segurança: Garante que o score final de similaridade esteja no intervalo [0.0, 1.0]
+        c["similarity"] = min(max(round(c["similarity"], 4), 0.0), 1.0)
+
     # Ordena todos juntos pelo score 'similarity' de forma decrescente
     all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
     
+    # Filtro Dinâmico de Relevância por Distância do Top-1:
+    # Se o Top-1 possui score alto (>= 0.85), descarta chunks secundários com queda superior a 0.25
+    if all_candidates and all_candidates[0].get("similarity", 0.0) >= 0.85:
+        top1_score = all_candidates[0]["similarity"]
+        filtered_candidates = [c for c in all_candidates if (top1_score - c.get("similarity", 0.0)) <= 0.25]
+        return filtered_candidates[:top_k]
+        
     return all_candidates[:top_k]
 
 

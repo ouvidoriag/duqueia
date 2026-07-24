@@ -847,7 +847,12 @@ class RagHandler(BaseHandler):
                 "5. Se o cidadão solicitar o **endereço** de uma secretaria, órgão ou equipamento público (ex: Guarda Municipal, CRAS, etc.), forneça a resposta principal em **negrito** e ofereça proativamente fornecer outros detalhes se ele desejar, como: telefone, horário de funcionamento, como chegar ou serviços oferecidos no local.\n"
                 "6. NÃO repita saudações se o diálogo já está em andamento. Comece a resposta de forma direta e natural.\n"
                 "7. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'.\n"
-                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário', sem inventar ou parafrasear os botões do formulário)."
+                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário', sem inventar ou parafrasear os botões do formulário).\n"
+                "9. PRINCÍPIO DA RESPOSTA ÚTIL E ACOLHEDORA (HUMANIDADE & CONTEXTO):\n"
+                "   - NUNCA limite sua resposta a copiar friamente o texto do documento. Responda como um atendente humano experiente, empático e capacitado da Prefeitura de Duque de Caxias.\n"
+                "   - Estruture a resposta com a seguinte fluência: 1) Responda diretamente à pergunta principal; 2) Explique o procedimento em linguagem simples; 3) Explique o PORQUÊ de determinadas informações serem solicitadas (ex: 'Informar o número do poste ou anexar foto ajuda a equipe de manutenção a localizar a ocorrência com mais rapidez'); 4) Em situações de risco ou urgência (ex: poste com risco de queda, fiação exposta ou buracos perigosos), inclua orientações de segurança e prevenção para o cidadão; 5) Sugira proativamente o próximo passo útil.\n"
+                "10. REGRA CRÍTICA DE EVIDÊNCIA OBRIGATÓRIA: Toda informação factual (como telefones, e-mails, endereços ou etapas de processo) apresentada na resposta DEVE ser estritamente baseada nos trechos fornecidos no contexto. É PROIBIDO inventar ou acrescentar e-mails, telefones, links ou dados de contato que não constem explicitamente nos textos do contexto. Se um telefone ou e-mail específico de uma unidade ou serviço não estiver escrito no contexto, declare que essa informação não consta nos registros e direcione para a Ouvidoria Geral.\n"
+                "11. REGRA CRÍTICA DE INFORMAÇÃO INDISPONÍVEL (FALLBACK): Se as fontes e o contexto fornecidos NÃO contiverem a resposta exata e específica para a pergunta do munícipe (ex: o serviço ou local solicitado não está nos documentos), você não deve inventar ou dar orientações evasivas. Em vez disso, explique com simpatia que não localizou essa informação nos canais oficiais e redirecione o munícipe diretamente para a Ouvidoria Geral de Duque de Caxias: Telefone **(21) 2652-3835** ou WhatsApp **(21) 99824-5903**."
             )
             
             if history:
@@ -904,6 +909,17 @@ class RagHandler(BaseHandler):
                             + "\n".join(f"- {s}" for s in sentences[:5]) +
                             f"\n\n*Fonte: {best_match['source']} (Fallback Offline)*"
                         )
+
+            # Sanitização determinística de campos nulos/None na resposta final
+            patterns_null = [
+                r"(?i)WhatsApp:\s*(?:None|null|undefined|N/A)",
+                r"(?i)Telefone:\s*(?:None|null|undefined|N/A)",
+                r"(?i)Endereço:\s*(?:None|null|undefined|N/A)",
+                r"(?i)E-mail:\s*(?:None|null|undefined|N/A)"
+            ]
+            for pat in patterns_null:
+                answer = re.sub(pat, "", answer)
+            answer = re.sub(r'\n\s*\n\s*\n', '\n\n', answer).strip()
         else:
             if base_score < effective_threshold:
                 answer = build_fallback_guidance(query)
@@ -928,7 +944,7 @@ class RagHandler(BaseHandler):
         # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) ou planilha (CARTA_DE_SERVICO) no Top-1,
         # anexa todos os detalhes estruturados/extraídos disponíveis logo abaixo da resposta gerada.
         extra_info = ""
-        if relevant_results:
+        if relevant_results and base_score >= effective_threshold:
             top_match = relevant_results[0]
             if "vw_ia_servicos" in top_match.get("source", "").lower() or "carta_de_servico" in top_match.get("source", "").lower():
                 content = top_match.get("content", "")
@@ -951,6 +967,10 @@ class RagHandler(BaseHandler):
 
         if extra_info:
             answer = answer.strip() + extra_info
+
+        # Aplicação da Política de Resposta via ResponseComposer (Orquestração de Intenção)
+        from agent.composer import ResponseComposer
+        answer = ResponseComposer.compose(query, answer, intent=intent_info["intent"].value)
 
 
         llm_time = time.time() - llm_start

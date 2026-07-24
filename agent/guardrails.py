@@ -87,8 +87,23 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     # para evitar que o modelo de guardrail bloqueie falsamente respostas sobre canais de atendimento.
     ans_lower = answer.lower()
     if any(term in ans_lower for term in ["2652-3835", "ouvidoria@duquedecaxias.rj.gov.br", "alameda esmeralda"]):
+        # Validação extra: mesmo em exceção, não permite e-mails inventados
+        if context:
+            ctx_norm = context.lower()
+            found_emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', answer)
+            for email in found_emails:
+                if email.lower() not in ctx_norm and "ouvidoria@duquedecaxias.rj.gov.br" not in email.lower():
+                    return False
         return True
         
+    # Validação determinística de e-mails não suportados pelo contexto
+    if context:
+        ctx_norm = context.lower()
+        found_emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', answer)
+        for email in found_emails:
+            if email.lower() not in ctx_norm and "ouvidoria@duquedecaxias.rj.gov.br" not in email.lower():
+                return False
+
     context_str = f"Contexto das fontes oficiais:\n{context}\n\n" if context else ""
     
     # Formata histórico conversacional

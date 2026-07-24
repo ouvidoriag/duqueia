@@ -195,15 +195,17 @@ def populate_structured_services():
         how = row_data.get("Como acessar", "")
         addr = row_data.get("Endereço", row_data.get("Endereco", ""))
         who = row_data.get("Quem pode solicitar", "Cidadão")
-        deadline = row_data.get("Prazo", "Não especificado")
-        cost = row_data.get("Gratuito", "Gratuito")
+        deadline = row_data.get("Prazo máximo", row_data.get("Prazo", "Não especificado"))
+        cost = row_data.get("Quanto custa", row_data.get("Gratuito", "Gratuito"))
+        waiting_time = row_data.get("Tempo de espera", "")
+        regulation_norm = row_data.get("Norma que regulamenta", "")
 
         cursor.execute("""
             INSERT INTO services (
                 secretaria_id, category_id, name, description, how_to_access, 
-                address, who_can_request, max_deadline, cost, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
-        """, (sec_id, cat_id, servico_nome, desc, how, addr, who, deadline, cost))
+                address, who_can_request, max_deadline, cost, status, waiting_time, regulation_norm
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', ?, ?)
+        """, (sec_id, cat_id, servico_nome, desc, how, addr, who, deadline, cost, waiting_time, regulation_norm))
         
         service_id = cursor.lastrowid
         count_services += 1
@@ -226,7 +228,8 @@ def populate_structured_services():
             cursor.execute("INSERT INTO service_links (service_id, link) VALUES (?, ?)", (service_id, lk))
 
         # 5. Passo a passo (steps) do serviço
-        steps = split_steps(how)
+        passo_a_passo = row_data.get("Passo a passo", "")
+        steps = split_steps(passo_a_passo if passo_a_passo else how)
         for idx_step, step_desc in enumerate(steps, 1):
             cursor.execute("INSERT INTO service_steps (service_id, step_number, description) VALUES (?, ?, ?)",
                            (service_id, idx_step, step_desc))

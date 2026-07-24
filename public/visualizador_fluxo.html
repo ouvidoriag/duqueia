@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapeamento Interativo de Fluxo — Duque IA</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --accent: #2563eb;
+      --accent-light: #eff6ff;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --success: #16a34a;
+      --warning: #ca8a04;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.2s ease-in-out;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    .logo-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0;
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-area p {
+      margin: 0.2rem 0 0 0;
+      font-size: 0.875rem;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .nav-badge {
+      background-color: var(--accent-light);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(37, 99, 235, 0.1);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 3rem;
+    }
+
+    /* Linha do Tempo e Cards */
+    .timeline-container {
+      position: relative;
+    }
+
+    /* Linha conectora vertical */
+    .timeline-line {
+      position: absolute;
+      left: 2.25rem;
+      top: 2rem;
+      bottom: 2rem;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--accent) 70%, var(--border) 30%);
+      z-index: 0;
+      border-radius: 2px;
+    }
+
+    .step-wrapper {
+      position: relative;
+      margin-bottom: 2.5rem;
+      padding-left: 5rem;
+      z-index: 1;
+    }
+
+    .step-icon {
+      position: absolute;
+      left: 1rem;
+      top: 0.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: var(--bg-card);
+      border: 4px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .step-wrapper.active .step-icon {
+      background: var(--accent);
+      color: #ffffff;
+      transform: scale(1.15);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+
+    .step-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
+
+    .step-wrapper.active .step-card {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-lg);
+      background: linear-gradient(to right, #ffffff, var(--accent-light));
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .step-module {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      background: #f1f5f9;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-desc {
+      font-size: 0.875rem;
+      color: var(--text-sub);
+      margin: 0 0 1rem 0;
+      line-height: 1.6;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: monospace;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .file-badge:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    /* Detalhes na Barra Lateral */
+    .sidebar {
+      position: sticky;
+      top: 8rem;
+      height: fit-content;
+    }
+
+    .details-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .details-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .details-content h4 {
+      margin: 1.5rem 0 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .details-content p {
+      font-size: 0.875rem;
+      color: var(--text-sub);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .payload-box {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      border: 1px solid #1e293b;
+    }
+
+    /* Caminhos Alternativos */
+    .path-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      background: var(--bg-card);
+      padding: 0.35rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .path-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .path-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 968px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: relative;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-area">
+      <h1>DUQUE IA</h1>
+      <p>Visualizador Interativo do Ciclo de Resposta</p>
+    </div>
+    <div class="nav-badge">Modo Claro de Alta Definição</div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Lado Esquerdo: Linha do Tempo -->
+    <div>
+      <div class="path-selector">
+        <button class="path-btn active" onclick="switchPath('rag')">📚 Fluxo Principal (RAG)</button>
+        <button class="path-btn" onclick="switchPath('fallback')">⚠️ Fallback / Ouvidoria</button>
+        <button class="path-btn" onclick="switchPath('security')">🛡️ Bloqueio de Segurança</button>
+      </div>
+
+      <div class="timeline-container">
+        <div class="timeline-line"></div>
+        
+        <!-- Passo 1 -->
+        <div class="step-wrapper active" onclick="selectStep(1)" id="step1">
+          <div class="step-icon">1</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title">Entrada da Pergunta</h3>
+              <span class="step-module">Interface / Frontend</span>
+            </div>
+            <p class="step-desc">O cidadão digita a dúvida no chat ou envia uma mensagem de áudio na interface do usuário.</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/public/chat.html" class="file-badge">public/chat.html</a>
+          </div>
+        </div>
+
+        <!-- Passo 2 -->
+        <div class="step-wrapper" onclick="selectStep(2)" id="step2">
+          <div class="step-icon">2</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title">spawn do Subprocesso</h3>
+              <span class="step-module">Servidor Node.js</span>
+            </div>
+            <p class="step-desc">O Node.js inicializa e gerencia sessões persistentes em memória por sessionId, repassando dados via stdin/stdout pipe.</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/server.js" class="file-badge">server.js</a>
+          </div>
+        </div>
+
+        <!-- Passo 3 -->
+        <div class="step-wrapper" onclick="selectStep(3)" id="step3">
+          <div class="step-icon">3</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title">Fast Gate e Guardrails</h3>
+              <span class="step-module">Validação Python</span>
+            </div>
+            <p class="step-desc">Verificação instantânea via expressões regulares contra SQL/Prompt Injection e vazamento de dados privados (LGPD).</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/agent/guardrails.py" class="file-badge">agent/guardrails.py</a>
+          </div>
+        </div>
+
+        <!-- Passo 4 -->
+        <div class="step-wrapper" id="step4_dynamic" onclick="selectStep(4)">
+          <div class="step-icon">4</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title" id="step4_title">Busca Híbrida Semântica</h3>
+              <span class="step-module">Camada RAG</span>
+            </div>
+            <p class="step-desc" id="step4_desc">Recuperação cruzada de dados estruturados e de chunks vetoriais usando o modelo gemini-embedding-2.</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/agent/retrieval.py" class="file-badge">agent/retrieval.py</a>
+          </div>
+        </div>
+
+        <!-- Passo 5 -->
+        <div class="step-wrapper" id="step5_dynamic" onclick="selectStep(5)">
+          <div class="step-icon">5</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title" id="step5_title">Reranking e Roteador LLM</h3>
+              <span class="step-module">Inteligência Artificial</span>
+            </div>
+            <p class="step-desc" id="step5_desc">Reordenação top-8 com Cross-Encoder e envio à API principal com fallback automático e transparente em caso de erro.</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/utils/llm_router.py" class="file-badge">utils/llm_router.py</a>
+          </div>
+        </div>
+
+        <!-- Passo 6 -->
+        <div class="step-wrapper" onclick="selectStep(6)" id="step6">
+          <div class="step-icon">6</div>
+          <div class="step-card">
+            <div class="step-header">
+              <h3 class="step-title">Validação e Retorno</h3>
+              <span class="step-module">Resposta</span>
+            </div>
+            <p class="step-desc">O output guardrail verifica se há alucinações, devolve o JSON estruturado final e registra a telemetria do nó.</p>
+            <a href="file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/agent/handlers.py" class="file-badge">agent/handlers.py</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lado Direito: Barra Lateral de Detalhes -->
+    <div class="sidebar">
+      <div class="details-panel">
+        <h3 id="panel-title" class="details-title">Passo 1: Entrada da Pergunta</h3>
+        <div class="details-content" id="panel-content">
+          <h4>O que acontece</h4>
+          <p>O munícipe digita uma pergunta na caixa de chat da interface web ou envia uma mensagem de áudio contínua gravada pelo microfone.</p>
+          
+          <h4>Dados Enviados</h4>
+          <div class="payload-box">{
+  "message": "meu filho é autista, o que fazer?",
+  "sessionId": "sess_178464094"
+}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const stepsData = {
+      rag: {
+        1: {
+          title: "Entrada da Pergunta",
+          desc: "O munícipe digita a dúvida no chat ou envia uma mensagem de áudio na interface do usuário.",
+          details: "<h4>O que acontece</h4><p>O munícipe digita uma pergunta na caixa de chat da interface web ou envia uma mensagem de áudio contínua gravada pelo microfone.</p><h4>Dados Enviados</h4><div class='payload-box'>{\n  \"message\": \"meu filho é autista, o que fazer?\",\n  \"sessionId\": \"sess_178464094\"\n}</div>"
+        },
+        2: {
+          title: "spawn do Subprocesso",
+          desc: "O Node.js inicializa e gerencia sessões persistentes em memória por sessionId, repassando dados via stdin/stdout pipe.",
+          details: "<h4>O que acontece</h4><p>O servidor Node.js cria um processo persistente executando 'agent/main.py' para a sessão. Ele escreve a string no fluxo stdin em UTF-8.</p><h4>Dados Enviados</h4><div class='payload-box'>\"meu filho é autista, o que fazer?\"\\n</div>"
+        },
+        3: {
+          title: "Fast Gate e Guardrails",
+          desc: "Verificação instantânea via expressões regulares contra SQL/Prompt Injection e vazamento de dados privados (LGPD).",
+          details: "<h4>O que acontece</h4><p>O módulo valida contra CPFs de terceiros, injeções SQL e tópicos estaduais/federais. Se detectado desvio, interrompe o grafo no nó de segurança.</p><h4>Dados Avaliados</h4><div class='payload-box'>clean_query = sanitize(user_query)</div>"
+        },
+        4: {
+          title: "Busca Híbrida Semântica",
+          desc: "Recuperação cruzada de dados estruturados e de chunks vetoriais usando o modelo gemini-embedding-2.",
+          details: "<h4>O que acontece</h4><p>Busca relacional na tabela de serviços municipais no 'main.db' e busca de embeddings por similaridade de cosseno no 'vector.db'.</p><h4>Métricas e Scores</h4><div class='payload-box'>score = 0.85 * cosine_sim + 0.15 * keyword_overlap</div>"
+        },
+        5: {
+          title: "Reranking e Roteador LLM",
+          desc: "Reordenação top-8 com Cross-Encoder e envio à API principal com fallback automático e transparente em caso de erro.",
+          details: "<h4>O que acontece</h4><p>O Cross-Encoder reordena os top 8 candidatos para garantir a maior precisão semântica. O LLMRouter tenta Gemini e desvia para Groq (Llama) se houver 429.</p><h4>Dados Processados</h4><div class='payload-box'>candidates_to_rerank = results[:8]</div>"
+        },
+        6: {
+          title: "Validação e Retorno",
+          desc: "O output guardrail verifica se há alucinações, devolve o JSON estruturado final e registra a telemetria do nó.",
+          details: "<h4>O que acontece</h4><p>Garante que a resposta final contenha dados baseados nas fontes oficiais e a imprime no stdout para ser capturada pelo Node.js.</p><h4>Estrutura de Saída</h4><div class='payload-box'>{\n  \"answer\": \"A prefeitura apoia a inclusão...\",\n  \"sources\": [\"gestao_e_inclusao.md\"],\n  \"confidence\": 0.95\n}</div>"
+        }
+      },
+      fallback: {
+        4: {
+          title: "Busca Híbrida de Baixo Score",
+          desc: "O retrieval não encontra resultados de alta similaridade na base de dados (abaixo do limiar de 0.65).",
+          details: "<h4>O que acontece</h4><p>A busca no banco de dados e vetorial retorna candidatos irrelevantes ou de baixo score. O sistema avalia que não pode responder com segurança.</p><h4>Métricas</h4><div class='payload-box'>base_score = 0.32 < effective_threshold</div>"
+        },
+        5: {
+          title: "Direcionamento para Ouvidoria",
+          desc: "O sistema ativa as regras de informação indisponível e monta as orientações de contato oficiais.",
+          details: "<h4>O que acontece</h4><p>O LLM Router é acionado, detecta a ausência de contexto confiável e gera uma mensagem empática apontando os contatos oficiais.</p><h4>Orientações Anexadas</h4><div class='payload-box'>Ouvidoria Geral: (21) 2652-3835\nWhatsApp: (21) 99824-5903</div>"
+        }
+      },
+      security: {
+        4: {
+          title: "Bloqueio no Fast Gate",
+          desc: "O sistema detecta uma entrada maliciosa ou vazamento de dados privados do munícipe.",
+          details: "<h4>O que acontece</h4><p>A triagem intercepta uma palavra proibida ou padrão de CPF/dados pessoais de terceiros, cortando o fluxo de busca imediatamente.</p><h4>Ação de Bloqueio</h4><div class='payload-box'>next_agent = \"SECURITY_HANDLER\"</div>"
+        },
+        5: {
+          title: "Ação do SecurityHandler",
+          desc: "Geração da resposta padrão de segurança sem expor nenhum dado interno do sistema.",
+          details: "<h4>O que acontece</h4><p>O SecurityHandler assume e imprime a mensagem formal de bloqueio e privacidade correspondente no stdout.</p><h4>Mensagem Padrão</h4><div class='payload-box'>answer = \"Por motivos de privacidade e conformidade com a LGPD, não posso exibir estes dados.\"</div>"
+        }
+      }
+    };
+
+    let currentPath = 'rag';
+    let currentStep = 1;
+
+    function switchPath(path) {
+      currentPath = path;
+      document.querySelectorAll('.path-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Atualiza os títulos e descrições dos passos 4 e 5 dinamicamente
+      const step4 = document.getElementById('step4_dynamic');
+      const step5 = document.getElementById('step5_dynamic');
+
+      if (path === 'rag') {
+        document.getElementById('step4_title').innerText = "Busca Híbrida Semântica";
+        document.getElementById('step4_desc').innerText = "Recuperação cruzada de dados estruturados e de chunks vetoriais usando o modelo gemini-embedding-2.";
+        document.getElementById('step5_title').innerText = "Reranking e Roteador LLM";
+        document.getElementById('step5_desc').innerText = "Reordenação top-8 com Cross-Encoder e envio à API principal com fallback automático e transparente.";
+      } else if (path === 'fallback') {
+        document.getElementById('step4_title').innerText = "Busca Híbrida de Baixo Score";
+        document.getElementById('step4_desc').innerText = "O retrieval não encontra resultados de alta similaridade na base de dados (abaixo do limiar de 0.65).";
+        document.getElementById('step5_title').innerText = "Direcionamento para Ouvidoria";
+        document.getElementById('step5_desc').innerText = "O sistema ativa as regras de informação indisponível e monta as orientações de contato oficiais.";
+      } else if (path === 'security') {
+        document.getElementById('step4_title').innerText = "Bloqueio no Fast Gate";
+        document.getElementById('step4_desc').innerText = "O sistema detecta uma entrada maliciosa ou vazamento de dados privados do munícipe.";
+        document.getElementById('step5_title').innerText = "Ação do SecurityHandler";
+        document.getElementById('step5_desc').innerText = "Geração da resposta padrão de segurança sem expor nenhum dado interno do sistema.";
+      }
+
+      selectStep(1);
+    }
+
+    function selectStep(step) {
+      currentStep = step;
+      document.querySelectorAll('.step-wrapper').forEach(w => w.classList.remove('active'));
+      document.getElementById(`step${step}`).classList.add('active');
+
+      // Atualiza o painel lateral
+      const data = stepsData[currentPath][step] || stepsData['rag'][step];
+      document.getElementById('panel-title').innerText = `Passo ${step}: ${data.title}`;
+      document.getElementById('panel-content').innerHTML = data.details;
+    }
+  </script>
+</body>
+</html>

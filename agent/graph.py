@@ -167,7 +167,35 @@ def node_fast_gate(state: AgentState, ctx: GraphContext) -> AgentState:
             triage_info=triage,
             next_node=next_node
         )
-    # Nenhuma regra disparou — vai para triagem LLM
+    # Nenhuma regra disparou — tenta resolução determinística na Golden Source Layer antes da LLM
+    return state.with_update(next_node="entity_resolver")
+
+
+def node_entity_resolver(state: AgentState, ctx: GraphContext) -> AgentState:
+    """Camada 0.5: Tenta resolução determinística instantânea na Golden Source Layer (0ms)."""
+    try:
+        from agent.entity_resolver import GoldenSourceResolver
+        from config.settings import DATABASE_MAIN
+        db_path = ctx.agent.db_path if hasattr(ctx.agent, 'db_path') and ctx.agent.db_path else DATABASE_MAIN
+        resolver = GoldenSourceResolver(db_path=db_path)
+        res = resolver.resolve(state.query)
+        if res:
+            response = {
+                "answer": res["answer"],
+                "sources": res["sources"],
+                "confidence": res["confidence"],
+                "intent": res["intent_detected"],
+                "_graph": {
+                    "nodes_executed": state.nodes_executed,
+                    "resolved_by": res["resolved_by"],
+                    "steps": len(state.nodes_executed)
+                }
+            }
+            return state.with_update(response=response, next_node="END")
+    except Exception as e:
+        import sys
+        print(f"[Graph EntityResolver Warning] {e}", file=sys.stderr)
+        
     return state.with_update(next_node="triage")
 
 
@@ -278,8 +306,9 @@ def build_duque_ia_graph() -> AgentGraph:
     graph = AgentGraph()
 
     # Nós de controle de fluxo
-    graph.add_node(Node("fast_gate",    node_fast_gate,    on_error_next="triage"))
-    graph.add_node(Node("triage",       node_triage,       on_error_next="tool_router"))
+    graph.add_node(Node("fast_gate",        node_fast_gate,        on_error_next="triage"))
+    graph.add_node(Node("entity_resolver",  node_entity_resolver,  on_error_next="triage"))
+    graph.add_node(Node("triage",           node_triage,           on_error_next="tool_router"))
     graph.add_node(Node("tool_router",  node_tool_router,  on_error_next="RAG_HANDLER"))
 
     # Nós de resposta (terminais — definem next_node="END")
