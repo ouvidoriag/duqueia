@@ -63,9 +63,19 @@ def main():
 
     while True:
         try:
-            query = input("" if not _is_tty else "Munícipe: ")
+            if _is_tty:
+                query = input("Munícipe: ")
+            else:
+                line = sys.stdin.readline()
+                if not line:
+                    import time
+                    time.sleep(0.05)
+                    continue
+                query = line.strip()
+
             if not query.strip():
                 continue
+
             cmd = query.strip().lower()
             if cmd == "sair":
                 if _is_tty:
@@ -109,7 +119,11 @@ def main():
         except (KeyboardInterrupt, EOFError):
             if _is_tty:
                 print("\nEncerrando o DUQUE IA. Até logo!")
-            break
+                break
+            else:
+                import time
+                time.sleep(0.05)
+                continue
 
 if __name__ == "__main__":
     main()
