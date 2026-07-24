@@ -36,7 +36,7 @@ COMPETENCY_TRIGGERS = [
     r"\binss\b", r"\bprev\s?social\b", r"\bprevidência\s+social\b",
     r"\baposentadoria\b", r"\bbenefício\s+(?:inss|previdência)\b",
     r"\bimposto\s+de\s+renda\b", r"\birpf\b", r"\breceita\s+federal\b",
-    r"\bcpf\s+(?:do|de|da)\b", r"\bcnpj\b",
+    r"(?:renovar|alterar|regularizar)\s+(?:o\s+)?cpf\b", r"tirar\s+cpf\s+na\s+receita\b", r"consultar\s+cnpj\s+na\s+receita\b",
     r"\brodovia\s+(?:br|federal|estadual)\b", r"\bbr-\d{3}\b",
     r"\bpolicía\s+(?:federal|rodoviária|militar)\b",
     r"\bjustiça\s+(?:federal|estadual|trabalhista)\b",

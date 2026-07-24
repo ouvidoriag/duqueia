@@ -941,32 +941,9 @@ class RagHandler(BaseHandler):
                     )
             
 
-        # Se houver um acerto em Carta de Serviços estruturada (vw_ia_servicos) ou planilha (CARTA_DE_SERVICO) no Top-1,
-        # anexa todos os detalhes estruturados/extraídos disponíveis logo abaixo da resposta gerada.
-        extra_info = ""
-        if relevant_results and base_score >= effective_threshold:
-            top_match = relevant_results[0]
-            if "vw_ia_servicos" in top_match.get("source", "").lower() or "carta_de_servico" in top_match.get("source", "").lower():
-                content = top_match.get("content", "")
-                details = extract_service_details(content)
-                
-                if details:
-                    extra_info += f"\n\n**Informações adicionais sobre \"{top_match.get('title')}\":**"
-                    if "endereco" in details:
-                        extra_info += f"\n📍 **Endereço de Atendimento:** {details['endereco']}"
-                    if "telefones" in details:
-                        extra_info += f"\n📞 **Telefone:** {details['telefones']}"
-                    if "emails" in details:
-                        extra_info += f"\n✉️ **E-mail:** {details['emails']}"
-                    if "links" in details:
-                        extra_info += f"\n🌐 **Canais Digitais/Links:** {details['links']}"
-                    if "documentos" in details:
-                        extra_info += f"\n\n📋 **Documentos Necessários:**\n{details['documentos']}"
-                    if "passo_a_passo" in details:
-                        extra_info += f"\n\n👣 **Passo a Passo:**\n{details['passo_a_passo']}"
-
-        if extra_info:
-            answer = answer.strip() + extra_info
+        # A síntese gerada pela LLM via RAG já contém todos os fatos, endereços e passos necessários.
+        # Desativamos a concatenação mecânica de blocos brutos (Informações Adicionais / Passo a Passo presencial)
+        # para evitar contradições com os canais digitais do Colab e informações descontextualizadas.
 
         # Aplicação da Política de Resposta via ResponseComposer (Orquestração de Intenção)
         from agent.composer import ResponseComposer

@@ -49,19 +49,17 @@ class ResponseComposer:
 
         composed = raw_answer
 
-        # Se for uma pergunta procedimental de zeladoria/serviço digital (ex: tapa-buraco, lâmpada queimada)
-        if is_procedural and not is_location:
-            # 1. Oculta seções de 'Informações adicionais' anexadas que instruam presencialmente
-            composed = re.sub(
-                r"(?i)\n*Informações adicionais sobre.*?(?:📍|👣|Passo a Passo).*?(?=\n\n|\Z)",
-                "",
-                composed,
-                flags=re.DOTALL
-            )
-            
-            # 2. Oculta linhas literais de "Passo 1: Presencialmente na secretaria"
-            composed = re.sub(r"(?i)Passo 1:\s*Presencialmente.*?\n", "", composed)
-            composed = re.sub(r"(?i)📍\s*Endereço de Atendimento:.*?\n", "", composed)
+        # 1. Oculta incondicionalmente blocos soltos de 'Informações adicionais' concatenados
+        composed = re.sub(
+            r"(?i)\n*Informações adicionais sobre.*?(?:📍|👣|Passo a Passo).*?(?=\n\n|\Z)",
+            "",
+            composed,
+            flags=re.DOTALL
+        )
+        
+        # 2. Oculta linhas literais de "Passo 1: Presencialmente na secretaria" descontextualizadas
+        composed = re.sub(r"(?i)Passo 1:\s*Presencialmente.*?\n?", "", composed)
+        composed = re.sub(r"(?i)📍\s*Endereço de Atendimento:.*?\n?", "", composed)
 
         # 3. Higienização final de nulos e espaços extras
         composed = re.sub(r'\n\s*\n\s*\n', '\n\n', composed).strip()

@@ -89,8 +89,14 @@ class GoldenSourceResolver:
         eqs = detection["equipments"]
         locs = detection["localities"]
 
-        # Impedir interceptação de 'Prefeitura' ou 'Ouvidoria' se a pergunta for procedimental (como fazer/solicitar serviço)
-        is_procedural = any(w in q_norm for w in ["como solicitar", "como pedir", "como faço", "como faco", "como registrar", "como emitir", "tapa-buraco", "tapa buraco", "limpeza", "entulho", "lixo", "poste", "lampada", "lâmpada", "matricula", "matrícula", "creche", "curso"])
+        # Impedir interceptação de 'Prefeitura' ou 'Ouvidoria' se a pergunta for procedimental ou sobre serviços do Colab
+        is_procedural = any(w in q_norm for w in [
+            "como solicitar", "como pedir", "como faço", "como faco", "como registrar", "como emitir", 
+            "tapa-buraco", "tapa buraco", "limpeza", "entulho", "lixo", "poste", "lampada", "lâmpada", 
+            "matricula", "matrícula", "creche", "curso", "quais", "quais sao", "quais são", "serviço", 
+            "servico", "serviços", "servicos", "colab", "disponivel", "disponiveis", "disponível", 
+            "disponíveis", "cadastro", "cadastrar", "oferece", "oferta"
+        ])
         is_location_query = any(w in q_norm for w in ["onde fica", "qual o endereco", "qual o endereço", "localizacao", "localização", "endereco", "endereço", "telefone", "horario", "horário", "quem e o prefeito", "quem é o prefeito"])
 
         # 1. Tentar resolver Ouvidoria Geral (apenas se não for pergunta procedimental sobre outro serviço)
@@ -110,7 +116,8 @@ class GoldenSourceResolver:
                 "resolved_by": "GoldenSourceResolver"
             }
 
-        if "prefeito" in eqs and (is_location_query or not is_procedural):
+        # Resolução da Sede da Prefeitura / Prefeito (Apenas para dúvidas diretas de localização/autoridade)
+        if "prefeito" in eqs and is_location_query and not is_procedural and "colab" not in q_norm:
             return {
                 "answer": (
                     "A Sede da **Prefeitura Municipal de Duque de Caxias** fica localizada na **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**.\n\n"

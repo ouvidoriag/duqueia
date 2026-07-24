@@ -322,11 +322,27 @@ Você pode entrar em contato pelo telefone **(21) 2652-3835**, pelo e-mail ouvid
 
 ## PARTE 3 — Relatório Diagnóstico das Perguntas Erradas / Lacunas de Dados
 
-| ID | Pergunta do Munícipe | Erro Auditado | Existe Resposta no Banco? | Diagnóstico da Engenharia & Solução Recomendada |
-| :---: | :--- | :---: | :---: | :--- |
-| **P03** | Como registrar uma reclamação de buraco na rua? | `LLM_HALLUCINATION` | ✘ **NÃO** | **Lacuna de Dados:** Adicionar informação faltante no vector.db. |
-| **P11** | Quais são os bairros do segundo distrito de Duque de Caxias? | `LLM_HALLUCINATION` | ✘ **NÃO** | **Bairros do 2º Distrito:** Falta a divisão territorial oficial por distritos. Criar chunk com a tabela oficial de bairros dos 4 distritos. |
-| **P14** | O poste da minha rua está apagado há uma semana. O que eu faço? | `LLM_HALLUCINATION` | ✘ **NÃO** | **Lacuna de Dados:** Adicionar informação faltante no vector.db. |
-| **P15** | Quero registrar uma denúncia sobre irregularidade em obra pública. | `TRIAGE_BYPASS` | ✘ **NÃO** | **Denúncia de Obra Pública:** A triagem enviou para o Agente Coletor do Colab. Ajustar triagem para encaminhar diretamente à Ouvidoria Geral. |
-| **P18** | Como consigo uma vaga na escola municipal para o próximo ano? | `LLM_HALLUCINATION` | ✘ **NÃO** | **Lacuna de Dados:** Adicionar informação faltante no vector.db. |
-| **P28** | Qual é a capital da França? | `TRIAGE_BYPASS` | ✘ **NÃO** | **Capital da França (Fora Escopo):** Conhecimento geral fora do escopo municipal. Manter rejeição no Fast Gate sob regra FORA_DE_ESCOPO. |
+| **P03** | Como registrar uma reclamação de buraco na rua? | `FALSE_NEGATIVE_GUARDRAIL` | ✔ **SIM** (Colab/Obras) | **Em Solução:** Base atualizada no `vector.db`. Ajustar flexibilização do Output Guardrail para evitar bloqueio indevido de respostas de zeladoria urbana. |
+| **P11** | Quais são os bairros do segundo distrito de Duque de Caxias? | `LLM_HALLUCINATION` | ✔ **SIM** (`lacunas_dados_resolvidas.md`) | **Em Solução:** Chunk territorial indexado com 175 palavras-chave (Campos Elíseos, Jardim Primavera, Pilar, Saracuruna, etc.) para priorização na busca FTS. |
+| **P14** | O poste da minha rua está apagado há uma semana. O que eu faço? | `NO_FAILURE_DETECTED` | ✔ **SIM** (`lacunas_dados_resolvidas.md`) | **RESOLVIDO:** Resposta de iluminação pública validada via RAG (`NO_FAILURE_DETECTED`). |
+| **P15** | Quero registrar uma denúncia sobre irregularidade em obra pública. | `TRIAGE_BYPASS` | ✔ **SIM** (Ouvidoria Geral) | **Em Solução:** Ajustar a regra da triagem para que denúncias de obras públicas sejam direcionadas diretamente à Ouvidoria Geral (`OUVIDORIA_MANIFESTACAO`). |
+| **P18** | Como consigo uma vaga na escola municipal para o próximo ano? | `NO_FAILURE_DETECTED` | ✔ **SIM** (`lacunas_dados_resolvidas.md`) | **RESOLVIDO:** Documentação e procedimentos de matrícula validados via RAG (`NO_FAILURE_DETECTED`). |
+| **P28** | Qual é a capital da França? | `TRIAGE_BYPASS` | ✘ **NÃO** (Fora do Escopo) | **Em Solução:** Adicionar regra no Fast Gate para bloquear perguntas de conhecimentos gerais/escolares sob o motivo `FORA_DE_ESCOPO`. |
+
+---
+
+## PARTE 4 — Status Pós-Indexação Incremental & Evolução do Framework
+
+1. **Base de Conhecimento Complementar Criada e Indexada:**
+   * Arquivo de referência: [lacunas_dados_resolvidas.md](file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/data/knowledge/CRIADO/lacunas_dados_resolvidas.md)
+   * 7 novos chunks adicionados com sucesso ao `duque_ia_chunks` via [ingest_lacunas_dados.py](file:///c:/Users/501379.PMDC/Desktop/PRODUCAO/scratch/ingest_lacunas_dados.py).
+   * **Enriquecimento FTS:** Cada chunk foi indexado com até 175 palavras-chave contextuais cobrindo termos populares e oficiais.
+
+2. **Resultados do Teste de Validação:**
+   * **P14** (Iluminação Pública / Poste Apagado): **Aprovado (`NO_FAILURE_DETECTED`)**
+   * **P18** (Vagas Escolas Municipais): **Aprovado (`NO_FAILURE_DETECTED`)**
+   * **P01, P04, P05, P07, P12, P20**: Consultas de poda, matrícula em creche, IPTU, lote baldio, população e FUNDEC recuperam diretamente os novos chunks.
+
+3. **Plano de Blindagem Final:**
+   * **Ajuste de Triagem (P15 & P28):** Mapear denúncias de obras públicas para a Ouvidoria e bloquear trivia no Fast Gate.
+   * **Output Guardrail Soft Mode (P03):** Garantir que respostas de orientação de zeladoria urbana pelo aplicativo Colab não sejam rejeitadas pelo Guardrail de Saída.
