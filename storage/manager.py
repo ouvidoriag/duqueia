@@ -64,7 +64,7 @@ class StorageManager:
                     db_status["integrity"] = f"error: {str(e)}"
             report[name] = db_status
 
-        # Checagem de Provedores de IA
+        # Checagem de Provedores de IA (Exclusivo Gemini)
         try:
             gemini = GeminiClient()
             gemini_keys = len(gemini.api_keys)
@@ -73,19 +73,10 @@ class StorageManager:
             gemini_keys = 0
             gemini_status = f"error: {e}"
 
-        try:
-            groq = GroqClient()
-            groq_status = "active" if groq.available else "offline/no_key"
-        except Exception as e:
-            groq_status = f"error: {e}"
-
         report["providers"] = {
             "gemini": {
                 "status": gemini_status,
                 "keys_loaded": gemini_keys
-            },
-            "groq": {
-                "status": groq_status
             }
         }
         return report

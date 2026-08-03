@@ -1,0 +1,128 @@
+[
+  {
+    "entity_id": "ISENCAO_TAXISTA",
+    "entity_type": "tributo",
+    "canonical_name": "Isenção de IPI e ICMS para Taxistas",
+    "secretaria": "Secretaria Municipal de Transportes e Serviços Públicos",
+    "aliases": [
+      "isenção ipi",
+      "isencao ipi",
+      "isenção icms",
+      "isencao icms",
+      "desconto taxista",
+      "taxista desconto carro",
+      "benefício taxista",
+      "beneficio taxista",
+      "isenção taxista",
+      "isencao taxista",
+      "desconto de imposto taxista",
+      "comprar carro com desconto",
+      "isenção para táxi",
+      "desconto táxi"
+    ],
+    "keywords": ["taxista", "ipi", "icms", "carro", "veículo", "isenção", "isencao", "desconto", "táxi", "taxi"],
+    "active": 1
+  },
+  {
+    "entity_id": "MATRICULA_ESCOLAR",
+    "entity_type": "educacao",
+    "canonical_name": "Matrícula nas Unidades Escolares da Rede Pública Municipal",
+    "secretaria": "Secretaria Municipal de Educação",
+    "aliases": [
+      "matrícula escolar",
+      "matricula escolar",
+      "vaga em creche",
+      "vaga creche",
+      "vaga na escola",
+      "inscrever meu filho",
+      "creche municipal",
+      "inscrição escolar",
+      "inscricao escolar",
+      "inscrição creche",
+      "matrícula creche",
+      "matricular filho",
+      "vaga escola municipal",
+      "rematrícula",
+      "rematricula"
+    ],
+    "keywords": ["matrícula", "matricula", "escola", "creche", "alunos", "vaga", "inscrição", "inscricao", "filho"],
+    "active": 1
+  },
+  {
+    "entity_id": "QUEBRA_MOLAS",
+    "entity_type": "obras",
+    "canonical_name": "Instalação e Manutenção de Quebra-molas / Lombadas",
+    "secretaria": "Secretaria Municipal de Obras e Agricultura",
+    "aliases": [
+      "quebra mola",
+      "quebra-mola",
+      "quebra molas",
+      "quebra-molas",
+      "quebramola",
+      "lombada",
+      "lombadas",
+      "lombada na rua",
+      "redutor de velocidade",
+      "passagem elevada",
+      "passagem elevada pedestres"
+    ],
+    "keywords": ["quebra", "mola", "lombada", "redutor", "velocidade", "trânsito", "rua"],
+    "active": 1
+  },
+  {
+    "entity_id": "TAPA_BURACO",
+    "entity_type": "obras",
+    "canonical_name": "Serviço de Tapa-Buraco e Pavimentação",
+    "secretaria": "Secretaria Municipal de Obras e Agricultura",
+    "aliases": [
+      "tapa buraco",
+      "tapa-buraco",
+      "buraco na rua",
+      "buraco no asfalto",
+      "consertar buraco",
+      "asfaltar minha rua",
+      "asfaltamento",
+      "cratera na rua",
+      "pavimentação",
+      "pavimentacao"
+    ],
+    "keywords": ["buraco", "tapa", "asfalto", "pavimentação", "rua", "cratera"],
+    "active": 1
+  },
+  {
+    "entity_id": "TRIBUTO_IPTU",
+    "entity_type": "tributo",
+    "canonical_name": "Emissão de Carnê e 2ª Via do IPTU",
+    "secretaria": "Secretaria Municipal de Fazenda",
+    "aliases": [
+      "iptu",
+      "2a via iptu",
+      "segunda via iptu",
+      "carnê iptu",
+      "carne iptu",
+      "imposto predial",
+      "pagar iptu",
+      "débito iptu"
+    ],
+    "keywords": ["iptu", "imposto", "carnê", "segunda via", "fazenda", "tributo"],
+    "active": 1
+  },
+  {
+    "entity_id": "ILUMINACAO_PUBLICA",
+    "entity_type": "servico",
+    "canonical_name": "Troca de Lâmpada e Iluminação Pública",
+    "secretaria": "Secretaria Municipal de Obras e Agricultura",
+    "aliases": [
+      "troca de lâmpada",
+      "troca de lampada",
+      "lampada queimada",
+      "lâmpada queimada",
+      "luz de poste",
+      "iluminação pública",
+      "iluminacao publica",
+      "poste apagado"
+    ],
+    "keywords": ["lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz", "rua"],
+    "active": 1
+  }
+]

@@ -120,12 +120,38 @@ function processBuffer(session) {
   if (startIdx === -1) return;
 
   let braceCount = 0;
+  let inString = false;
+  let escapeNext = false;
   let endIdx = -1;
+
   for (let i = startIdx; i < text.length; i++) {
-    if (text[i] === '{') braceCount++;
-    else if (text[i] === '}') {
-      braceCount--;
-      if (braceCount === 0) { endIdx = i; break; }
+    const char = text[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escapeNext = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (!inString) {
+      if (char === '{') {
+        braceCount++;
+      } else if (char === '}') {
+        braceCount--;
+        if (braceCount === 0) {
+          endIdx = i;
+          break;
+        }
+      }
     }
   }
 
@@ -141,8 +167,8 @@ function processBuffer(session) {
       session.currentResolve = null;
       session.currentReject = null;
     }
-  } catch (_) {
-    // Bloco JSON mal formado — descarta e tenta extrair o próximo
+  } catch (err) {
+    console.error('[Server JSON Parse Warning]:', err.message);
     session.buffer = text.substring(startIdx + 1);
     processBuffer(session);
   }

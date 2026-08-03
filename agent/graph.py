@@ -332,16 +332,7 @@ def build_duque_ia_graph() -> AgentGraph:
 def run_graph(query: str, conversation_id: str, history: list, agent) -> dict:
     """
     Executa o grafo do Duque IA e retorna a resposta final.
-
-    Args:
-        query:           Mensagem do munícipe.
-        conversation_id: ID da sessão de conversa.
-        history:         Histórico de mensagens anteriores.
-        agent:           Instância de DuqueIAAgent.
-
-    Returns:
-        dict com campos: answer, sources, confidence, intent_detected, triage_info,
-                         metrics, _graph (metadados de auditoria do grafo).
+    Exibe a cronometria detalhada milissegundo a milissegundo de cada etapa.
     """
     graph = build_duque_ia_graph()
     ctx = GraphContext(agent=agent, db_path=agent.db_path)
@@ -352,13 +343,33 @@ def run_graph(query: str, conversation_id: str, history: list, agent) -> dict:
         start_time=time.time()
     )
     final_state = graph.run(initial_state, ctx=ctx)
+    total_elapsed = round((time.time() - initial_state.start_time) * 1000, 2)
     
+    # Exibe relatório de cronometria no sys.stderr para auditoria
+    import sys
+    print("\n==========================================================", file=sys.stderr)
+    print("               CRONOMETRIA DO PIPELINE RAG                ", file=sys.stderr)
+    print("==========================================================", file=sys.stderr)
+    for node_info in final_state.nodes_executed:
+        node_name = node_info.get("node", "?")
+        dur = node_info.get("duration_ms", 0.0)
+        print(f"  {node_name:<25} : {dur:>8.2f} ms", file=sys.stderr)
+    print("----------------------------------------------------------", file=sys.stderr)
+    print(f"  TEMPO TOTAL DO PIPELINE   : {total_elapsed:>8.2f} ms", file=sys.stderr)
+    print("==========================================================\n", file=sys.stderr)
+
+    # Injeta métricas de tempo no dicionário de resposta
+    if isinstance(final_state.response, dict):
+        if "metrics" not in final_state.response:
+            final_state.response["metrics"] = {}
+        final_state.response["metrics"]["total_time_ms"] = total_elapsed
+        final_state.response["metrics"]["nodes_timing"] = final_state.nodes_executed
+
     # Grava métricas de observabilidade de forma assíncrona/segura
     try:
         from metrics.collector import MetricsCollector
         MetricsCollector.record(final_state)
     except Exception as e:
-        import sys
         print(f"[Graph Metrics Warning] Erro ao gravar métricas: {e}", file=sys.stderr)
         
     return final_state.response

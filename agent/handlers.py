@@ -115,7 +115,13 @@ class SecurityHandler(BaseHandler):
             ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
             intent_detected = "human_escalation"
         elif intent == "FORA_COMPETENCIA":
-            ans = "Esta pergunta não está inserida nos temas que são de responsabilidade da Prefeitura de Duque de Caxias. O metrô, por exemplo, é um transporte de âmbito estadual, e não compete à prefeitura municipal."
+            query_lower = query.lower()
+            if any(w in query_lower for w in ["metro", "metrô", "trem", "supervia"]):
+                ans = "Assuntos sobre transporte ferroviário e metrô são de âmbito estadual (Governo do Estado do RJ) e não competem à Prefeitura de Duque de Caxias."
+            elif any(w in query_lower for w in ["inss", "aposentadoria", "cpf", "receita federal"]):
+                ans = "Assuntos sobre INSS, aposentadoria e CPF/Receita Federal são de âmbito federal e não competem à Prefeitura de Duque de Caxias."
+            else:
+                ans = "Esta pergunta aborda um tema fora do âmbito das atribuições da Prefeitura de Duque de Caxias. Como assistente virtual municipal, meu foco é orientar sobre secretarias, tributos, escolas, postos de saúde, zeladoria e serviços da nossa cidade."
             intent_detected = "out_of_competency"
         elif intent == "JURIDICO":
             ans = "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes."
@@ -448,7 +454,7 @@ class AmbiguityHandler(BaseHandler):
                     system_instruction=system_instruction,
                     model="gemini-3.1-flash-lite",
                     temperature=0.2,
-                    max_output_tokens=250
+                    max_output_tokens=1000
                 ).strip()
                 return {
                     "answer": answer,
@@ -707,7 +713,7 @@ class RagHandler(BaseHandler):
         tools_selected = triage_info.get("tools_selected")
         results = retrieve_context(
             effective_query, agent.db_path, agent.using_real, agent.similarity_threshold,
-            agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info,
+            agent.gemini_client, agent.reranker, top_k=6, intent_info=intent_info,
             tools_selected=tools_selected
         )
         
@@ -716,7 +722,7 @@ class RagHandler(BaseHandler):
             search_query = f"{query} {' '.join(history[-2:])}"
             history_results = retrieve_context(
                 search_query, agent.db_path, agent.using_real, agent.similarity_threshold,
-                agent.gemini_client, agent.reranker, top_k=3, intent_info=intent_info,
+                agent.gemini_client, agent.reranker, top_k=6, intent_info=intent_info,
                 tools_selected=tools_selected
             )
             if history_results and (not results or history_results[0].get("similarity", 0.0) > results[0].get("similarity", 0.0)):
@@ -758,6 +764,29 @@ class RagHandler(BaseHandler):
         # A2: Clarificação de Baixa Confiança Off-LLM (sem chamada extra à API)
         # Usa o título e categoria do Top-1 para gerar pergunta de confirmação local.
         if base_score < 0.60:
+            query_norm = query.lower()
+            is_factual_query = any(kw in query_norm for kw in ["quantos", "quantas", "onde", "quais", "lista", "praça", "praças", "hospital", "hospitais", "escola", "escolas", "creche", "creches"])
+            if is_factual_query:
+                from agent.fallback import build_controlled_web_fallback
+                web_fb = build_controlled_web_fallback(effective_query, agent.gemini_client)
+                if web_fb and web_fb.get("is_web_fallback"):
+                    total_time = time.time() - start_time
+                    return {
+                        "answer": web_fb["answer"],
+                        "sources": web_fb["sources"],
+                        "confidence": web_fb["confidence"],
+                        "confidence_matrix": web_fb.get("metrics_triple", {}),
+                        "intent_detected": "web_fallback_low_confidence",
+                        "triage_info": triage_info,
+                        "metrics": {
+                            "retrieval_time_ms": round(retrieval_time * 1000, 2),
+                            "llm_time_ms": round((total_time - retrieval_time) * 1000, 2),
+                            "total_time_ms": round(total_time * 1000, 2),
+                            "tokens_used": 150,
+                            "keywords": extract_query_keywords(query)
+                        }
+                    }
+
             top_title = relevant_results[0].get("title", "")
             top_category = relevant_results[0].get("category", "")
             if top_title and top_category in ("carta_servicos", "secretarias", "unidades"):
@@ -799,60 +828,96 @@ class RagHandler(BaseHandler):
         
         # 4. Geração de Resposta (LLM ou Fallback Offline)
         llm_start = time.time()
-        structured_parts = []
-        complementary_parts = []
+        # 3. Conversão de Candidatos e Aplicação do Motor Declarativo de Ranking
+        from agent.candidate import Candidate
+        from agent.ranking import CandidateRanker
+        from agent.context_builder import ContextBuilder
+        from agent.telemetry import PermanentTelemetry
+
+        candidate_objects = []
+        for r in relevant_results:
+            c_obj = Candidate(
+                source=r.get("source", "desconhecido"),
+                title=r.get("title", ""),
+                category=r.get("category", "geral"),
+                content=r.get("content", ""),
+                semantic_score=r.get("semantic_score", 0.0),
+                keyword_score=r.get("keyword_score", 0.0),
+                retrieval_score=r.get("similarity", 0.0),
+                chunk_keywords=r.get("chunk_keywords", [])
+            )
+            candidate_objects.append(c_obj)
+
+        ranking_start = time.time()
+        ranked_candidates = CandidateRanker.apply_ranking(effective_query, candidate_objects)
+        ranking_ms = (time.time() - ranking_start) * 1000.0
+
+        confidence_level, top_score = CandidateRanker.evaluate_confidence(ranked_candidates)
+
+        # ------------------------------------------------------------------ #
+        # CONFIDENCE GATE & ZONA CINZENTA (0.50 - 0.85):                      #
+        # - top_score < 0.50: Baixa confiança de dados locais -> Web Search   #
+        # - 0.50 <= top_score < 0.85: RAG com fallback pós-LLM                #
+        # ------------------------------------------------------------------ #
+        if top_score < 0.50:
+            from agent.fallback import build_controlled_web_fallback
+            web_fb = build_controlled_web_fallback(effective_query, agent.gemini_client)
+
+            total_time = time.time() - start_time
+            agent.log_execution_metrics(
+                user_query=query,
+                retrieval_time=retrieval_time,
+                llm_time=total_time - retrieval_time,
+                total_time=total_time,
+                similarity_score=top_score,
+                tokens_usados=150,
+                embedding_cost=0.0,
+                rewritten_query=effective_query if effective_query != query else None,
+                structured_hit=False,
+                vector_count=len(relevant_results),
+                selected_sources=web_fb["sources"]
+            )
+
+            return {
+                "answer": web_fb["answer"],
+                "sources": web_fb["sources"],
+                "confidence": web_fb["confidence"],
+                "confidence_matrix": web_fb.get("metrics_triple", {}),
+                "intent_detected": "web_fallback_low_confidence",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": round(retrieval_ms, 2),
+                    "ranking_time_ms": round(ranking_ms, 2),
+                    "llm_time_ms": round((total_time - retrieval_time) * 1000, 2),
+                    "total_time_ms": round(total_time * 1000, 2),
+                    "tokens_used": 150,
+                    "keywords": extract_query_keywords(query)
+                }
+            }
+
+        # 4. Construção de Contexto Oficial
+        context_start = time.time()
+        context_str, selected_sources, top_candidates = ContextBuilder.build_context(ranked_candidates, top_k=5)
+        context_ms = (time.time() - context_start) * 1000.0
+
+        agent._last_context = context_str
+        
+        # 5. Geração de Resposta (LLM ou Fallback Offline)
+        llm_start = time.time()
         
         if agent.using_real:
-            for r in relevant_results:
-                source_upper = r['source'].upper()
-                content_block = f"[{r['title']}]:\n{r['content']}"
-                if "SECRETARIAS" in source_upper or "VW_IA_SERVICOS" in source_upper:
-                    structured_parts.append(content_block)
-                else:
-                    complementary_parts.append(content_block)
-            
-            context_blocks = []
-            if structured_parts:
-                context_blocks.append("=== INFORMAÇÕES OFICIAIS ESTRUTURADAS (PRIORIDADE MÁXIMA) ===\n" + "\n\n".join(structured_parts))
-            if complementary_parts:
-                context_blocks.append("=== CONTEXTO COMPLEMENTAR DE APOIO ===\n" + "\n\n".join(complementary_parts))
-                
-            context_str = "\n\n".join(context_blocks)
-            agent._last_context = context_str
-            is_list_result = any(r.get("is_list_result") for r in relevant_results)
-            
             system_instruction = (
                 "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
-                "Sua personalidade deve ser extremamente simpática, calorosa, prestativa e humana (aumente a empatia e use palavras acolhedoras). Responda com extrema gentileza genuína, mas NUNCA use saudações redundantes ou frases artificiais como 'Com um sorriso', 'Com um sorriso virtual', 'Olá! Que bom ter você por aqui!' ou saudações repetidas.\n"
-                "Apesar de muito caloroso, seja objetivo, preciso e direto. Prefira respostas de 2 a 4 frases — suficientes para ser muito útil e acolhedor, sem exageros.\n"
-                "\n"
-                "REGRA DE FONTES (CRÍTICO):\n"
-                "- 'INFORMAÇÕES OFICIAIS ESTRUTURADAS' têm precedência absoluta sobre qualquer outro contexto.\n"
-                "- Para endereço, telefone, e-mail e horário: use EXCLUSIVAMENTE os dados estruturados.\n"
-                "- O 'CONTEXTO COMPLEMENTAR' serve apenas para enriquecer com descrições, nunca para substituir dados oficiais.\n"
-                "\n"
-                "REGRA CRÍTICA DE COMPETÊNCIA — PERTURBAÇÃO DO SOSSEGO / BARULHO:\n"
-                "- Ruídos provenientes de residências ou espaços particulares deverão ser encaminhados diretamente à autoridade policial competente (ligue **190**), não havendo intervenção por parte da Prefeitura.\n"
-                "- Para poluição sonora de outras fontes (comércio, bar, obras, veículo na rua, etc.), a solicitação deve ser feita exclusivamente via Ouvidoria pelo aplicativo Colab, orientando o cidadão a selecionar a categoria correta:\n"
-                "  * **Ordem Pública**: Ruídos de bares, restaurantes, locutores e comércios em geral;\n"
-                "  * **Guarda Municipal**: Ruídos de veículos não oficiais (ex: som automotivo/paredão);\n"
-                "  * **Urbanismo**: Ruídos de obras em andamento;\n"
-                "  * **Meio Ambiente**: Demais casos de poluição sonora.\n"
-                "\n"
-                "DIRETRIZES CONVERSACIONAIS:\n"
-                "1. Use **negrito** para telefones, endereços e horários.\n"
-                "2. Fale com autoridade, clareza e acolhimento. Jamais use 'pelo que sei', 'não tenho certeza' ou termos de hesitação.\n"
-                "3. Se o cidadão deseja pedir um serviço de zeladoria urbana pela primeira vez (como tapar buraco, retirar entulho, limpar bueiro, capina ou trocar lâmpada pública), oriente-o claramente e com muita simpatia a abrir uma **Solicitação de Serviço** no Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/)) e não reclamação na Ouvidoria, apontando a categoria correta: **Obras** (asfalto/drenagem), **Limpeza Urbana** (lixo/entulho/mato) ou **Transportes** (iluminação pública). Para agilizar o atendimento de zeladoria, lembre o munícipe de informar: endereço completo do fato com ponto de referência, número aproximado do poste (se aplicável) e se puder anexar uma foto no app Colab.\n"
-                "4. Se o cidadão solicitar genericamente os serviços atendidos pela zeladoria urbana ou serviços urbanos, liste de forma clara e organizada os seguintes itens: **Tapa-buraco**, **Limpeza de ruas**, **Capina**, **Roçada**, **Retirada de entulho**, **Coleta de galhos**, **Iluminação pública**, **Desobstrução de bueiros**, **Limpeza de rios e canais**, **Manutenção de praças**.\n"
-                "5. Se o cidadão solicitar o **endereço** de uma secretaria, órgão ou equipamento público (ex: Guarda Municipal, CRAS, etc.), forneça a resposta principal em **negrito** e ofereça proativamente fornecer outros detalhes se ele desejar, como: telefone, horário de funcionamento, como chegar ou serviços oferecidos no local.\n"
-                "6. NÃO repita saudações se o diálogo já está em andamento. Comece a resposta de forma direta e natural.\n"
-                "7. NÃO use 'com base nos documentos', 'segundo o contexto' ou 'de acordo com a base de dados'.\n"
-                "8. Ao indicar temas ou assuntos do Colab, utilize sempre os nomes exatos e reais constantes nas fontes de dados (ex: 'Conduta irregular de funcionário' ou 'Funcionário', sem inventar ou parafrasear os botões do formulário).\n"
-                "9. PRINCÍPIO DA RESPOSTA ÚTIL E ACOLHEDORA (HUMANIDADE & CONTEXTO):\n"
-                "   - NUNCA limite sua resposta a copiar friamente o texto do documento. Responda como um atendente humano experiente, empático e capacitado da Prefeitura de Duque de Caxias.\n"
-                "   - Estruture a resposta com a seguinte fluência: 1) Responda diretamente à pergunta principal; 2) Explique o procedimento em linguagem simples; 3) Explique o PORQUÊ de determinadas informações serem solicitadas (ex: 'Informar o número do poste ou anexar foto ajuda a equipe de manutenção a localizar a ocorrência com mais rapidez'); 4) Em situações de risco ou urgência (ex: poste com risco de queda, fiação exposta ou buracos perigosos), inclua orientações de segurança e prevenção para o cidadão; 5) Sugira proativamente o próximo passo útil.\n"
-                "10. REGRA CRÍTICA DE EVIDÊNCIA OBRIGATÓRIA: Toda informação factual (como telefones, e-mails, endereços ou etapas de processo) apresentada na resposta DEVE ser estritamente baseada nos trechos fornecidos no contexto. É PROIBIDO inventar ou acrescentar e-mails, telefones, links ou dados de contato que não constem explicitamente nos textos do contexto. Se um telefone ou e-mail específico de uma unidade ou serviço não estiver escrito no contexto, declare que essa informação não consta nos registros e direcione para a Ouvidoria Geral.\n"
-                "11. REGRA CRÍTICA DE INFORMAÇÃO INDISPONÍVEL (FALLBACK): Se as fontes e o contexto fornecidos NÃO contiverem a resposta exata e específica para a pergunta do munícipe (ex: o serviço ou local solicitado não está nos documentos), você não deve inventar ou dar orientações evasivas. Em vez disso, explique com simpatia que não localizou essa informação nos canais oficiais e redirecione o munícipe diretamente para a Ouvidoria Geral de Duque de Caxias: Telefone **(21) 2652-3835** ou WhatsApp **(21) 99824-5903**."
+                "Sua missão é dar a resposta ideal adaptada ao tipo de pergunta do cidadão, usando com prioridade máxima os dados oficiais fornecidos no contexto.\n\n"
+                "REGRAS DE ADAPTAÇÃO DA RESPOSTA:\n"
+                "1. **Perguntas Diretas e Pontuais** (ex: 'qual o telefone...', 'onde fica...', 'qual o e-mail...'): Responda de forma direta e concisa (1 a 3 frases), destacando o dado solicitado em **negrito**.\n"
+                "2. **Consultas sobre Serviços da Carta de Serviços** (ex: IPTU, Poda de Árvore, Alvará, Cursos, Fiscalização): Forneça a orientação clara adaptada ao serviço, cobrindo: **Órgão Responsável**, **Como Solicitar / Passo a Passo**, **Documentação Necessária** (se houver), **Prazo Máximo**, **Custo** e **Canais de Atendimento** (destacando contatos em **negrito**). Se o contexto mencionar canais digitais (aplicativo **Colab**) e presenciais, apresente ambos os canais de forma integrada e prestativa.\n"
+                "3. **Casos com Dupla Atribuição**:\n"
+                "   - **Terreno Abandonado**: Explique a diferença entre terreno particular (Fiscalização Urbanística - SMUH) e área pública (Limpeza Urbana - Colab);\n"
+                "   - **Barulho / Perturbação**: Residência/vizinho oriente ligar para a **Polícia Militar (190)**; comércio/evento oriente o app **Colab**.\n"
+                "4. **Para Serviços e Procedimentos**: UTILIZE E EXPLIQUE OBRIGATORIAMENTE AS INFORMAÇÕES PRESENTES NO CONTEXTO (órgão responsável, como solicitar online/presencial, documentos e contatos).\n"
+                "5. **Para Perguntas Quantitativas / Contagem Exata** (ex: 'quantos hospitais...', 'quantas praças...', 'quantas escolas...'): Se o contexto fornecido NÃO apresentar a quantidade/contagem exata total solicitada, DECLARE EXPLICITAMENTE que a quantidade total não está detalhada na base oficial interna (ex: 'A quantidade total exata não está detalhada na base oficial disponível no momento').\n"
+                "6. NÃO use saudações redundantes se a conversa já estiver em andamento."
             )
             
             if history:
@@ -863,10 +928,10 @@ class RagHandler(BaseHandler):
                 )
             
             prompt = (
-                f"Contexto oficial (use SOMENTE estas informações para responder):\n"
+                f"Contexto oficial da Carta de Serviços (use SOMENTE estas informações para responder):\n"
                 f"{context_str}\n\n"
                 f"Pergunta do cidadão:\n{effective_query}\n\n"
-                f"Resposta simpática, calorosa, objetiva e precisa:"
+                f"Gere uma resposta completa, detalhada, empática e prestativa informando os órgãos, procedimentos, documentos, prazos, custos e canais oficiais:"
             )
             
             from agent.agent import DuqueIAAgent
@@ -876,6 +941,7 @@ class RagHandler(BaseHandler):
                 DuqueIAAgent._interaction_map = {}
             gemini_interaction_id = DuqueIAAgent._interaction_map.get(conversation_id) if conversation_id else None
             
+            gemini_start = time.time()
             try:
                 answer, new_conv_id, working_model = agent.gemini_client.generate_interaction(
                     prompt,
@@ -883,7 +949,7 @@ class RagHandler(BaseHandler):
                     model=session_model,
                     previous_interaction_id=gemini_interaction_id,
                     temperature=0.15,
-                    max_output_tokens=800
+                    max_output_tokens=2048
                 )
                 if new_conv_id and conversation_id:
                     DuqueIAAgent._interaction_map[conversation_id] = new_conv_id
@@ -912,14 +978,37 @@ class RagHandler(BaseHandler):
 
             # Sanitização determinística de campos nulos/None na resposta final
             patterns_null = [
-                r"(?i)WhatsApp:\s*(?:None|null|undefined|N/A)",
-                r"(?i)Telefone:\s*(?:None|null|undefined|N/A)",
-                r"(?i)Endereço:\s*(?:None|null|undefined|N/A)",
-                r"(?i)E-mail:\s*(?:None|null|undefined|N/A)"
+                r"(?i)\(?\s*WhatsApp:\s*(?:None|null|undefined|N/A)\s*\)?",
+                r"(?i)\(?\s*Telefone:\s*(?:None|null|undefined|N/A)\s*\)?",
+                r"(?i)\(?\s*Endereço:\s*(?:None|null|undefined|N/A)\s*\)?",
+                r"(?i)\(?\s*E-mail:\s*(?:None|null|undefined|N/A)\s*\)?"
             ]
             for pat in patterns_null:
                 answer = re.sub(pat, "", answer)
+            answer = re.sub(r'\(\s*\)', '', answer)
+            answer = re.sub(r'\s*\(\s*$', '.', answer)  # Remove parêntese órfão no final substituindo por ponto
             answer = re.sub(r'\n\s*\n\s*\n', '\n\n', answer).strip()
+
+            # FALLBACK PÓS-LLM: Se a resposta do LLM declarar que o dado não consta ou não está especificado nos dados locais
+            unprovided_triggers = [
+                "não especificam", "não especifica", "não detalham", "não detalha", "não está detalhad",
+                "não constam", "não consta", "não contêm", "não contém", "não informam", "não informa",
+                "não há registro", "não há informação", "não foram encontrad", "não foi possível localizar",
+                "não foi possível determinar", "não foi possível encontrar", "não temos essa informação",
+                "não possui informação", "informações oficiais disponíveis", "dados oficiais disponíveis"
+            ]
+            ans_lower = answer.lower()
+            if any(trig in ans_lower for trig in unprovided_triggers):
+                try:
+                    from agent.fallback import build_controlled_web_fallback
+                    web_fb = build_controlled_web_fallback(effective_query, agent.gemini_client)
+                    if web_fb and web_fb.get("is_web_fallback"):
+                        answer = web_fb["answer"]
+                        sources_list = web_fb.get("sources", sources_list)
+                        confidence = web_fb.get("confidence", confidence)
+                        confidence_level = "MEDIA"
+                except Exception as e_web:
+                    print(f"[RAGHandler Post-LLM Fallback Warning] Falha na busca web pós-LLM: {e_web}", file=sys.stderr)
         else:
             if base_score < effective_threshold:
                 answer = build_fallback_guidance(query)
@@ -952,6 +1041,22 @@ class RagHandler(BaseHandler):
 
         llm_time = time.time() - llm_start
         total_time = time.time() - start_time
+
+        try:
+            PermanentTelemetry.log_execution(
+                query=effective_query,
+                retrieval_ms=retrieval_time * 1000.0,
+                ranking_ms=ranking_ms,
+                context_ms=context_ms,
+                llm_ms=llm_time * 1000.0,
+                candidates_found=len(relevant_results),
+                top_candidates=top_candidates,
+                answer=answer,
+                sources_used=selected_sources,
+                confidence_level=confidence_level
+            )
+        except Exception as e_tel:
+            print(f"[Telemetry Warning] Erro ao gravar estatísticas: {e_tel}", file=sys.stderr)
         
         # 5. Calibração da Confiança
         base_score = relevant_results[0]["similarity"]
@@ -1021,7 +1126,7 @@ class RagHandler(BaseHandler):
                 "structured_hit": structured_hit,
                 "vector_candidates": len(results),
                 "official_sources": len([s for s in sources_list if "SECRETARIAS" in s.upper() or "VW_IA_SERVICOS" in s.upper()]),
-                "response_source": "structured" if structured_hit and not complementary_parts else ("hybrid" if structured_hit else "complementary"),
+                "response_source": "structured" if structured_hit and not any(c.category != "carta_servicos" for c in top_candidates) else ("hybrid" if structured_hit else "complementary"),
                 "query_was_rewritten": effective_query != query,
                 "hybrid_score": round(top_hybrid_score, 4),
                 "cross_score": round(top_cross_score, 4),

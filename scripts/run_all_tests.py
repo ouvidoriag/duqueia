@@ -29,13 +29,16 @@ TESTS = [
     ("test_stateful_triage",    "scripts/tests/test_stateful_triage.py",    []),
     ("test_questionnaires",     "scripts/tests/test_questionnaires.py",     [], 300),
     ("test_ask_batch",          "scripts/tests/test_ask.py",                ["--batch"], 300),
-    ("test_groq",               "scripts/test_groq.py",                     []),
-    ("test_openai",             "scripts/test_openai.py",                   []),
     ("test_llm_router",         "scripts/test_llm_router.py",               []),
     ("test_models_direct",      "scripts/test_models_direct.py",            []),
     ("test_retrieval_relevance","scripts/tests/test_retrieval_relevance.py",[]),
     ("test_conversation_turn",  "scripts/test_conversation_turn.py",        [], 120),
     ("test_possivel_denuncia",  "scripts/tests/test_possivel_denuncia.py",  []),
+    ("test_ontology",           "scripts/tests/test_ontology.py",           []),
+    ("test_completeness",       "scripts/tests/test_completeness.py",       []),
+    ("eval_ontology_benchmark", "scripts/eval_ontology.py",                 []),
+    ("test_rrf_fusion",         "scripts/tests/test_rrf_fusion.py",         []),
+    ("test_context_builder",    "scripts/tests/test_context_builder.py",    []),
 ]
 
 REPORT_PATH = os.path.join(ROOT, "metrics", "test_suite_report.json")

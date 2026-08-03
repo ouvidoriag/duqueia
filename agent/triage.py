@@ -103,6 +103,25 @@ AUTORIDADE_PUBLICA_FAST_PATTERNS = [
     (r"\b(?:quem\s+é\s+o\s+ouvidor|quem\s+e\s+o\s+ouvidor|quem\s+é\s+o\s+procurador|quem\s+e\s+o\s+procurador|quem\s+é\s+o\s+controlador|quem\s+e\s+o\s+controlador)\b", "AUTORIDADE_PUBLICA", "Busca por autoridades de controle.")
 ]
 
+RAG_GERAL_FAST_PATTERNS = [
+    # Zeladoria Urbana, Obras, Limpeza e Iluminação
+    (r"\b(?:tapa\s*buraco|buracos?|asfalto|pavimentação|pavimentacao|bueiro|drenagem|boca\s+de\s+lobo)\b", "RAG_GERAL", "Serviço de obras e pavimentação detectado localmente."),
+    (r"\b(?:limpeza|capina|roçada|rocada|roçagem|entulho|lixo|varrição|varricao|mato)\b", "RAG_GERAL", "Serviço de limpeza e conservação urbana detectado localmente."),
+    (r"\b(?:iluminação|iluminacao|lâmpadas?|lampadas?|postes?|luzes?\s+(?:da\s+rua|pública|publica)?)\b", "RAG_GERAL", "Serviço de iluminação pública detectado localmente."),
+    
+    # Tributos, Finanças e Certidões
+    (r"\b(?:iptu|alvará|alvara|iss|2ª\s*via|segunda\s+via|carnê|carne|certidão|certidao|imposto|taxa)\b", "RAG_GERAL", "Serviço de tributos e receitas municipais detectado localmente."),
+    
+    # Assistência Social, Saúde, Educação e Cursos
+    (r"\b(?:cras|creas|bolsa\s+família|bolsa\s+familia|cadúnico|cadunico|assistência\s+social|assistencia\s+social)\b", "RAG_GERAL", "Serviço de assistência social detectado localmente."),
+    (r"\b(?:hospital|upa|posto\s+de\s+saúde|posto\s+de\s+saude|ubs|vacina|exame|consulta|marcar|médico|medico|remédio|remedio|farmácia|farmacia)\b", "RAG_GERAL", "Serviço de saúde municipal detectado localmente."),
+    (r"\b(?:escola|creche|matrícula|matricula|vaga|educação|educacao|fundec|curso|cursos)\b", "RAG_GERAL", "Serviço de educação ou cursos detectado localmente."),
+    
+    # Transportes, Mobilidade e Canais da Prefeitura
+    (r"\b(?:ônibus|onibus|transporte|tarifa\s+zero|passe\s+livre|estacionamento|sinal|semáforo|semaforo)\b", "RAG_GERAL", "Serviço de transportes e mobilidade detectado localmente."),
+    (r"\b(?:ouvidoria|colab|telefone|endereço|endereco|contato|horário|horario|secretaria|prefeitura)\b", "RAG_GERAL", "Consulta informativa de canais/secretarias detectada localmente.")
+]
+
 def check_fast_gate(query: str) -> dict | None:
     """Valida a query usando regras locais de baixíssima latência (0ms)."""
     query_lower = query.lower().strip()
@@ -157,6 +176,17 @@ def check_fast_gate(query: str) -> dict | None:
                 "reason": reason,
                 "source": "FAST_GATE"
             }
+
+    # 1º D: Serviços Municipais Diretos (RAG_GERAL instantâneo em 0ms sem acionar Gemini)
+    for regex, intent, reason in RAG_GERAL_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
     
     # 2º: Detector de ambiguidade de barulho (sem origem explícita)
     for regex, intent, reason in AMBIGUITY_FAST_PATTERNS:
@@ -191,23 +221,33 @@ def init_cache_db(db_path: str):
         )
     """)
 
+_L1_RAM_TRIAGE_CACHE: dict = {}
+
 def get_query_hash(query: str) -> str:
     """Gera um hash md5 único a partir da query normalizada."""
     normalized = query.lower().strip()
     return hashlib.md5(normalized.encode('utf-8')).hexdigest()
 
 def get_cached_triage(db_path: str, query: str) -> dict | None:
-    """Busca o resultado da triagem no cache SQLite."""
+    """Busca o resultado da triagem no cache L1 RAM ou SQLite."""
     query_hash = get_query_hash(query)
+    if query_hash in _L1_RAM_TRIAGE_CACHE:
+        return _L1_RAM_TRIAGE_CACHE[query_hash]
     try:
-        return storage_manager.cache.get_cached_triage(query_hash, PROMPT_VERSION, MODEL_VERSION)
+        res = storage_manager.cache.get_cached_triage(query_hash, PROMPT_VERSION, MODEL_VERSION)
+        if res:
+            _L1_RAM_TRIAGE_CACHE[query_hash] = res
+        return res
     except Exception as e:
         print(f"[Triage Cache Warning] Falha ao ler cache: {e}", file=sys.stderr)
     return None
 
 def save_triage_to_cache(db_path: str, query: str, triage_res: dict):
-    """Salva o resultado da triagem no cache SQLite."""
+    """Salva o resultado da triagem no cache L1 RAM e no SQLite."""
     query_hash = get_query_hash(query)
+    cached_entry = dict(triage_res)
+    cached_entry["source"] = "SQLITE_CACHE"
+    _L1_RAM_TRIAGE_CACHE[query_hash] = cached_entry
     try:
         storage_manager.cache.save_triage_to_cache(
             query_hash,
@@ -222,86 +262,59 @@ def save_triage_to_cache(db_path: str, query: str, triage_res: dict):
         print(f"[Triage Cache Warning] Falha ao gravar cache: {e}", file=sys.stderr)
 
 
+
+
 # --------------------------------------------------------------------------
 # CLASSIFICADOR LLM & VALIDAÇÃO
 # --------------------------------------------------------------------------
 def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
-    """Chama o Gemini para classificar a intenção e valida o resultado."""
+    """Chama o Gemini com prompt ultradenso (<200 tokens) para classificar a intenção e reescrever a query."""
     history_context = ""
     if history:
         from agent.memory import ConversationMemory
         formatted = ConversationMemory.get_context(history, gemini_client)
-        history_context = f"Histórico de mensagens anteriores nesta conversa:\n{formatted}\n\n"
+        history_context = f"Histórico:\n{formatted}\n\n"
 
     prompt = (
-        "Você é o Agente de Triagem oficial do Duque IA da Prefeitura de Duque de Caxias.\n"
-        "Sua função é classificar a consulta do cidadão em uma intenção municipal estruturada.\n"
-        "Analise a consulta atual à luz das mensagens anteriores (se fornecidas no histórico abaixo) para entender o contexto e saber se alguma ambiguidade já foi esclarecida.\n"
-        "\n"
-        "REGRAS DE RESOLUÇÃO DE HISTÓRICO:\n"
-        "- Se o munícipe foi anteriormente questionado sobre uma escolha ambígua (ex: 'é na sua casa ou iluminação pública / poste na rua?', ou 'é barulho de vizinho ou evento público/rua?') e a última mensagem dele é uma resposta a essa pergunta (ex: 'lâmpada', 'é uma lâmpada', 'poste', 'rua', 'é da rua', 'vizinho', 'casa', 'queimada', 'queimanda prora'), NÃO classifique como AMBIGUO. Use o histórico para inferir a intenção e resolver a ambiguidade:\n"
-        "  * Se ele responde 'lâmpada', 'é uma lâmpada', 'poste', 'rua', 'queimada', 'queimanda prora' etc., após perguntarmos de iluminação pública vs residencial, classifique como RAG_GERAL (needs_clarification=false).\n"
-        "  * Se ele responde 'na minha casa', 'no meu quarto', 'minha casa', 'aqui em casa' etc., classifique como RESIDENCIAL (needs_clarification=false).\n"
-        "  * Se ele responde 'vizinho', 'casa ao lado' etc., para barulho, classifique como RAG_GERAL (needs_clarification=false) para que a resposta informe Polícia (190).\n"
-        "  * Se ele responde 'rua', 'show', 'praça' etc., para barulho, classifique como RAG_GERAL (needs_clarification=false) para orientar o Colab.\n"
-        "Não responda à pergunta do usuário. Apenas identifique a intenção e classifique-a.\n\n"
-        "Categorias permitidas:\n"
-        "- SAUDACAO: Cumprimentos simples (oi, olá, bom dia, tchau).\n"
-        "- IDENTIDADE: Perguntas sobre quem é você ou suas capacidades.\n"
-        "- LGPD: Solicitação de CPFs, nomes de reclamantes ou andamento de protocolos de terceiros (vizinhos).\n"
-        "- JURIDICO: Pedido de formulação de defesas, pareceres ou recursos contra o poder público.\n"
-        "- FORA_COMPETENCIA: Assuntos que competem ao Estado ou União (ex: linhas de metrô, rodovias federais).\n"
-        "- AMBIGUO_LUZ: Dúvida sobre falta de luz (distribuição Light) ou lâmpada apagada no poste da rua.\n"
-        "- AMBIGUO_LAMPADA: Dúvida sobre troca de lâmpada dentro da residência vs poste público de rua.\n"
-        "- AMBIGUO_BARULHO: Reclamação de barulho excessivo, som alto, festas ou algazarra onde NÃO esteja claro se a origem é em local privado (vizinho/residência) ou em local público (rua, praça, evento, bar).\n"
-        "  * Defina needs_clarification=true e intent=AMBIGUO_BARULHO se o cidadão reclamar de barulho/som/festa mas NÃO especificar a origem. Ex: 'tem barulho perto de casa', 'ta tendo festa e não consigo dormir', 'muito barulho aqui na minha rua'.\n"
-        "  * EXCEÇÃO RAG_GERAL: Se o cidadão especificar claramente que é vizinho/residência particular (ex: 'meu vizinho com som alto', 'festa na casa ao lado', 'apartamento do Rildo'), classifique como RAG_GERAL — o RAG direciona para a Polícia (190).\n"
-        "  * EXCEÇÃO RAG_GERAL: Se o cidadão especificar claramente que é evento público/rua/praça (ex: 'show na praça', 'baile funk na rua', 'bar na esquina'), classifique como RAG_GERAL — o RAG direciona para Ordem Urbana/Colab.\n"
-        "  * Exemplo AMBIGUO_BARULHO: 'ta tendo um barulho insuportavel perto da minha casa' → needs_clarification=true (não se sabe se é vizinho ou rua).\n"
-        "  * Exemplo AMBIGUO_BARULHO: 'tem uma festa que não me deixa dormir' → needs_clarification=true (não se sabe se é casa ao lado ou rua).\n"
-        "- RESIDENCIAL: Manutenção elétrica interna em área particular ou condomínio privado.\n"
-        "- OUVIDORIA_MANIFESTACAO: O cidadão quer registrar uma manifestação oficial na Ouvidoria Geral (reclamação, denúncia, sugestão ou elogio).\n"
-        "  * ATENÇÃO (CRÍTICO - ZELADORIA URBANA): Se o cidadão está relatando um problema de zeladoria urbana pela primeira vez (ex: 'tem um buraco na minha rua', 'lixo acumulado na calçada', 'poste apagado na rua') sem mencionar que já fez um pedido anterior ou que possui um protocolo não atendido, classifique como RAG_GERAL. O objetivo é orientá-lo a abrir uma 'Solicitação de Serviço' de zeladoria comum no Colab, e não uma reclamação na Ouvidoria.\n"
-        "  * Classifique como OUVIDORIA_MANIFESTACAO apenas se: (1) O cidadão disser expressamente que já solicitou o serviço anteriormente e o problema não foi resolvido; (2) O cidadão disser que possui um número de protocolo pendente/atrasado; ou (3) O cidadão expressar a intenção direta de reclamar da Ouvidoria/Prefeitura em geral.\n"
-        "  * Defina needs_clarification=true apenas se o cidadão indicou que quer abrir uma manifestação, mas NÃO especificou qual é o assunto municipal (ex: 'quero fazer uma reclamação', 'quero abrir uma manifestação', 'como faço uma denúncia' - sem citar o problema).\n"
-        "  * Defina needs_clarification=false se o cidadão já especificou o assunto ou problema municipal (ex: 'cratera na rua', 'poste caindo', 'lixo acumulado', 'buraco na rua'), mesmo que ele NÃO tenha fornecido a localização ou o endereço exato do fato. Não insista no endereço, pois ele será direcionado a preenchê-lo no aplicativo Colab.\n"
-        "  * Exemplo com clarification=false: 'quero reclamar de buraco na rua que já solicitei mês passado' — tipo_manifestacao=reclamacao, assunto=buraco na rua, needs_clarification=false.\n"
-        "  * Exemplo com clarification=true: 'quero fazer uma reclamação' — tipo_manifestacao=reclamacao, assunto não especificado, então needs_clarification=true.\n"
-        "- ESCALONAMENTO_HUMANO: Denúncias graves contra a administração, desvios de verbas, subornos ou corrupção envolvendo servidores.\n"
-        "- POSSIVEL_DENUNCIA: Relatos de ofensas, xingamentos, ameaças, humilhações, grosserias ou mau atendimento sofrido pelo cidadão (ex: 'o rildo me xingou', 'me trataram mal').\n"
-        "- AUTORIDADE_PUBLICA: Perguntas sobre a identidade de detentores de cargos públicos do município (prefeito, vice-prefeito, secretários, ouvidor, procurador, controlador, etc.).\n"
-        "- PROGRAMACAO: Solicitações de codificação, scripts, programação de computadores ou TI em geral (ex: 'me de um codigo em python').\n"
-        "- CONVERSA: Bate-papo geral, piadas, conversa fiada, discussões filosóficas ou perguntas sobre o mundo fora do domínio municipal.\n"
-        "- RAG_GERAL: Dúvidas específicas de serviços municipais (tapa-buracos, CRAS, IPTU, escolas, cursos FUNDEC, telefones, endereços, iluminação pública resolvida, obras resolvidas).\n\n"
+        "Você é o triador do Duque IA (Prefeitura de Duque de Caxias - RJ).\n"
+        "Classifique a pergunta do cidadão em uma intenção e reescreva-a para ser autossuficiente caso dependa do histórico.\n\n"
+        "Intenções permitidas:\n"
+        "SAUDACAO, IDENTIDADE, LGPD, JURIDICO, FORA_COMPETENCIA, AMBIGUO_LUZ, AMBIGUO_LAMPADA, AMBIGUO_BARULHO, "
+        "RESIDENCIAL, OUVIDORIA_MANIFESTACAO, ESCALONAMENTO_HUMANO, POSSIVEL_DENUNCIA, AUTORIDADE_PUBLICA, PROGRAMACAO, CONVERSA, RAG_GERAL.\n\n"
+        "Regras Rápidas:\n"
+        "- FORA_COMPETENCIA = Usar APENAS para órgãos Estaduais (Metrô, Trem/Supervia, DETRAN), Federais (INSS, IRPF/Receita Federal) ou Prefeituras de OUTROS municípios. Perguntas sobre bairros de Caxias (Jardim Primavera, Xerém, 25 de Agosto, etc.), comércio local, restaurantes, passeios, história ou locais do município NÃO são FORA_COMPETENCIA -> use RAG_GERAL.\n"
+        "- Zeladoria urbana (buraco, lixo, lâmpada pública) primeira vez sem protocolo = RAG_GERAL (needs_clarification=false).\n"
+        "- Se o histórico contém uma dúvida sobre luz/iluminação (AMBIGUO_LUZ) e o usuário desambigua para postes ou lâmpadas da rua = RAG_GERAL (needs_clarification=false).\n"
+        "- Manifestação de Ouvidoria com protocolo/atraso ou sem assunto = OUVIDORIA_MANIFESTACAO (needs_clarification=true se sem assunto).\n"
+        "- Barulho sem local explícito = AMBIGUO_BARULHO (needs_clarification=true).\n"
+        "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n\n"
         f"{history_context}"
-        f"Consulta atual do cidadão: \"{query}\"\n\n"
-        "Retorne EXCLUSIVAMENTE um objeto JSON válido contendo:\n"
+        f"Consulta: \"{query}\"\n\n"
+        "Retorne APENAS um JSON:\n"
         "{\n"
-        '  "intent": "SAUDACAO"|"IDENTIDADE"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA",\n'
+        '  "intent": "SAUDACAO"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
         '  "tipo_manifestacao": "reclamacao"|"denuncia"|"elogio"|"sugestao"|"geral"|null,\n'
         '  "confidence": 0.0-1.0,\n'
         '  "needs_clarification": true|false,\n'
-        '  "rewritten_query": "versão autossuficiente e completa da pergunta atual, resolvendo referências ao histórico (ex: pronomes como \'ele\', \'aquele\', \'e o telefone?\'). Se a pergunta já for autossuficiente, repita-a idêntica.",\n'
-        '  "reason": "Breve justificativa técnica da classificação."\n'
+        '  "rewritten_query": "versão completa e autossuficiente",\n'
+        '  "reason": "justificativa curta"\n'
         "}"
     )
     
     try:
-        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=250)
+        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=150)
         match = re.search(r'\{.*\}', response_text.replace('\n', ' '), re.DOTALL)
         if match:
             triage_data = json.loads(match.group(0))
             intent = triage_data.get("intent", "").upper().strip()
             tipo_manifestacao = triage_data.get("tipo_manifestacao", None)
             
-            # Validação do Schema
             if intent not in ALLOWED_INTENTS:
                 raise ValueError(f"Intenção inválida retornada pelo LLM: {intent}")
                 
             confidence = float(triage_data.get("confidence", 0.0))
             needs_clarification = bool(triage_data.get("needs_clarification", False))
             
-            # Ajuste de Confiança (< 0.70 força esclarecimento)
             if confidence < 0.70:
                 needs_clarification = True
                 

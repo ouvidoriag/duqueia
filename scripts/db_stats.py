@@ -91,7 +91,6 @@ def main():
     # 5. Providers Check
     print("\n[AI PROVIDERS] — Status das APIs de LLM")
     print(f"  Gemini API Status    : {health['providers']['gemini']['status']} ({health['providers']['gemini']['keys_loaded']} chaves carregadas)")
-    print(f"  Groq API Status      : {health['providers']['groq']['status']}")
 
     print("\n" + "=" * 60)
 

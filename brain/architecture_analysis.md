@@ -1,177 +1,203 @@
-# Análise Detalhada da Arquitetura e Mapeamento do Pipeline RAG — DUQUE IA
+# Análise Arquitetural Completa e Mapeamento do Framework RAG — DUQUE IA
 
-> **Auditoria de Arquitetura — FASE 1 / ETAPA 1**  
-> **Data:** 2026-07-23 | **Sistema:** DUQUE IA (Sistema de Informações Municipais — Duque de Caxias / RJ)
+> **Auditoria Arquitetural — FASE 1: MAPEAMENTO COMPLETO**  
+> **Data:** 2026-07-29 | **Sistema:** DUQUE IA (Sistema de Informações Municipais — Duque de Caxias / RJ)  
+> **Autor:** Arquiteto Sênior de IA (Antigravity AI Agent)
 
 ---
 
-## 1. Mapeamento Geral da Arquitetura
+## 1. Visão Geral e Diagrama Textual da Arquitetura
 
-O sistema **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) multicamadas de atendimento público municipal. Ele combina triagem de intenções em 3 níveis, reescrita de queries conversacionais, planejamento semântico multi-query (LORS), busca híbrida (banco estruturado + banco vetorial + unidades físicas), reranking com Cross-Encoder e guardrails estritos de entrada e saída.
+O **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) de nível empresarial, projetado para o atendimento ao munícipe da Prefeitura de Duque de Caxias / RJ. O sistema adota uma arquitetura descentralizada de micro-bancos de dados (SQLite `main.db`, `vector.db`, `cache.db`, `telemetry.db`), orquestração por Grafo de Estados (LangGraph Lite em Python puro), triagem semântica em múltiplos níveis, busca híbrida (relacional + vetorial RRF) e blindagem rigorosa de segurança (Input, Output e Privacy Guardrails).
 
 ```text
-                               ┌─────────────────────────┐
-                               │  Cliente Web / Frontend │
-                               └────────────┬────────────┘
-                                            │ HTTP POST /api/chat
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   server.js (Node.js)   │  Gateway HTTP & Gestão de Sessões
-                               └────────────┬────────────┘
-                                            │ UTF-8 Pipe (stdin/stdout)
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/main.py (CLI)   │  Entry Point Python
-                               └────────────┬────────────┘
-                                            │
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/agent.py        │  Orquestrador DuqueIAAgent
-                               └────────────┬────────────┘
-                                            │
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/graph.py        │  LangGraph Lite (Grafo de Estados)
-                               └────────────┬────────────┘
-                                            │
-         ┌──────────────────────────────────┼──────────────────────────────────┐
-         │                                  │                                  │
-         ▼                                  ▼                                  ▼
-┌─────────────────┐                ┌─────────────────┐                ┌─────────────────┐
-│ Input Guardrails│                │     Triagem     │                │   Query Rewriter│
-│(guardrails.py)  │                │   (triage.py)   │                │  (handlers.py)  │
-│• Prompt Inject  │                │• Fast Gate (0ms)│                │• Histórico      │
-│• LGPD / Privacy │                │• Cache SQLite   │                │• Resolução de   │
-│• Competência    │                │• Gemini LLM     │                │  referências    │
-└────────┬────────┘                └────────┬────────┘                └────────┬────────┘
-         │                                  │                                  │
-         └──────────────────────────────────┼──────────────────────────────────┘
-                                            │
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/planner.py      │  Planner Semântico (LORS)
-                               │  Multi-query Expansion  │  (Sugere até 3 sub-queries)
-                               └────────────┬────────────┘
-                                            │ Sub-queries + Filtros
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/retrieval.py    │  Retriever Híbrido Multiconta
-                               └────────────┬────────────┘
-                                            │
-         ┌──────────────────────────────────┼──────────────────────────────────┐
-         ▼                                  ▼                                  ▼
-┌──────────────────┐               ┌──────────────────┐               ┌──────────────────┐
-│  Secretarias /   │               │   vw_ia_servicos │               │   duque_ia_chunks│
-│  Carta Serviços  │               │   e Unidades CRAS│               │   (Banco Vetorial│
-│  (SQLite Main)   │               │   (SQLite Main)  │               │   sqlite-vec/emb)│
-└────────┬─────────┘               └────────┬─────────┘               └────────┬─────────┘
-         │                                  │                                  │
-         └──────────────────────────────────┼──────────────────────────────────┘
-                                            │ Chunks & Registros Candidatos
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/reranker.py     │  Re-ranker Cross-Encoder
-                               │ (GeminiCrossEncoder)    │  (60% Cross + 40% Hybrid)
-                               └────────────┬────────────┘
-                                            │ Top Chunks Ordenados
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   agent/handlers.py     │  Prompt Builder & LLM Response
-                               │  (RagHandler + Prompt)  │  (gemini-3.1-flash-lite)
-                               └────────────┬────────────┘
-                                            │ Resposta Candidata
-                                            ▼
-                               ┌─────────────────────────┐
-                               │   Output Guardrail      │  Auditoria Anti-alucinação
-                               │   (guardrails.py)       │  & Proteção LGPD de Saída
-                               └────────────┬────────────┘
-                                            │ Resposta Final JSON
-                                            ▼
-                               ┌─────────────────────────┐
-                               │  Logs / Telemetria      │  metrics/ & logs/
-                               └─────────────────────────┘
+                               ┌───────────────────────────────────┐
+                               │     Cliente Web / Frontend        │
+                               └─────────────────┬─────────────────┘
+                                                 │ HTTP POST /api/chat
+                                                 ▼
+                               ┌───────────────────────────────────┐
+                               │       server.js (Node.js)         │  Gateway HTTP & Gestão de Sessões
+                               └─────────────────┬─────────────────┘
+                                                 │ UTF-8 Pipe (stdin/stdout)
+                                                 ▼
+                               ┌───────────────────────────────────┐
+                               │       agent/main.py (CLI)         │  Entry Point Python
+                               └─────────────────┬─────────────────┘
+                                                 │
+                                                 ▼
+                               ┌───────────────────────────────────┐
+                               │       agent/agent.py              │  Orquestrador DuqueIAAgent
+                               └─────────────────┬─────────────────┘
+                                                 │
+                                                 ▼
+                               ┌───────────────────────────────────┐
+                               │       agent/graph.py              │  LangGraph Lite (Grafo de Estados)
+                               └─────────────────┬─────────────────┘
+                                                 │
+            ┌────────────────────────────────────┼────────────────────────────────────┐
+            │                                    │                                    │
+            ▼                                    ▼                                    ▼
+ ┌─────────────────────┐              ┌─────────────────────┐              ┌─────────────────────┐
+ │  Input Guardrails   │              │   Triagem FastGate  │              │   Query Rewriter    │
+ │ (agent/guardrails)  │              │   (agent/triage)    │              │  (agent/handlers)   │
+ │ • Prompt Injection  │              │ • Regras estáticas  │              │ • Histórico         │
+ │ • SQL Injection     │              │ • Cache SQLite      │              │ • Resolução de      │
+ │ • LGPD / Privacidade│              │ • LLM Classifier    │              │   referências       │
+ │ • Competência Munic.│              └──────────┬──────────┘              └──────────┬──────────┘
+ └──────────┬──────────┘                         │                                    │
+            │                                    └──────────────────┬─────────────────┘
+            └────────────────────────────────────┐                  │
+                                                 ▼                  ▼
+                                       ┌───────────────────────────────────┐
+                                       │   Roteamento de Handlers          │
+                                       │   (agent/handlers.py)             │
+                                       └─────────────────┬─────────────────┘
+                                                         │
+       ┌───────────────────────┬─────────────────────────┼─────────────────────────┬───────────────────────┐
+       ▼                       ▼                         ▼                         ▼                       ▼
+┌──────────────┐       ┌──────────────┐          ┌──────────────┐          ┌──────────────┐        ┌──────────────┐
+│  Security    │       │ Conversation │          │  Collector   │          │  Ambiguity   │        │  RAG Handler │
+│  Handler     │       │   Handler    │          │   Handler    │          │   Handler    │        │  (Retrieval) │
+└──────┬───────┘       └──────┬───────┘          └──────┬───────┘          └──────┬───────┘        └──────┬───────┘
+       │                      │                         │                         │                       │
+       └──────────────────────┴─────────────────────────┼─────────────────────────┴───────────────────────┘
+                                                        │
+                                                        ▼
+                                       ┌───────────────────────────────────┐
+                                       │     agent/retrieval.py            │  Retriever Híbrido Multiconta
+                                       └────────────────┬──────────────────┘
+                                                        │
+                ┌───────────────────────────────────────┼───────────────────────────────────────┐
+                ▼                                       ▼                                       ▼
+     ┌─────────────────────┐                 ┌─────────────────────┐                 ┌─────────────────────┐
+     │   SQLite Main       │                 │   SQLite Vector     │                 │  Geographic Engine  │
+     │ (vw_ia_servicos,    │                 │ (duque_ia_chunks,   │                 │ (unidades_cras,     │
+     │  carta_servicos)    │                 │  gemini-emb 768d)   │                 │  bairros / postos)  │
+     └──────────┬──────────┘                 └──────────┬──────────┘                 └──────────┬──────────┘
+                │                                       │                                       │
+                └───────────────────────────────────────┼───────────────────────────────────────┘
+                                                        │ Candidatos Recuperados
+                                                        ▼
+                                       ┌───────────────────────────────────┐
+                                       │       agent/reranker.py           │  Cross-Encoder Reranking
+                                       │ (GeminiCrossEncoder + RRF Fusion) │  (60% Cross + 40% Hybrid)
+                                       └────────────────┬──────────────────┘
+                                                        │ Top Chunks Ranqueados
+                                                        ▼
+                                       ┌───────────────────────────────────┐
+                                       │     agent/handlers.py             │  Gerador de Respostas LLM
+                                       │ (Prompt Builder + Gemini API)     │
+                                       └────────────────┬──────────────────┘
+                                                        │ Resposta Candidata
+                                                        ▼
+                                       ┌───────────────────────────────────┐
+                                       │       Output Guardrail            │  Verificação Anti-Alucinação
+                                       │      (agent/guardrails.py)        │  & Sanitização LGPD
+                                       └────────────────┬──────────────────┘
+                                                        │ Resposta Final JSON
+                                                        ▼
+                                       ┌───────────────────────────────────┐
+                                       │   database/telemetry.db           │  Telemetria & Métricas
+                                       └───────────────────────────────────┘
 ```
 
 ---
 
-## 2. Componentes e Responsabilidades por Arquivo
+## 2. Fluxos Principais do Sistema
 
-| Componente | Arquivo(s) Responsável(eis) | Função Principal | Serviços / APIs Utilizados |
-| :--- | :--- | :--- | :--- |
-| **Gateway & I/O** | `server.js`, `agent/main.py` | Gerencia conexões HTTP, sessões por `sessionId` e faz interface via pipe UTF-8 stdin/stdout com Python. | Node.js child_process spawn |
-| **Orquestrador de Grafo** | `agent/graph.py`, `agent/agent.py` | Executa o estado (`AgentState`) entre nós atômicos de decisão com capacidade de desvio e retentativa em caso de erro. | LangGraph Lite (Python puro) |
-| **Input Guardrails** | `agent/guardrails.py`, `agent/fallback.py` | Filtra injeções de SQL, Prompt Injection, violações de privacidade LGPD, incompetência municipal e solicitações jurídicas antes da LLM. | Regras Regex locais |
-| **Triagem & Classificador** | `agent/triage.py` | Classifica a intenção em 16 categorias em 3 níveis (Fast Gate 0ms → Cache SQLite → Gemini LLM 3.1 Flash-Lite). | SQLite Cache, Gemini API |
-| **Query Rewriter** | `agent/handlers.py` (`rewrite_query_with_history`) | Reestrutura perguntas de continuação ("e o telefone?", "onde fica?") incorporando o histórico para tornar a query autossuficiente. | Gemini API / Regras Heurísticas |
-| **Roteador de Ferramentas** | `agent/tool_router.py` | Seleciona dinamicamente quais fontes de dados acionar com base na intenção (`structured_db`, `geo_units`, `faq_chunks`). | Regras estáticas |
-| **Planner Semântico** | `agent/planner.py` | Decompõe a query original em até 3 sub-queries complementares (LORS: Lógica de Recuperação Semântica). | Gemini API / Rule Engine offline |
-| **Retriever Híbrido** | `agent/retrieval.py`, `agent/scoring.py` | Executa busca vetorial (cosseno 85% + overlap 15%) + busca SQL estruturada em `secretarias` e `vw_ia_servicos` com fuzzy Levenshtein. | Gemini Embeddings (768d), SQLite |
-| **Re-ranker** | `agent/reranker.py` | Avalia o par (Query, Chunk) usando Gemini Cross-Encoder para refinar o ranking dos 8 melhores candidatos. | Gemini API (3.1 Flash-Lite) |
-| **Prompt Builder & Synthesis**| `agent/handlers.py` (`RagHandler`) | Monta o prompt final organizando a hierarquia estrita de fontes (Estruturado > Complementar) e gera a resposta humanizada. | Gemini API (3.1 Flash-Lite) |
-| **Calibrador & Output Guardrail** | `agent/confidence.py`, `agent/guardrails.py` | Calibra o score de confiança e audita a resposta final comparando-a diretamente com as fontes recuperadas para travar alucinações. | Gemini API (3.1 Flash-Lite) |
-| **Persistência & Métricas** | `storage/storage_manager.py`, `metrics/collector.py` | Mantém os bancos SQLite segregados (`duque_ia.db`, `vector.db`, `cache.db`, `telemetry.db`) e grava logs de execução em CSV/log. | SQLite, File System |
+### 2.1 Fluxo de Ingestão de Dados (`ingestion/parser/`)
+- **Fontes Suportadas**: PDFs Oficiais, Carta de Serviços (XLSX/CSV), Documentos Web (Scraped Markdown), Ofícios Digitalizados (OCR) e Tabelas Estruturadas de Assuntos/Unidades.
+- **Módulos de Ingestão**:
+  - `parse_carta_servico.py`: Processa planilhas estruturadas da Carta de Serviços da Prefeitura.
+  - `parse_oficios_ocr.py`: Trata anexos e ofícios scanned com OCR Tesseract/PyMuPDF.
+  - `parse_pdfs.py`: Extração e chunking recursivo hierárquico de decretos, leis e normativas municipais.
+  - `parse_web.py`: Extração limpa do portal oficial da Prefeitura de Duque de Caxias.
+  - `populate_structured_services.py`: Registra serviços diretamente nas visões relacionais (`vw_ia_servicos`).
+  - `inject_ouvidoria_chunk.py`: Injeta contatos oficiais e fluxos de atendimento da Ouvidoria Geral.
 
----
+### 2.2 Fluxo de Gerador de Embeddings (`ingestion/embed/`)
+- **Módulo**: `ingestion/embed/core.py` e `ingestion/embed/main.py`.
+- **Modelo de Embedding**: `gemini-embedding-2` (768 dimensões com normalização L2).
+- **Armazenamento**: Tabela `duque_ia_chunks` e índices vetoriais em `database/vector.db` (`sqlite-vec`).
+- **Estratégia de Chunking**: Chunking contextualizado com prefixo hierárquico (`[Documento: X | Seção: Y]`).
 
-## 3. Pipeline RAG Passo a Passo (Cadeia de Execução)
+### 2.3 Fluxo de Retrieval e Reranking (`agent/retrieval.py` e `agent/reranker.py`)
+1. **Reescrita e Expansão de Query**: Expandida em até 3 sub-queries focadas via `agent/planner.py` (método LORS).
+2. **Busca Híbrida em Paralelo**:
+   - *Busca Vetorial*: Cosine similarity em `vector.db` (top-K chunks).
+   - *Busca Relacional FTS*: Match exato/BM25 nas tabelas relacionais de serviços e secretarias (`main.db`).
+   - *Busca de Entidades Geográficas*: Mapeamento de unidades físicas (CRAS, Postos de Saúde, Bairros) via `agent/entity_resolver.py`.
+3. **Fusão RRF (Reciprocal Rank Fusion)**: Combina rankings de BM25 e busca vetorial.
+4. **Reranking Cross-Encoder**: Avaliação do alinhamento semântico profundo com peso `0.60 * CrossEncoderScore + 0.40 * HybridScore`.
 
-1. **Recepção da Pergunta:** O munícipe envia a mensagem pelo frontend HTTP. O `server.js` redireciona via `stdin` para o processo `agent/main.py`.
-2. **Entrada no Grafo de Estados:** O `run_graph` inicia o nó `fast_gate` (0ms). Se a query casar com regras de segurança ou ambiguidade óbvia, desvia imediatamente.
-3. **Triagem de Intenção (3 Níveis):**
-   - *Nível 0:* Fast Gate Regex.
-   - *Nível 1:* Consulta ao `triage_cache` no SQLite por hash MD5.
-   - *Nível 2:* Chamada ao Gemini `gemini-3.1-flash-lite` com histórico conversacional. Retorna JSON com `intent`, `needs_clarification` e `rewritten_query`.
-4. **Reescrita Conversacional da Consulta:** Se a triagem não forneceu a reescrita e há histórico, o `rewrite_query_with_history` expande pronomes e elipses.
-5. **Planejamento Semântico (LORS Planner):** O `SemanticRecoveryPlanner` gera até 3 sub-queries de busca direcionadas (ex: buscando serviço + secretaria + unidade física CRAS simultaneamente).
-6. **Recuperação Multiconta (Retrieval Híbrido):**
-   - **Estruturada:** Consulta tabelas `secretarias`, `vw_ia_servicos` e `secretaria_unidades` no `duque_ia.db` usando busca aproximada de Levenshtein e aliasing.
-   - **Vetorial:** Gera vetor de embedding 768d da sub-query via Gemini Embeddings e calcula similaridade de cosseno contra a tabela `duque_ia_chunks` no `vector.db`.
-   - **Boosts & Filtros:** Aplica boosts de contexto (governança, liderança, impostos, saúde, localidade de bairros como Xerém ou Imbariê).
-7. **Reranking de Segundo Estágio:** O `GeminiCrossEncoder` avalia os top 8 candidatos para verificar se o trecho efetivamente responde à pergunta. Combina os scores (60% Cross + 40% Híbrido).
-8. **Validação do Guardrail de Retrieval:** Se o melhor candidato tiver pontuação inferior ao limiar mínimo (`similarity_threshold` = 0.50 em prod / 0.25 em dev), o sistema dispara o fallback de baixa confiança.
-9. **Construção do Prompt & Síntese:** O `RagHandler` formata os blocos de contexto priorizando fontes oficiais estruturadas e instrui a LLM a gerar resposta direta, sem saudações redundantes.
-10. **Guardrail de Saída & Auditoria:** O `check_output_guardrail` faz uma verificação final contra o contexto original para garantir ausência de contradições, alucinações ou vazamento de CPFs/protocolos de terceiros.
-11. **Entrega da Resposta & Métricas:** A resposta final formatada em JSON é emitida no `stdout` para o `server.js` e enviada ao usuário, registrando a telemetria em `metrics/retrieval_performance.csv` e `logs/execution.log`.
+### 2.4 Fluxo de Triagem e Tomada de Decisão (`agent/triage.py` e `agent/graph.py`)
+- **FastGate (0ms)**: Expressões regulares e regras determinísticas interceptam saudações, tentativas de SQL/Prompt Injection e consultas LGPD bloqueadas.
+- **Cache de Triagem**: Consultas recorrentes são respondidas com latência zero via `database/cache.db`.
+- **Classificador LLM**: Classifica intenção (`RAG_GERAL`, `COLETOR_INFO`, `AMBIGUIDADE`, `FORA_COMPETENCIA`, `LGPD_PRIVACIDADE`, `PROGRAMACAO`, `AGRADECIMENTO`).
 
 ---
 
-## 4. Dependências entre Módulos e Tecnologias Utilizadas
+## 3. Matriz de Dependências Entre Módulos
 
-```text
-[server.js] ──(spawn)──► [agent/main.py]
-                             │
-                             ▼
-                    [agent/agent.py]
-                             │
-        ┌────────────────────┴────────────────────┐
-        ▼                                         ▼
-[agent/graph.py]                          [utils/gemini_client.py]
-        │                                         │ (Google Gemini API / 3.1 Flash-Lite)
-        ├──► [agent/triage.py] ───────────────────┤
-        ├──► [agent/guardrails.py] ───────────────┤
-        ├──► [agent/planner.py] ──────────────────┤
-        ├──► [agent/retrieval.py] ────────────────┼──► [agent/scoring.py]
-        ├──► [agent/reranker.py] ─────────────────┤
-        └──► [agent/handlers.py] ─────────────────┘
-                     │
-                     ▼
-        [storage/storage_manager.py]
-                     │
-    ┌────────────────┼────────────────┬────────────────┐
-    ▼                ▼                ▼                ▼
-duque_ia.db      vector.db        cache.db       telemetry.db
-(Estruturado)    (Vetorial)       (Triagem)      (Métricas)
+| Módulo Orquestrador | Dependências Diretas | Função e Papel |
+| :--- | :--- | :--- |
+| `agent/agent.py` | `agent/triage.py`, `agent/retrieval.py`, `agent/handlers.py`, `agent/guardrails.py`, `utils/gemini_client.py` | Orquestrador principal da classe `DuqueIAAgent`. |
+| `agent/graph.py` | `agent/triage.py`, `agent/handlers.py`, `agent/guardrails.py` | Grafo de Estados LangGraph Lite para roteamento resiliente. |
+| `agent/triage.py` | `utils/gemini_client.py`, `config/settings.py`, `database/cache.db` | Triagem de intenções em 3 níveis com fallback Gracioso. |
+| `agent/retrieval.py` | `utils/db_client.py`, `agent/entity_resolver.py`, `config/settings.py` | Busca híbrida multiconta e resolução de entidades físicas. |
+| `agent/handlers.py` | `utils/gemini_client.py`, `agent/context_builder.py`, `agent/fallback.py` | Execução de nós de resposta (Collector, Ambiguity, RAG). |
+| `agent/guardrails.py` | `config/settings.py` | Filtros de segurança de entrada/saída (SQLi, Prompt Injection, LGPD). |
+
+---
+
+## 4. Auditoria de Segurança, LGPD e Blindagem POP
+
+### 4.1 Input Guardrails
+- **Prompt Injection**: Intercepta tentativas de desvio ("ignore instruções anteriores", "você agora é...").
+- **SQL Injection**: Detecta comandos SQL perigosos (`DROP TABLE`, `UNION SELECT`, `DELETE FROM`).
+- **LGPD / Privacidade de Terceiros**: Impede buscas por CPFs de terceiros, nomes de munícipes ou andamento de processos de vizinhos. Resposta de bloqueio padronizada sem expor dados.
+- **Competência Municipal**: Filtra perguntas sobre esferas Federal/Estadual (Metrô, INSS, Rodovias Federais, etc.) e emite recusa por falta de competência da Prefeitura de Duque de Caxias.
+
+### 4.2 Fallback e Redirecionamento Direto para Ouvidoria Geral
+Quando as buscas no RAG não atingem o limiar de confiança exigido (`score < threshold`), a resposta substitui mensagens genéricas de erro pelo direcionamento direto:
+- **Telefone Ouvidoria Geral**: `(21) 2652-3835`
+- **WhatsApp Ouvidoria Geral**: `(21) 99824-5903`
+- **Plataforma Colab**: Instrução para preenchimento de dados essenciais (CPF, endereço completo com ponto de referência e fotos).
+
+### 4.3 Agente Coletor (Triagem de Esclarecimento Contextual)
+Quando `needs_clarification: true`, o sistema aciona o modo **Agente Coletor**:
+- Avalia o histórico recente de conversas para preservar o contexto dos turnos anteriores.
+- Realiza perguntas amigáveis e **estritamente incrementais (uma solicitação por vez)** para evitar sobrecarregar o cidadão.
+- Direciona o munícipe a abrir o chamado na plataforma **Colab** vinculando-o à Secretaria adequada.
+
+---
+
+## 5. Mapeamento de Gargalos e Oportunidades de Melhoria
+
+1. **Latência no Classificador LLM de Triagem**:
+   - *Gargalo*: Quando a consulta não cai no FastGate, há uma chamada remota ao LLM para triagem antes do retrieval.
+   - *Melhoria*: Expandir o cache determinístico local e usar modelos ultra-rápidos (`gemini-3.1-flash-lite`) com resposta estruturada via JSON Schema.
+2. **Integração SIG / GIS Territorial (Duque 2.0)**:
+   - *Oportunidade*: Implementar o Chunking por Entidade Geográfica (1 entidade territorial = 1 chunk com GeoJSON da feição) para responder consultas por bairro, distrito, setor e lote.
+3. **Consistência de Thresholds Dinâmicos**:
+   - *Gargalo*: Ajuste dinâmico de score limiar dependendo da categoria de serviços.
+   - *Melhoria*: Padronização do Cross-Encoder com trava máxima `min(score, 1.0)` para evitar inflação de relevância.
+
+---
+
+## 6. Recomendação Arquitetural e Roadmap para PRODUÇÃO
+
+```mermaid
+graph TD
+    A[Mapeamento & Auditoria FASE 1] --> B[Auditoria de Chunking FASE 2]
+    B --> C[Avaliação de Retrieval FASE 3]
+    C --> D[Fortalecimento de Guardrails FASE 4]
+    D --> E[Métricas & Telemetria FASE 5]
+    E --> F[Suporte GeoJSON / GIS FASE 6]
+    F --> G[Benchmark de Desempenho FASE 7]
+    G --> H[Empacotamento Docker / Supabase FASE 8]
 ```
 
 ---
-
-## 5. Pontos Críticos Mapeados para Diagnóstico de Perda de Informação
-
-Com o mapeamento da arquitetura completo, os seguintes pontos foram identificados como potenciais causas raiz de falhas no RAG:
-
-1. **Classificação Errônea de Intenção na Triagem:** Se a triagem classificar incorretamente uma dúvida sobre serviço como `OUVIDORIA_MANIFESTACAO` ou `CONVERSA`, o fluxo é desviado para o `CollectorHandler` ou `ConversationHandler`, pulando totalmente a busca no banco vetorial.
-2. **Reescrita Excessiva ou Distorcida (Query Rewriter):** A reescrita de query pode alterar termos-chave da pergunta original ao tentar incorporar o histórico, prejudicando o batimento na busca estruturada/vetorial.
-3. **Sub-queries Inadequadas no LORS Planner:** Se o motor de regras offline do Planner não cobrir determinados sinônimos ou termos populares da cidade, as sub-queries geradas podem trazer contexto irrelevante.
-4. **Desconexão entre Tabela Estruturada e Banco Vetorial:** Dados existentes em `services`/`secretarias` podem estar ausentes ou desatualizados em `duque_ia_chunks`, ou vice-versa, gerando lacunas de contexto.
-5. **Corte Rígido do Guardrail de Retrieval:** Um limiar de similaridade muito estrito (ex: 0.50) pode descartar chunks corretos que receberam score ligeiramente menor devido a divergência de termos.
-6. **Sensibilidade Excessiva do Output Guardrail:** O guardrail de saída pode barrar respostas legítimas por classificar falsamente ausência de termos como contradição.
+*Documento gerado e validado em conformidade com as diretrizes do projeto DUQUE IA.*

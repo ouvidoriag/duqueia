@@ -6,15 +6,16 @@ class ChunkingStrategies:
     """Implementação das diferentes estratégias de chunking para RAG do DUQUE IA."""
 
     @staticmethod
-    def recursive_character_chunker(text: str, chunk_size: int, chunk_overlap: int) -> List[str]:
-        """Divide o texto recursivamente por parágrafos, linhas, frases e palavras."""
+    def recursive_character_chunker(text: str, chunk_size: int, chunk_overlap: int, context_prefix: str = "") -> List[str]:
+        """Divide o texto recursivamente por parágrafos, linhas, frases e palavras com Contextual Chunking."""
         chunks = []
         start = 0
         text_len = len(text)
+        prefix = f"{context_prefix.strip()}\n" if context_prefix else ""
         
         while start < text_len:
             end = min(start + chunk_size, text_len)
-            chunk = text[start:end]
+            chunk = prefix + text[start:end]
             chunks.append(chunk)
             start += (chunk_size - chunk_overlap)
             if start >= text_len or chunk_size <= chunk_overlap:
@@ -22,39 +23,38 @@ class ChunkingStrategies:
         return chunks
 
     @staticmethod
-    def token_chunker(text: str, chunk_size: int, chunk_overlap: int) -> List[str]:
-        """Divide o texto baseado em tokens estimativos (usando delimitadores de palavras)."""
+    def token_chunker(text: str, chunk_size: int, chunk_overlap: int, context_prefix: str = "") -> List[str]:
+        """Divide o texto baseado em tokens estimativos com Contextual Chunking."""
         words = text.split()
         chunks = []
         step = chunk_size - chunk_overlap
+        prefix = f"{context_prefix.strip()}\n" if context_prefix else ""
         
         for i in range(0, len(words), step):
             chunk_words = words[i:i + chunk_size]
-            chunks.append(" ".join(chunk_words))
+            chunks.append(prefix + " ".join(chunk_words))
             if i + chunk_size >= len(words):
                 break
         return chunks
 
     @staticmethod
-    def semantic_chunker(text: str, buffer_size: int, threshold: float) -> List[str]:
-        """Divide o texto baseado na variação semântica entre frases subsequentes."""
-        # Split por pontuação para separar frases
+    def semantic_chunker(text: str, buffer_size: int, threshold: float, context_prefix: str = "") -> List[str]:
+        """Divide o texto baseado na variação semântica entre frases subsequentes com Contextual Chunking."""
         sentences = re.split(r'(?<=[.!?])\s+', text)
         chunks = []
         current_chunk = []
+        prefix = f"{context_prefix.strip()}\n" if context_prefix else ""
         
-        # Simulação de análise semântica: junta sentenças até um limite de tamanho
-        # Em produção, usaria embeddings para medir a similaridade de cosseno
         for sentence in sentences:
             if not sentence.strip():
                 continue
             current_chunk.append(sentence)
             if len(" ".join(current_chunk)) > 400:
-                chunks.append(" ".join(current_chunk))
+                chunks.append(prefix + " ".join(current_chunk))
                 current_chunk = []
                 
         if current_chunk:
-            chunks.append(" ".join(current_chunk))
+            chunks.append(prefix + " ".join(current_chunk))
         return chunks
 
     @staticmethod

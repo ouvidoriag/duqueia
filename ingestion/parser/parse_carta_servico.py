@@ -70,16 +70,23 @@ def servico_para_texto(servico: dict) -> str:
     """Converte um servico em texto rico para embedding e busca semantica."""
     partes = []
 
-    nome     = servico.get("Serviço", servico.get("Servico", ""))
-    orgao    = servico.get("Órgão", servico.get("Orgao", ""))
-    cat      = servico.get("Categoria", "")
-    o_que_e  = servico.get("O que é o serviço", servico.get("O que e o servico", ""))
-    como     = servico.get("Como acessar", "")
-    endereco = servico.get("Endereço", servico.get("Endereco", ""))
-    doctos   = servico.get("Documentos necessários", servico.get("Documentos necessarios", ""))
-    prazo    = servico.get("Prazo", "")
-    gratuito = servico.get("Gratuito", "")
-    canal    = servico.get("Canal de atendimento", "")
+    nome        = servico.get("Serviço", servico.get("Servico", ""))
+    orgao       = servico.get("Órgão", servico.get("Orgao", ""))
+    cat         = servico.get("Categoria", "")
+    o_que_e     = servico.get("O que é o serviço", servico.get("O que e o servico", ""))
+    como        = servico.get("Como acessar", "")
+    endereco    = servico.get("Endereço", servico.get("Endereco", ""))
+    telefone    = servico.get("Telefone", "")
+    email       = servico.get("E-mail(s)", servico.get("Email", ""))
+    link        = servico.get("Link(s)", servico.get("Link", ""))
+    passo       = servico.get("Passo a passo", "")
+    quem        = servico.get("Quem pode solicitar", "")
+    doctos      = servico.get("Documentação necessária", servico.get("Documentos necessários", servico.get("Documentos necessarios", "")))
+    tempo_esp   = servico.get("Tempo de espera", "")
+    prazo       = servico.get("Prazo máximo", servico.get("Prazo", ""))
+    prioridade  = servico.get("Prioridade de atendimento", "")
+    custo       = servico.get("Quanto custa", servico.get("Gratuito", ""))
+    norma       = servico.get("Norma que regulamenta", "")
 
     if nome:
         partes.append(f"Servico: {nome}")
@@ -93,14 +100,28 @@ def servico_para_texto(servico: dict) -> str:
         partes.append(f"Como acessar: {como}")
     if endereco:
         partes.append(f"Endereco: {endereco}")
+    if telefone:
+        partes.append(f"Telefone: {telefone}")
+    if email:
+        partes.append(f"Email: {email}")
+    if link:
+        partes.append(f"Link: {link}")
+    if passo:
+        partes.append(f"Passo a passo: {passo}")
+    if quem:
+        partes.append(f"Quem pode solicitar: {quem}")
     if doctos:
-        partes.append(f"Documentos necessarios: {doctos}")
+        partes.append(f"Documentacao necessaria: {doctos}")
+    if tempo_esp:
+        partes.append(f"Tempo de espera: {tempo_esp}")
     if prazo:
-        partes.append(f"Prazo: {prazo}")
-    if gratuito:
-        partes.append(f"Gratuito: {gratuito}")
-    if canal:
-        partes.append(f"Canal de atendimento: {canal}")
+        partes.append(f"Prazo maximo: {prazo}")
+    if prioridade:
+        partes.append(f"Prioridade: {prioridade}")
+    if custo:
+        partes.append(f"Custo: {custo}")
+    if norma:
+        partes.append(f"Norma regulamentadora: {norma}")
 
     return " | ".join(partes)
 

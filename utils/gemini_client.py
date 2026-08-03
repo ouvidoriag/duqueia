@@ -67,7 +67,7 @@ class GeminiClient:
 
         self.current_key_index = 0
         self.embedding_model_name = GEMINI_EMBEDDING_MODEL
-        self.generation_model_name = GEMINI_MODEL
+        self.generation_model_name = self._sanitize_model_name(GEMINI_MODEL)
         self._working_embedding_model = None  # cache do modelo que funcionou
 
         # Cliente instanciado pelo novo SDK (por chave ativa)
@@ -82,6 +82,15 @@ class GeminiClient:
                   "Sistema rodara em modo offline (fallback local).")
 
 
+
+    def _sanitize_model_name(self, model_name: str) -> str:
+        """Garante o uso exclusivo de modelos Flash. Se um modelo Pro for solicitado, redireciona para gemini-2.5-flash."""
+        if not model_name:
+            return self._sanitize_model_name(self.generation_model_name)
+        if "pro" in model_name.lower():
+            print(f"[GeminiClient] AVISO: Modelo Pro '{model_name}' bloqueado por diretriz do sistema. Redirecionando para 'gemini-2.5-flash'.", file=sys.stderr)
+            return "gemini-2.5-flash"
+        return model_name
 
     def _configure_current_key(self):
         """Configura a chave ativa atual no SDK do Google."""
@@ -113,7 +122,7 @@ class GeminiClient:
                 self._configure_current_key()
                 return True
         
-        # Se todas estao em cooldown para este modelo, falha imediatamente sem sleep para ativar fallback offline rapido
+        # Se todas estao em cooldown para este modelo, lança exceção para acionar backoff/fallback
         raise RuntimeError(f"Todas as chaves de API do Gemini estao em cooldown temporario para o modelo {model_name}.")
 
     def is_retryable_error(self, e) -> bool:
@@ -137,13 +146,14 @@ class GeminiClient:
 
     def execute_with_rotation(self, func, model_name: str = None, *args, **kwargs):
         """
-        Executa uma funcao da API do Gemini com roteamento robusto.
-        Distingue erros de programacao de erros de cota (429/503).
-        Caso ocorra erro temporario, coloca a chave em cooldown para o modelo e rotaciona imediatamente.
+        Executa uma funcao da API do Gemini com roteamento robusto, rotação de chaves
+        e Exponential Backoff com Jitter.
+        Distingue erros de programacao de erros de cota/indisponibilidade (429/503/500).
         """
         if not self.api_keys:
             raise RuntimeError("Nenhuma chave de API disponivel no sistema.")
 
+        import random
         max_attempts = len(self.api_keys) * 2
         for attempt in range(max_attempts):
             try:
@@ -151,11 +161,15 @@ class GeminiClient:
             except Exception as e:
                 # 1. Classifica o erro
                 if not self.is_retryable_error(e):
-                    print(f"[GeminiClient] ERRO NÃO RECUPERÁVEL: {e}. Abortando execução.", file=sys.stderr)
+                    print(f"[GeminiClient] ERRO NÃO RECUPERÁVEL para {model_name}: {e}. Abortando execução.", file=sys.stderr)
                     raise e
                 
-                # 2. Erro recuperável (429, 503, timeout)
-                print(f"[GeminiClient] Erro recuperável na tentativa {attempt + 1}: {e}", file=sys.stderr)
+                # 2. Erro recuperável (429, 503, 500, timeout)
+                # Pausa com Exponential Backoff + Jitter randômico para evitar sobrecarregar o Gemini
+                backoff_wait = (2 ** min(attempt, 4)) + random.uniform(0.1, 1.0)
+                print(f"[GeminiClient] Erro recuperável na tentativa {attempt + 1}/{max_attempts} ({e}). "
+                      f"Aguardando {backoff_wait:.2f}s (backoff+jitter)...", file=sys.stderr)
+                time.sleep(backoff_wait)
                 
                 # Coloca a chave atual em cooldown de 60 segundos para este modelo
                 cooldown_key = (self.current_key_index, model_name) if model_name else self.current_key_index
@@ -164,10 +178,14 @@ class GeminiClient:
                 if attempt == max_attempts - 1:
                     break
                 
-                # Rotaciona chave imediatamente (se todas estiverem em cooldown, levantará RuntimeError instantâneo)
-                self.rotate_key(model_name=model_name)
+                # Rotaciona chave de API
+                try:
+                    self.rotate_key(model_name=model_name)
+                except RuntimeError:
+                    # Se todas as chaves estão temporariamente em cooldown, aguarda um momento extra e tenta continuar
+                    time.sleep(1.0)
 
-        raise RuntimeError("Todas as chaves de API falharam ou atingiram limite de cota.")
+        raise RuntimeError(f"Todas as chaves de API falharam ou atingiram limite de cota para o modelo {model_name}.")
 
     # --------------------------------------------------------------------------
     # EMBEDDINGS
@@ -216,7 +234,10 @@ class GeminiClient:
                     continue
                 # Outro erro: tenta rotacionar chave
                 print(f"[GeminiClient] Erro de embedding ({model_name}): {e}", file=sys.stderr)
-                self.rotate_key()
+                try:
+                    self.rotate_key()
+                except RuntimeError:
+                    pass
                 time.sleep(0.5)
 
         return self._local_fallback_embedding(text)
@@ -226,23 +247,29 @@ class GeminiClient:
         if not self.api_keys:
             return "Desculpe, o sistema esta rodando sem chaves de API ativas.", None, None
 
-        requested_model = model if model else self.generation_model_name
+        requested_model = self._sanitize_model_name(model if model else self.generation_model_name)
         models_to_try = [requested_model]
         
-        # Fallbacks padrão se o solicitado falhar
+        # Fallbacks padrão de alta performance (APENAS modelos Flash)
         default_fallbacks = [
             "gemini-2.5-flash",
             "gemini-3.1-flash-lite",
             "gemini-2.5-flash-lite",
-            "gemini-3.5-flash"
+            "gemini-3.5-flash",
+            "gemini-2.0-flash"
         ]
         for m in default_fallbacks:
-            if m not in models_to_try:
-                models_to_try.append(m)
+            m_clean = self._sanitize_model_name(m)
+            if m_clean not in models_to_try:
+                models_to_try.append(m_clean)
 
         last_exception = None
         for current_model in models_to_try:
             try:
+                prompt_len = len(prompt or "")
+                sys_len = len(system_instruction or "")
+                print(f"[GeminiClient] Disparando '{current_model}' | Prompt: {prompt_len} chars | SysInstruction: {sys_len} chars", file=sys.stderr)
+
                 if _USE_NEW_SDK:
                     def _call(m=current_model):
                         config = {
@@ -277,6 +304,11 @@ class GeminiClient:
                             contents=prompt,
                             config=genai_types.GenerateContentConfig(**config)
                         )
+                        if hasattr(resp, "usage_metadata") and resp.usage_metadata:
+                            meta = resp.usage_metadata
+                            p_tok = getattr(meta, "prompt_token_count", "?")
+                            c_tok = getattr(meta, "candidates_token_count", "?")
+                            print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
                         return resp.text, None
                 else:
                     def _call(m=current_model):
@@ -296,12 +328,17 @@ class GeminiClient:
                             {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
                             {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"}
                         ]
-                        res = model_obj.generate_content(
+                        res_obj = model_obj.generate_content(
                             prompt,
                             generation_config=genai.GenerationConfig(**gen_config) if gen_config else None,
                             safety_settings=legacy_safety
-                        ).text
-                        return res, None
+                        )
+                        if hasattr(res_obj, "usage_metadata") and res_obj.usage_metadata:
+                            meta = res_obj.usage_metadata
+                            p_tok = getattr(meta, "prompt_token_count", "?")
+                            c_tok = getattr(meta, "candidates_token_count", "?")
+                            print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
+                        return res_obj.text, None
 
                 # Executa com rotação de chaves
                 ans, c_id = self.execute_with_rotation(_call, model_name=current_model)
@@ -319,10 +356,10 @@ class GeminiClient:
         if not self.api_keys:
             return "Desculpe, o sistema esta rodando sem chaves de API ativas."
 
-        requested_model = model if model else self.generation_model_name
+        requested_model = self._sanitize_model_name(model if model else self.generation_model_name)
         models_to_try = [requested_model]
         
-        # Fallbacks padrão se o solicitado falhar (priorizando modelos verificados)
+        # Fallbacks padrão de alta performance (APENAS modelos Flash)
         default_fallbacks = [
             "gemini-2.5-flash",
             "gemini-3.1-flash-lite",
@@ -331,12 +368,17 @@ class GeminiClient:
             "gemini-2.0-flash"
         ]
         for m in default_fallbacks:
-            if m not in models_to_try:
-                models_to_try.append(m)
+            m_clean = self._sanitize_model_name(m)
+            if m_clean not in models_to_try:
+                models_to_try.append(m_clean)
 
         last_exception = None
         for current_model in models_to_try:
             try:
+                prompt_len = len(prompt or "")
+                sys_len = len(system_instruction or "")
+                print(f"[GeminiClient] Disparando '{current_model}' | Prompt: {prompt_len} chars | SysInstruction: {sys_len} chars", file=sys.stderr)
+
                 if _USE_NEW_SDK:
                     def _call(m=current_model):
                         config = {
@@ -370,6 +412,11 @@ class GeminiClient:
                             contents=prompt,
                             config=genai_types.GenerateContentConfig(**config)
                         )
+                        if hasattr(resp, "usage_metadata") and resp.usage_metadata:
+                            meta = resp.usage_metadata
+                            p_tok = getattr(meta, "prompt_token_count", "?")
+                            c_tok = getattr(meta, "candidates_token_count", "?")
+                            print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
                         return resp.text
                 else:
                     def _call(m=current_model):
@@ -389,11 +436,17 @@ class GeminiClient:
                             {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
                             {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"}
                         ]
-                        return model_obj.generate_content(
+                        res_obj = model_obj.generate_content(
                             prompt,
                             generation_config=genai.GenerationConfig(**gen_config) if gen_config else None,
                             safety_settings=legacy_safety
-                        ).text
+                        )
+                        if hasattr(res_obj, "usage_metadata") and res_obj.usage_metadata:
+                            meta = res_obj.usage_metadata
+                            p_tok = getattr(meta, "prompt_token_count", "?")
+                            c_tok = getattr(meta, "candidates_token_count", "?")
+                            print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
+                        return res_obj.text
 
                 # Executa com rotação de chaves para este modelo específico
                 return self.execute_with_rotation(_call, model_name=current_model)

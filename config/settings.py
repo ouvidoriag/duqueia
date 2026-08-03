@@ -117,7 +117,7 @@ EMBEDDING_DIMS = {
 # Dados de contato centralizados da Ouvidoria Geral
 OUVIDORIA_CONTACTS = {
     "telefone": "(21) 2652-3835",
-    "whatsapp": None,
+    "whatsapp": "(21) 99824-5903",
     "email": "ouvidoria@duquedecaxias.rj.gov.br",
     "presencial": "Alameda Esmeralda, 206 - Jardim Primavera",
     "colab_url": "https://duquedecaxias.colab.re",
@@ -132,8 +132,8 @@ PRIVACY_BLOCKED_MESSAGE = (
 )
 
 COMPETENCY_BLOCKED_MESSAGE = (
-    "Esta pergunta não está inserida nos temas que são de responsabilidade da Prefeitura de Duque de Caxias. "
-    "O metrô, por exemplo, é um transporte de âmbito estadual, e não compete à prefeitura municipal."
+    "Esta pergunta não refere-se a assuntos de competência da Prefeitura de Duque de Caxias. "
+    "Para informações sobre serviços municipais, estou à disposição para ajudar!"
 )
 
 LEGAL_BLOCKED_MESSAGE = (

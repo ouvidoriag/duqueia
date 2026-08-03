@@ -20,6 +20,17 @@ CREATE TABLE IF NOT EXISTS secretaria_unidades (
     FOREIGN KEY(secretaria_id) REFERENCES secretarias(id) ON DELETE CASCADE
 );
 
+-- Tabela 'municipal_entities': Ontologia Municipal Auditável (Sinônimos, Aliases e Entidades Oficiais de Governo).
+CREATE TABLE IF NOT EXISTS municipal_entities (
+    entity_id TEXT PRIMARY KEY,
+    entity_type TEXT NOT NULL,
+    canonical_name TEXT NOT NULL,
+    aliases TEXT NOT NULL,
+    keywords TEXT,
+    secretaria TEXT,
+    active INTEGER DEFAULT 1
+);
+
 -- Tabela 'categories': Armazena as categorias de taxonomia dos serviços da prefeitura.
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

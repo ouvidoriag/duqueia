@@ -11,7 +11,7 @@ from agent.scoring import (
     calculate_keyword_score,
     calculate_keyword_overlap
 )
-from config.settings import DATABASE_VECTOR
+from config.settings import DATABASE_VECTOR, DATABASE_MAIN
 from storage import storage_manager
 
 # Algoritmo de Distância de Levenshtein leve para Fuzzy Matching offline
@@ -212,30 +212,70 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
     # 1. Filtra palavras de ação, pronomes, preposições e ruído estrutural comum
     action_words = [
         "como", "solicitar", "fazer", "quero", "preciso", "saber", "favor", "onde", "para", "pedir", 
-        "registrar", " reclamar", "reclamacao", "denuncia", "denunciar", "obter", "emitir", "tirar", 
-        "segunda", "via", "telefone", "contato", "endereco", "com", "qual", "quais", "quem", "sobre", 
+        "registrar", "reclamar", "reclamacao", "denuncia", "denunciar", "obter", "tirar", 
+        "telefone", "contato", "endereco", "com", "qual", "quais", "quem", "sobre", 
         "atendimento", "entro", "entrar", "servico", "serviço", "geral", "informacao", "informações"
     ]
     entity_words = ["rua", "ruas", "avenida", "avenidas", "bairro", "bairros", "distrito", "lote", "lotes", "quadra", "quadras", "numero", "num"]
+    noise_words = ["municipal", "prefeitura", "secretaria", "unidades", "unidade", "rede", "publica", "pública", "ensino", "duque", "caxias", "rio", "janeiro"]
     
-    search_words = [w for w in query_keywords if len(w) >= 3 and w not in action_words and w not in entity_words]
+    query_lower = query.lower().replace("limepza", "limpeza").replace("fiscalisacao", "fiscalização").replace("fiscaisacao", "fiscalização")
     
-    # Tratamento especial para termos comuns (IPTU, Tapa Buraco)
-    query_lower = query.lower()
+    search_words = []
+    for w in query_keywords:
+        w_clean = w.lower().strip()
+        w_clean = w_clean.replace("limepza", "limpeza").replace("fiscalisacao", "fiscalização").replace("fiscaisacao", "fiscalização")
+        if len(w_clean) >= 3 and w_clean not in action_words and w_clean not in entity_words and w_clean not in noise_words:
+            if w_clean not in search_words:
+                search_words.append(w_clean)
+    
+    if any(w in query_lower for w in ["iptu", "carne", "carnê", "2a via", "2ª via", "segunda via", "emitir"]):
+        for extra_kw in ["iptu", "carnê", "carne", "segunda via", "emitir"]:
+            if extra_kw not in search_words:
+                search_words.append(extra_kw)
+    
     if "tapa" in query_lower or "buraco" in query_lower:
         if "buraco" not in search_words:
             search_words.append("buraco")
         if "tapa" not in search_words:
             search_words.append("tapa")
-            
+
+    if any(w in query_lower for w in ["ipi", "icms", "isencao", "isenção", "taxista", "taxi", "pcd"]):
+        for extra_kw in ["ipi", "isenção", "isencao", "taxista", "icms"]:
+            if extra_kw not in search_words:
+                search_words.append(extra_kw)
+
+    if any(w in query_lower for w in ["matricula", "matrícula", "escola", "escolar", "creche"]):
+        for extra_kw in ["matrícula", "matricula", "unidades escolares", "escola"]:
+            if extra_kw not in search_words:
+                search_words.append(extra_kw)
+
+    if any(w in query_lower for w in ["quebra", "mola", "quebramola", "lombada", "redutor"]):
+        for extra_kw in ["quebra", "lombada", "sinalização"]:
+            if extra_kw not in search_words:
+                search_words.append(extra_kw)
+
+    if any(w in query_lower for w in ["terreno", "terrenos", "abandonado", "abandonada", "lote", "mato"]):
+        for extra_kw in ["fiscalização", "limpeza", "urbanismo"]:
+            if extra_kw not in search_words:
+                search_words.append(extra_kw)
+
     if not search_words:
         return []
         
     conditions = []
     params = []
     for w in search_words:
-        conditions.append("(servico_nome LIKE ? OR descricao LIKE ?)")
-        params.extend([f"%{w}%", f"%{w}%"])
+        w_no_acc = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
+        conditions.append("(servico_nome LIKE ? OR descricao LIKE ? OR servico_nome LIKE ? OR descricao LIKE ?)")
+        params.extend([f"%{w}%", f"%{w}%", f"%{w_no_acc}%", f"%{w_no_acc}%"])
+        
+    order_conditions = []
+    order_params = []
+    for w in search_words:
+        w_no_acc = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
+        order_conditions.append("WHEN servico_nome LIKE ? OR servico_nome LIKE ? THEN 1")
+        order_params.extend([f"%{w}%", f"%{w_no_acc}%"])
         
     sql = f"""
         SELECT servico_id, secretaria_nome, secretaria_codigo, servico_nome, 
@@ -243,65 +283,90 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
                tempo_espera, prazo_maximo, custo, norma_reguladora
         FROM vw_ia_servicos
         WHERE {" OR ".join(conditions)}
+        ORDER BY 
+        CASE 
+            {" ".join(order_conditions)}
+            ELSE 2
+        END
     """
     
+    final_sql_params = params + order_params
+    
     results = []
-    with get_db_connection(db_path) as conn:
+    main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
+    with get_db_connection(main_db) as conn:
         cursor = conn.cursor()
         try:
-            cursor.execute(sql, params)
+            cursor.execute(sql, final_sql_params)
             rows = cursor.fetchall()
         except Exception as e:
             print(f"[Structured Retrieval Error] View vw_ia_servicos não disponível: {e}", file=sys.stderr)
             return []
             
+        # 1. Filtra serviços que possuem match de palavra-chave
+        matched_services = []
         for row in rows:
             s_id, sec_name, sec_code, s_name, cat, desc, how, who, wait, deadline, cost, norm = row
-            
             match_score = 0.0
-            # Normalização para comparação sem acento
             s_name_norm = ''.join(c for c in unicodedata.normalize('NFKD', s_name.lower()) if not unicodedata.combining(c))
             desc_norm = ''.join(c for c in unicodedata.normalize('NFKD', desc.lower()) if not unicodedata.combining(c)) if desc else ""
             
             for w in search_words:
                 w_norm = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
                 if w_norm in s_name_norm:
-                    # Dá um peso significativamente maior se corresponder ao termo exato do serviço
-                    if w_norm == "buraco" and "buraco" in s_name_norm:
-                        match_score += 4.0
-                    else:
-                        match_score += 2.0
+                    match_score += 4.0 if w_norm == "buraco" and "buraco" in s_name_norm else 2.0
                 elif desc_norm and w_norm in desc_norm:
-                    if w_norm == "buraco" and "buraco" in desc_norm:
-                        match_score += 2.0
-                    else:
-                        match_score += 1.0
+                    match_score += 2.0 if w_norm == "buraco" and "buraco" in desc_norm else 1.0
                     
-            if match_score == 0.0:
-                continue
+            if match_score > 0.0:
+                matched_services.append((row, match_score))
                 
-            cursor.execute("SELECT phone FROM service_phones WHERE service_id = ?", (s_id,))
-            phones = [r[0] for r in cursor.fetchall()]
+        if not matched_services:
+            return []
+
+        # 2. Batch Prefetch de Tabelas Relacionadas (Eliminação de N+1 Query)
+        matching_ids = [m[0][0] for m in matched_services]
+        placeholders = ",".join(["?"] * len(matching_ids))
+
+        from collections import defaultdict
+        phones_dict = defaultdict(list)
+        cursor.execute(f"SELECT service_id, phone FROM service_phones WHERE service_id IN ({placeholders})", matching_ids)
+        for sid, ph in cursor.fetchall(): phones_dict[sid].append(ph)
+
+        emails_dict = defaultdict(list)
+        cursor.execute(f"SELECT service_id, email FROM service_emails WHERE service_id IN ({placeholders})", matching_ids)
+        for sid, em in cursor.fetchall(): emails_dict[sid].append(em)
+
+        links_dict = defaultdict(list)
+        cursor.execute(f"SELECT service_id, link FROM service_links WHERE service_id IN ({placeholders})", matching_ids)
+        for sid, lk in cursor.fetchall(): links_dict[sid].append(lk)
+
+        steps_dict = defaultdict(list)
+        cursor.execute(f"SELECT service_id, step_number, description FROM service_steps WHERE service_id IN ({placeholders}) ORDER BY step_number", matching_ids)
+        for sid, num, d in cursor.fetchall(): steps_dict[sid].append(f"Passo {num}: {d}")
+
+        docs_dict = defaultdict(list)
+        cursor.execute(f"SELECT service_id, document_name FROM service_documents WHERE service_id IN ({placeholders})", matching_ids)
+        for sid, doc in cursor.fetchall(): docs_dict[sid].append(doc)
+
+        sec_addr_dict = {}
+        cursor.execute("SELECT name, code, address FROM secretarias")
+        for sec_n, sec_c, addr in cursor.fetchall():
+            if addr:
+                sec_addr_dict[sec_n] = addr
+                if sec_c: sec_addr_dict[sec_c] = addr
+
+        # 3. Montagem dos Objetos Candidatos Estruturados
+        for row, match_score in matched_services:
+            s_id, sec_name, sec_code, s_name, cat, desc, how, who, wait, deadline, cost, norm = row
             
-            cursor.execute("SELECT email FROM service_emails WHERE service_id = ?", (s_id,))
-            emails = [r[0] for r in cursor.fetchall()]
-            
-            cursor.execute("SELECT link FROM service_links WHERE service_id = ?", (s_id,))
-            links = [r[0] for r in cursor.fetchall()]
-            
-            cursor.execute("SELECT step_number, description FROM service_steps WHERE service_id = ? ORDER BY step_number", (s_id,))
-            steps = [f"Passo {num}: {d}" for num, d in cursor.fetchall()]
-            
-            cursor.execute("SELECT document_name FROM service_documents WHERE service_id = ?", (s_id,))
-            docs = [r[0] for r in cursor.fetchall()]
-            
-            # Busca o endereço físico da secretaria responsável pelo serviço
-            sec_address = "Não cadastrado"
-            cursor.execute("SELECT address FROM secretarias WHERE name = ? OR code = ?", (sec_name, sec_code))
-            sec_row = cursor.fetchone()
-            if sec_row and sec_row[0]:
-                sec_address = sec_row[0]
-                
+            phones = phones_dict.get(s_id, [])
+            emails = emails_dict.get(s_id, [])
+            links = links_dict.get(s_id, [])
+            steps = steps_dict.get(s_id, [])
+            docs = docs_dict.get(s_id, [])
+            sec_address = sec_addr_dict.get(sec_name, sec_addr_dict.get(sec_code, "Não cadastrado"))
+
             content_parts = [
                 "[FONTE OFICIAL ESTRUTURADA]",
                 "Tipo: Carta de Serviços Oficiais",
@@ -309,28 +374,38 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
                 "Última Atualização: 2026-07-01",
                 "",
                 f"Serviço Oficial: {s_name}",
-                f"Secretaria Responsável: {sec_name} ({sec_code})",
-                f"Endereço de Atendimento: {sec_address}",
-                f"Descrição: {desc}",
-                f"Quem pode solicitar: {who}",
-                f"Prazo Máximo: {deadline}",
-                f"Custo: {cost}"
+                f"Secretaria Responsável: {sec_name}" + (f" ({sec_code})" if sec_code else "")
             ]
-            if phones:
-                content_parts.append(f"Telefones de Contato: {', '.join(phones)}")
-            if emails:
-                content_parts.append(f"E-mails de Contato: {', '.join(emails)}")
-            if links:
-                content_parts.append(f"Links / Canais Digitais: {', '.join(links)}")
-            if docs:
-                content_parts.append("Documentos Necessários:\n" + "\n".join(f"- {d}" for d in docs))
+            if sec_address and sec_address != "Não cadastrado":
+                content_parts.append(f"Endereço de Atendimento: {sec_address}")
+
+            if desc and str(desc).strip() and str(desc) != "None" and str(desc) != "Não cadastrado":
+                content_parts.append(f"Descrição: {desc}")
+            if who and str(who).strip() and str(who) != "None" and str(who) != "Não cadastrado":
+                content_parts.append(f"Quem pode solicitar: {who}")
+            if deadline and str(deadline).strip() and str(deadline) != "None" and str(deadline) != "Não cadastrado":
+                content_parts.append(f"Prazo Máximo: {deadline}")
+            if cost and str(cost).strip() and str(cost) != "None":
+                content_parts.append(f"Custo: {cost}")
+            if wait and str(wait).strip() and str(wait) != "None":
+                content_parts.append(f"Tempo de Espera: {wait}")
+            if norm and str(norm).strip() and str(norm) != "None":
+                content_parts.append(f"Norma Reguladora: {norm}")
+            if phones: content_parts.append(f"Telefones de Contato: {', '.join(phones)}")
+            if emails: content_parts.append(f"E-mails de Contato: {', '.join(emails)}")
+            if links: content_parts.append(f"Links / Canais Digitais: {', '.join(links)}")
+            if docs: content_parts.append("Documentos Necessários:\n" + "\n".join(f"- {d}" for d in docs))
+            
             if steps:
                 content_parts.append("Passo a Passo de Acesso:\n" + "\n".join(steps))
+            elif how and str(how).strip() and str(how) != "None":
+                content_parts.append(f"Como Solicitar: {how}")
+            elif sec_address and sec_address != "Não cadastrado":
+                content_parts.append(f"Como Solicitar: Atendimento presencial no endereço da {sec_name}: {sec_address}.")
                 
             structured_text = "\n".join(content_parts)
-            
-            base_score = 0.50 if using_real else 0.35
-            calibrated_score = min(base_score + (match_score * 0.15), 0.98)
+            base_score = 0.85 if (using_real and match_score >= 2.0) else 0.45
+            calibrated_score = min(base_score + (match_score * 0.05), 0.99)
             
             results.append({
                 "source": f"vw_ia_servicos (ID: {s_id})",
@@ -377,7 +452,8 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
     existing_codes = []
     existing_names = []
     
-    with get_db_connection(db_path) as conn:
+    main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
+    with get_db_connection(main_db) as conn:
         cursor = conn.cursor()
         try:
             cursor.execute("SELECT code, name FROM secretarias;")
@@ -475,8 +551,25 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
                 "chunk_keywords": search_words
             })
         return results
+def compute_rrf_fusion(rankings: list, k: int = 60) -> dict:
+    """
+    Combina múltiplos rankings (estruturado, vetorial, palavras-chave) 
+    usando Reciprocal Rank Fusion (RRF):
+    RRF_Score(d) = sum(1 / (k + rank(d)))
+    """
+    rrf_scores = {}
+    for rank_list in rankings:
+        for rank_idx, item in enumerate(rank_list):
+            src = item.get("source", "")
+            if not src:
+                continue
+            rank = rank_idx + 1
+            if src not in rrf_scores:
+                rrf_scores[src] = {"item": item, "score": 0.0}
+            rrf_scores[src]["score"] += 1.0 / (k + rank)
+    return rrf_scores
 
-def retrieve_context(query: str, db_path: str, using_real: bool, similarity_threshold: float, gemini_client, reranker, top_k: int = 3, intent_info: dict = None, tools_selected: list = None) -> list:
+def retrieve_context(query: str, db_path: str, using_real: bool, similarity_threshold: float, gemini_client, reranker, top_k: int = 5, intent_info: dict = None, tools_selected: list = None) -> list:
     """Busca híbrida baseada na arquitetura LORS: orquestração multi-query gerada pela LLM/Planner."""
     if not os.path.exists(db_path):
         print(f"[Agent Error] Banco de dados não encontrado em {db_path}", file=sys.stderr)
@@ -498,16 +591,19 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
     run_geo = tools_selected is None or "geo_units" in tools_selected
     run_vector = tools_selected is None or "faq_chunks" in tools_selected
 
-    # 1. Aciona o Planejador Semântico (LORS)
+    # 1. Aciona o Planejador Semântico Local (0ms de rede)
     from agent.planner import SemanticRecoveryPlanner
     planner = SemanticRecoveryPlanner(gemini_client)
-    plan = planner.plan_recovery(query, history=None)
+    plan = planner._generate_offline_plan(query, history=None)
     
     plan_queries = plan.get("queries", [query])
     plan_focus = plan.get("focus", ["general"])
     
     structured_candidates = []
     vector_candidates = []
+    
+    # Pre-calcula o vetor semântico da query principal apenas 1 vez para economizar rede
+    main_query_vector = gemini_client.get_embedding(query, is_query=True) if using_real else None
     
     # 2. Executa as buscas para cada sub-query gerada pelo LORS
     for q_sub in plan_queries:
@@ -529,7 +625,8 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na nova tabela secretaria_unidades
         if run_geo and any(ind in q_sub_norm for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
             try:
-                rows_unidades = query_db(db_path, """
+                main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
+                rows_unidades = query_db(main_db, """
                     SELECT u.name, u.address, u.phone, u.working_hours, s.name
                     FROM secretaria_unidades u
                     JOIN secretarias s ON u.secretaria_id = s.id
@@ -562,7 +659,7 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
 
         # D) Busca Vetorial/Descritiva (Chunks gerais de documentos)
         if run_vector:
-            query_vector = gemini_client.get_embedding(q_sub, is_query=True) if using_real else None
+            query_vector = main_query_vector
             try:
                 rows_chunks = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
                 for row in rows_chunks:
@@ -614,112 +711,54 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
     top_candidates.sort(key=lambda x: x["similarity"], reverse=True)
     reranked = reranker.rerank(query, top_candidates)
     
-    # Merge Híbrido Dinâmico: Junta todos os candidatos estruturados e vetoriais,
-    # ordena pelo score 'similarity' final para garantir que o mais relevante (seja estruturado ou descritivo) suba para o topo.
-    all_candidates = []
-    seen_sources = set()
+    # Merge Híbrido Dinâmico com Reciprocal Rank Fusion (RRF)
+    rrf_fused = compute_rrf_fusion([structured_candidates, reranked], k=60)
     
-    for sc in structured_candidates:
-        if sc["source"] not in seen_sources:
-            seen_sources.add(sc["source"])
-            all_candidates.append(sc)
-            
-    for r in reranked:
-        if r["source"] not in seen_sources:
-            seen_sources.add(r["source"])
-            all_candidates.append(r)
-            
-    # Aplica boosts e filtros a todos os candidatos mesclados (estruturados e vetoriais)
-    for c in all_candidates:
-        # Boost de categoria e de contato/localização nos chunks do RAG
-        if c.get("category") == "secretarias" and any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
-            c["similarity"] = round(c["similarity"] + 0.15, 4)
-        if any(w in query_normalized for w in ["onde", "fica", "endereco", "localizacao", "contato", "telefone"]):
-            content_lower = c.get("content", "").lower()
-            if "endereço" in content_lower or "endereco" in content_lower or "como acessar" in content_lower or "telefone" in content_lower:
-                c["similarity"] = round(c["similarity"] + 0.15, 4)
-                
-        # Boost de saúde para direcionamento clínico/hospitalar
-        if c.get("source") in ["saude.md", "saude.json", "postos_saude_caxias.xlsx"] and any(w in query_normalized for w in ["hospital", "upa", "uph", "emergencia", "emergência", "dor", "medico", "médico", "quebrado", "fratura", "pe ", "pé "]):
-            c["similarity"] = round(c["similarity"] + 0.20, 4)
-
-        # ── NOVOS BOOSTS DE INTENÇÃO E FILTROS DE METADADOS ──
+    all_candidates = []
+    for src, data in rrf_fused.items():
+        c_item = data["item"]
+        c_item["rrf_score"] = round(data["score"], 6)
+        all_candidates.append(c_item)
         
-        # 1. Governança e Informações Gerais da Cidade
-        if any(w in query_normalized for w in ["distrito", "prefeito", "historia", "origem", "fundacao", "fundacao"]):
-            if c.get("category") == "general" or "a_cidade" in str(c.get("source")) or "prefeito" in str(c.get("source")):
-                c["similarity"] = round(c["similarity"] + 0.35, 4)
-            # Penaliza carta de serviços para perguntas de geografia/governo geral
-            if c.get("category") == "carta_servicos":
-                c["similarity"] = round(c["similarity"] - 0.25, 4)
+    # Aplica o Score Multiplicativo de Completude e a Ontologia Municipal
+    from agent.completeness import calculate_completeness_score
+    from agent.ontology import ontology_engine
 
-        # 2. Lideranças e Estrutura das Secretarias (Quem é o secretário...)
-        if any(w in query_normalized for w in ["secretario", "secretaria", "responsavel pela pasta", "pasta de", "liderança"]):
-            if c.get("category") == "secretarias":
-                c["similarity"] = round(c["similarity"] + 0.35, 4)
-            if c.get("category") == "carta_servicos":
-                c["similarity"] = round(c["similarity"] - 0.30, 4)
+    resolved_entity = ontology_engine.resolve_entity(query)
 
-        # 3. Impostos, Taxas e Fazenda (IPTU, Alvará, ISS)
-        if any(w in query_normalized for w in ["iptu", "alvara", "iss", "fazenda", "tributo", "imposto"]):
-            if "fazenda" in str(c.get("source")):
-                c["similarity"] = round(c["similarity"] + 0.35, 4)
-            elif c.get("category") == "carta_servicos" and "iptu" not in c.get("content", "").lower() and "alvara" not in c.get("content", "").lower():
-                c["similarity"] = round(c["similarity"] - 0.25, 4)
+    for c in all_candidates:
+        retrieval_score = c.get("similarity", c.get("semantic_score", 0.50))
+        completeness = calculate_completeness_score(c)
+        c["completeness_score"] = completeness
 
-        # 4. Saúde do Homem / Saúde Geral
-        if "saude do homem" in query_normalized or "saude da mulher" in query_normalized:
-            if "saude" in str(c.get("source")):
-                c["similarity"] = round(c["similarity"] + 0.35, 4)
-            elif c.get("category") == "carta_servicos":
-                # Penaliza outros serviços se a busca for especificamente sobre o programa de saúde do homem na ficha da secretaria
-                c["similarity"] = round(c["similarity"] - 0.20, 4)
+        # Boost genérico por correspondência com a Entidade da Ontologia Municipal
+        ontology_boost = 0.0
+        if resolved_entity:
+            canonical = resolved_entity.get("canonical_name", "").lower()
+            secretaria = resolved_entity.get("secretaria", "").lower()
+            aliases = [a.lower() for a in resolved_entity.get("aliases", [])]
+            keywords = [k.lower() for k in resolved_entity.get("keywords", []) if len(k) > 2]
+            title_content = (c.get("title", "") + " " + c.get("content", "") + " " + str(c.get("source", ""))).lower()
 
-        # C1: Boost para queries de especialidades médicas
-        # Prioriza chunks de saúde com "especialidade" ou "encaminhamento" e penaliza programas escolares
-        MEDICAL_SPECIALTY_TERMS = [
-            "dermato", "oftalmolog", "cardiolog", "ortopedia", "neurolog", "pneumolog",
-            "ginecolog", "urolog", "psiquiatr", "nefrol", "gastroenterol", "endocrinol",
-            "reumatol", "hemat", "infectolog", "proctolog", "geriatr", "especialist",
-            "consulta especializada", "medico especialista"
-        ]
-        if any(term in query_normalized for term in MEDICAL_SPECIALTY_TERMS):
-            content_lower = c.get("content", "").lower()
-            title_lower = c.get("title", "").lower()
-            if any(x in content_lower or x in title_lower for x in ["especialidade", "encaminhamento", "ubs", "unidade basica", "regulacao"]):
-                c["similarity"] = round(c["similarity"] + 0.30, 4)
-            # Penaliza fortemente chunks de programas escolares (causa raiz do bug do dermatologista)
-            if any(x in title_lower or x in content_lower for x in ["escola", "escolar", "programa saude na escola", "pse"]):
-                c["similarity"] = round(c["similarity"] - 0.40, 4)
+            # Se qualquer alias da entidade ou o nome canônico estiver no título/conteúdo do candidato
+            if (canonical and canonical in title_content) or any(alias in title_content for alias in aliases):
+                ontology_boost += 0.35
+            elif any(kw in title_content for kw in keywords):
+                ontology_boost += 0.20
+            elif secretaria and secretaria in title_content:
+                ontology_boost += 0.10
 
-        # C2: Boost de Localidade — aumenta relevância de chunks que mencionam o bairro/localidade da query
-        KNOWN_LOCALITIES = [
-            "xerem", "xerém", "jardim primavera", "parque paulista",
-            "imbarie", "imbariê", "pilar", "saracuruna",
-            "campos eliseos", "campos elíseos", "pantanal", "centenario",
-            "centenário", "25 de agosto"
-        ]
-        for loc in KNOWN_LOCALITIES:
-            if loc in query_normalized:
-                loc_norm = ''.join(c2 for c2 in unicodedata.normalize('NFKD', loc.lower()) if not unicodedata.combining(c2))
-                content_norm = ''.join(c2 for c2 in unicodedata.normalize('NFKD', c.get("content", "").lower()) if not unicodedata.combining(c2))
-                if loc_norm in content_norm or loc_norm in ''.join(
-                    c2 for c2 in unicodedata.normalize('NFKD', c.get("title", "").lower()) if not unicodedata.combining(c2)
-                ):
-                    c["similarity"] = round(c["similarity"] + 0.25, 4)
-                break
+        base_score = retrieval_score + ontology_boost
+        # Fator Multiplicativo: final_score = base_score * completeness_score
+        c["similarity"] = min(max(round(base_score * completeness, 4), 0.0), 1.0)
 
-        # Trava de Segurança: Garante que o score final de similaridade esteja no intervalo [0.0, 1.0]
-        c["similarity"] = min(max(round(c["similarity"], 4), 0.0), 1.0)
-
-    # Ordena todos juntos pelo score 'similarity' de forma decrescente
+    # Ordena todos juntos pelo score 'similarity' final de forma decrescente
     all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
     
-    # Filtro Dinâmico de Relevância por Distância do Top-1:
-    # Se o Top-1 possui score alto (>= 0.85), descarta chunks secundários com queda superior a 0.25
-    if all_candidates and all_candidates[0].get("similarity", 0.0) >= 0.85:
+    # Filtro Dinâmico de Relevância por Distância do Top-1
+    if all_candidates and all_candidates[0].get("similarity", 0.0) >= 0.70:
         top1_score = all_candidates[0]["similarity"]
-        filtered_candidates = [c for c in all_candidates if (top1_score - c.get("similarity", 0.0)) <= 0.25]
+        filtered_candidates = [c for c in all_candidates if (top1_score - c.get("similarity", 0.0)) <= 0.40]
         return filtered_candidates[:top_k]
         
     return all_candidates[:top_k]

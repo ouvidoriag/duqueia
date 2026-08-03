@@ -210,22 +210,32 @@ def populate_structured_services():
         service_id = cursor.lastrowid
         count_services += 1
 
-        # 4. Extração e inserção de telefones, e-mails, links das colunas de texto
-        # Procuramos tanto na coluna de canais como no endereço/como acessar
-        canal_texto = row_data.get("Canal de atendimento", "")
-        context_texto = f"{canal_texto} {how} {addr} {desc}"
+        # 4. Extração e inserção de telefones, e-mails, links das colunas do Excel e texto
+        col_tel = row_data.get("Telefone", "")
+        col_eml = row_data.get("E-mail(s)", row_data.get("Email", ""))
+        col_lnk = row_data.get("Link(s)", row_data.get("Link", ""))
+        context_texto = f"{col_tel} {col_eml} {col_lnk} {how} {addr} {desc}"
 
         phones = extract_phones(context_texto)
+        if col_tel and col_tel not in ("Não informado", "Não cadastrado", "nan", ""):
+            phones.append(col_tel)
         for ph in set(phones):
-            cursor.execute("INSERT INTO service_phones (service_id, phone) VALUES (?, ?)", (service_id, ph))
+            if len(ph) >= 5:
+                cursor.execute("INSERT INTO service_phones (service_id, phone) VALUES (?, ?)", (service_id, ph))
 
         emails = extract_emails(context_texto)
+        if col_eml and col_eml not in ("Não informado", "Não cadastrado", "nan", ""):
+            emails.append(col_eml)
         for em in set(emails):
-            cursor.execute("INSERT INTO service_emails (service_id, email) VALUES (?, ?)", (service_id, em))
+            if "@" in em:
+                cursor.execute("INSERT INTO service_emails (service_id, email) VALUES (?, ?)", (service_id, em))
 
         links = extract_links(context_texto)
+        if col_lnk and col_lnk not in ("Não informado", "Não cadastrado", "nan", ""):
+            links.append(col_lnk)
         for lk in set(links):
-            cursor.execute("INSERT INTO service_links (service_id, link) VALUES (?, ?)", (service_id, lk))
+            if len(lk) >= 5:
+                cursor.execute("INSERT INTO service_links (service_id, link) VALUES (?, ?)", (service_id, lk))
 
         # 5. Passo a passo (steps) do serviço
         passo_a_passo = row_data.get("Passo a passo", "")
@@ -235,10 +245,12 @@ def populate_structured_services():
                            (service_id, idx_step, step_desc))
 
         # 6. Documentos necessários
-        docs = split_documents(row_data.get("Documentos necessários", row_data.get("Documentos necessarios", "")))
+        docs_raw = row_data.get("Documentação necessária", row_data.get("Documentos necessários", row_data.get("Documentos necessarios", "")))
+        docs = split_documents(docs_raw)
         for doc_name in docs:
-            cursor.execute("INSERT INTO service_documents (service_id, document_name) VALUES (?, ?)",
-                           (service_id, doc_name))
+            if len(doc_name) >= 3:
+                cursor.execute("INSERT INTO service_documents (service_id, document_name) VALUES (?, ?)",
+                               (service_id, doc_name))
 
     conn.commit()
     conn.close()

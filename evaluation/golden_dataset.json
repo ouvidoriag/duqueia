@@ -1,0 +1,41 @@
+{
+  "description": "Dataset de Avaliação Factual e Recuperação para o RAG Duque IA (Golden Standard)",
+  "version": "1.0",
+  "questions": [
+    {
+      "id": "Q01",
+      "domain": "education",
+      "query": "Quais documentos preciso para matricular meu filho na creche municipal?",
+      "mandatory_sources": ["lacunas_dados_resolvidas.md"],
+      "expected_keywords": ["Certidão de Nascimento", "Carteira de Vacinação", "Comprovante de Residência"]
+    },
+    {
+      "id": "Q02",
+      "domain": "health",
+      "query": "Qual é o horário de funcionamento das UPAs em Duque de Caxias?",
+      "mandatory_sources": ["saude.md", "postos_saude_caxias.xlsx", "vw_ia_servicos"],
+      "expected_keywords": ["24 horas", "24h", "UPA"]
+    },
+    {
+      "id": "Q03",
+      "domain": "lighting",
+      "query": "O poste da minha rua está apagado há uma semana. O que eu faço?",
+      "mandatory_sources": ["vw_ia_servicos", "lacunas_dados_resolvidas.md"],
+      "expected_keywords": ["Colab", "Iluminação Pública", "troca de lâmpada"]
+    },
+    {
+      "id": "Q04",
+      "domain": "culture",
+      "query": "A FUNDEC oferece cursos gratuitos? Quais?",
+      "mandatory_sources": ["lacunas_dados_resolvidas.md", "vw_ia_servicos"],
+      "expected_keywords": ["Informática", "Barbeiro", "Cabeleireiro", "Inglês"]
+    },
+    {
+      "id": "Q05",
+      "domain": "governance",
+      "query": "Quais são os bairros do segundo distrito de Duque de Caxias?",
+      "mandatory_sources": ["lacunas_dados_resolvidas.md", "a_cidade.md"],
+      "expected_keywords": ["Jardim Primavera", "Campos Elíseos", "Saracuruna"]
+    }
+  ]
+}

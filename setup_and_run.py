@@ -159,13 +159,25 @@ def setup_database():
     cur_main.execute("SELECT COUNT(*) FROM secretaria_unidades;")
     if cur_main.fetchone()[0] == 0:
         log("Banco de unidades físicas vazio. Populando CRAS de Duque de Caxias...")
+        cur_main.execute("SELECT id FROM secretarias WHERE code = 'SMASDH' OR name LIKE '%Assistência Social%' LIMIT 1;")
+        row_sec = cur_main.fetchone()
+        if not row_sec:
+            cur_main.execute("SELECT id FROM secretarias LIMIT 1;")
+            row_sec = cur_main.fetchone()
+        if not row_sec:
+            cur_main.execute("INSERT INTO secretarias (code, name) VALUES ('SMASDH', 'Secretaria Municipal de Assistência Social e Direitos Humanos');")
+            conn_main.commit()
+            sec_id = cur_main.lastrowid
+        else:
+            sec_id = row_sec[0]
+
         cras_units = [
-            (4, "CRAS Jardim Primavera", "Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ", "(21) 2773-1066", "Segunda a sexta-feira, das 9h às 17h"),
-            (4, "CRAS Centenário", "Rua Doutor Manoel Reis, 120 - Centenário, Duque de Caxias - RJ", "(21) 2671-1508", "Segunda a sexta-feira, das 9h às 17h"),
-            (4, "CRAS Imbariê", "Rua Feliciano Sodré, s/nº - Imbariê, Duque de Caxias - RJ", "(21) 2778-1926", "Segunda a sexta-feira, das 9h às 17h"),
-            (4, "CRAS Parque Paulista", "Avenida Automóvel Clube, 120 - Parque Paulista, Duque de Caxias - RJ", "(21) 2773-5120", "Segunda a sexta-feira, das 9h às 17h"),
-            (4, "CRAS Pilar", "Estrada do Pilar, s/nº - Pilar, Duque de Caxias - RJ", "(21) 2676-1520", "Segunda a sexta-feira, das 9h às 17h"),
-            (4, "CRAS Xerém", "Avenida Dr. Sabino Árias, 15 - Xerém, Duque de Caxias - RJ", "(21) 2679-2236", "Segunda a sexta-feira, das 9h às 17h")
+            (sec_id, "CRAS Jardim Primavera", "Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ", "(21) 2773-1066", "Segunda a sexta-feira, das 9h às 17h"),
+            (sec_id, "CRAS Centenário", "Rua Doutor Manoel Reis, 120 - Centenário, Duque de Caxias - RJ", "(21) 2671-1508", "Segunda a sexta-feira, das 9h às 17h"),
+            (sec_id, "CRAS Imbariê", "Rua Feliciano Sodré, s/nº - Imbariê, Duque de Caxias - RJ", "(21) 2778-1926", "Segunda a sexta-feira, das 9h às 17h"),
+            (sec_id, "CRAS Parque Paulista", "Avenida Automóvel Clube, 120 - Parque Paulista, Duque de Caxias - RJ", "(21) 2773-5120", "Segunda a sexta-feira, das 9h às 17h"),
+            (sec_id, "CRAS Pilar", "Estrada do Pilar, s/nº - Pilar, Duque de Caxias - RJ", "(21) 2676-1520", "Segunda a sexta-feira, das 9h às 17h"),
+            (sec_id, "CRAS Xerém", "Avenida Dr. Sabino Árias, 15 - Xerém, Duque de Caxias - RJ", "(21) 2679-2236", "Segunda a sexta-feira, das 9h às 17h")
         ]
         cur_main.executemany("""
         INSERT INTO secretaria_unidades (secretaria_id, name, address, phone, working_hours)

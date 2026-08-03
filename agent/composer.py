@@ -62,5 +62,7 @@ class ResponseComposer:
         composed = re.sub(r"(?i)📍\s*Endereço de Atendimento:.*?\n?", "", composed)
 
         # 3. Higienização final de nulos e espaços extras
+        composed = re.sub(r'\(\s*\)', '', composed)
+        composed = re.sub(r'\s*\(\s*$', '.', composed)
         composed = re.sub(r'\n\s*\n\s*\n', '\n\n', composed).strip()
         return composed

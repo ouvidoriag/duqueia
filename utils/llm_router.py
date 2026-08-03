@@ -1,59 +1,44 @@
 """
-LLM Router - Roteador de provedores de LLM para o DUQUE IA
-===========================================================
-Gerencia a rotação automática entre provedores (Gemini, Groq) de forma
-transparente. Quando um provedor falha ou esgota cota, tenta o próximo.
+LLM Router — Roteador Exclusivo Gemini do DUQUE IA
+===================================================
+Gerencia a execução e fallback entre modelos do Google Gemini
+utilizando rotação transparente entre 11 chaves de API ativas.
 
-Estratégia:
-  - Gemini 2.5 Flash: modelo principal (geração RAG e triagem)
-  - Groq llama-3.1-8b-instant: fallback ultrarrápido e gratuito
-  - Groq llama-3.3-70b-versatile: fallback de qualidade alta
+Modelos Suportados:
+  - Gemini 2.5 Flash: modelo principal de alta capacidade (RAG e resposta)
+  - Gemini 3.1 Flash Lite: modelo ultra-rápido de menor latência (triagem e fallback)
 """
 
 import os
-import time
 import sys
+import time
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from utils.gemini_client import GeminiClient
-from utils.groq_client import GroqClient
 
-# Instâncias singleton (criadas uma vez, reutilizadas)
+# Instância singleton do cliente Gemini
 _gemini_client: GeminiClient = None
-_groq_client: GroqClient = None
 
 
 def get_gemini() -> GeminiClient:
+    """Retorna o cliente Gemini único compartilhado."""
     global _gemini_client
     if _gemini_client is None:
         _gemini_client = GeminiClient()
     return _gemini_client
 
 
-def get_groq() -> GroqClient:
-    global _groq_client
-    if _groq_client is None:
-        _groq_client = GroqClient()
-    return _groq_client
-
-
 class LLMRouter:
     """
-    Roteador principal de LLMs do DUQUE IA.
-    
-    Estratégias de uso:
-      - generate_response(): usa Gemini primeiro, Groq como fallback
-      - generate_triage(): usa Groq 8b (velocidade) primeiro, Gemini como fallback
-      - generate_rag_response(): usa Gemini primeiro (qualidade RAG), Groq 70b como fallback
+    Roteador principal de LLMs do DUQUE IA (Exclusivo para o ecossistema Gemini).
     """
 
     def __init__(self):
         self.gemini = get_gemini()
-        self.groq = get_groq()
         self._provider_stats = {
-            "gemini_ok": 0, "gemini_fail": 0,
-            "groq_ok": 0, "groq_fail": 0
+            "gemini_ok": 0,
+            "gemini_fail": 0
         }
 
     def generate_response(
@@ -63,10 +48,9 @@ class LLMRouter:
         model: str = None
     ) -> tuple:
         """
-        Geração de texto com fallback automático Gemini → Groq.
+        Geração de texto com rotação automática de chaves do Gemini.
         Retorna: (texto, provedor_usado)
         """
-        # Tenta Gemini primeiro
         if self.gemini.api_keys:
             try:
                 text = self.gemini.generate_response(
@@ -78,34 +62,21 @@ class LLMRouter:
                 return text, "gemini"
             except Exception as e:
                 self._provider_stats["gemini_fail"] += 1
-                print(f"[LLMRouter] Gemini falhou: {str(e)[:80]}. Tentando Groq...", file=sys.stderr)
-
-        # Fallback para Groq
-        if self.groq.available:
-            try:
-                text = self.groq.generate_response(
-                    prompt,
-                    system_instruction=system_instruction,
-                    prefer_quality=False
-                )
-                self._provider_stats["groq_ok"] += 1
-                return text, "groq-8b"
-            except Exception as e:
-                self._provider_stats["groq_fail"] += 1
-                print(f"[LLMRouter] Groq 8b falhou: {str(e)[:80]}. Tentando Groq 70b...", file=sys.stderr)
+                print(f"[LLMRouter] Gemini primário falhou: {str(e)[:80]}. Tentando modelo Lite de fallback...", file=sys.stderr)
+                # Tenta fallback para o modelo lite
                 try:
-                    text = self.groq.generate_response(
+                    text = self.gemini.generate_response(
                         prompt,
                         system_instruction=system_instruction,
-                        prefer_quality=True
+                        model="gemini-3.1-flash-lite"
                     )
-                    self._provider_stats["groq_ok"] += 1
-                    return text, "groq-70b"
+                    self._provider_stats["gemini_ok"] += 1
+                    return text, "gemini-3.1-flash-lite"
                 except Exception as e2:
-                    self._provider_stats["groq_fail"] += 1
-                    print(f"[LLMRouter] Groq 70b falhou: {str(e2)[:80]}", file=sys.stderr)
+                    self._provider_stats["gemini_fail"] += 1
+                    raise RuntimeError(f"Todos os modelos Gemini falharam na geração: {e2}")
 
-        raise RuntimeError("Todos os provedores LLM falharam. Sistema em modo offline.")
+        raise RuntimeError("Nenhuma chave Gemini disponível.")
 
     def generate_triage(
         self,
@@ -113,30 +84,33 @@ class LLMRouter:
         system_instruction: str = None
     ) -> tuple:
         """
-        Geração otimizada para triagem: Groq 8b (velocidade máxima) → Gemini.
+        Geração otimizada para triagem utilizando o modelo Lite (baixa latência) ou Flash primário.
         Retorna: (texto, provedor_usado)
         """
-        # Tenta Groq primeiro (mais rápido para triagem)
-        if self.groq.available:
-            try:
-                text = self.groq.generate_triage(prompt, system_instruction=system_instruction)
-                self._provider_stats["groq_ok"] += 1
-                return text, "groq-8b"
-            except Exception as e:
-                self._provider_stats["groq_fail"] += 1
-                print(f"[LLMRouter] Groq falhou na triagem: {str(e)[:80]}. Tentando Gemini...", file=sys.stderr)
-
-        # Fallback para Gemini
         if self.gemini.api_keys:
             try:
-                text = self.gemini.generate_response(prompt, system_instruction=system_instruction)
+                text = self.gemini.generate_response(
+                    prompt,
+                    system_instruction=system_instruction,
+                    model="gemini-3.1-flash-lite"
+                )
                 self._provider_stats["gemini_ok"] += 1
-                return text, "gemini"
+                return text, "gemini-3.1-flash-lite"
             except Exception as e:
                 self._provider_stats["gemini_fail"] += 1
-                raise RuntimeError(f"Todos os provedores falharam na triagem: {e}")
+                print(f"[LLMRouter] Gemini Lite falhou na triagem: {str(e)[:80]}. Tentando modelo padrão...", file=sys.stderr)
+                try:
+                    text = self.gemini.generate_response(
+                        prompt,
+                        system_instruction=system_instruction
+                    )
+                    self._provider_stats["gemini_ok"] += 1
+                    return text, "gemini"
+                except Exception as e2:
+                    self._provider_stats["gemini_fail"] += 1
+                    raise RuntimeError(f"Falha na triagem com Gemini: {e2}")
 
-        raise RuntimeError("Nenhum provedor LLM disponível para triagem.")
+        raise RuntimeError("Nenhum provedor Gemini disponível para triagem.")
 
     def generate_rag_response(
         self,
@@ -145,10 +119,9 @@ class LLMRouter:
         previous_interaction_id: str = None
     ) -> tuple:
         """
-        Geração para respostas RAG: Gemini (contexto nativo) → Groq 70b.
+        Geração para respostas RAG usando o modelo principal do Gemini.
         Retorna: (texto, novo_interaction_id, provedor_usado)
         """
-        # Gemini primeiro para RAG (suporte a interaction ID e contexto)
         if self.gemini.api_keys:
             try:
                 text, new_id, model = self.gemini.generate_interaction(
@@ -160,36 +133,12 @@ class LLMRouter:
                 return text, new_id, f"gemini:{model}"
             except Exception as e:
                 self._provider_stats["gemini_fail"] += 1
-                print(f"[LLMRouter] Gemini RAG falhou: {str(e)[:80]}. Tentando Groq 70b...", file=sys.stderr)
+                raise RuntimeError(f"Falha no Gemini RAG: {e}")
 
-        # Fallback Groq 70b (qualidade para RAG)
-        if self.groq.available:
-            try:
-                text = self.groq.generate_response(
-                    prompt,
-                    system_instruction=system_instruction,
-                    prefer_quality=True
-                )
-                self._provider_stats["groq_ok"] += 1
-                return text, None, "groq:llama-3.3-70b-versatile"
-            except Exception as e:
-                self._provider_stats["groq_fail"] += 1
-                # Último fallback: Groq 8b
-                try:
-                    text = self.groq.generate_response(
-                        prompt,
-                        system_instruction=system_instruction,
-                        prefer_quality=False
-                    )
-                    self._provider_stats["groq_ok"] += 1
-                    return text, None, "groq:llama-3.1-8b-instant"
-                except Exception as e2:
-                    self._provider_stats["groq_fail"] += 1
-
-        raise RuntimeError("Todos os provedores LLM falharam no RAG. Sistema em modo offline.")
+        raise RuntimeError("Nenhum provedor Gemini disponível para RAG.")
 
     def get_stats(self) -> dict:
-        """Retorna estatísticas de uso dos provedores."""
+        """Retorna estatísticas de uso do Gemini."""
         total = sum(self._provider_stats.values())
         return {
             **self._provider_stats,
@@ -207,3 +156,4 @@ def get_router() -> LLMRouter:
     if _router is None:
         _router = LLMRouter()
     return _router
+
