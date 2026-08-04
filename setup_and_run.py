@@ -212,19 +212,28 @@ def setup_database():
 
 def run_server():
     log("Iniciando o Duque IA Chat Server...")
-    # Executa o node server.js sem shell=True por padrão
     try:
         subprocess.run(["node", "server.js"], check=True)
+    except KeyboardInterrupt:
+        raise
     except Exception as e:
         log(f"Falha ao iniciar o Node diretamente: {e}. Tentando com shell=True...")
-        subprocess.run("node server.js", shell=True)
+        try:
+            subprocess.run("node server.js", shell=True)
+        except KeyboardInterrupt:
+            raise
 
 if __name__ == "__main__":
-    # Verifica se existe o .env
-    if not os.path.exists(".env"):
-        log("Arquivo .env não encontrado. Copiando do template .env.example...")
-        shutil.copy(".env.example", ".env")
-        
-    check_requirements()
-    setup_database()
-    run_server()
+    try:
+        # Verifica se existe o .env
+        if not os.path.exists(".env"):
+            log("Arquivo .env não encontrado. Copiando do template .env.example...")
+            shutil.copy(".env.example", ".env")
+            
+        check_requirements()
+        setup_database()
+        run_server()
+    except KeyboardInterrupt:
+        log("Servidor encerrado pelo usuário (Ctrl+C). Até logo! 👋")
+        sys.exit(0)
+
