@@ -28,12 +28,13 @@ htmlcov/
 .agents/
 scratch/
 
-# Banco de Dados SQLite Local e Temporários
+# Banco de Dados SQLite Local (Bancos da aplicação inclusos no repositório)
 *.db
 *.db-journal
 *.db-wal
-!data/db/duque_ia.db
-banco.db
+!data/db/main.db
+!data/db/vector.db
+!data/db/cache.db
 
 
 # Logs e Métricas Locais

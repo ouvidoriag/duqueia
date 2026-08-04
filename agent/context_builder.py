@@ -1,4 +1,5 @@
 from typing import List, Tuple, Dict
+from agent.candidate import Candidate
 
 class ContextBuilder:
     """

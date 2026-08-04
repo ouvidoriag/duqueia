@@ -13,8 +13,12 @@ load_dotenv(os.path.join(_PROJECT_ROOT, ".env"))
 # Garante acesso à pasta utils
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from utils.gemini_client import GeminiClient
-from config import load_config
-from core import ChunkingStrategies
+try:
+    from ingestion.embed.config import load_config
+    from ingestion.embed.core import ChunkingStrategies
+except ImportError:
+    from config import load_config
+    from core import ChunkingStrategies
 from config.settings import DATABASE_VECTOR
 from storage import storage_manager
 
