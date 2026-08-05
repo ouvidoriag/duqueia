@@ -49,8 +49,13 @@ Acesse a [Documentação de Instalação](docs/02-Instalacao/Instalacao.md) para
 
 ### Instalação Rápida:
 ```bash
-# Instalar dependências python
-npm run build
+# Criar e ativar ambiente virtual Python
+python3 -m venv .venv
+source .venv/bin/activate  # no Windows: .venv\Scripts\activate
+
+# Instalar dependências Python e Node.js
+pip install -r requirements.txt
+npm install
 
 # Configurar variáveis de ambiente
 cp .env.example .env
@@ -60,8 +65,8 @@ cp .env.example .env
 python ingestion/parser/parse_pdfs.py
 python ingestion/embed/main.py --config ingestion/embed/embed_config.yml
 
-# Iniciar em ambiente de desenvolvimento
-npm run dev
+# Iniciar o servidor
+npm start
 ```
 
 ---

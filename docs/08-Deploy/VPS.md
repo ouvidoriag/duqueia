@@ -27,11 +27,23 @@ USE_TRIAGE_LAYER=true
 SQLITE_DB_PATH=agent/duque_ia.db
 ```
 
-## 3. Instalação e Inicialização
-Instale as dependências Node.js e Python:
+## 3. Instalação e Ambiente Virtual (.venv)
+Em distribuições Linux com Python 3.13+ (Ubuntu 23+/Debian 12+), o Python protege o ambiente do sistema (PEP 668). É mandatório utilizar um ambiente virtual:
 
 ```bash
-npm run build
+# Instalar suporte a venv no sistema
+sudo apt install python3-venv python3-full -y
+
+# Criar e ativar o ambiente virtual na pasta do projeto
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Atualizar pip e instalar dependências Python
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Instalar dependências Node.js
+npm install
 ```
 
 Alimente o banco de dados (se for a primeira execução e você não trouxe o banco já populado):
@@ -42,11 +54,17 @@ python3 ingestion/embed/main.py --config ingestion/embed/embed_config.yml
 ```
 
 ## 4. Gerenciamento do Processo com PM2
-Para manter o servidor Node.js executando continuamente em segundo plano, utilize o gerenciador de processos PM2:
+Para manter o servidor executando continuamente em segundo plano com suporte automático ao intérprete `.venv`:
 
 ```bash
 sudo npm install -g pm2
-pm2 start server.js --name "duqueia"
+
+# Opção 1: Utilizando o arquivo de ecossistema (Recomendado - auto-detecta .venv)
+pm2 start ecosystem.config.js
+
+# Opção 2: Especificando explicitamente o Python do ambiente virtual
+pm2 start setup_and_run.py --name "duqueia" --interpreter .venv/bin/python
+
 pm2 save
 pm2 startup
 ```
