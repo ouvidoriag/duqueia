@@ -217,15 +217,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── Health Check (Render usa isso para verificar se o serviço está vivo) ─
-  if (req.url === '/health' && req.method === 'GET') {
+  // ── Health Check ────────────────────────────────────────────────────────
+  if ((req.url === '/health' || req.url.endsWith('/health')) && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', sessions: activeSessions.size }));
     return;
   }
 
   // ── API de Chat ─────────────────────────────────────────────────────────
-  if (req.url === '/api/chat' && req.method === 'POST') {
+  if ((req.url === '/api/chat' || req.url.endsWith('/api/chat')) && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk.toString('utf-8'); });
     req.on('end', async () => {
@@ -274,7 +274,7 @@ const server = http.createServer((req, res) => {
   }
 
   // ── API de Métricas ─────────────────────────────────────────────────────
-  if (req.url.startsWith('/api/metrics') && req.method === 'GET') {
+  if ((req.url.includes('/api/metrics')) && req.method === 'GET') {
     const jsonlPath = path.join(__dirname, 'metrics', 'requests.jsonl');
     const csvPath = path.join(__dirname, 'metrics', 'retrieval_performance.csv');
     

@@ -765,7 +765,7 @@
       appendMessage('user', text);
       showTyping();
       try {
-        const res  = await fetch('/api/chat', {
+        const res  = await fetch('api/chat', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ message: text, sessionId })
@@ -865,7 +865,7 @@
                 const base64Audio = reader.result;
 
                 try {
-                  const res = await fetch('/api/chat', {
+                  const res = await fetch('api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ audio: base64Audio, sessionId })
