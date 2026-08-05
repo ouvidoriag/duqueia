@@ -19,13 +19,11 @@ PROGRAMMING_TRIGGERS = [
 ]
 
 PRIVACY_TRIGGERS = [
-    # Match vizinho/vizinha only if query doesn't mention sound or noise
-    r"\bvizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
-    r"\bvizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))",
     r"cpf\s+(?:de|do|da|do\s+meu|da\s+minha|de\s+um|de\s+uma)?\s*(?:cidadão|cidadao|reclamante|outro|terceiro|vizinho|vizinha|fulano|sicrano|beltrano|wellington)",
-    r"protocolo\s+.*(?:vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
-    r"nome\s+(?:dele|dela|do\s+vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|da\s+vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|do\s+reclamante|do\s+outro|da\s+outra)",
-    r"reclamaç(?:ão|ões|ao)\s+abertas?\s+sobre\s+(?:o\s+bar|o\s+estabelecimento|vizinho\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|vizinha\b(?![^#]*?(?:som|barulho|musica|música|festa|algazarra))|outro|terceiro)"
+    r"protocolo\s+.*(?:vizinho|vizinha|outro|outra|terceiro|terceira|fulano|sicrano|wellington)",
+    r"nome\s+(?:dele|dela|do\s+vizinho|da\s+vizinha|do\s+reclamante|do\s+outro|da\s+outra)",
+    r"dados\s+pessoais\s+(?:do|da|de)?\s*(?:vizinho|vizinha|terceiro|outro)",
+    r"reclamaç(?:ão|ões|ao)\s+abertas?\s+por\s+(?:terceiro|outro|vizinho|vizinha)"
 ]
 
 COMPETENCY_TRIGGERS = [
@@ -50,12 +48,19 @@ LEGAL_TRIGGERS = [
     r"formular\s+(?:defesa|parecer|recurso)",
     r"orientaç(?:ão|ões)\s+jurídica",
     r"argumentos?\s+contra\s+o\s+poder\s+público",
-    r"como\s+a\s+administração\s+pública\s+deve\s+proceder\s+diante\s+de\s+reclamações\s+recorrentes"
+    r"como\s+a\s+administração\s+pública\s+deve\s+proceder\s+diante\s+de\s+reclamações\s+recorrentes",
+    r"árvore\s+(?:caiu|derrubou)\s+no\s+(?:meu\s+)?(?:carro|veículo|veiculo|casa|telhado)",
+    r"indenizaç(?:ão|ao)\s+prefeitura",
+    r"prefeitura\s+pagar\s+(?:o\s+)?prejuízo",
+    r"responsabilidade\s+civil\s+prefeitura"
 ]
 
 HUMAN_ESCALATION_TRIGGERS = [
     r"desvi(?:o|ando)\s+verba|roub(?:o|ando)|suborn(?:o|ar|ando)|corrupç(?:ão|ao)|\bsecretário\s+roub\w+",
-    r"\b(?:matar|agredir|bater|violentar|assassinar|morrer|espancar|facada|tiro)\b"
+    r"\b(?:matar|agredir|bater|violentar|assassinar|morrer|espancar|facada|tiro)\b",
+    r"\bmenor\b.*?\b(?:agressão|agressao|agredid[oa]|apanhando|espancad[oa]|maus-tratos|maustratos|abuso|violência|violencia)\b",
+    r"\b(?:criança|crianca|menor|infantil)\b.*?\b(?:sofrendo|vítima|vitima|agredid[oa]|espancad[oa]|maus-tratos|maustratos|abuso)\b",
+    r"\b(?:vizinho|pais?|mãe|mae|pai)\b.*?\b(?:menor|criança|crianca)\b.*?\b(?:agressão|agressao|apanhando|espancando|maus-tratos)\b"
 ]
 
 def check_input_guardrail(query: str) -> bool:

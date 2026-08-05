@@ -28,6 +28,9 @@ ALLOWED_INTENTS = {
     "AMBIGUO_LUZ",
     "AMBIGUO_LAMPADA",
     "AMBIGUO_BARULHO",
+    "AMBIGUO_LOCALIZACAO",
+    "DEFESA_CIVIL_EMERGENCIA",
+    "SEGURANCA_PUBLICA_EMERGENCIA",
     "RESIDENCIAL",
     "OUVIDORIA_MANIFESTACAO",
     "ESCALONAMENTO_HUMANO",
@@ -43,6 +46,9 @@ ALLOWED_INTENTS = {
 # --------------------------------------------------------------------------
 FAST_SECURITY_PATTERNS = []
 
+for pat in HUMAN_ESCALATION_TRIGGERS:
+    FAST_SECURITY_PATTERNS.append((pat, "ESCALONAMENTO_HUMANO", "Assunto sensível ou denúncia encaminhada para escalonamento humano."))
+
 for pat in PROGRAMMING_TRIGGERS:
     FAST_SECURITY_PATTERNS.append((pat, "PROGRAMACAO", "Solicitação de programação bloqueada localmente."))
 
@@ -54,9 +60,6 @@ for pat in COMPETENCY_TRIGGERS:
 
 for pat in LEGAL_TRIGGERS:
     FAST_SECURITY_PATTERNS.append((pat, "JURIDICO", "Solicitação jurídica bloqueada localmente."))
-
-for pat in HUMAN_ESCALATION_TRIGGERS:
-    FAST_SECURITY_PATTERNS.append((pat, "ESCALONAMENTO_HUMANO", "Assunto sensível ou denúncia encaminhada para escalonamento humano."))
 
 
 # Detecta queries de barulho/som onde o cidadão NÃO especifica se a origem é pública ou privada.
@@ -79,6 +82,20 @@ AMBIGUITY_FAST_PATTERNS = [
         "AMBIGUO_BARULHO",
         "Reclamação de barulho intenso sem origem explícita — aguardando esclarecimento."
     ),
+    # Solicitação de unidade/serviço mais próximo sem menção de bairro ou rua
+    (
+        r"\b(?:qual|onde\s+fica|qual\s+é|onde\s+tem)\s+(?:a|o)?\s*(?:creche|posto\s+de\s+saúde|posto\s+de\s+saude|escola|ubs|cras)\s+(?:mais\s+próxim[ao]|mais\s+perto)\b(?!.*(?:bairro|rua|centro|xerém|xerem|saracuruna|imparti|pantanal|manoa|25\s+de\s+agosto|figueira))",
+        "AMBIGUO_LOCALIZACAO",
+        "Solicitação de proximidade de unidade sem informação de bairro ou rua."
+    )
+]
+
+DEFESA_CIVIL_FAST_PATTERNS = [
+    (r"\b(?:desabando|desabamento|casa\s+(?:está\s+)?desabando|casa\s+(?:está\s+)?caindo|risco\s+de\s+desabamento|deslizamento|barranco\s+caindo|alagamento\s+grave)\b", "DEFESA_CIVIL_EMERGENCIA", "Ocorrência grave de emergência de Defesa Civil detectada localmente.")
+]
+
+SEGURANCA_PUBLICA_FAST_PATTERNS = [
+    (r"\b(?:tráfico|trafico|tráfico\s+de\s+drogas|trafico\s+de\s+drogas|boca\s+de\s+fumo|tiroteio)\b", "SEGURANCA_PUBLICA_EMERGENCIA", "Ocorrência de segurança pública / crime detectada localmente.")
 ]
 
 POSSIVEL_DENUNCIA_FAST_PATTERNS = [
@@ -146,6 +163,28 @@ def check_fast_gate(query: str) -> dict | None:
         
     # 1º: Matcher de políticas de segurança / escopo (máxima prioridade)
     for regex, intent, reason in FAST_SECURITY_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+
+    # 1º A: Ocorrências de Emergência de Defesa Civil
+    for regex, intent, reason in DEFESA_CIVIL_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+
+    # 1º A2: Ocorrências de Crimes / Segurança Pública de Emergência
+    for regex, intent, reason in SEGURANCA_PUBLICA_FAST_PATTERNS:
         if re.search(regex, query_lower):
             return {
                 "intent": intent,

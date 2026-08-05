@@ -34,19 +34,42 @@ EQUIPMENT_PATTERNS = {
 }
 
 LOCALITY_PATTERNS = {
+    # 1º Distrito — Centro e Adjacências
+    "25 de agosto": r"\b25\s+de\s+agosto\b|\bjardim\s+25\s+de\s+agosto\b",
+    "centro": r"\bcentro\s+(?:de\s+caxias|de\s+duque\s+de\s+caxias)?\b",
+    "dr laureano": r"\bdr\s+laureano\b|\bdoutor\s+laureano\b",
+    "parque lafaiete": r"\bparque\s+lafaiete\b|\blafaiete\b",
+    "gramacho": r"\bgramacho\b|\bparque\s+gramacho\b|\bparada\s+gramacho\b",
+    "centenario": r"\bcentenario\b|\bcentenário\b",
+    "beira mar": r"\bbeira\s+mar\b|\bperiquitos\b",
+    "olavo bilac": r"\bolavo\s+bilac\b|\bbilac\b",
+    "bar dos cavaleiros": r"\bbar\s+dos\s+cavaleiros\b|\bcavaleiros\b",
+    "vila sao luis": r"\bvila\s+sao\s+luis\b|\bvila\s+são\s+luís\b|\bvila\s+são\s+luis\b",
+    "engenho do porto": r"\bengenho\s+do\s+porto\b",
+    "pantanal": r"\bpantanal\b",
+
+    # 2º Distrito — Campos Elíseos
+    "campos eliseos": r"\bcampos\s+eliseos\b|\bcampos\s+elíseos\b",
     "jardim primavera": r"\bjardim\s+primavera\b|\bprimavera\b",
-    "xerem": r"\bxerem\b|\bxerém\b",
+    "saracuruna": r"\bsaracuruna\b",
+    "pilar": r"\bpilar\b",
+    "figueira": r"\bfigueira\b",
+    "chacaras rio petropolis": r"\bchacaras?\s+rio\s+petropolis\b|\bchácaras?\s+rio\s+petrópolis\b",
+
+    # 3º Distrito — Imbariê
     "imbarie": r"\bimbarie\b|\bimbariê\b",
     "parque paulista": r"\bparque\s+paulista\b",
-    "pilar": r"\bpilar\b",
-    "saracuruna": r"\bsaracuruna\b",
-    "campos eliseos": r"\bcampos\s+eliseos\b|\bcampos\s+elíseos\b",
-    "pantanal": r"\bpantanal\b",
-    "centenario": r"\bcentenario\b|\bcentenário\b",
-    "beira mar": r"\bbeira\s+mar\b",
-    "25 de agosto": r"\b25\s+de\s+agosto\b|\bjardim\s+25\s+de\s+agosto\b",
-    "olavo bilac": r"\bolavo\s+bilac\b",
-    "dr laureano": r"\bdr\s+laureano\b|\bdoutor\s+laureano\b"
+    "parada angelica": r"\bparada\s+angelica\b|\bparada\s+angérica\b|\bparada\s+angélica\b",
+    "nova campinas": r"\bnova\s+campinas\b",
+    "santa lucia": r"\bsanta\s+lucia\b|\bsanta\s+lúcia\b",
+    "parque equitativa": r"\bparque\s+equitativa\b|\bequitativa\b",
+    "santa cruz da serra": r"\bsanta\s+cruz\s+da\s+serra\b|\bsanta\s+cruz\b",
+    "taquara": r"\btaquara\b",
+
+    # 4º Distrito — Xerém
+    "xerem": r"\bxerem\b|\bxerém\b",
+    "mantiquira": r"\bmantiquira\b",
+    "amapa": r"\bamapa\b|\bamapá\b"
 }
 
 

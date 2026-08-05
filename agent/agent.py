@@ -273,6 +273,13 @@ class DuqueIAAgent:
             print(f"[Clarification Warning] Erro ao gerar pergunta de esclarecimento dinâmica: {e}", file=sys.stderr)
             return fallback_msg
 
+    def process_query(self, user_query: str, conversation_id: str = None, history: list = None) -> dict:
+        """Método helper de alto nível que recebe query e histórico e retorna o dicionário com a resposta."""
+        if history and conversation_id and hasattr(DuqueIAAgent, "_history"):
+            DuqueIAAgent._history[conversation_id] = history
+        res_str = self.respond(user_query, conversation_id=conversation_id)
+        return json.loads(res_str)
+
     def respond(self, user_query: str, use_triage: bool = None, conversation_id: str = None) -> str:
         """Wrapper para gerenciar o estado da conversa e responder JSON com validação de Output Guardrail."""
         context_holder = {"conversation_id": conversation_id}

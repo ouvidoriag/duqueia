@@ -112,8 +112,30 @@ class SecurityHandler(BaseHandler):
             ans = "Por motivos de segurança e privacidade (LGPD), não tenho autorização para fornecer dados pessoais, CPFs ou andamento de solicitações de terceiros. Por favor, consulte o andamento de suas próprias solicitações nos canais oficiais identificados."
             intent_detected = "blocked_privacy"
         elif intent == "ESCALONAMENTO_HUMANO":
-            ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
+            q_low = query.lower()
+            if any(w in q_low for w in ["menor", "criança", "crianca", "filho", "filha", "agressão", "agressao", "maus-tratos"]):
+                ans = (
+                    "**Atenção**: Esta é uma situação de extrema gravidade que envolve a proteção e os direitos da criança e do adolescente.\n\n"
+                    "• **Emergência Imediata**: Caso a agressão ou risco esteja ocorrendo agora, entre em contato imediatamente com a **Polícia Militar pelo 190** ou com o **Disque Direitos Humanos (Disque 100)**.\n"
+                    "• **Denúncia Municipal**: Você pode registrar denúncia no **Conselho Tutelar de Duque de Caxias** ou na **Ouvidoria Geral de Duque de Caxias**: telefone **(21) 2652-3835**, WhatsApp **(21) 99824-5903**, ou pelo aplicativo **Colab** (categoria Assistência Social e Direitos Humanos)."
+                )
+            else:
+                ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
             intent_detected = "human_escalation"
+        elif intent == "DEFESA_CIVIL_EMERGENCIA":
+            ans = (
+                "**Emergência de Defesa Civil**: Em casos de risco de desabamento, desabamento de imóvel, deslizamento de terra ou alagamento grave, a prioridade absoluta é garantir a sua segurança!\n\n"
+                "• **Telefones de Emergência 24h**: Ligue imediatamente para a **Defesa Civil pelo 199** ou **(21) 2676-8000**.\n"
+                "• **Acompanhamento no Colab**: Para solicitar vistoria técnica preventiva ou registro de ocorrência, acesse o aplicativo **Colab** no tema **Defesa Civil**."
+            )
+            intent_detected = "defesa_civil_emergencia"
+        elif intent == "SEGURANCA_PUBLICA_EMERGENCIA":
+            ans = (
+                "**Segurança Pública e Crimes**: Para situações que envolvem tráfico de drogas, tiroteios ou emergências criminais, o atendimento presencial urgente cabe à força policial:\n\n"
+                "• **Urgência Policial**: Ligue imediatamente para a **Polícia Militar no 190**.\n"
+                "• **Denúncias e Ordem Pública**: Para registrar relatórios sobre o local ou fiscalização de ordem pública, acesse o aplicativo **Colab** ou site [duquedecaxias.colab.re](https://duquedecaxias.colab.re/) selecionando a categoria **Segurança Pública (SMSP)**."
+            )
+            intent_detected = "seguranca_publica_emergencia"
         elif intent == "FORA_COMPETENCIA":
             query_lower = query.lower()
             if any(w in query_lower for w in ["metro", "metrô", "trem", "supervia"]):
@@ -124,7 +146,16 @@ class SecurityHandler(BaseHandler):
                 ans = "Esta pergunta aborda um tema fora do âmbito das atribuições da Prefeitura de Duque de Caxias. Como assistente virtual municipal, meu foco é orientar sobre secretarias, tributos, escolas, postos de saúde, zeladoria e serviços da nossa cidade."
             intent_detected = "out_of_competency"
         elif intent == "JURIDICO":
-            ans = "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes."
+            query_lower = query.lower()
+            if any(w in query_lower for w in ["árvore", "arvore", "carro", "veículo", "veiculo", "casa", "indenização", "indenizacao", "prejuízo", "prejuizo"]):
+                ans = (
+                    "Para solicitações de indenização, ressarcimento ou análise de responsabilidade por danos materiais (como queda de árvore sobre veículos ou imóveis), a Prefeitura não realiza acordos ou pareceres formais via chat de atendimento virtual.\n\n"
+                    "**Como Proceder:**\n"
+                    "• O cidadão deve abrir um **Processo Administrativo de Avaliação de Danos** junto à **Procuradoria Geral do Município** ou dar entrada via **Ouvidoria Geral** (telefone **(21) 2652-3835**, WhatsApp **(21) 99824-5903** ou e-mail **ouvidoria@duquedecaxias.rj.gov.br**).\n"
+                    "• É necessário apresentar documentação do bem danificado, fotos do local e Registro de Ocorrência (se houver)."
+                )
+            else:
+                ans = "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes."
             intent_detected = "blocked_legal"
         else:
             ans = "Requisição bloqueada por motivos de segurança (Input Guardrail)."
@@ -536,6 +567,11 @@ class AmbiguityHandler(BaseHandler):
                 "  - **Urbanismo**: Obras em andamento;\n"
                 "  - **Meio Ambiente**: Demais casos de poluição sonora."
             )
+        elif intent == "AMBIGUO_LOCALIZACAO":
+            answer = (
+                "Para eu te indicar a **unidade ou creche mais próxima de você**, por favor me informe o seu **Bairro** e a sua **Rua**.\n\n"
+                "Com a sua localização exata, poderei verificar o equipamento público municipal mais conveniente!"
+            )
         else:
             answer = (
                 "Para eu te orientar direitinho, a troca de lâmpada que você precisa é **dentro da sua casa (área particular)** "
@@ -909,22 +945,24 @@ class RagHandler(BaseHandler):
             system_instruction = (
                 "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
                 "Sua missão é dar a resposta ideal adaptada ao tipo de pergunta do cidadão, usando com prioridade máxima os dados oficiais fornecidos no contexto.\n\n"
-                "REGRAS DE ADAPTAÇÃO DA RESPOSTA:\n"
-                "1. **Perguntas Diretas e Pontuais** (ex: 'qual o telefone...', 'onde fica...', 'qual o e-mail...'): Responda de forma direta e concisa (1 a 3 frases), destacando o dado solicitado em **negrito**.\n"
-                "2. **Consultas sobre Serviços da Carta de Serviços** (ex: IPTU, Poda de Árvore, Alvará, Cursos, Fiscalização): Forneça a orientação clara adaptada ao serviço, cobrindo: **Órgão Responsável**, **Como Solicitar / Passo a Passo**, **Documentação Necessária** (se houver), **Prazo Máximo**, **Custo** e **Canais de Atendimento** (destacando contatos em **negrito**). Se o contexto mencionar canais digitais (aplicativo **Colab**) e presenciais, apresente ambos os canais de forma integrada e prestativa.\n"
-                "3. **Casos com Dupla Atribuição**:\n"
+                "REGRAS DE ADAPTAÇÃO E FORMATAÇÃO DA RESPOSTA:\n"
+                "1. **Organização e Formatação Limpa**: Organize as respostas estruturadamente usando marcadores bem definidos em **negrito** (ex: **Quem pode solicitar**, **Documentos Necessários**, **Como Solicitar**, **Contatos / Onde ir**). Evite blocos de texto corrido extensos ou poluídos.\n"
+                "2. **Perguntas Diretas e Pontuais**: Responda de forma direta e concisa (1 a 3 frases), destacando o dado solicitado em **negrito**.\n"
+                "3. **Consultas sobre Serviços**: Forneça orientação clara adaptada ao serviço, cobrindo: **Órgão Responsável**, **Como Solicitar / Passo a Passo**, **Documentos** (se houver), **Prazo**, **Custo** e **Canais de Atendimento** (contatos em **negrito**).\n"
+                "4. **Vagas de Emprego e Concursos**: Forneça orientação genérica e objetiva (Sine Caxias, portal oficial de concursos e cursos da FUNDEC). NUNCA invente, presuma ou informe datas específicas de editais ou provas que não constem expressamente no contexto oficial fornecido.\n"
+                "5. **Poda de Árvores em Alta Tensão**: Se a árvore estiver encostada em fios de eletricidade/alta tensão, alerte sobre o risco elétrico e explique que a poda exige atuação conjunta/desligamento por parte da concessionária de energia (**Light**), devendo o pedido ser aberto no app **Colab** (Meio Ambiente) e comunicado à Light.\n"
+                "6. **Casos com Dupla Atribuição**:\n"
                 "   - **Terreno Abandonado**: Explique a diferença entre terreno particular (Fiscalização Urbanística - SMUH) e área pública (Limpeza Urbana - Colab);\n"
                 "   - **Barulho / Perturbação**: Residência/vizinho oriente ligar para a **Polícia Militar (190)**; comércio/evento oriente o app **Colab**.\n"
-                "4. **Para Serviços e Procedimentos**: UTILIZE E EXPLIQUE OBRIGATORIAMENTE AS INFORMAÇÕES PRESENTES NO CONTEXTO (órgão responsável, como solicitar online/presencial, documentos e contatos).\n"
-                "5. **Para Perguntas Quantitativas / Contagem Exata** (ex: 'quantos hospitais...', 'quantas praças...', 'quantas escolas...'): Se o contexto fornecido NÃO apresentar a quantidade/contagem exata total solicitada, DECLARE EXPLICITAMENTE que a quantidade total não está detalhada na base oficial interna (ex: 'A quantidade total exata não está detalhada na base oficial disponível no momento').\n"
-                "6. NÃO use saudações redundantes se a conversa já estiver em andamento."
+                "7. **Para Perguntas Quantitativas / Contagem Exata**: Se o contexto fornecido NÃO apresentar a quantidade exata total, DECLARE EXPLICITAMENTE que a quantidade total não está detalhada na base oficial interna.\n"
+                "8. NÃO use saudações redundantes se a conversa já estiver em andamento."
             )
             
             if history:
                 system_instruction += (
-                    "\nREGRA DE CONVERSA EM ANDAMENTO:\n"
-                    "- A conversa já está em andamento. NUNCA comece a resposta com saudações, saudações de boas-vindas, ou cumprimentos (como 'Olá', 'Oi', 'Bom dia', 'Tudo bem', 'Que bom ver você', etc.).\n"
-                    "- Vá direto para o assunto e inicie a resposta diretamente com os dados factuais solicitados."
+                    "\nREGRA DE CONVERSA EM ANDAMENTO (ANTI-REDUNDÂNCIA):\n"
+                    "- A conversa já está em andamento. NUNCA comece a resposta com saudações ou cumprimentos (como 'Olá', 'Oi', 'Bom dia').\n"
+                    "- Se as regras gerais ou procedimentos do serviço já foram explicados na mensagem anterior do histórico, NÃO repita as instruções genéricas anteriores. Responda estritamente à pergunta específica do turno atual."
                 )
             
             prompt = (
