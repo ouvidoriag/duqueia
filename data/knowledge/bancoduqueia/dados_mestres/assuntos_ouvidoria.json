@@ -1,0 +1,266 @@
+{
+  "versao": "consolidado_ouvidoria_2026",
+  "descricao": "Taxonomia Canônica de Temas (Assuntos) e Subassuntos da Ouvidoria Geral de Duque de Caxias / Colab / Colab",
+  "total_temas": 32,
+  "temas": {
+    "Saúde": [
+      "Agendamento de consulta/retorno",
+      "Alta da internação",
+      "Aparelho auditivo",
+      "Assistência social na saúde",
+      "Atendimento de urgência e emergência",
+      "Atendimento domiciliar (home care)",
+      "Atendimento odontológico",
+      "Atendimento à saúde mental (CAPS)",
+      "Banco de leite materno",
+      "Biópsias e exames laboratoriais",
+      "Cirurgia de catarata / Hospital do Olho",
+      "Cirurgia geral e bariátrica",
+      "Demora na entrega de lentes (Setor de Córnea)",
+      "Demora no resultado de exames e laudos",
+      "Demora/fila no SISREG",
+      "Elogio a equipes médicas e de enfermagem",
+      "Exames de imagem (Tomografia, Ressonância, Raio-X)",
+      "Falta de medicamentos e farmácia básica",
+      "Falta de médicos e especialistas",
+      "Fornecimento de próteses e órteses",
+      "Internação e regulação hospitalar",
+      "Maternidade e Pré-natal",
+      "Prontuário médico e laudos periciais",
+      "UPAs 24h e Clínicas da Família",
+      "Vacinação infantil e adulta"
+    ],
+    "Obras, Limpeza Urbana e Braço de Luz": [
+      "Asfaltamento e pavimentação de vias",
+      "Braço de luz e iluminação pública",
+      "Bueiros, manilhas e redes de drenagem",
+      "Caminhão Vac-All (desobstrução de esgotos)",
+      "Capina, roçada e poda de vegetação urbana",
+      "Conservação de calçadas e passeios públicos",
+      "Construção e manutenção de pontes e passarelas",
+      "Drenagem e combate a alagamentos",
+      "Limpeza de rios, canais e valões",
+      "Limpeza urbana e coleta de lixo domiciliar",
+      "Manutenção de praças, parques e áreas de lazer",
+      "Operação Tapa-Buraco",
+      "Quebra-molas e redutores de velocidade",
+      "Retirada de entulho e caçambas públicas"
+    ],
+    "Fiscalização e tributos": [
+      "Alvará de funcionamento comercial e industrial",
+      "Certidão Negativa de Débitos (CND Municipal)",
+      "Dívida Ativa e parcelamentos",
+      "Emissão de 2ª via do IPTU",
+      "Fiscalização de feiras livres e ambulantes",
+      "Imposto Sobre Serviços (ISSQN)",
+      "Imposto de Transmissão de Bens Imóveis (ITBI)",
+      "Isenção tributária e anistia fiscal (REFIS)",
+      "Nota Fiscal de Serviços Eletrônica (NFS-e)",
+      "Taxa de letreiro e publicidade urbana",
+      "Transferência de titularidade de imóvel"
+    ],
+    "Assistência Social e Direitos Humanos": [
+      "Acolhimento institucional (abrigos e casas de passagem)",
+      "Atendimento nos 10 CRAS municipais",
+      "Atendimento no CREAS (Proteção Especial)",
+      "Benefício de Prestação Continuada (BPC/LOAS)",
+      "Benefícios eventuais (auxílio funeral, cesta básica)",
+      "Cadastro Único (CadÚnico / Bolsa Família)",
+      "Combate ao abuso e exploração infantil",
+      "Direitos da população em situação de rua",
+      "Direitos LGBTQIA+ e igualdade racial",
+      "Restaurante do Povo / Segurança Alimentar",
+      "Vale Social / Passe interestadual"
+    ],
+    "Educação": [
+      "Atendimento Educacional Especializado (AEE)",
+      "Creches municipais e Educação Infantil",
+      "Educação de Jovens e Adultos (EJA)",
+      "Emissão de histórico e documentos escolares",
+      "Falta de professores e mediadores escolares",
+      "Infraestrutura e manutenção das escolas",
+      "Kits escolares e uniformes",
+      "Matrícula Fácil Caxias",
+      "Merenda escolar e nutrição (PNAE)",
+      "Segurança no ambiente escolar e combate ao bullying",
+      "Transporte escolar gratuito"
+    ],
+    "Defesa Civil": [
+      "Abrigos emergenciais e apoio a desalojados",
+      "Alertas meteorológicos e rede de sirenes (199)",
+      "Emergências de desabamentos e inundações",
+      "Monitoramento de encostas e risco de deslizamento",
+      "Poda e remoção emergencial de árvores em risco",
+      "Vistorias técnicas preventivas e interdição de imóveis"
+    ],
+    "Segurança, Sinalização, Multas e Tarifa Zero": [
+      "Acidentes de trânsito e ocorrências viárias",
+      "Estacionamento irregular e reboque",
+      "Fiscalização de velocidade e radares",
+      "Guarda Civil Municipal (Central 153)",
+      "Monitoramento por câmeras (CICC)",
+      "Multas de trânsito e recursos",
+      "Patrulhamento escolar e comunitário",
+      "Perturbação do sossego e som alto",
+      "Programa Tarifa Zero Municipal",
+      "Sinalização viária (placas, faixas e semáforos)",
+      "Veículos abandonados em via pública"
+    ],
+    "FUNDEC": [
+      "Certificados e declarações de conclusão",
+      "Cursos técnicos e profissionalizantes gratuitos",
+      "Inscrição e matrícula nos 27 polos descentralizados",
+      "Oficinas de música, instrumentos e coral",
+      "Oficinas de idiomas (Inglês, Espanhol, Francês, Mandarim, Libras)",
+      "Oficinas de informática, robótica e beleza",
+      "Preparatórios para ENEM e concursos públicos (PME)"
+    ],
+    "Proteção Animal": [
+      "Adoção responsável e feiras de animais",
+      "Atendimento veterinário público",
+      "Campanhas de vacinação antirrábica animal",
+      "Combate a maus-tratos e resgate de animais",
+      "Programa Castramóvel (Castração gratuita nos 4 distritos)"
+    ],
+    "Direito da Mulher": [
+      "Abraço Mulher e acolhimento psicossocial",
+      "Atendimento na Casa da Mulher Caxiense Ruth Cardoso",
+      "Atendimento jurídico e assistência a vítimas de violência",
+      "Patrulha Maria da Penha (GCM)",
+      "Qualificação e autonomia econômica da mulher"
+    ],
+    "Direitos à Pessoa com Deficiência": [
+      "Acessibilidade em prédios e vias públicas",
+      "Atendimento no Centro de Atendimento ao Autista (Fazendinha)",
+      "Carteira de Identificação da Pessoa com Autismo (CIPTEA)",
+      "Inclusão escolar e mediadores",
+      "Passe Livre PCD no transporte público"
+    ],
+    "Meio Ambiente (Poluição Sonora, Árvores e Licenciamento)": [
+      "Coleta seletiva e cooperativas de reciclagem",
+      "Denúncias de desmatamento e queimadas",
+      "Educação ambiental e projetos ecológicos",
+      "Fiscalização de poluição ambiental (solo, água, ar e som)",
+      "Licenciamento ambiental municipal (LP, LI, LO)",
+      "Parque Natural Municipal da Taquara e áreas de conservação",
+      "Poda e supressão autorizada de vegetação"
+    ],
+    "Cultura e Turismo": [
+      "Biblioteca Pública Municipal Governador Leonel Brizola",
+      "Editais e fomento cultural (Lei Paulo Gustavo)",
+      "Eventos culturais, feiras e espetáculos",
+      "Museu Vivo do São Bento e patrimônio histórico",
+      "Teatro Municipal Raul Cortez e Praça do Pacificador",
+      "Turismo ecológico e histórico na Baixada"
+    ],
+    "Esporte e Lazer": [
+      "Acesso gratuito à Vila Olímpica de Duque de Caxias",
+      "Escolinhas de esportes e hidroginástica",
+      "Incentivo ao esporte amador e comunitário",
+      "Manutenção de quadras esportivas e campos nos bairros"
+    ],
+    "Habitação": [
+      "Cadastro e atualização de beneficiários",
+      "Inscrição em programas habitacionais (Minha Casa Minha Vida)",
+      "Política de aluguel social",
+      "Reassentamento de famílias de áreas de risco",
+      "Regularização fundiária de loteamentos"
+    ],
+    "Fiscalização Urbana, Regularização e Registro de Imóveis": [
+      "Aprovação de projetos e loteamentos",
+      "Construções irregulares e invasões de áreas públicas",
+      "Habite-se e certidões de obras",
+      "Obstrução de calçadas e vias públicas por comércio",
+      "Propriedades e terrenos baldios abandonados",
+      "Regularização fundiária urbana (REURB)"
+    ],
+    "Direitos e Vantagens do Servidor": [
+      "Abono de permanência e adicional de tempo de serviço (triênios)",
+      "Aposentadoria e pensões estatutárias (IPMDC)",
+      "Concursos públicos e posse de servidores",
+      "Folha de pagamento e consignações",
+      "Licenças (maternidade, capacitação, tratamento de saúde)",
+      "Planos de cargos, carreiras e remuneração"
+    ],
+    "Governo Municipal e Enterro Gratuito": [
+      "Concessão de enterro e gratuidade de sepultamento",
+      "Gestão de cemitérios municipais",
+      "Ouvidoria Geral do Município (Colab e Colab)",
+      "Prazos da Lei de Acesso à Informação (e-SIC)",
+      "Transparência pública e prestação de contas"
+    ],
+    "Serviços e Rede de Água e Esgoto (Águas do Rio)": [
+      "Baixa pressão e falta de abastecimento de água",
+      "Conserto de hidrômetros e vazamentos na rua",
+      "Desobstrução e manutenção da rede de esgoto",
+      "Repavimentação de vias após obras da concessionária"
+    ],
+    "LIGHT: Energia, Infraestrutura e Atendimento": [
+      "Falta de energia elétrica e fios partidos",
+      "Postes abalroados ou com risco de queda",
+      "Poda emergencial de árvores em contato com a rede de alta tensão"
+    ],
+    "ELOVIAS (W. LUIZ - BR 040): Rodovia e Manutenção": [
+      "Acidentes e socorro médico na BR-040",
+      "Alagamentos e bolsões de água na pista",
+      "Conservação de passarelas, asfalto e drenagem da rodovia"
+    ],
+    "Vetores e Zoonoses (Combate à Dengue e Pragas)": [
+      "Combate ao mosquito da dengue (Aedes aegypti) e fumacê",
+      "Controle de roedores e pragas urbanas",
+      "Criação irregular de animais em área residencial",
+      "Fiscalização de ferros-velhos e acúmulo de água",
+      "Vacinação antirrábica e controle de zoonoses"
+    ],
+    "Vigilância Sanitária": [
+      "Condições higiênico-sanitárias de restaurantes, mercados e bares",
+      "Fiscalização de farmácias, clínicas médicas e odontológicas",
+      "Fiscalização de produtos de beleza e estética",
+      "Licenciamento e alvará sanitário municipal",
+      "Validade e conservação de alimentos perecíveis"
+    ],
+    "Trabalho, Emprego e Renda": [
+      "Agência do Trabalhador de Duque de Caxias",
+      "Balcão de empregos e intermediação de mão de obra",
+      "Capacitação e cursos rápidos de qualificação",
+      "Formalização do Microempreendedor Individual (MEI)"
+    ],
+    "Empresas e Legalizações": [
+      "Alvará de funcionamento online",
+      "Apoio ao empreendedorismo e Sala do Empreendedor",
+      "Baixa e encerramento de empresas",
+      "Fiscalização de atividades comerciais"
+    ],
+    "Agricultura": [
+      "Agricultura familiar e feiras do produtor rural",
+      "Apicultura e produção de mel em Caxias",
+      "Assistência técnica a pequenos produtores rurais (Xerém e Imbariê)",
+      "Hortas comunitárias e escolares"
+    ],
+    "Criança, Adolescente e Idoso": [
+      "Atendimento prioritário a idosos e pessoas com mobilidade reduzida",
+      "Combate ao trabalho infantil",
+      "Conselhos Tutelares 1, 2 e 3 (Atuação e denúncias)",
+      "Projetos de convivência e centros dia para idosos"
+    ],
+    "Comunicação Social": [
+      "Campanhas educativas e utilidade pública",
+      "Divulgação de serviços e canais oficiais da Prefeitura",
+      "Portal institucional e Diário Oficial Eletrônico"
+    ],
+    "Controle e Auditoria": [
+      "Auditoria interna de contratos e convênios",
+      "Controladoria-Geral do Município (CGM)",
+      "Fiscalização da Lei de Responsabilidade Fiscal"
+    ],
+    "Assuntos Jurídicos": [
+      "Consultoria jurídica da Prefeitura",
+      "Execução fiscal da Dívida Ativa",
+      "Procuradoria-Geral do Município (PGM)"
+    ],
+    "Administração Pública": [
+      "Atendimento presencial no protocolo geral",
+      "Estrutura organizacional e patrimônio público"
+    ]
+  }
+}

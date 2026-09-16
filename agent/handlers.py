@@ -147,6 +147,12 @@ class SecurityHandler(BaseHandler):
             intent_detected = "out_of_competency"
         elif intent == "JURIDICO":
             query_lower = query.lower()
+            # Perguntas institucionais sobre a função de órgãos municipais (ex: Procuradoria) ou legislação são respondidas pelo RAG
+            if any(w in query_lower for w in ["procuradoria", "pgm", "lei orgânica", "lei organica", "código tributário", "codigo tributario"]) and any(w in query_lower for w in ["função", "funcao", "atribuição", "atribuicao", "papel", "competência", "competencia", "o que faz", "estrutura", "qual", "quais", "artigo"]):
+                rag_h = agent.handlers.get("RAG_HANDLER")
+                if rag_h:
+                    return rag_h.execute(query=query, triage_info=triage_info, agent=agent, conversation_id=conversation_id, start_time=start_time, history=history)
+
             if any(w in query_lower for w in ["árvore", "arvore", "carro", "veículo", "veiculo", "casa", "indenização", "indenizacao", "prejuízo", "prejuizo"]):
                 ans = (
                     "Para solicitações de indenização, ressarcimento ou análise de responsabilidade por danos materiais (como queda de árvore sobre veículos ou imóveis), a Prefeitura não realiza acordos ou pareceres formais via chat de atendimento virtual.\n\n"
@@ -1027,16 +1033,19 @@ class RagHandler(BaseHandler):
             answer = re.sub(r'\s*\(\s*$', '.', answer)  # Remove parêntese órfão no final substituindo por ponto
             answer = re.sub(r'\n\s*\n\s*\n', '\n\n', answer).strip()
 
-            # FALLBACK PÓS-LLM: Se a resposta do LLM declarar que o dado não consta ou não está especificado nos dados locais
+            # FALLBACK PÓS-LLM: Se a resposta do LLM declarar que o dado não consta nos dados locais
+            # Regras canônicas de governança têm prioridade máxima e NUNCA sofrem override por busca web
+            has_regra = any("regra" in str(c.get("category", "")).lower() or "regra" in str(c.get("source", "")).lower() for c in relevant_results)
+            
             unprovided_triggers = [
                 "não especificam", "não especifica", "não detalham", "não detalha", "não está detalhad",
                 "não constam", "não consta", "não contêm", "não contém", "não informam", "não informa",
                 "não há registro", "não há informação", "não foram encontrad", "não foi possível localizar",
                 "não foi possível determinar", "não foi possível encontrar", "não temos essa informação",
-                "não possui informação", "informações oficiais disponíveis", "dados oficiais disponíveis"
+                "não possui informação", "não há dados disponíveis sobre"
             ]
             ans_lower = answer.lower()
-            if any(trig in ans_lower for trig in unprovided_triggers):
+            if not has_regra and any(trig in ans_lower for trig in unprovided_triggers):
                 try:
                     from agent.fallback import build_controlled_web_fallback
                     web_fb = build_controlled_web_fallback(effective_query, agent.gemini_client)

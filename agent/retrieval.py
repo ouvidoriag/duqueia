@@ -551,6 +551,115 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
                 "chunk_keywords": search_words
             })
         return results
+
+def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
+    """Recupera regras canônicas de negócio com boost prioritário de governança."""
+    main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else None
+    if not main_db:
+        return []
+
+    stop_words = {"como", "onde", "qual", "para", "fazer", "quero", "saber", "favor", "solicitar", "prefeitura", "duque", "caxias"}
+    search_terms = [w.lower() for w in query_keywords if len(w) >= 3 and w.lower() not in stop_words]
+    if not search_terms:
+        return []
+
+    try:
+        with get_db_connection(main_db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT id, tipo_label, tema, assunto, conteudo, tags, prioridade, boost_weight FROM regras_negocio")
+            rows = cur.fetchall()
+
+            candidates = []
+            for r in rows:
+                rid, tipo_lbl, tema, assunto, cont, tags_str, prio, boost = r
+                try:
+                    tags = json.loads(tags_str) if tags_str else []
+                except Exception:
+                    tags = []
+
+                match_text = f"{tema or ''} {assunto or ''} {cont or ''} {' '.join(tags)}".lower()
+                matches = sum(1 for t in search_terms if t in match_text)
+
+                if matches > 0:
+                    boost_val = float(boost or 3.0)
+                    score = min(0.96 + (matches * 0.02 * boost_val), 1.0)
+
+                    structured_text = (
+                        f"[DIRETRIZ DE GOVERNANÇA MÁXIMA E OBRIGATÓRIA — AUDITADO]\n"
+                        f"Tema: {tema}\n"
+                        f"Assunto: {assunto}\n"
+                        f"Prioridade: MÁXIMA (Regra Canônica de Negócio - Boost: {boost_val}x)\n"
+                        f"Diretriz Oficial Obrigatória:\n{cont}"
+                    )
+
+                    candidates.append({
+                        "source": f"regras_negocio ({rid})",
+                        "category": "regra_negocio",
+                        "content": structured_text,
+                        "title": f"Regra Canônica: {assunto}",
+                        "semantic_score": score,
+                        "similarity": score,
+                        "chunk_keywords": search_terms,
+                        "boost_weight": boost_val
+                    })
+
+            candidates.sort(key=lambda x: x["similarity"], reverse=True)
+            return candidates[:3]
+    except Exception as e:
+        return []
+
+def retrieve_fts_chunks(query: str, query_keywords: list, top_k: int = 5) -> list:
+    """Busca direta no índice FTS5 (tabela chunks_fts) em vector.db com altíssima velocidade e suporte a acentos."""
+    vec_db = DATABASE_VECTOR if os.path.exists(DATABASE_VECTOR) else None
+    if not vec_db:
+        return []
+
+    stop_words = {"como", "onde", "qual", "para", "fazer", "quero", "saber", "favor", "solicitar", "prefeitura", "duque", "caxias"}
+    search_words = [w.lower() for w in query_keywords if len(w) >= 3 and w.lower() not in stop_words]
+    if not search_words:
+        return []
+
+    terms = " OR ".join([f'"{w}"' for w in search_words])
+    try:
+        with get_db_connection(vec_db) as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT c.id, c.tipo, c.titulo, c.conteudo, c.metadata_json, rank
+                FROM chunks_fts f
+                JOIN chunks c ON f.id = c.id
+                WHERE chunks_fts MATCH ?
+                ORDER BY rank
+                LIMIT ?
+            """, (terms, top_k * 3))
+            rows = cur.fetchall()
+
+            candidates = []
+            for r in rows:
+                cid, tipo, tit, cont, meta_str, rank = r
+                try:
+                    meta = json.loads(meta_str) if meta_str else {}
+                except Exception:
+                    meta = {}
+
+                boost = float(meta.get("boost_weight", 1.0))
+                calibrated = min(max(0.75 + (boost * 0.08) - (rank * 0.01), 0.65), 0.98)
+
+                candidates.append({
+                    "source": f"bancoduqueia ({cid})",
+                    "category": tipo.lower(),
+                    "content": cont,
+                    "title": tit,
+                    "semantic_score": calibrated,
+                    "similarity": calibrated,
+                    "chunk_keywords": search_words,
+                    "boost_weight": boost
+                })
+
+            candidates.sort(key=lambda x: x["similarity"], reverse=True)
+            return candidates[:top_k]
+    except Exception:
+        return []
+
 def compute_rrf_fusion(rankings: list, k: int = 60) -> dict:
     """
     Combina múltiplos rankings (estruturado, vetorial, palavras-chave) 
@@ -622,8 +731,13 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             struct_res = retrieve_structured_service(db_path, q_sub, q_keywords, using_real)
             structured_candidates.extend(struct_res)
             
-        # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na nova tabela secretaria_unidades
-        if run_geo and any(ind in q_sub_norm for ind in ["cras", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro"]):
+        # B.1) Regras Canônicas de Governança (BANCODUQUEIA - Prioridade Máxima Auditada)
+        struct_regras = retrieve_regras_negocio(q_sub, q_keywords)
+        if struct_regras:
+            structured_candidates.extend(struct_regras)
+
+        # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na tabela secretaria_unidades
+        if run_geo and any(ind in q_sub_norm for ind in ["cras", "creas", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro", "hospital", "upa", "ceam", "restaurante", "ciep", "escola", "clinica"]):
             try:
                 main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
                 rows_unidades = query_db(main_db, """
@@ -657,8 +771,13 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             except Exception as e:
                 print(f"[LORS Unidades Error] Falha na busca de unidades físicas: {e}", file=sys.stderr)
 
-        # D) Busca Vetorial/Descritiva (Chunks gerais de documentos)
+        # D) Busca Vetorial/Descritiva & FTS5 (Chunks Mestres BANCODUQUEIA)
         if run_vector:
+            # D.1) Recuperação ultrarrápida via FTS5 dos 1.575 Chunks Mestres
+            fts_chunks = retrieve_fts_chunks(q_sub, q_keywords, top_k=top_k)
+            if fts_chunks:
+                vector_candidates.extend(fts_chunks)
+
             query_vector = main_query_vector
             try:
                 rows_chunks = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
@@ -752,8 +871,14 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         # Fator Multiplicativo: final_score = base_score * completeness_score
         c["similarity"] = min(max(round(base_score * completeness, 4), 0.0), 1.0)
 
-    # Ordena todos juntos pelo score 'similarity' final de forma decrescente
-    all_candidates.sort(key=lambda x: x.get("similarity", 0.0), reverse=True)
+    # Ordena todos juntos garantindo prioridade MÁXIMA para Regras Canônicas de Negócio
+    def get_candidate_sort_key(c):
+        cat = str(c.get("category", "")).lower()
+        src = str(c.get("source", "")).lower()
+        is_regra = 1 if ("regra" in cat or src.startswith("regras_negocio") or src.startswith("bancoduqueia (regra_")) else 0
+        return (is_regra, c.get("similarity", 0.0))
+
+    all_candidates.sort(key=get_candidate_sort_key, reverse=True)
     
     # Filtro Dinâmico de Relevância por Distância do Top-1
     if all_candidates and all_candidates[0].get("similarity", 0.0) >= 0.70:

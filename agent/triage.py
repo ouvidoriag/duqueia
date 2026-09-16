@@ -419,7 +419,7 @@ def _add_routing_metadata(triage_res: dict) -> dict:
     needs_clarification = triage_res.get("needs_clarification", False)
     
     # Mapeamento de agentes e workflows
-    if intent in ["LGPD", "ESCALONAMENTO_HUMANO", "FORA_COMPETENCIA", "JURIDICO"]:
+    if intent in ["LGPD", "ESCALONAMENTO_HUMANO", "FORA_COMPETENCIA", "JURIDICO", "DEFESA_CIVIL_EMERGENCIA", "SEGURANCA_PUBLICA_EMERGENCIA"]:
         triage_res["next_agent"] = "SECURITY_HANDLER"
         triage_res["workflow"] = "SECURITY_BLOCKED"
         triage_res["clarification_type"] = None
@@ -439,7 +439,7 @@ def _add_routing_metadata(triage_res: dict) -> dict:
         triage_res["next_agent"] = "AUTHORITY_HANDLER"
         triage_res["workflow"] = "RAG"
         triage_res["clarification_type"] = None
-    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO"]:
+    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO", "AMBIGUO_LOCALIZACAO"]:
         triage_res["next_agent"] = "AMBIGUITY_HANDLER"
         triage_res["workflow"] = "AMBIGUITY_RESOLVER"
         triage_res["clarification_type"] = "AMBIGUITY" if needs_clarification else None

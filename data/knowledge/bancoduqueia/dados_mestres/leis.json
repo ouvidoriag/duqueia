@@ -1,0 +1,494 @@
+[
+  {
+    "id": "lei-organica-duque-de-caxias",
+    "numero": "Lei Orgânica",
+    "ano": 1990,
+    "tipo": "LEI_ORGANICA",
+    "ementa": "Lei Orgânica do Município de Duque de Caxias, que organiza a autonomia municipal, competências dos Poderes Executivo e Legislativo, tributos, finanças, desenvolvimento urbano e garantias dos serviços públicos municipais.",
+    "orgao_emissor": "Câmara Municipal de Duque de Caxias",
+    "data_publicacao": "1990-04-05",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Administração Pública",
+      "Organização dos Poderes",
+      "Direitos dos Cidadãos",
+      "Serviços Públicos",
+      "Tributos Municipais"
+    ],
+    "fonte_url": "https://www.cmdc.rj.gov.br/lei-organica"
+  },
+  {
+    "id": "lei-codigo-tributario-01-2010",
+    "numero": "01",
+    "ano": 2010,
+    "tipo": "LEI_COMPLEMENTAR",
+    "ementa": "Institui o Código Tributário do Município de Duque de Caxias, regulamentando o IPTU, ISSQN, ITBI, taxas pelo poder de polícia, contribuição de iluminação pública (CIP) e processos administrativos fiscais.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / Câmara Municipal",
+    "data_publicacao": "2010-12-23",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "IPTU",
+      "ISSQN",
+      "ITBI",
+      "Taxas Municipais",
+      "Dívida Ativa",
+      "Código Tributário"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/codigo_tributario.pdf"
+  },
+  {
+    "id": "lei-plano-diretor-03-2006",
+    "numero": "03",
+    "ano": 2006,
+    "tipo": "LEI_COMPLEMENTAR",
+    "ementa": "Dispõe sobre o Plano Diretor Participativo do Município de Duque de Caxias, estabelecendo as diretrizes de desenvolvimento urbano, macrozoneamento dos 4 distritos, ZEIS, outorga onerosa, uso do solo e preservação ambiental.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias",
+    "data_publicacao": "2006-10-10",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Plano Diretor",
+      "Desenvolvimento Urbano",
+      "Zoneamento",
+      "Macrozoneamento",
+      "4 Distritos",
+      "Uso do Solo"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/plano_diretor.pdf"
+  },
+  {
+    "id": "lei-codigo-obras-1418-1998",
+    "numero": "1.418",
+    "ano": 1998,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Estabelece o Código de Obras e Edificações do Município de Duque de Caxias, fixando normas para elaboração de projetos, licenciamento de obras, parâmetros construtivos, habite-se e acessibilidade.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMUH",
+    "data_publicacao": "1998-12-18",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Código de Obras",
+      "Alvará de Construção",
+      "Habite-se",
+      "SMUH",
+      "Edificações",
+      "Acessibilidade"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/codigo_obras.pdf"
+  },
+  {
+    "id": "lei-codigo-posturas-1419-1998",
+    "numero": "1.419",
+    "ano": 1998,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui o Código de Posturas Urbanas do Município de Duque de Caxias, regulamentando a higiene pública, sossego público, conservação de calçadas, funcionamento de feiras livres e fiscalização de posturas.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMUH / SMSP",
+    "data_publicacao": "1998-12-18",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Código de Posturas",
+      "Sossego Público",
+      "Calçadas",
+      "Feiras Livres",
+      "Ordem Pública",
+      "Fiscalização"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/codigo_posturas.pdf"
+  },
+  {
+    "id": "lei-codigo-ambiental-1550-2001",
+    "numero": "1.550",
+    "ano": 2001,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Dispõe sobre a Política Municipal de Meio Ambiente e institui o Código Ambiental de Duque de Caxias, regulamentando o licenciamento ambiental local, áreas de preservação permanente (APP) e sanções ecológicas.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMMA",
+    "data_publicacao": "2001-11-27",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Código Ambiental",
+      "Meio Ambiente",
+      "SMMA",
+      "Licenciamento Ambiental",
+      "Preservação",
+      "Tinguá"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/codigo_ambiental.pdf"
+  },
+  {
+    "id": "lei-estatuto-servidores-1664-2002",
+    "numero": "1.664",
+    "ano": 2002,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Dispõe sobre o Estatuto dos Funcionários Públicos do Município de Duque de Caxias, estabelecendo regime jurídico, direitos, deveres, vencimentos, adicionais de titulação, licenças e processo administrativo disciplinar.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMA",
+    "data_publicacao": "2002-12-30",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Estatuto dos Servidores",
+      "Funcionalismo Público",
+      "Concurso Público",
+      "SMA",
+      "Carreira e Vencimentos"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/estatuto_servidores.pdf"
+  },
+  {
+    "id": "lei-ipmdc-previdencia-1520-2000",
+    "numero": "1.520",
+    "ano": 2000,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Reestrutura o Regime Próprio de Previdência Social dos Servidores Públicos do Município de Duque de Caxias (RPPS) e disciplina a atuação do Instituto de Previdência dos Servidores Públicos (IPMDC).",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / IPMDC",
+    "data_publicacao": "2000-12-28",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Previdência Municipal",
+      "IPMDC",
+      "Aposentadorias",
+      "Pensões",
+      "RPPS"
+    ],
+    "fonte_url": "https://ipmdc.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "lei-guarda-municipal-1155-1993",
+    "numero": "1.155",
+    "ano": 1993,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Cria a Guarda Municipal de Duque de Caxias, corporação civil uniformizada destinada à proteção de bens, serviços, instalações municipais, fiscalização de trânsito e apoio à segurança pública cidadã.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMSP",
+    "data_publicacao": "1993-06-11",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Guarda Municipal",
+      "Segurança Pública",
+      "153",
+      "SMSP",
+      "Ronda Escolar",
+      "Trânsito"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/guarda_municipal.pdf"
+  },
+  {
+    "id": "lei-lai-acesso-informacao-2500-2012",
+    "numero": "2.500",
+    "ano": 2012,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Regulamenta no âmbito do Município de Duque de Caxias a Lei Federal nº 12.527/2011 (Lei de Acesso à Informação - LAI), instituindo o Sistema Eletrônico do Serviço de Informação ao Cidadão (e-SIC).",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / Ouvidoria Geral",
+    "data_publicacao": "2012-05-16",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Lei de Acesso à Informação",
+      "LAI",
+      "Transparência",
+      "e-SIC",
+      "Ouvidoria Geral"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/lai"
+  },
+  {
+    "id": "lei-criacao-fundec-1500-2000",
+    "numero": "1.500",
+    "ano": 2000,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Cria a Fundação de Apoio à Escola Técnica, Ciência, Tecnologia, Esporte, Lazer, Cultura e Saúde de Duque de Caxias (FUNDEC), fundação pública destinada à formação profissional e inclusão técnica.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / FUNDEC",
+    "data_publicacao": "2000-07-06",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "FUNDEC",
+      "Ensino Técnico",
+      "Cursos Gratuitos",
+      "Qualificação Profissional",
+      "Educação Profissional"
+    ],
+    "fonte_url": "https://www.fundec.rj.gov.br/legislacao"
+  },
+  {
+    "id": "lei-cria-secretaria-protecao-animal-3495-2025",
+    "numero": "3.495",
+    "ano": 2025,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui a Secretaria Municipal de Proteção Animal (SMPA) no Município de Duque de Caxias, estabelecendo competências para formulação e execução de políticas públicas voltadas à proteção, defesa e bem-estar dos animais, castração gratuita itinerante e combate aos maus-tratos.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMPA",
+    "data_publicacao": "2025-04-10",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Proteção Animal",
+      "SMPA",
+      "Bem-Estar Animal",
+      "Castramóvel",
+      "Maus-Tratos"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/ver20230623/tmp/carta/24CartaServicosSMPA.pdf"
+  },
+  {
+    "id": "lei-procon-municipal-1780-2003",
+    "numero": "1.780",
+    "ano": 2003,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Cria o Sistema Municipal de Defesa do Consumidor (PROCON Duque de Caxias), estabelecendo diretrizes para conciliação, fiscalização comercial e aplicação de multas por infração ao CDC.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / PROCON",
+    "data_publicacao": "2003-09-18",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "PROCON",
+      "Defesa do Consumidor",
+      "Fiscalização Comercial",
+      "Direitos do Consumidor"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/procon.pdf"
+  },
+  {
+    "id": "lei-conselhos-tutelares-1450-1999",
+    "numero": "1.450",
+    "ano": 1999,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Dispõe sobre a Política Municipal de Atendimento dos Direitos da Criança e do Adolescente, criação e funcionamento dos Conselhos Tutelares nos 4 distritos e organização do CMDCA.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMASDH",
+    "data_publicacao": "1999-10-14",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Conselho Tutelar",
+      "ECA",
+      "Criança e Adolescente",
+      "CMDCA",
+      "SMASDH"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/conselho_tutelar.pdf"
+  },
+  {
+    "id": "lei-anistia-fiscal-3200-2025",
+    "numero": "3.200",
+    "ano": 2025,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui o Programa de Anistia Fiscal e Regularização de Débitos Tributários (REFIS Municipal), concedendo anistia de até 100% em juros e multas moratórias de IPTU, ISS e taxas.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMF",
+    "data_publicacao": "2025-05-12",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "REFIS",
+      "Anistia Fiscal",
+      "IPTU",
+      "Dívida Ativa",
+      "Parcelamento Fiscal",
+      "SMF"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/refis2025.pdf"
+  },
+  {
+    "id": "lei-anistia-fiscal-3602-2026",
+    "numero": "3.602",
+    "ano": 2026,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui o Programa Especial de Conciliação e Regularização Fiscal (REFIS 2026) no Município de Duque de Caxias, prevendo parcelamento incentivado e descontos para contribuintes inadimplentes.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMF",
+    "data_publicacao": "2026-02-10",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "REFIS 2026",
+      "Anistia Fiscal",
+      "IPTU",
+      "ISS",
+      "Conciliação Fiscal",
+      "SMF"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/refis2026.pdf"
+  },
+  {
+    "id": "decreto-tarifa-zero-8120-2023",
+    "numero": "8.120",
+    "ano": 2023,
+    "tipo": "DECRETO",
+    "ementa": "Regulamenta o Programa Ônibus Tarifa Zero no Transporte Público Municipal de Duque de Caxias, atribuindo à Secretaria Municipal de Segurança Pública a gestão das linhas circulares gratuitas.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMSP",
+    "data_publicacao": "2023-08-22",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Tarifa Zero",
+      "Ônibus Gratuito",
+      "SMSP",
+      "Mobilidade Urbana",
+      "Transporte Municipal"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/tarifa_zero.pdf"
+  },
+  {
+    "id": "portaria-reclamacao-ouvidoria-045-2024",
+    "numero": "045",
+    "ano": 2024,
+    "tipo": "PORTARIA",
+    "ementa": "Estabelece os prazos de resposta, triagem e protocolo de atendimento da Ouvidoria Geral do Município através da plataforma oficial Colab (duquedecaxias.colab.re).",
+    "orgao_emissor": "Ouvidoria Geral do Município / SMG",
+    "data_publicacao": "2024-03-15",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Ouvidoria Geral",
+      "Colab",
+      "Prazos de Atendimento",
+      "Manifestações",
+      "Transparência"
+    ],
+    "fonte_url": "https://duquedecaxias.colab.re"
+  },
+  {
+    "id": "decreto-estrutura-administracao-8240-2024",
+    "numero": "8.240",
+    "ano": 2024,
+    "tipo": "DECRETO",
+    "ementa": "Aprova a estrutura organizacional detalhada do Poder Executivo Municipal de Duque de Caxias, definindo competências de secretarias, subsecretarias, departamentos e diretorias.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias",
+    "data_publicacao": "2024-01-08",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Estrutura Organizacional",
+      "Organograma",
+      "Secretarias",
+      "Administração Direta"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao/estrutura_adm.pdf"
+  },
+  {
+    "id": "decreto-simpdec-defesa-civil-9115-2026",
+    "numero": "9.115",
+    "ano": 2026,
+    "tipo": "DECRETO",
+    "ementa": "Institui o Sistema Municipal de Proteção e Defesa Civil (SIMPDEC), cria o Conselho Municipal de Defesa Civil (COMDEC) e regulamenta o plano de contingência e alertas de emergência meteorológica em Duque de Caxias.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMDC",
+    "data_publicacao": "2026-04-08",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Defesa Civil",
+      "SIMPDEC",
+      "Alertas Meteorológicos",
+      "Prevenção de Enchentes",
+      "Emergências"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/diario_oficial"
+  },
+  {
+    "id": "lei-reurb-regularizacao-fundiaria-08-2021",
+    "numero": "08",
+    "ano": 2021,
+    "tipo": "LEI_COMPLEMENTAR",
+    "ementa": "Institui e regulamenta a Regularização Fundiária Urbana (REURB) no Município de Duque de Caxias, estabelecendo normas gerais para REURB-S (Social) e REURB-E (Específica) nos quatro distritos municipais.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMUH",
+    "data_publicacao": "2021-11-18",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Regularização Fundiária",
+      "REURB",
+      "Habitação de Interesse Social",
+      "Urbanismo",
+      "Titulação de Imóveis"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "lei-incentivo-taxistas-ipi-icms-1820-2004",
+    "numero": "1.820",
+    "ano": 2004,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Dispõe sobre a concessão de declaração de reconhecimento e isenção tributária para aquisição de veículos destinados ao serviço público de transporte individual de passageiros (táxi) em Duque de Caxias.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMTSP",
+    "data_publicacao": "2004-06-15",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Transporte por Táxi",
+      "Isenção Fiscal",
+      "Taxistas",
+      "SMTSP",
+      "Transportes Públicos"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "decreto-ppp-iluminacao-led-7950-2022",
+    "numero": "7.950",
+    "ano": 2022,
+    "tipo": "DECRETO",
+    "ementa": "Regulamenta o contrato de Parceria Público-Privada (PPP) para modernização, eficientização, expansão e manutenção do parque de iluminação pública municipal com tecnologia LED.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMTSP",
+    "data_publicacao": "2022-03-24",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Iluminação Pública",
+      "PPP LED",
+      "SMTSP",
+      "Zeladoria Urbana",
+      "Eficiência Energética"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "lei-codigo-sanitario-municipal-1250-1995",
+    "numero": "1.250",
+    "ano": 1995,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui o Código Sanitário do Município de Duque de Caxias, fixando normas de vigilância sanitária, higiene de alimentos, controle de vetores e condições sanitárias de estabelecimentos comerciais e hospitalares.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMS",
+    "data_publicacao": "1995-09-28",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Vigilância Sanitária",
+      "Código Sanitário",
+      "Saúde Pública",
+      "Fiscalização de Alimentos",
+      "Alvará Sanitário"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "decreto-licenciamento-ambiental-unificado-7620-2020",
+    "numero": "7.620",
+    "ano": 2020,
+    "tipo": "DECRETO",
+    "ementa": "Regulamenta os procedimentos administrativos para o Licenciamento Ambiental Municipal unificado, autorizações ambientais, certidões de inexigibilidade e fiscalização sonora e industrial pela Secretaria Municipal de Meio Ambiente.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMMA",
+    "data_publicacao": "2020-08-12",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Meio Ambiente",
+      "Licenciamento Ambiental",
+      "SMMA",
+      "Fiscalização Industrial",
+      "Poluição Sonora"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "decreto-saude-atencao-basica-pep-7890-2021",
+    "numero": "7.890",
+    "ano": 2021,
+    "tipo": "DECRETO",
+    "ementa": "Dispõe sobre a organização da Rede de Atenção Básica de Saúde, acolhimento territorializado e implantação obrigatória do Prontuário Eletrônico do Paciente (PEP-AB) nas Unidades Básicas e Clínicas da Família.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMS",
+    "data_publicacao": "2021-05-19",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Saúde Pública",
+      "Atenção Primária",
+      "PEP",
+      "Clínicas da Família",
+      "SMS"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  },
+  {
+    "id": "lei-criacao-moeda-social-caxias-3450-2024",
+    "numero": "3.450",
+    "ano": 2024,
+    "tipo": "LEI_ORDINARIA",
+    "ementa": "Institui o Programa Municipal de Transferência de Renda e Moeda Social de Duque de Caxias, destinado ao combate à extrema pobreza e estímulo ao comércio local dos 4 distritos.",
+    "orgao_emissor": "Prefeitura Municipal de Duque de Caxias / SMASDH",
+    "data_publicacao": "2024-07-03",
+    "situacao": "VIGENTE",
+    "assuntos": [
+      "Assistência Social",
+      "Transferência de Renda",
+      "Moeda Social",
+      "SMASDH",
+      "Desenvolvimento Econômico"
+    ],
+    "fonte_url": "https://transparencia.duquedecaxias.rj.gov.br/legislacao"
+  }
+]

@@ -1,0 +1,1578 @@
+{
+  "versao_schema": "2.0",
+  "titulo": "Tabela Canônica de Regras de Negócio e Restrições - DUQUE IA",
+  "total_regras": 57,
+  "data_atualizacao": "2026-09-14",
+  "fonte_primaria": "Ouvidoria Geral do Município / Diretoria da Ouvidoria Geral",
+  "regras": [
+    {
+      "id": "rule_1787153232925",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "LIGHT: Energia, Infraestrutura, Manutenção e Atendimento",
+      "assunto": "Geral do Tema",
+      "conteudo": "Em casos de árvores com risco à rede elétrica: quando uma árvore estiver próxima ou em contato com a rede elétrica, a LIGHT deverá ser acionada para realizar os procedimentos de segurança necessários. Caso o cidadão opte por registrar a demanda junto à Secretaria Municipal de Meio Ambiente, a solicitação será encaminhada à concessionária de energia elétrica para a adoção das medidas necessárias, antes que a Prefeitura dê prosseguimento com a prestação de serviço.  Caso opte por entrar em contato com a Secretaria de Meio Ambiente, o serviço poderá ser solicitado  presencialmente:Endereço: Alameda James Franco, 03 – Jardim Primavera,25215-265,  Duque de Caxias - RJ, atendimento de 08 às 17h",
+      "tags": [
+        "poda de arvore",
+        "arvore na fiacao",
+        "rede eletrica",
+        "light",
+        "desligamento de energia",
+        "risco eletrico",
+        "alameda james franco",
+        "light: energia, infraestrutura, manutenção e atendimento",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-19 12:27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787152553609",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)",
+      "assunto": "Geral do Tema",
+      "conteudo": "A Secretaria Municipal de Meio Ambiente não possui autorização para realizar podas em áreas privadas. Nesses casos, sua atuação consiste na análise da solicitação e emissão da autorização necessária para a realização da poda, cabendo ao proprietário providenciar a execução do serviço por meios próprios, após a devida autorização.",
+      "tags": [
+        "poda em terreno privado",
+        "arvore no quintal",
+        "terreno particular",
+        "autorizacao para poda",
+        "meio ambiente",
+        "smma",
+        "meio ambiente (poluição sonora, árvores, licenças e fiscalizações ambientais e etc.)",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-19 12:15",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787849003260",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Poluição Sonora / Ordem Pública, Meio Ambiente e Urbanismo",
+      "assunto": "Diversos tratamentos para Poluição Sonora",
+      "conteudo": "A Poluição Sonora é um assunto que abarca diversos órgãos a depender da especificidade. Para isso, é importante detalhar com cautela onde é que entra cada órgão para resolver a questão.\n\nPara poluição sonora que esteja ocorrendo em obras que  estejam em andamento no território municipal, quem trata é a Secretaria de Urbanismo e Habitação, através do tema \"Fiscalização Urbana, Regularização e Registro de Imóveis\".Em casos de poluição sonora em estabelecimentos comerciais no geral e empresas, o tratamento é de responsabilidade da Secretaria Municipal de Meio Ambiente, através do tema \"Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)\".Já para situações onde a poluição sonora seja advinda de eventos, bares,  locais de acesso público, feiras, ruas e vias públicas, quem resolve é a Superintendência de Ordem Pública, através do tema \"Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)\"",
+      "tags": [
+        "poluicao sonora",
+        "som alto",
+        "barulho",
+        "decibelimetro",
+        "igreja",
+        "barulho de obra",
+        "ordem publica",
+        "festa na rua",
+        "som automotivo",
+        "poluição sonora / ordem pública, meio ambiente e urbanismo",
+        "diversos tratamentos para poluição sonora"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787850815095",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Saúde",
+      "assunto": "Unidades de Saúde Municipal/Marcação de Consulta/Geral/Especialidades",
+      "conteudo": "É importante diferenciarmos no município o funcionamento e o objetivo de cada unidade/equipamento de saúdeUBS (Unidade Básica de Saúde)Unidade de atenção primária que funciona como a porta de entrada preferencial do SUS. Seu foco está em ações de prevenção, promoção da saúde, vacinação, renovação de receitas, pré-natal de baixo risco e consultas de rotina para problemas de saúde de baixa complexidade.USF (Unidade de Saúde da Família)Estabelecimento de atenção primária operacionalizado por meio da Estratégia Saúde da Família (ESF). Seu diferencial é o foco territorial: atende uma comunidade adscrita (cadastrada e delimitada) por meio de equipes multiprofissionais (médico de família, enfermeiro, técnico e Agentes Comunitários de Saúde) que realizam visitas domiciliares e acompanhamento contínuo da população local.CF (Clínica da Família)Modelo estrutural e operacional ampliado da atenção primária, típico do estado do Rio de Janeiro. Trata-se de uma grande USF que agrupa diversas equipes da Saúde da Família sob o mesmo teto, incorporando suporte diagnóstico no próprio local (como exames laboratoriais, radiografia, ultrassom e atendimento odontológico integrado).UPH (Unidade Pré-Hospitalar)Unidade de pronto atendimento voltada às urgências e emergências clínicas de média complexidade (modelo municipal equivalente às UPAs 24h). Seu objetivo é atender quadros agudos (como dores intensas, picos de pressão, febre alta, pequenos traumas), realizar a medicação/estabilização imediata e, se necessário, manter o paciente em observação ou regulá-lo para um hospital.HSM (Hospital Municipal)Centro de atenção secundária e terciária voltado ao atendimento de alta e média complexidade. Seu conceito engloba internações hospitalares em enfermaria e CTI/UTI, cirurgias eletivas e de emergência, exames de alta precisão e suporte a patologias graves que exigem junta médica especializada e aparatos tecnológicos avançados.\n\nPara marcar consultas com clínico geral ou especialistas, através da regulação municipal, necessita comparecer de posse do cartão do SUS em uma Unidade Básica de Saúde - UBS mais próxima.OBS.:Para realizar consultas com médicos especialistas, é necessário passar previamente peloclínico geral, que fará a avaliação e o atendimento necessários. Havendo indicação, o clínico geral fornecerá o papel deencaminhamento para o especialista, que deverá ser entregue na regulação da Unidade Básica de Saúde para marcação.\n\nPara saber mais sobre os endereços das undiades de saúde, acesse: https://saude.duquedecaxias.rj.gov.br/unidades-de-saude.php",
+      "tags": [
+        "unidades de saude",
+        "upa",
+        "uph",
+        "hospital municipal",
+        "posto de saude",
+        "ubs",
+        "clinica da familia",
+        "marcacao de consulta",
+        "emergencia 24h",
+        "saúde",
+        "unidades de saúde municipal/marcação de consulta/geral/especialidades"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [
+        "https://saude.duquedecaxias.rj.gov.br/unidades-de-saude.php"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787851842425",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Saúde",
+      "assunto": "Marcação de Exâmes/Cirurgias/Exames complexos/Exames de sangue/Todos exames",
+      "conteudo": "Para agendar e realizar exames em geral, é necessário, primeiramente, passar por consulta com o clínico geral e/ou médico especialista, que fará a avaliação e, quando necessário, emitirá o pedido para a realização dos exames. Após a solicitação médica, o agendamento do exame dependerá de sua complexidade e deverá seguir os seguintes passos:Exames de Sangue e Laboratoriais de RotinaFluxo:Atendimento inicial em uma UBS, USF ou Clínica da Família.Como agendar:O médico ou enfermeiro emite o pedido e a marcação é feita diretamente no posto de saúde ou o exame é coletado no próprio polo de atendimento de referência da unidade\n.Exames de Imagem e Média Complexidade (Raio-X, Tomografia, Ultrassom, Mamografia)Canal Digital:A Prefeitura disponibiliza o WhatsApp oficial0800 000 3627para agendamento e acompanhamento de exames de imagem.Presencial:O pedido médico emitido na rede pública pode ser inserido no sistema pela própria unidade de saúde de origem.Exames de Vista e Oftalmologia (Hospital do Olho Júlio Cândido de Brito e Programa Visão Caxiense)Como agendar:Pelo WhatsApp0800 000 3627ou por encaminhamento da unidade de saúde mais próxima do morador.Serviços abrangidos:Consultas oftalmológicas, exames diagnósticos da visão e triagem para cirurgias (como catarata e pterígio).Exames de Alta Complexidade, Consultas Especializadas e Cirurgias EletivasPasso 1 (Consulta Inicial):Passar por atendimento em uma UBS, USF, Clínica da Família ou UPH para obtenção do laudo de encaminhamento.Passo 2 (Regulação):A unidade cadastra o pedido noSISREGna unidade de saúde onde foi realizada a consulta.Passo 3 (Acompanhamento e Convocação):O paciente aguarda o agendamento de acordo com a prioridade clínica. A notificação de data, local e horário (ex.: Hospital Municipal Dr. Moacyr Rodrigues do Carmo ou centros especializados) ocorre por mensagem/WhatsApp, telefone ou aviso no posto de origem.Passo 4 (Encaminhamento Cirúrgico):Caso haja indicação cirúrgica na consulta especializada, o médico do hospital realiza a inserção do paciente no mapa cirúrgico municipal e solicita os exames pré-operatórios.",
+      "tags": [
+        "marcacao de exames",
+        "exame de sangue",
+        "cirurgias",
+        "sisreg",
+        "clinico geral",
+        "regulação medica",
+        "pedido de exame",
+        "saúde",
+        "marcação de exâmes/cirurgias/exames complexos/exames de sangue/todos exames"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787852332697",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Saúde",
+      "assunto": "Carreta  \"Chegaram os Especialistas\"/Atendimento na carreta/Atendimento médico no meu bairro/Exame no meu bairro/Atendimento de saúde e médico nos distritos",
+      "conteudo": "O projeto \"Chegaram os Especialistas\" é uma iniciativa itinerante estruturada em uma grande carreta médica, que geralmente atua em conjunto com as ações do programa \"Governo nos Bairros\". O objetivo central é descentralizar o atendimento de média complexidade, levando consultas e exames especializados para perto das residências e, consequentemente, agilizar e reduzir a fila de espera do município.Como Funciona o Acesso (A Regra de Agendamento)Diferente de uma UPH ou de um hospital de emergência, a carretanão atende por livre demanda(não basta chegar ao local e pegar uma senha). O funcionamento segue um fluxo rigoroso:O atendimento édestinado exclusivamente aos pacientes regulados pela Secretaria Municipal de Saúde.Na prática:O cidadão precisa ter passado anteriormente por uma unidade de atenção primária (UBS/Clínica da Família), recebido o encaminhamento do clínico geral e ter o pedido inserido no sistema municipal de regulação (SISREG). Quando a carreta chega a um determinado distrito, a própria Prefeitura faz uma varredura na fila daquela região e convoca os pacientes para o atendimento no local.Especialidades DisponíveisA unidade móvel funciona como uma policlínica, com foco nas especialidades que costumam ter a maior retenção de vagas. As áreas médicas disponibilizadas no programa incluem:CardiologiaOrtopediaEndocrinologiaAngiologiaUrologiaReumatologiaPediatriaPneumologia e GastroenterologiaDinâmica Itinerante e AlcanceO programa tem caráter temporário em cada localidade. A carreta é instalada em pontos estratégicos (praças ou campos de futebol) e permanece por semanas até dar vazão à demanda local.",
+      "tags": [
+        "saúde",
+        "carreta  \"chegaram os especialistas\"/atendimento na carreta/atendimento médico no meu bairro/exame no meu bairro/atendimento de saúde e médico nos distritos"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787854483253",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Segurança Pública",
+      "assunto": "Guarda Municipal/Força Municipal/Muralha Digital/Torre de Monitoramento",
+      "conteudo": "A Prefeitura de Duque de Caxias atua de formaestratégica, estruturada e integrada na área da segurança pública. Embora a competência direta pelo policiamento ostensivo seja doGoverno do Estado, o município também desempenha um papel importante na promoção da segurança e da proteção da população. Por isso, Duque de Caxias mantéminvestimentos significativos e ações voltadas à segurança pública, contribuindo para a prevenção da violência, a proteção dos espaços públicos e a construção de um ambiente mais seguro e com maior qualidade de vida para a população.Guarda Civil Municipal Armada:É a corporação geral que passou por uma recente reestruturação de segurança pública em Duque de Caxias, recebendo autorização legal para atuar com armamento letal. A transição foi marcada pela formação de novos agentes e pela homologação de um concurso público com 500 vagas (2025/2026).Força Municipal:É o grupamento tático especializado dentro da Guarda Armada. Funciona estritamente de forma motorizada, patrulhando pontos estratégicos da cidade com viaturas e grupamentos de motocicletas para ações de resposta rápida.Armamento e TreinamentoOs agentes passaram por formação técnica e operacional baseada em matrizes rigorosas, cumprindo todos os protocolos e critérios exigidos pela Polícia Federal para a certificação do porte de arma.O armamento padrão liberado incluipistolas calibre 9 mm e .40.Como diferencial tático, as equipes motorizadas da Força Municipal têm autorização e treinamento para operarfuzis Sig Sauer calibre 5.56, uso exclusivo desse grupamento em patrulhas veiculares.Efetivo e Cronograma de Implantação (Atualização de Agosto de 2026)O patrulhamento armado oficial começou nas ruas em3 de agosto de 2026, em uma primeira fase composta por 141 guardas e 22 novas viaturas.Em meados de agosto de 2026, a operação já contabilizava 184 agentes armados nas ruas, integrando também um recém-criadoBatalhão Tático de Motocicletaspara melhorar o deslocamento em bairros de vias estreitas.A previsão da Prefeitura é chegar a um contingente de 500 a 600 agentes armados atuando no município de forma escalonada.Foco Operacional e Limites de AtuaçãoObjetivo Primário:O patrulhamento atua de forma complementar à Polícia Militar, focado na prevenção e repressão a crimes patrimoniais:roubo de rua, roubo de veículos, roubo de carga e furtos.As rotas são definidas com base nas manchas criminais fornecidas pelo Instituto de Segurança Pública (ISP) e registros da Polícia Civil.Limitações:A corporação tem como diretriz estritanão atuar em investigações criminais e não realizar incursões em áreas de conflito(favelas sob domínio de facções criminosas).Mapeamento e Desdobramento TecnológicoA Força Municipal iniciou suas rondas prioritariamente no 1º Distrito, abrangendo bairros como Jardim 25 de Agosto, Pauliceia, Vila São Luiz, Doutor Laureano, Engenho do Porto e Parque Lafaiete, expandindo o perímetro nas semanas seguintes para Chacrinha, Sarapuí e Vila Leopoldina.A operação armada atua de forma integrada com a novaMuralha Digital, um sistema de câmeras e cercamento eletrônico instalado em pontos estratégicos e nas divisas do município (como o limite com Belford Roxo) para a rápida identificação de veículos roubados.",
+      "tags": [
+        "segurança pública",
+        "guarda municipal/força municipal/muralha digital/torre de monitoramento"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787854597589",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Segurança Pública",
+      "assunto": "Segurança no município/Assaltos/Roubos/Remoção de Barricadas/Patrulha da Madrugada",
+      "conteudo": "O município de Duque de Caxias atua na segurança pública por meio de parcerias entre a Secretaria Municipal de Segurança Pública, a Polícia Militar (15º BPM) e o programa estadual CPROEIS.Combate a Assaltos e Roubos de VeículosEstratégia Operacional:O enfrentamento a roubos de rua e de veículos combina a atuação da novaForça Municipal Armadanas ruas com o cerco tecnológico daMuralha Digitale a presença dos Módulos Integrados de Segurança.Resultados dos Índices:As ações integradas resultaram em uma queda de mais de 50% nos roubos de veículos na cidade, com registros de dias inteiros sem ocorrências desse tipo de crime no município.Programa \"Patrulha da Madrugada\"Funcionamento e Horário:Fruto de cooperação com a Polícia Militar e o CPROEIS, o programa realiza rondas focadas na faixa da madrugada (operando de forma ostensiva entre 3h30 e 6h).Objetivo:Garantir a proteção de trabalhadores e moradores que circulam bem cedo por vias principais, pontos de ônibus e estações de trem em horários de maior vulnerabilidade.Impacto:A presença intensificada nesses horários reduziu os índices de roubos de rua na cidade (apresentando quedas superiores a 20% após a consolidação das rondas).Remoção de Barricadas (Programa \"Caxias Livre\")Ação Integrada:A remoção de bloqueios operada pelo programa \"Caxias Livre\" é realizada em conjunto com o 15º BPM para desobstruir vias públicas ocupadas pelo crime organizado.Intervenções Recentes:Operações da polícia e do município realizam a retirada física de obstáculos em comunidades como Santuário, Sapo e Mangueirinha para restabelecer o direito de ir e vir dos moradores.Fiscalização Contínua:Além da retirada mecânica do entulho, a fiscalização conta com o apoio de denúncias populacionais e monitoramento (inclusive por drones) para identificar e coibir a reinstalação rápida de barreiras pelas facções.",
+      "tags": [
+        "segurança pública",
+        "segurança no município/assaltos/roubos/remoção de barricadas/patrulha da madrugada"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787855520967",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Segurança Pública",
+      "assunto": "Muralha Digital/Torre de  Monitoramento/Vigilância de Segurança/Monitoramento de Crimes, roubos e segurança no geral",
+      "conteudo": "O município de Duque de Caxias tem tabalhado firme com o monitoramento de segurança, inibindo crimes e identificando criminosos, trazendo mais  segurança para a população.Muralha DigitalA Muralha Digital é um programa tecnológico voltado à segurança pública, fundamentado no uso de vigilância eletrônica. Em Duque de Caxias, o sistema opera como um cerco inteligente estruturado a partir da instalação de pórticos e câmeras de monitoramento.Cercamento e Integração de Fronteiras:A tecnologia tem como premissa o controle dos principais acessos e limites da cidade, contando com equipamentos instalados em pontos estratégicos, como a divisa entre Duque de Caxias e Belford Roxo. O projeto também marcou a integração inédita dos sistemas de segurança eletrônica de Duque de Caxias com os do Rio de Janeiro, estabelecendo a primeira zona de monitoramento conjunto entre os municípios.Redução da Criminalidade:O foco operacional da Muralha Digital é apoiar taticamente as forças policiais. O monitoramento constante auxilia diretamente na repressão de crimes recorrentes — refletindo-se em balanços de dias sem registros de roubos de cargas e de veículos —, além de ser uma ferramenta ativa para localizar e prender indivíduos procurados pela Justiça.As Torres de MonitoramentoAs torres de monitoramento (frequentemente chamadas de totens urbanos) são a face mais visível e capilarizada da Muralha Digital. Em Duque de Caxias, elas integram o programa \"Smart\" e funcionam como os pilares tecnológicos dos Módulos Integrados de Segurança.Distribuição e Estrutura:Tratam-se de estruturas verticais equipadas com câmeras avançadas, distribuídas em vias de alto fluxo e pontos de interesse. O município já implementou essas torres em áreas como o bairro Jardim Primavera e a Avenida Brigadeiro Lima e Silva.Rastreamento em Tempo Real:A vigilância ininterrupta dessas torres permite o acompanhamento ao vivo de ocorrências. A eficácia do sistema é comprovada no apoio direto à Polícia Militar: em um caso prático, as câmeras da torre conseguiram rastrear continuamente homens que vandalizaram o próprio equipamento, guiando os policiais desde o local da fuga até o momento exato da abordagem e prisão na Avenida Duque de Caxias.",
+      "tags": [
+        "segurança pública",
+        "muralha digital/torre de  monitoramento/vigilância de segurança/monitoramento de crimes, roubos e segurança no geral"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787855718021",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Segurança Pública",
+      "assunto": "Atuação exclusiva da Polícia Militar/Restrição de atuação da Guarda Municipal e da Força Municipal",
+      "conteudo": "A atuação do município de Duque de Caxias em segurança pública possui limites constitucionais estritos (Artigo 144 da Constituição Federal), ficando as seguintes atribuições reservadas de forma exclusiva à Polícia Militar (PMERJ) e às forças estaduais:Incursões e Operações em Áreas Conflagradas:A Guarda Municipal (mesmo armada) não realiza operações táticas, incursões ou confrontos armados dentro de favelas e comunidades dominadas por facções criminosas para repressão ao tráfico de drogas ou armas. Essa ação de confronto e ocupação de território é de competência estrita da Polícia Militar (15º BPM e tropas de elite como o BOPE).Policiamento Ostensivo de Manutenção da Ordem Pública:O dever constitucional primário de preservação da ordem pública e da segurança ostensiva em âmbito estadual é da PMERJ. A Força Municipal atua de forma preventiva, focada na proteção de bens públicos, vias urbanas e combate a crimes patrimoniais de rua, sem substituir o papel da polícia militarizada.Cumprimento de Mandados Judiciais:Agentes municipais não têm atribuição legal para cumprir mandados de prisão, busca e apreensão ou ordens de arresto expedidas pelo Poder Judiciário.Gerenciamento de Crises de Alto Risco:Ocorrências que envolvam tomada de reféns, Sequestros, gerenciamento de crises de grande magnitude ou desamparo de artefatos explosivos dependem exclusivamente de protocolos e forças táticas especializadas da Polícia Militar.Custódia e Escolta de Presos:O transporte, custódia em celas provisórias e escolta de detentos para audiências ou estabelecimentos prisionais são atribuições do sistema penal e da Polícia Militar, estando fora do escopo da Guarda Municipal.Investigação Criminal (Reserva da Polícia Civil):Embora a Polícia Militar também não investigue, vale destacar que nem a PM nem a Guarda Municipal instauram inquéritos policiais ou realizam perícia criminal — função restrita à Polícia Civil do Estado do Rio de Janeiro.",
+      "tags": [
+        "segurança pública",
+        "atuação exclusiva da polícia militar/restrição de atuação da guarda municipal e da força municipal"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787857255193",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Ouvidoria Geral e Sistema Municipal de Ouvidoria",
+      "assunto": "Atribuições da Ouvidoria Geral e Sistema Municipal de Ouvidoria",
+      "conteudo": "Base legalO Sistema Municipal de Ouvidoria (SISOUV) foi instituído peloDecreto Municipal nº 8.894/2025, com fundamento naLei Federal nº 13.460/2017(lei que dispõe sobre participação, proteção e defesa dos direitos do usuário dos serviços públicos).Atribuições da Ouvidoria Geral do Município (OGM)A OGM é o órgão central de supervisão do sistema, responsável por:Diretrizes normativase inteligência consolidada de todo o SISOUVAtuar comosensor estratégicopara orientar a alocação eficiente de recursos públicos no territórioReceber, tratar e encaminharas manifestações dos cidadãos às secretarias competentesProduzirindicadores gerenciaisa partir dos dados coletados, retroalimentando o processo de gestão e decisão do prefeito e das secretariasApresentarsugestões e recomendaçõescomo instrumento de gestão, contribuindo para uma administração ética e transparenteAtuar comoórgão de apoioque cria instrumentos que viabilizem a unificação da Carta de Serviços em todo o município — mantendo relação dediálogo institucionalentre os órgãos.Desenvolver metodologias, estratégias e ferramentas que inovadoras que viabilizem uma melhor  e mais eficiente integração entre o governo municipal e a população de Duque de Caxias em diversos temas da municipalidade.Coordenar iniciativas de escuta ativa presencial, como aOuvidoria Itinerantee aPesquisas de opinião e satisfação.Estrutura do SISOUV (5 camadas)CamadaFunçãoOGM– Ouvidoria Geral do MunicípioÓrgão central de supervisão e diretrizesOST– Ouvidorias SetoriaisEstruturas alocadas nas Secretarias.UAC– Unidades de Atendimento ao CidadãoPontos de contato presenciais (hospitais, UPHs) para atendimento mais próximo aos cidadãosSEOUV– Servidores-OuvintesPontos focais em cada Secretaria, respondem diretamente às manifestações e não possuem Ouvidorias SetoriaisAGO– Agentes de OuvidoriaSubordinados à OGM, supervisão operacional in loco nas OSTs e UACsAtribuições operacionais do Sistema de Ouvidoria (via Colab)Unificar  e tratar os dados de forma estratégicaOuvidoria, Zeladoria Urbana, e e-SIC e Serviços Digitais diversosPermitir que o cidadão execute todo o ciclo de solicitação de forma digital: abertura, acompanhamento, execução e comunicação de resultadoTratar tecnicamente os dados recebidos de diversas fontes advindas de serviços e da participação cidadã para gerar indicadores em tempo realMonitorar prazos legais de resposta (a lei exige até 30 dias; a meta interna informada foi responder com folga, cerca de 15 dias abaixo do prazo)",
+      "tags": [
+        "sisouv",
+        "ouvidoria geral",
+        "decreto 8894",
+        "ouvidoria setorial",
+        "atendimento ao cidadao",
+        "canais de ouvidoria",
+        "leis de ouvidoria",
+        "ouvidoria geral e sistema municipal de ouvidoria",
+        "atribuições da ouvidoria geral e sistema municipal de ouvidoria"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787859352907",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Processo Seletivo Simplificado - PSS",
+      "assunto": "Processo de contratação via PSS - Processo Seletivo Simplificado",
+      "conteudo": "O Processo Seletivo Simplificado (PSS) no município de Duque de Caxias é o mecanismo utilizado pelas Secretarias Municipais (como Educação - SME, Assistência Social - SMASDH e Saúde - SMS) para contratação temporária de pessoal diante de necessidades de excepcional interesse público. Geralmente o processo segue um padrão de etapas que são as seguintes:Inscrição e CotasGratuidade:As inscrições são 100% gratuitas, sem cobrança de taxa.Formato:Realizadas exclusivamente via internet nos portais oficiais da Prefeitura de Duque de Caxias ou em plataformas credenciadas ao processo.Reserva de Vagas:Todos os editais garantem a cota legal de 10% das vagas para Pessoas com Deficiência (PcD) e 20% para candidatos negros, pardos ou indígenas.Etapas e Critérios de SeleçãoEtapa I (Análise Curricular e Títulos):Fase eliminatória e classificatória baseada na análise de escolaridade, especializações, aperfeiçoamentos e comprovação de tempo de serviço/experiência profissional na função.Etapa II (Prova Eletrônica/Técnica ou Entrevista):Conforme a exigência do cargo ou secretaria, os aprovados na Etapa I são convocados para uma avaliação complementar online ou presencial.Procedimento de Heteroidentificação:Candidatos inscritos nas cotas raciais passam por verificação presencial para validação da autodeclaração antes da homologação final.Fases de RecursoO candidato dispõe de prazos estabelecidos no cronograma do edital para interpor recurso (realizado online) em diversas fases:Recurso contra o indeferimento da inscrição / homologação.Recurso contra o resultado do procedimento de heteroidentificação.Recurso contra o pontuação do resultado preliminar da Etapa I (títulos e experiência).Recurso contra o gabarito ou pontuação da Etapa II (prova/avaliação).Aprovação, Validade e ContrataçãoPontuação Final:O resultado do candidato é obtido pelo somatório dos pontos acumulados nas etapas do processo.Publicação do Resultado:A Lista Final de Classificados e as convocações são divulgadas nos portais da Prefeitura e no Diário Oficial do Município.Contrato:Os convocados que cumprem os requisitos admissionais firmam contrato por tempo determinado (geralmente de 12 meses, com possibilidade de prorrogação legal por igual período).\n\nAs etapas informas acima podem sofrer modificações/atualizações ou alterações conforme legislação ou norma vigente, bem como o que for definido conforme as especificidades de cada edital.",
+      "tags": [
+        "pss",
+        "processo seletivo simplificado",
+        "contratacao temporaria",
+        "edital de selecao",
+        "trabalhar na prefeitura",
+        "diario oficial",
+        "processo seletivo simplificado - pss",
+        "processo de contratação via pss - processo seletivo simplificado"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787859623939",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Educação",
+      "assunto": "Vaga/Matrícula e Transferência Escolar/Vaga em Creche/Vaga em educação básica/Vaga escolar",
+      "conteudo": "O processo de ingresso, transferência e reserva de vagas na rede municipal de Duque de Caxias é unificado e realizado de forma 100% online, gerenciado pela Secretaria Municipal de Educação (SME). Todo o trâmite de inscrição é feito através do portal educacional do município (sistemae-Duque):https://www.eduque.smeduquedecaxias.rj.gov.br/pagina/naceVaga em Creche (1 a 3 anos)Critério de Seleção:As vagas para a primeira infância no município não são distribuídas por ordem de chegada, mas sim através deSorteio Público.Inscrição e Sorteio:Os responsáveis devem inscrever as crianças no portal durante a primeira fase do calendário (geralmente na segunda quinzena de dezembro). O sorteio oficial das vagas é realizado no mês de janeiro, seguido pela convocação para entrega de documentos.Vaga na Educação Básica (Pré-escola e Ensino Fundamental)O responsável deve preencher o formulário no sistema e-Duque com os dados do aluno e selecionar a opção desejada de ingresso.As convocações ocorrem em fases: há uma primeira chamada com a lista geral em janeiro e uma segunda chamada em fevereiro para os estudantes que ficaram na lista de espera (\"aguardando\").No final de fevereiro, o município abre um período específico de inscrição online exclusivo para vagas remanescentes (sobras de vagas em unidades específicas).Transferência Escolar e EJA (Educação de Jovens e Adultos)Transferência Interna:Alunos que já pertencem à rede municipal de Duque de Caxias e desejam mudar de escola também devem solicitar a transferência através do portal online durante o mês de dezembro.EJA:O processo online também atende alunos da Educação de Jovens e Adultos. Caso o aluno perca o prazo da primeira fase, o município permite que as matrículas da EJA sejam feitas diretamente e presencialmente nas unidades escolares a partir de fevereiro, e também no mês de julho para o segundo semestre letivo.Confirmação e Validação de MatrículaA inscrição no site garante apenas a pré-reserva. A matrícula só é efetivada presencialmente, mediante a entrega de documentos na unidade escolar designada. O responsável que não comparecer na data indicada no calendário perderá a vaga e será considerado desistente.Documentação Obrigatória (Originais e Cópias)Certidão de Nascimento do aluno.Identidade e CPF do responsável (e do aluno, caso possua).Comprovante de residência atualizado.Carteira de vacinação.Laudo médico comprobatório (item obrigatório apenas para alunos que buscam vagas destinadas ao público da Educação Especial).Certificado de reservista / documentação militar (exigido para estudantes do sexo masculino, maiores de 18 anos, que ingressam na EJA).",
+      "tags": [
+        "educação",
+        "vaga/matrícula e transferência escolar/vaga em creche/vaga em educação básica/vaga escolar"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [
+        "https://www.eduque.smeduquedecaxias.rj.gov.br/pagina/naceVaga"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787860338163",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Educação",
+      "assunto": "Transferência de Matrícula /Transferir aluno/Transferir meu filho(a)/Mudar de escola/Mudar meu filho(a) de escola",
+      "conteudo": "A transferência escolhar, trata-se de um processo que viabiliza o aluno ser alterado de unidade escola, tanto internamente como externamente (de uma escola não municipal para uma que seja municipal)Transferência para Creches (1 a 3 anos)Transferência Interna (Mudança de unidade municipal):Crianças que já estão matriculadas em uma creche da prefeitura e desejam mudar para outra devem ter a solicitação feita pelo responsável no portal online (e-Duque) durante a primeira fase do calendário letivo (fase de remanejamento). A transferência só é efetivada se houver vaga desocupada na nova creche desejada.Transferência Externa (Vindo da rede particular ou de outra cidade):O sistema trata esse caso como \"Aluno Novo\". Como a creche não é uma etapa de ensino obrigatória por lei e há limite de capacidade, a criança não tem garantia de vaga automática. O responsável precisa fazer a inscrição online e a criança participará do mesmoSorteio Públicoou entrará na lista de espera junto aos demais inscritos.Transferência para a Educação Básica (Pré-escola e Ensino Fundamental)Transferência Interna (Mudança entre escolas da rede):É a primeira fase do calendário de matrículas no e-Duque, ocorrendo antes da abertura para alunos de fora. O responsável loga no sistema e escolhe a nova unidade desejada. Caso a escola escolhida não tenha vaga disponível, o município garante que o aluno não fique desamparado, mantendo a matrícula automaticamente renovada na sua escola de origem.Transferência Externa (Vindo de escola estadual, particular ou de outro município):O responsável inscreve o aluno no e-Duque no período de \"Novas Matrículas\". Por se tratar de educação obrigatória (dos 4 aos 17 anos), o município é obrigado a garantir a vaga, alocando o aluno de acordo com a disponibilidade das escolas mais próximas ao endereço cadastrado (zoneamento).Documentação Espcífica para Transferência:Ao ser convocado para ir presencialmente à nova escola, além dos documentos básicos de identidade e residência, é exigida a apresentação doHistórico Escolarou de umaDeclaração de Transferência(com validade provisória, geralmente de 30 dias) emitida pela escola anterior, atestando em qual série o estudante está aprovado e habilitado a cursar.",
+      "tags": [
+        "educação",
+        "transferência de matrícula /transferir aluno/transferir meu filho(a)/mudar de escola/mudar meu filho(a) de escola"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787860799879",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Educação",
+      "assunto": "Educação Infantil Especial/TEA/Autismo/Criança com Necessidades Especiais/Matricula de crianças especiais",
+      "conteudo": "O processo de matrícula e suporte para alunos com deficiência (PcD), Transtorno do Espectro Autista (TEA) e outras neurodivergências na rede municipal de Duque de Caxias é coordenado pelaSME (Secretaria Municipal de Educação), sob a gestão técnica doDAIE (Departamento de Acompanhamento à Inclusão Educacional).1. Inscrição e Prioridade no CalendárioSistema Online:A solicitação de vaga inicial é feita exclusivamente pelo sistema onlinee-Duque(matricula.eduque.smeduquedecaxias.rj.gov.br).Fase Prioritária:O calendário municipal estabelece uma fase prioritária de matrículas para alunos com deficiência e estudantes da educação infantil. Esse prazo geralmente é encerrado antes da abertura das matrículas gerais (frequentemente no início de janeiro), permitindo que a Secretaria de Educação tenha tempo hábil para organizar a distribuição de profissionais de apoio e acessibilidade.Alocação:Após a inscrição, o DAIE é o órgão responsável por cruzar as necessidades do aluno com a oferta de vagas, indicando as Unidades Escolares equipadas para recebê-lo.2. Validação Presencial e Documentação ObrigatóriaApós a designação da vaga no sistema, o responsável deve comparecer presencialmente à unidade escolar munido dos documentos gerais (Certidão de Nascimento, comprovante de residência, RG e CPF do responsável e carteira de vacinação) e da documentação de saúde:Laudo Médico:É exigida a apresentação de laudo médico atualizado (geralmente emitido por neuropediatra ou psiquiatra) contendo a Classificação Internacional de Doenças (CID) para atestar a condição do aluno (ex.: laudo de TEA). O laudo pauta a elaboração do relatório técnico-pedagógico da escola.Estudo de Caso:A avaliação técnica da escola e os relatórios pedagógicos e médicos servem para demonstrar se há necessidade de acompanhamento individualizado para promover a autonomia e a socialização do estudante.3. Estrutura de Apoio e Direitos Garantidos (AEE)Os alunos incluídos na rede municipal têm assegurados recursos legais e pedagógicos específicos:Atendimento Educacional Especializado (AEE):A criança com transtorno do espectro autista tem o direito constitucional e municipal de receber suporte focado, funcionando muitas vezes no contraturno escolar (Salas de Recursos) para complementar a formação.Profissional de Apoio Escolar (Mediador/Monitor):Caso o estudo de caso ou o laudo médico demonstre a necessidade de auxílio na alimentação, higiene, locomoção ou mediação pedagógica, o município tem o dever de disponibilizar um monitor de carreira ou profissional de apoio escolar.Limitação de Alunos por Turma:Para garantir a qualidade da inclusão e não sobrecarregar os profissionais, o sistema municipal (e-Duque) prevê adaptações na lotação das salas. Existem diretrizes para a redução do quantitativo de vagas em turmas inclusivas, prevendo, por exemplo, Classes Especiais de Autismo limitadas a turmas reduzidas, com capacidade de 6 a 8 estudantes.",
+      "tags": [
+        "matricula especial",
+        "autismo",
+        "tea",
+        "pcd",
+        "daie",
+        "aee",
+        "mediador escolar",
+        "monitor de apoio",
+        "sala de recursos",
+        "laudo medico",
+        "educação",
+        "educação infantil especial/tea/autismo/criança com necessidades especiais/matricula de crianças especiais"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787861020424",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Educação",
+      "assunto": "Alimentação dos alunos/Alimentação dos alunos de unidade basica e creche/Comida para os alunos nas escolas/Alimentação nas escolas",
+      "conteudo": "O fornecimento de refeições na rede municipal de Duque de Caxias segue umplanejamento alimentar elaborado para contribuir com a saúde, o desenvolvimento e a qualidade de vida dos alunos, considerando suas necessidades nutricionais e as diretrizes aplicáveis à alimentação escolar.Responsabilidade Técnica:Os cardápios são elaborados exclusivamente por nutricionistas registradas, seguindo as diretrizes de necessidades nutricionais diárias e de faixa etária estabelecidas pelo Programa Nacional de Alimentação Escolar (PNAE).Alimentação Inclusiva (Dietas Especiais):A rede é obrigada a fornecer cardápios adaptados para estudantes com necessidades médicas diagnosticadas e comprovadas por laudo (como doença celíaca, diabetes, hipertensão ou Alergia à Proteína do Leite de Vaca - APLV).Diferença de Alimentação por Etapa de EnsinoA seleção dos alimentos muda drasticamente dependendo se o aluno está na creche ou no ensino fundamental, seguindo o marco regulatório do FNDE:Creches (Primeira Infância - até 3 anos):A regra é restritiva e focada na introdução alimentar segura. Éestritamente proibida a adição de açúcar, mel ou adoçantes nas preparações e bebidas. Também é vedado o fornecimento de alimentos ultraprocessados (como achocolatados, biscoitos recheados, salsichas e sucos de caixinha). O cardápio baseia-se puramente em alimentosin naturaou minimamente processados (frutas, legumes, raízes, carnes, ovos e arroz/feijão).Pré-escola e Ensino Fundamental:O cardápio é estruturado para garantir a oferta frequente de fontes de ferro (como leguminosas e vegetais verde-escuros) e vitamina A. Há limites rigorosos para a oferta de produtos cárneos em conserva, enlatados e doces (que, quando permitidos, são restritos a pouquíssimas vezes no mês). Para alunos em tempo parcial, a merenda cobre 20% da necessidade calórica diária; para escolas de tempo integral, cobre no mínimo 70% com a oferta de múltiplas refeições (desjejum, almoço e lanche).Origem dos Alimentos e Preparo LocalAgricultura Familiar:Para garantir que a comida chegue fresca às escolas, a Prefeitura de Duque de Caxias destina obrigatoriamente um percentual da verba (por lei, no mínimo 30% do repasse federal) para a compra direta de produtores da agricultura familiar rural. Isso garante a entrada constante de hortifrutis frescos (frutas da estação, alface, cheiro-verde, aipim, abóbora) em vez de produtos industrializados.Preparo nas Unidades:As refeições não chegam prontas em marmitas de empresas terceirizadas. Elas são cozinhadas nas próprias escolas pelas merendeiras da rede municipal, que passam por capacitações focadas na aceitabilidade do cardápio e no aproveitamento integral dos alimentos.Controle e FiscalizaçãoExibição Obrigatória:As escolas são obrigadas a manter o cardápio oficial do mês (assinado pela nutricionista da SME) fixado em local visível, geralmente no mural de entrada ou no refeitório.CAE (Conselho de Alimentação Escolar):A qualidade dos alimentos que chegam às despensas das escolas, as datas de validade, a higiene das cozinhas e o cumprimento do cardápio são fiscalizados de forma independente pelo CAE de Duque de Caxias, um conselho paritário formado por pais de alunos, professores e representantes da sociedade civil.",
+      "tags": [
+        "merenda escolar",
+        "alimentacao dos alunos",
+        "pnae",
+        "dieta especial",
+        "sem acucar",
+        "creche merenda",
+        "agricultura familiar",
+        "cae",
+        "educação",
+        "alimentação dos alunos/alimentação dos alunos de unidade basica e creche/comida para os alunos nas escolas/alimentação nas escolas"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-27",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787918621226",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Obras e Agricultura",
+      "assunto": "Instalação de poste/reparo de poste/o poste está caído/não tem poste",
+      "conteudo": "A Secretaria de Obras e Agricultura não é, em geral, responsável pela instalação de postes ou reparo destes.A maioria dos postes são de responsabilidade das concessionárias de energia, salvo raras exceções. Por isso é importante antes entrar em contato para falar sobre o assunto por nossos canais oficiais, é importante verificar de quem é a responsabilidade dos postes na área. Caso tenha dificuldade em conseguir identificar, você pode entrar em contato informando o endereço para verificar a responsabilidade:Telefone: (21) 2652-3835E-mail: ouvidoria@duquedecaxias.rj.gov.br\nColab:https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "poste caido",
+        "reparo de poste",
+        "poste quebrado",
+        "instalacao de poste",
+        "light postes",
+        "concessionaria de energia",
+        "obras e agricultura",
+        "instalação de poste/reparo de poste/o poste está caído/não tem poste"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Coordenação Técnica da Ouvidoria",
+      "data_homologacao": "2026-08-28",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787151190236",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Transportes, Serviços Públicos e Troca de Lâmpadas",
+      "assunto": "Geral do Tema",
+      "conteudo": "tags: Tarifa Zero \n\nDúvidas relacionadas ao programa de ônibus Tarifa Zero, incluindo informações sobre circulação, itinerários e etc, podem ser esclarecidas através do serviço informativo na plataforma colab:Link de acesso: https://duquedecaxias.colab.re/service/686d4bb2a7bdec6ecbe37a9fPara informações detalhadas e dúvidas mais complexas sobre situações relacionadas ao serviço, devem ser direcionadas à Secretaria Municipal de Segurança Pública, responsável pelo atendimento dessas demandas através do Canal de Ouvidoria no tema  \"Segurança, Sinalização, Multas e Tarifa Zero\", através do link:\n\nhttps://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "tarifa zero",
+        "onibus de graca",
+        "onibus tarifa zero",
+        "transporte gratuito",
+        "secretaria de seguranca",
+        "transportes, serviços públicos e troca de lâmpadas",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 11:53",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/686d4bb2a7bdec6ecbe37a9fPara",
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787146425607",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Vigilância Sanitária",
+      "assunto": "Atendimento",
+      "conteudo": "Tags: Vigilância Sanitária; carne estragada\n\nQuestões e dúvidas mais específicas relacionadas à Vigilância Sanitária contam com atendimento presencial na sede da Secretaria Municipal de Saúde.\n\nEndereço:Alameda James Franco, 03 - Jardim Primavera,CEP: 25215-260 - Duque de Caxias - RJPresencialmente  você pode buscar informações e orientações sobre os serviços e procedimentos relacionados à área. \n\nCaso deseje registrar uma denúncia que envolva fiscalização sanitária, você pode entrar em contato com a Ouvidoria Geral do Município pelo telefone (21) 2652-3835 ou pelo e-mail ouvidoria@duquedecaxias.rj.gov.br. \n\nTambém é possível registrar sua manifestação pelo site ou aplicativo Colab, selecionando o tema “Vigilância Sanitária” pelo Link: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "vigilância sanitária",
+        "carne estragada",
+        "vigilancia sanitaria",
+        "comida vencida",
+        "fiscalizacao de mercado",
+        "restaurante sujo",
+        "colab vigilancia",
+        "atendimento"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 10:33",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787145977212",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Assistência Social e Direitos Humanos",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags: Ouvidoria Setorial de assistência social\n\nPara dúvidas mais complexas sobe Assistência Social, você pode procurar a Ouvidoria Setorial deAssistência Social e Direitos Humanos está localizada na Av. Brigadeiro Lima e Silva, nº 1618, bairro 25 de Agosto, Duque de Caxias/RJ, no 2º andar. No local, você pode buscar atendimento e orientações relacionadas às demandas e serviços. \n\nPara facilitar o atendimento, recomendamos que, ao comparecer ao local, tenha em mãos as informações e documentos relacionados à sua solicitação, quando aplicável.\n\nVocê também pode cadastrar uma manifestação através do serviço de Ouvidoria com o tema \"Assistência Social e Direitos Humanos\", através do link:https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "ouvidoria setorial de assistência social",
+        "ouvidoria assistencia social",
+        "smasdh",
+        "brigadeiro lima e silva",
+        "atendimento assistencia social",
+        "25 de agosto",
+        "assistência social e direitos humanos",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 10:26",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787145528489",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Comunicação Social",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags: solicitação de informação; pedido de informação; acesso à informação; e-SIC; Sistema Eletrônico do Serviço de Informação ao Cidadão.\n\nPara realizar um pedido de informação, acesse o site: https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840\n\nCaso precise de orientação sobre o procedimento, a Ouvidoria Geral também está disponível pelo telefone (21) 2652-3835,pelo e-mail ouvidoria@duquedecaxias.rj.gov.br ou presencialmente no endereço:Alameda Esmeralda 206, Jd. Primavera, Duque de Caxias / RJ, CEP: 25215-260",
+      "tags": [
+        "solicitação de informação",
+        "pedido de informação",
+        "acesso à informação",
+        "e-sic",
+        "sistema eletrônico do serviço de informação ao cidadão.",
+        "acesso a informacao",
+        "lai",
+        "pedido de informacao",
+        "transparencia publica",
+        "colab e-sic",
+        "comunicação social",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 10:18",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787145209226",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Fiscalização Urbana, Regularização e Registro de Imóveis",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags: estrutura fixada no solo; ocupação irregular de calçada\n\nDemandas relacionadas à obstrução de calçadas por estruturas fixadas no solo, que possam comprometer a circulação de pedestres ou a utilização adequada do passeio público, são tratadas pela Secretaria Municipal de Urbanismo. A situação deve ser encaminhada ao órgão para análise do local e adoção das providências cabíveis, conforme as normas de uso e ocupação do espaço público.\n\nEste serviço pode ser solicitado pelo Colab através do aplicativo no serviço de Zeladoria cuja categoria é \"Obstrução de Calçada (Notificação)\" dentro do tema \"Urbanismo\".\n\nPara baixar o app basta acessar:\n\nPlaystore: https://play.google.com/store/apps/details?id=thirtyideas.colab_android&hl=pt_BR\n\nAppstore: https://apps.apple.com/br/app/colab/id609666061",
+      "tags": [
+        "estrutura fixada no solo",
+        "ocupação irregular de calçada",
+        "obstrucao de calcada",
+        "estrutura fixada",
+        "muro na calcada",
+        "calcada bloqueada",
+        "urbanismo",
+        "fiscalizacao urbana",
+        "fiscalização urbana, regularização e registro de imóveis",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 10:13",
+      "links_oficiais": [
+        "https://play.google.com/store/apps/details?id=thirtyideas.colab_android&hl=pt_BR",
+        "https://apps.apple.com/br/app/colab/id609666061"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1787145039097",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Cultura e Turismo",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags:  espaço atrás da Biblioteca Leonel de Moura; som alto no raul cortez\n\nDemandas relacionadas a poluição sonora ou perturbação do sossego no espaço localizado atrás da Biblioteca Leonel de Moura são de responsabilidade da Secretaria Municipal de Cultura e Turismo, considerando que o local está vinculado à referida Secretaria. \n\nNesses casos, a situação deve ser encaminhada diretamente ao órgão responsável, que poderá avaliar a ocorrência e adotar as providências cabíveis.\n\nCaso queira cadastrar denúncia sobre este caso, acesso o serviço de ouvidoria pelo colab: https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840\n\nPelo Telefone:(21) 2652-3835\n\nE-mail:ouvidoria@duquedecaxias.rj.gov.br\n\nPresencialmente:Alameda Esmeralda 206, Jd. Primavera, Duque de Caxias / RJ, CEP: 25215-260",
+      "tags": [
+        "espaço atrás da biblioteca leonel de moura",
+        "som alto no raul cortez",
+        "som no raul cortez",
+        "atras da biblioteca",
+        "leonel brizola",
+        "cultura e turismo",
+        "barulho na praca do teatro",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-19 10:10",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786969009292",
+      "tipo": "RESTRICAO_PROIBICAO",
+      "tipo_label": "Restrição / Proibição",
+      "tema": "Defesa Civil",
+      "assunto": "Geral do Tema",
+      "conteudo": "Nunca indique abrir reclamações ou procedimentos buracráticos quando for caso de emergência envolvendo risco de desabamento para defesa civil. Nesse caso indique entrar em contato direto com a Defesa Civil pelo telefone 199.",
+      "tags": [
+        "desabamento",
+        "risco de queda",
+        "defesa civil 199",
+        "emergencia desabamento",
+        "rachadura em casa",
+        "enchente",
+        "defesa civil",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 09:16",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786967258058",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Comunicação Social",
+      "assunto": "Atendimento ao cidadão via canais de comunicação",
+      "conteudo": "Tags: \"Localização/Endereço/Acesso à Ouvidoria\"\n\nCaso esteja se referindo à Ouvidoria Geral de Duque de Caxias, ela está localizada em Jardim Primavera, na Alameda Esmeralda, nº 206.\n\nAlém do atendimento presencial, também é possível entrar em contato pelos seguintes canais:\n\nTelefone: 2652-3835, de segunda a sexta-feira, das 8h às 17h.\nE-mail: ouvidoria@duquedecaxias.rj.gov.br.\nColab: https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840",
+      "tags": [
+        "localização/endereço/acesso à ouvidoria",
+        "endereco da ouvidoria",
+        "alameda esmeralda 206",
+        "ouvidoria geral",
+        "telefone da ouvidoria",
+        "jardim primavera",
+        "comunicação social",
+        "atendimento ao cidadão via canais de comunicação"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 08:47",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786965988382",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Segurança, Sinalização, Multas e Tarifa Zero",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags: \"Soliciatção/Reclamação/Demandas em que o cerne seja quebra molas\"\n\nA solicitação para instalação de quebra-molas deve ser feita na Secretaria Municipal de Segurança Pública, que irá enviar um Guarda ao local para verificar a necessidade e a viabilidade da instalação. Caso seja constatada a necessidade, a solicitação será encaminhada para a Secretaria Municipal de Obras, responsável pela execução do serviço.\n\nTodo esse procedimento será realizado mediante reclamação cadastrada com o tema \"Segurança, Sinalização, Multas e Tarifa Zero\", através do colab: https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840 \nou presencialmente através do endereço:Rua Silva Fernandes, 275, Sede da Guarda Municipal , Duque de Caxias - RJ",
+      "tags": [
+        "soliciatção/reclamação/demandas em que o cerne seja quebra molas",
+        "como pedir quebra molas",
+        "instalacao de lombada",
+        "quebra molas",
+        "vistoria da guarda",
+        "seguranca publica quebra molas",
+        "segurança, sinalização, multas e tarifa zero",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 08:26",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786965601834",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Gestão, Inclusão e Mulher (Fazendinha do Autista e Programas de Inclusão)",
+      "assunto": "Geral do Tema",
+      "conteudo": "Tags: \"Acesso/Localização/Demandas/Solicitações/Serviçosobre casa do autista\"\n\nA Casa do Autista é um projeto onde o funcionamento será no Primeiro Distrito de Duque de Caxias. O espaço será estruturado para oferecer atendimento multidisciplinar, contando com fisioterapia, fonoaudiologia, pedagogia, psicologia, psiquiatria, nutrição, além de assistência social e jurídica. A unidade também deverá contar com ambientes destinados a atividades culturais e de desenvolvimento, como teatro, sala de música, espaço de leitura e circo, além de refeitório, vestiários adaptados e áreas de convivência.\n\nOnde será a localização: Rua Jandira, atrás do Restaurante Popular, Parque Vila Nova, 1º Distrito, Duque de Caxias - RJ",
+      "tags": [
+        "acesso/localização/demandas/solicitações/serviçosobre casa do autista",
+        "casa do autista",
+        "fazendinha do autista",
+        "atendimento multidisciplinar",
+        "inclusao e mulher",
+        "1 distrito autista",
+        "gestão, inclusão e mulher (fazendinha do autista e programas de inclusão)",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 08:20",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786965302697",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Fiscalização Urbana, Regularização e Registro de Imóveis",
+      "assunto": "Poluição sonora/barulho em obras em andamento, seja particular ou pública",
+      "conteudo": "Quando a poluição sonora for proveniente de uma obra em andamento no município, seja particular ou não, a demanda deverá ser direcionada à Secretaria Municipal de Urbanismo através do tema \"Fiscalização Urbana, Regularização e Registro de Imóveis\" pelo colab:https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "poluicao sonora de obra",
+        "barulho de construcao",
+        "obra vizinho barulho",
+        "secretaria de urbanismo",
+        "fiscalização urbana, regularização e registro de imóveis",
+        "poluição sonora/barulho em obras em andamento, seja particular ou pública"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 08:15",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786964570866",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)",
+      "assunto": "Poluição Ambiental (Ar, Solo, Água e Som)",
+      "conteudo": "Tags: \"Poluição sonora/barulho em igreja\"\n\nA Secretaria Municipal de Meio Ambiente atua na fiscalização de casos de poluição sonora relacionados a estabelecimentos comerciais e espaços religiosos. A equipe realiza a aferição dos níveis de ruído, para verificar se os limites estabelecidos estão sendo respeitados.\n\nPara abrir uma denúncia de poluição sonora nesses estabelecimentos, basta acessar o Colab e selecionar o tema \"Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)\" através do link: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "poluição sonora/barulho em igreja",
+        "poluicao sonora igreja",
+        "barulho de templo",
+        "som de comercio",
+        "decibelimetro smma",
+        "meio ambiente barulho",
+        "meio ambiente (poluição sonora, árvores, licenças e fiscalizações ambientais e etc.)",
+        "poluição ambiental (ar, solo, água e som)"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 08:02",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786964275438",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Meio Ambiente (Poluição Sonora, Árvores, Licenças e Fiscalizações Ambientais e etc.)",
+      "assunto": "Poda e remoção de árvore",
+      "conteudo": "Tags: \"Arvore do vizinho\" \"podar arvore do vizinho\" \"arvore no quintal do vizinho\"\n\nÁrvores localizadas em imóvel vizinho: o solicitante não poderá ingressar em propriedade de terceiros para realizar poda ou corte de árvores sem autorização do proprietário ou outra autorização legal que permita o acesso. Entretanto, caso galhos ou raízes de árvore localizada no imóvel vizinho ultrapassem a divisa e avancem sobre sua propriedade, o artigo 1.283 do Código Civil permite o corte da parte que ultrapassar o limite do imóvel, até o plano vertical divisório, observadas as autorizações e exigências ambientais aplicáveis no Município de Duque de Caxias.",
+      "tags": [
+        "arvore do vizinho podar arvore do vizinho arvore no quintal do vizinho",
+        "arvore do vizinho",
+        "podar galho do vizinho",
+        "arvore no quintal do vizinho",
+        "artigo 1283 codigo civil",
+        "plano divisorio",
+        "meio ambiente (poluição sonora, árvores, licenças e fiscalizações ambientais e etc.)",
+        "poda e remoção de árvore"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas Brian",
+      "data_homologacao": "2026-08-17 07:57",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786734801745",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Vigilância Sanitária",
+      "assunto": "Atuação/fiscalização da Vigilância Sanitária",
+      "conteudo": "Restringe sua atuação a espaços comerciais. Questões sanitárias em estabelecimentos, restaurantes, mercados, clínicas e quaisquer espaços de atividade comercial, bem como condições insalubres nestes locais.\n\nDenúncias em espaços residênciais insalubres não é de competência do órgão de vigilância sanitária.",
+      "tags": [
+        "vigilancia sanitaria restricao",
+        "espaco comercial",
+        "mercado insalubre",
+        "clinica sanitaria",
+        "restricao residencia",
+        "vigilância sanitária",
+        "atuação/fiscalização da vigilância sanitária"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 16:13",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786734667257",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Veículo Abandonado, Ordem Pública (Bares, Eventos e Feiras)",
+      "assunto": "Geral do Tema",
+      "conteudo": "Atua principalmente na fiscalização do uso do espaço público. Responde pelas demandas de obstrução de vias públicas por unidades móveis, eventos, festas, bares e restaurantes que ocupem as calçadas e/ou vias públicas, bem como veículos abandonados na via e ordenamento público.\n\nSua função inclui ações diretas de ordenamento, não possuindo função responsabilizatória ou poder de polícia.",
+      "tags": [
+        "veiculo abandonado",
+        "carro abandonado na rua",
+        "obstrucao por mesas e cadeiras",
+        "ordem publica",
+        "feiras livres",
+        "veículo abandonado, ordem pública (bares, eventos e feiras)",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 16:11",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786734576313",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Transportes, Serviços Públicos e Troca de Lâmpadas",
+      "assunto": "Transporte público urbano/concessões de empresas de transportes públicos de ônibus",
+      "conteudo": "O Município não responde por linhas intermunicipais, sendo de competência da Secretaria de Transportes do Estado. Em caso de problemas estruturais nos veículos e conduta dos motoristas, recomenda-se primeiramente entrar em contato com a própria empresa de ônibus. \n\nO município atua na fiscalização do correto funcionamento das empresas, porém, as mesmas também possuem canais de contato próprio para receberem reclamações da população.\n\nPara cadastrar manifestações referentes a transporte público das concessionárias, acesse o link do colab, selecionando o tema \"Transportes, Serviços Públicos e Troca de Lâmpadas\":https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "onibus municipal",
+        "linhas de onibus caxias",
+        "onibus intermunicipal",
+        "setrans",
+        "detro rj",
+        "smtsp",
+        "transportes, serviços públicos e troca de lâmpadas",
+        "transporte público urbano/concessões de empresas de transportes públicos de ônibus"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 16:09",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786734424793",
+      "tipo": "RESTRICAO_PROIBICAO",
+      "tipo_label": "Restrição / Proibição",
+      "tema": "Transportes, Serviços Públicos e Troca de Lâmpadas",
+      "assunto": "Troca de lâmpadas",
+      "conteudo": "A Secretária de Transportes e Serviços Públicos, responsável pelo tema \"Transportes, Serviços Públicos e Troca de Lâmpadas\", não realiza implantação de postes e braço de luz. Atuam apenas na troca das lâmpadas própriamente ditas em postes de responsabilidade municipal.",
+      "tags": [
+        "troca de lampadas",
+        "braco de luz",
+        "proibicao instalacao de poste",
+        "poste sem luz",
+        "smtsp",
+        "transportes, serviços públicos e troca de lâmpadas",
+        "troca de lâmpadas"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 16:07",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786734048042",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Governo Municipal e Enterro Gratuito",
+      "assunto": "Enterro gratuito/sepultamento",
+      "conteudo": "Antes de tudo, é importante para assuntos delicados, crítico e que envolvem dor emocional, sermos empáticos e lamentar pela tristeza e momento difícil vivido pela pessoa e tratar a demanda sempre num tom respeitoso.\n\nO município presta serviço de enterro e sepultamento gratuíto para auxiliar os familiares que tenham necessidade e se enquadrem nos critérios socioeconomicos pertinentes. Caso deseje ser atendido, esteja com os seguintes documentos em mãos:- Declaração de óbito ou certidão de óbito\n - RG e CPF do falecido\n - Comprovante de residência no nome do falecido\n - RG (grafado como \"rhh\") e CPF da mãe no caso de natimorto\n - RG e CPF do declarantePara saber mais e/ou solicitar o serviço, entre em contato  com a Central de Atendimentos Funerários de Duque de Caxias, através dos canais:\n\nE-mail: atendimentopmdccaf@gmail.com\n\nPresencial: Alameda esmeralda nº 206 - jardim primavera - duque de caxias/rj.",
+      "tags": [
+        "enterro gratuito",
+        "cemiterio nossa senhora de fatima",
+        "taquara",
+        "sepultamento gratuito",
+        "governo municipal e enterro gratuito",
+        "enterro gratuito/sepultamento"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 16:00",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733963178",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Fiscalização e tributos",
+      "assunto": "Impostos/Tributos/Taxas/Informações fazendárias",
+      "conteudo": "Todas as demandas referentes à taxas, tributos municipais e IPTU de modo geral, tratados pela Secretaria Municipal de Fazenda.\n\nDiversas solicitações podem ser feitas através do Portal do Contribuinte: https://portalcontribuinte.duquedecaxias.rj.gov.br/\n\nAlém disso, caso precise cadastrar manifestações sobre o tema, você pode faze-lo pelo colab com o tema \"Fiscalização e Tributos\", pelo link: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "fiscalizacao e tributos",
+        "iptu",
+        "portal do contribuinte",
+        "taxas municipais",
+        "fazenda",
+        "fiscalização e tributos",
+        "impostos/tributos/taxas/informações fazendárias"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:59",
+      "links_oficiais": [
+        "https://portalcontribuinte.duquedecaxias.rj.gov.br/",
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733907098",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Fiscalização Urbana, Regularização e Registro de Imóveis",
+      "assunto": "Geral do Tema",
+      "conteudo": "Todas as demandas referentes à obstrução de via pública por construções fixas (muros, estrutura concretada, bloqueios e barreiras), registro imobiliário, logradouro, autorização para obras, barulhos e perturbações provenientes de obras, terrenos abandonados, limites do imóvel, etc, são de competência da Secretaria de Urbanismo e Habitação. \n\nEm se tratando de uma manifestação (denúncia, reclamação, sugestão e elogio), pode ser cadastrada com o tema \"Fiscalização Urbana, Regularização e Registro de Imóveis\", através do link: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "obstrucao via publica",
+        "muro irregular",
+        "terreno abandonado",
+        "registro de imoveis",
+        "urbanismo",
+        "fiscalização urbana, regularização e registro de imóveis",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:58",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733767802",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "FUNDEC",
+      "assunto": "Cursos/Educação Técnica/Especialização/ Espacialização de mão de obra / Capacitação",
+      "conteudo": "Todas as demandas referentes à ofertas de cursos profissionalizantes e demais especializações, capacitação e etc, que não sejam ligadas diretamente a uma escola municipal quem cuida é a FUNDEC. Nem todos os cursos possíveis são disponibilizados, mais possuímos uma grande variedade de cursos gratuítos que podem ser acessados através do site: https://www.fundec.rj.gov.br/cursos.php\n\nFique atento aos períodos de aberturas de vagas, pois as vagas e turmas são limitadas! \n\nCaso queira abrir uma manifestação(denúncia, reclamação, sugestão e elogio), basta acessar o colab e selecionar o tema \"FUNDEC\" através do link: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "fundec",
+        "cursos gratuitos",
+        "cursos profissionalizantes",
+        "inscricao fundec",
+        "qualificacao profissional",
+        "cursos/educação técnica/especialização/ espacialização de mão de obra / capacitação"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:56",
+      "links_oficiais": [
+        "https://www.fundec.rj.gov.br/cursos.php",
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733729282",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "Empresas e Legalizações",
+      "assunto": "Legalização de empresa/Alvará/Permissão para atuação",
+      "conteudo": "Para PMEs (Pequenas e Médias Empresas), MEIs (Microempreendedores Individuais), Microempresas e demais empreendedores, as orientações e dúvidas relacionadas à abertura, regularização e funcionamento de atividades comerciais no município devem ser direcionadas à Secretaria Municipal de Fazenda.A Secretaria é responsável pelo atendimento de demandas relacionadas a alvará de funcionamento, legalização de atividades comerciais, CNPJ, MEI e inscrição municipal, bem como a situações de atividade comercial irregular em espaços comerciais, desde que a questão não envolva aspectos sanitários.Solicitação de informaçõesPara solicitar informações, acesse:https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840Registro de manifestaçõesPara registrar Denúncias, Reclamações, Elogios ou Sugestões, acesse:https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7bAtendimento presencialPara demais dúvidas e atendimento presencial, compareça à:Praça Roberto Silveira, 31 – Jardim Vinte e Cinco de Agosto, Duque de Caxias – RJ, CEP 25071-160.Nesse mesmo endereço funciona a Sala do Empreendedor, espaço destinado ao atendimento e à orientação dos empreendedores do município.",
+      "tags": [
+        "alvara de funcionamento",
+        "legalizacao de empresas",
+        "mei caxias",
+        "inscricao municipal",
+        "fazenda empresas",
+        "empresas e legalizações",
+        "legalização de empresa/alvará/permissão para atuação"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:55",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/68389939e814a47fd7f16840Registro",
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7bAtendimento"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733521722",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Negócio",
+      "tema": "ELOVIAS (W. LUIZ - BR 040): Atendimento, Limpeza, Infraestrutura, Manutenção e Segurança",
+      "assunto": "Geral do Tema",
+      "conteudo": "A Prefeitura de Duque de Caxias estabeleceu uma parceria com a Elovias, através da Ouvidoria Geral, visando tratar de todas as demandas referentes à ocorrências na BR-040 - Rod. Washington Luiz nos KM's que envolvem todo o território do município. Além disso, tudo que envolva iluminação, sinalização, limpeza, capina e roçada e demais serviços estritamente às margens da BR-040 é de competência desta concessionária.\n\nA Ouvidoria Geral, através dos seus canais, a partir do tema \"ELOVIAS (W. LUIZ - BR 040): Atendimento, Limpeza, Infraestrutura, Manutenção e Segurança\" recebe e repassa as demandas à ELOVIAS, acompanhando todo o processo até a efetiva resposta conclusiva ao cidadão.Caso queira entrar em contato, você pode optar pelos canais oficiais da empresa, ou, através dos canais do Sistema de Ouvidoria:Presencial:Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ, 25214-360Telefone:(21) 2652-3835\n\nE-mail:ouvidoria@duquedecaxias.rj.gov.br\n\nColab: https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b",
+      "tags": [
+        "elovias",
+        "rodovia washington luiz",
+        "br 040",
+        "manutencao br040",
+        "iluminacao br040",
+        "concessionaria",
+        "elovias (w. luiz - br 040): atendimento, limpeza, infraestrutura, manutenção e segurança",
+        "geral do tema"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:52",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/service/6a68e699f0b6a053e1decb7b"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_1786733150754",
+      "tipo": "ORIENTACAO_ATENDIMENTO",
+      "tipo_label": "Orientação de Atendimento",
+      "tema": "Assistência Social e Direitos Humanos",
+      "assunto": "Cadastro Único (CadÚnico)/Vale Social/Programas Sociais/Bolsa Família/Cesta Básica/Auxílios e ajudas socioeconômicas",
+      "conteudo": "Em casos de renovação e/ou atualização do cadastro unipessoal do CadÚnico, o cidadão poderá comparecer presencialmente à Secretaria Municipal de Assistência Social e Direitos Humanos, portando os documentos originais: RG, CPF e Comprovante de Residência. Nesses casos, não há mais necessidade de visita domiciliar pelo CRAS da região.Para saber os endereços dos equipamentos que atendem às temáticas de Assistência Social no município, bem como suas respectivas atribuições, acesse:https://seasdih.duquedecaxias.rj.gov.br/digital/Caso precise de mais informações, o cidadão também poderá procurar o CRAS mais próximo de sua residência. Para saber onde está o CRAS mais próximo, acesse:https://seasdih.duquedecaxias.rj.gov.br/digital/cras/Para realizar cadastro, renovação ou atualização de dados relacionados a benefícios sociais, como Bolsa Família, auxílios, cestas básicas, programas socioeconômicos de apoio à renda, entre outros, o atendimento também é realizado pela Secretaria Municipal de Assistência Social e Direitos Humanos.",
+      "tags": [
+        "cadunico unipessoal",
+        "cadastro unico",
+        "atualizacao unipessoal",
+        "smasdh 25 de agosto",
+        "sem visita do cras",
+        "assistência social e direitos humanos",
+        "cadastro único (cadúnico)/vale social/programas sociais/bolsa família/cesta básica/auxílios e ajudas socioeconômicas"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Rildo",
+      "data_homologacao": "2026-08-14 15:45",
+      "links_oficiais": [
+        "https://seasdih.duquedecaxias.rj.gov.br/digital/Caso",
+        "https://seasdih.duquedecaxias.rj.gov.br/digital/cras/Para"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral",
+        "Diretoria de Tecnologia"
+      ]
+    },
+    {
+      "id": "rule_nikolas_01_ouvidoria_enderecos",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - Ouvidoria",
+      "tema": "Ouvidoria Geral e Canais de Atendimento",
+      "assunto": "Locais físicos de atendimento presencial e contatos",
+      "conteudo": "A Ouvidoria Geral de Duque de Caxias possui 2 postos físicos centrais: 1) Sede Administrativa: Alameda Esmeralda, 206, Jardim Primavera (atendimento das 09h às 17h); 2) Posto Central: Praça Roberto da Silveira, 31, 3º andar, Centro (atendimento das 09h às 17h). Telefone geral: (21) 3900-1651 e WhatsApp oficial de atendimento.",
+      "tags": [
+        "ouvidoria",
+        "endereco",
+        "onde fica a ouvidoria",
+        "atendimento presencial",
+        "telefone ouvidoria",
+        "jardim primavera",
+        "praca roberto da silveira"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br/ouvidoria"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_02_pedido_informacao_lai",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - LAI / e-SIC",
+      "tema": "Acesso à Informação e Transparência Passiva",
+      "assunto": "Abertura de Pedido de Informação (Lei 12.527/2011)",
+      "conteudo": "Pedidos de Acesso à Informação (e-SIC / LAI) devem ser registrados preferencialmente pela plataforma Colab (opção Pedido de Informação) ou presencialmente na Ouvidoria Geral. O cidadão também pode tirar dúvidas pelos telefones (21) 2652-3835 ou WhatsApp (21) 99824-5903. O prazo legal de resposta é de 20 dias corridos, prorrogável por mais 10 mediante justificativa.",
+      "tags": [
+        "lai",
+        "e-sic",
+        "pedido de informacao",
+        "transparencia passiva",
+        "lei de acesso a informacao",
+        "colab"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [
+        "https://transparencia.duquedecaxias.rj.gov.br"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_03_poluicao_sonora_desambiguacao",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Desambiguação Dinâmica",
+      "tema": "Ordem Pública e Meio Ambiente",
+      "assunto": "Desambiguação de Poluição Sonora e Barulho em Templos/Bares/Vias",
+      "conteudo": "A denúncia de poluição sonora exige desambiguação: 1) Barulho em vias públicas, carros de som, bares ou eventos: fiscalização da Secretaria Municipal de Meio Ambiente (SMMA) e Secretaria de Ordem Pública (SMSP), com chamado via Colab; 2) Perturbação de sossego e ordem pública imediata em curso (flagrante noturno, desordem, briga): acionar a Polícia Militar pelo 190; 3) Templos religiosos: fiscalização preventiva de emissão sonora com laudo técnico pela SMMA.",
+      "tags": [
+        "poluicao sonora",
+        "barulho igreja",
+        "som alto templo",
+        "som alto bar",
+        "carro de som",
+        "meio ambiente",
+        "policia militar 190"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_04_ouvidoria_assistencia_social",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - Ouvidoria Setorial",
+      "tema": "Assistência Social e Direitos Humanos",
+      "assunto": "Canais e Atendimento da Ouvidoria Setorial da SEASDIH",
+      "conteudo": "A Ouvidoria Setorial da Secretaria Municipal de Assistência Social e Direitos Humanos (SEASDIH) atende na Alameda Esmeralda, 206 - Jardim Primavera (sede da SEASDIH) e pelo portal digital seasdih.duquedecaxias.rj.gov.br/digital/ouvidoria. Atende manifestações sobre CRAS, CREAS, Cadastro Único, Bolsa Família, Cartão Recomeçar e acolhimento.",
+      "tags": [
+        "ouvidoria assistencia social",
+        "seasdih",
+        "ouvidoria setorial seasdih",
+        "cras",
+        "creas",
+        "bolsa familia"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [
+        "https://seasdih.duquedecaxias.rj.gov.br/digital/ouvidoria"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_05_solicitacao_quebra_molas",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - Trânsito e Serviços",
+      "tema": "Transportes e Serviços Públicos",
+      "assunto": "Solicitação e Instalação de Quebra-Molas e Redutores de Velocidade",
+      "conteudo": "Solicitações de instalação de quebra-molas (lombadas) ou travessias elevadas são de competência exclusiva da Secretaria Municipal de Transportes e Serviços Públicos (SMTSP). O cidadão deve abrir a solicitação pelo Colab informando o endereço exato com ponto de referência. Uma equipe técnica de engenharia de tráfego realiza vistoria no local para avaliar a viabilidade conforme as normas do CONTRAN.",
+      "tags": [
+        "quebra molas",
+        "lombada",
+        "redutor de velocidade",
+        "smts",
+        "transporte",
+        "transito",
+        "colab"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_06_brinquedos_em_praca",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - Obras e Urbanismo",
+      "tema": "Obras, Urbanismo e Praças Públicas",
+      "assunto": "Manutenção de Brinquedos, Parquinhos e Aparelhos em Praças",
+      "conteudo": "Demandas de reparo, instalação ou manutenção de brinquedos em praças públicas e academias da terceira idade devem ser direcionadas à Secretaria Municipal de Obras e Urbanismo (SMOU). O chamado deve ser registrado no Colab na categoria de Manutenção de Praças e Parques, anexando foto do equipamento danificado se possível.",
+      "tags": [
+        "brinquedos em praca",
+        "parquinho",
+        "praca publica",
+        "manutencao de praca",
+        "obras",
+        "smou",
+        "colab"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_07_ouvidoria_meio_ambiente",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Atendimento Setorial",
+      "tema": "Meio Ambiente e Proteção Animal",
+      "assunto": "Canais de Atendimento e Ouvidoria Setorial do Meio Ambiente",
+      "conteudo": "A Ouvidoria Setorial da Secretaria Municipal de Meio Ambiente atende presencialmente na sede da SMMA: Alameda James Franco, nº 03 - Jardim Primavera, Duque de Caxias - RJ (CEP 25215-265), no horário das 08h às 17h, de segunda a sexta-feira. Demandas ambientais (poda, fiscalização de descarte irregular, queima de lixo) podem ser registradas no Colab.",
+      "tags": [
+        "ouvidoria meio ambiente",
+        "smma",
+        "alameda james franco",
+        "poda de arvore",
+        "fiscalizacao ambiental"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_08_carne_estragada_vigilancia_sanitaria",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem - Saúde e Fiscalização Sanitária",
+      "tema": "Vigilância Sanitária e Defesa do Consumidor",
+      "assunto": "Denúncia de Carne Estragada, Alimentos Vencidos e Mercados Irregulares",
+      "conteudo": "Denúncias de venda de carne estragada, alimentos deteriorados, falta de higiene em açougues/supermercados e produtos vencidos devem ser encaminhadas imediatamente ao Departamento de Vigilância Sanitária (DVS / SMS). O registro é feito pelo Colab ou presencialmente na sede da Secretaria de Saúde. Em casos de prejuízo financeiro ou recusa de troca, o cidadão pode também acionar o PROCON Caxias.",
+      "tags": [
+        "carne estragada",
+        "alimento vencido",
+        "mercado",
+        "acougue",
+        "vigilancia sanitaria",
+        "dvs",
+        "procon",
+        "denuncia alimento"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "rule_nikolas_09_arvore_quintal_vizinho_lgpd",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regra de Triagem e Calibração LGPD",
+      "tema": "Meio Ambiente e Defesa Civil",
+      "assunto": "Árvore em Terreno Particular vs Área Pública e Não Bloqueio por Privacidade",
+      "conteudo": "Quando o cidadão questiona sobre árvore no quintal do vizinho ou terreno particular com risco de queda: 1) Se houver risco iminente de queda sobre residências ou via pública, deve acionar a Defesa Civil pelo 199; 2) Se o risco for à rede elétrica, acionar a concessionária Light; 3) A poda em propriedade particular é de responsabilidade do proprietário com autorização da Secretaria de Meio Ambiente; 4) A menção ao termo 'vizinho' em consultas de risco não deve sofrer bloqueio de LGPD.",
+      "tags": [
+        "arvore no quintal do vizinho",
+        "arvore vizinho",
+        "poda particular",
+        "defesa civil 199",
+        "light",
+        "meio ambiente"
+      ],
+      "prioridade": "ALTA",
+      "boost_weight": 2.0,
+      "autor": "Nikolas / Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-08-19",
+      "links_oficiais": [],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_smoa_vs_smuh",
+      "tipo": "MATRIZ_DE_COMPETENCIA",
+      "tipo_label": "Matriz de Competência Mandatória",
+      "tema": "Obras Públicas vs Licenciamento Urbanístico",
+      "assunto": "Competência SMOA vs SMUH",
+      "conteudo": "Secretaria Municipal de Obras e Agricultura (SMOA): Pavimentação asfáltica, tapa-buraco, drenagem pluvial, dragagem de canais, contenção de encostas e execução física de quebra-molas. Secretaria Municipal de Urbanismo e Habitação (SMUH): Licenciamento de obras particulares, concessão de Alvará de Construção, Habite-se, Regularização Fundiária (REURB), fiscalização de posturas e poluição sonora de obras em andamento. NUNCA fundir SMOA e SMUH em um único órgão.",
+      "tags": [
+        "obras",
+        "buraco",
+        "asfalto",
+        "alvara",
+        "habite-se",
+        "reurb",
+        "smoa",
+        "smuh"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Gabinete do Prefeito"
+      ]
+    },
+    {
+      "id": "regra_canon_smma_vs_smpa",
+      "tipo": "MATRIZ_DE_COMPETENCIA",
+      "tipo_label": "Matriz de Competência Mandatória",
+      "tema": "Meio Ambiente vs Proteção Animal",
+      "assunto": "Competência SMMA vs SMPA",
+      "conteudo": "Secretaria Municipal de Meio Ambiente (SMMA): Licenciamento ambiental municipal, autorização de poda/supressão arbórea em logradouros públicos (sem risco direto à rede energizada), fiscalização com decibelímetro em indústrias e templos religiosos. Secretaria Municipal de Proteção Animal (SMPA): Criada pela Lei nº 3.495/2025, com sede oficial na Alameda Dona Esmeralda nº 206, Jardim Primavera. Responsável pela castração gratuita de cães e gatos (Castramóvel), resgate de animais em situação de risco/maus-tratos via Petzap (21) 97179-7900, adoção e abrigo transitório. NUNCA fundir SMMA e SMPA em um único órgão.",
+      "tags": [
+        "meio ambiente",
+        "poda",
+        "arvore",
+        "protecao animal",
+        "hospital veterinario",
+        "castracao",
+        "smma",
+        "smpa"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_fluxo_quebra_molas",
+      "tipo": "FLUXO_OPERACIONAL",
+      "tipo_label": "Fluxo Obrigatório em 2 Fases",
+      "tema": "Trânsito e Obras",
+      "assunto": "Redutores de Velocidade (Quebra-Molas)",
+      "conteudo": "O pedido de quebra-molas ou redutor de velocidade ocorre obrigatoriamente em duas etapas: Fase 1 (Vistoria e Estudo Técnico de Tráfego): Secretaria Municipal de Segurança Pública (SMSP) via Guarda Municipal. Fase 2 (Execução Física da Obra): Secretaria Municipal de Obras e Agricultura (SMOA). A Secretaria de Transportes e Serviços Públicos (SMTSP) NÃO executa obras físicas de quebra-molas. A solicitação entra no Colab via SMSP.",
+      "tags": [
+        "quebra-mola",
+        "redutor de velocidade",
+        "smsp",
+        "guarda municipal",
+        "smoa",
+        "obras",
+        "smtsp"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Guarda Municipal"
+      ]
+    },
+    {
+      "id": "regra_canon_concessionaria_aguas_rio",
+      "tipo": "CONCESSIONARIA_EXTERNA",
+      "tipo_label": "Delimitação de Concessionária Externa",
+      "tema": "Água e Esgotamento Sanitário",
+      "assunto": "Águas do Rio vs Município / CEDAE",
+      "conteudo": "A concessionária responsável pelos serviços de abastecimento de água encanada, reparo de vazamentos na rede de água e esgotamento sanitário no município de Duque de Caxias é exclusivamente a ÁGUAS DO RIO. É estritamente proibido indicar a CEDAE para atendimentos e serviços operacionais de rede ao munícipe.",
+      "tags": [
+        "agua",
+        "falta de agua",
+        "esgoto",
+        "vazamento",
+        "aguas do rio",
+        "cedae proibido"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_concessionaria_light_vs_ppp",
+      "tipo": "CONCESSIONARIA_EXTERNA",
+      "tipo_label": "Delimitação de Iluminação vs Rede Elétrica",
+      "tema": "Energia Elétrica e Iluminação Pública",
+      "assunto": "LIGHT vs SMTSP (PPP Iluminação)",
+      "conteudo": "A Secretaria Municipal de Transportes e Serviços Públicos (SMTSP) é responsável apenas pela substituição e manutenção de lâmpadas queimadas ou danificadas da iluminação pública (PPP Iluminação LED). Problemas em postes caídos ou quebrados, transformadores, faíscas na fiação, rede de alta tensão e poda de árvores com risco elétrico direto são de responsabilidade exclusiva da LIGHT.",
+      "tags": [
+        "luz",
+        "lampada apagada",
+        "iluminacao publica",
+        "poste caido",
+        "transformador",
+        "light",
+        "smtsp"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_concessionaria_br040",
+      "tipo": "CONCESSIONARIA_EXTERNA",
+      "tipo_label": "Delimitação Federal de Rodovia",
+      "tema": "Rodovia Washington Luiz (BR-040)",
+      "assunto": "Rodovia Federal vs Vias Municipais",
+      "conteudo": "A manutenção asfáltica, capina, limpeza, iluminação e socorro mecânico/médico nas pistas principais e marginais da Rodovia Washington Luiz (BR-040) cabem exclusivamente à concessionária federal ELOVIAS / CONCER (ou PRF 191). Solicitações no Colab devem ser cadastradas no tema específico da Rodovia para encaminhamento competente.",
+      "tags": [
+        "br-040",
+        "washington luiz",
+        "rodovia",
+        "elovias",
+        "concer",
+        "prf"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_poluicao_sonora_4_destinos",
+      "tipo": "DESAMBIGUACAO_MULTIPLA",
+      "tipo_label": "Desambiguação de Poluição Sonora em 4 Destinações",
+      "tema": "Fiscalização e Perturbação do Sossego",
+      "assunto": "Roteamento Canônico de Barulho",
+      "conteudo": "A fiscalização de poluição sonora divide-se estritamente conforme a origem: 1. Ruído de obras públicas ou particulares em andamento: Secretaria Municipal de Urbanismo e Habitação (SMUH). 2. Ruído de estabelecimentos comerciais, indústrias e templos religiosos: Secretaria Municipal de Meio Ambiente (SMMA). 3. Bares na calçada, festas de rua, carros de som e feiras: Superintendência de Ordem Pública (SMSP/SOP). 4. Flagrante noturno e emergência de madrugada: 190 (Polícia Militar / PMERJ).",
+      "tags": [
+        "barulho",
+        "poluicao sonora",
+        "som alto",
+        "igreja",
+        "obra",
+        "bar",
+        "carro de som",
+        "smuh",
+        "smma",
+        "smsp",
+        "pmerj"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município",
+      "data_homologacao": "2026-09-14 15:00",
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1606 @@
+[
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Cumprimento de Normas e Regulamentos",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Fiscalização de Contratos e Convênios",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais da unidade",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Informação e Orientação pública",
+    "secretaria_responsavel": "Controle Interno"
+  },
+  {
+    "assunto": "Atendimento em situações de calamidade pública",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Sinalização de áreas de risco",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Prevenção de acidentes e campanhas educativas",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Deslizamentos de encostas",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Emergências de desabamentos",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Vistorias técnicas estruturais",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Monitoramento e alerta de riscos naturais (chuvas, tempestades, etc.)",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Poda e remoção de árvore",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Abrigos emergenciais para desabrigados/desalojados",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Apoio a famílias em situação de risco",
+    "secretaria_responsavel": "Defesa Civil"
+  },
+  {
+    "assunto": "Inscrição e matrícula em cursos",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Falta de pagamento",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Levantamento de depósito",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Processo de inscrição (transparência, documentação exigida, prazos)",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Atendimento e orientação ao público (aguardas, canais de contato)",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Implantação de unidade da FUNDEC",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Acesso digital (plataforma online, sistemas de inscrição e acompanhamento)",
+    "secretaria_responsavel": "FUNDEC"
+  },
+  {
+    "assunto": "Limpeza urbana e retirada de entulho",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Marcação de consulta",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Marcação de Exame",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Bueiros, rios, valões e redes de esgotos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Fiscalização de bares e casas noturnas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Capina e roçada urbana",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Asfaltamento e pavimentação",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Propriedade abandonada (terreno, casa, galpão e prédio)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Equipe médica",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Acessibilidade em transporte",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais da unidade",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Infraestrutura urbana",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Direitos e acesso a programas sociais",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Benefício de Prestação Continuada (BPC/LOAS)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Conservação de calçadas e passeios públicos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Tempo de espera em fila SISREG",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Publicação de decretos e portarias",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Manutenção de praças e parques",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Poluição Ambiental (Ar, Solo, Água e Som)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de medicamentos e insumos (remédios e fraldas)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Divulgação de programas, serviços e eventos públicos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Reparação de Danos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de médicos especialistas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Transporte escolar",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Vacinação",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Tempo de espera para exames",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Implementação de braço de luz",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Instalação de pontos de ônibus",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Gestão escolar",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Obstrução de via pública (fixas)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de professores",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Poda e remoção de árvore",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Fomento ao empreendedorismo",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Drenagem e combate a alagamentos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Ordenamento público em ruas e eventos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Substituição de tampas e grelhas de esgoto",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Uso irregular de espaço público",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Publicidade e propaganda institucional",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Averbação de alterações (construções, ampliações, mudança de uso)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Informação e orientação pública",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Revitalização de áreas degradadas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "sinalização de trânsito",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Troca de lâmpadas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Construção irregular",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Comunicação oficial e campanhas públicas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Coleta seletiva e reciclagem",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Marcação de cirurgia",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de exames na unidade",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Cadastro Único (CadÚnico)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Direitos e programas sociais",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Manutenção de abrigos de ônibus",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Demora no resultado de exames",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Placa de proibição de lixo",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Matrícula escolar",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Eu, cidadão(ã), estou preenchendo por conta própria",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de mediadores",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Nota Fiscal de Serviços",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Transporte de servidores",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Levantamento de depósito",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Fiscalização de estabelecimentos comerciais e industriais",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Fornecimento de próteses e órteses",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Outro",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Vacinação e controle de animais domésticos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Conservação de prédios e equipamentos públicos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Fila de espera para procedimentos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Falta de pagamento",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "obras nas grades de proteção do valão da rua diamante",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Agência do trabalhador",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais das unidades",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Animais abandonados em vias públicas",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Conflitos de limites, confrontações e conflitos de vizinhança",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "retirada de galhos resultantes de poda de árvore necessárias",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Educação Ambiental",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Criação de usinas de coleta seletiva",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Enchentes e alagamentos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Construção e manutenção de pontes e passarelas em região urbana",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "retroescavadeira destruii a calçada da vizinha retirando entulho",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Programa de qualificação profissional",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Atendimento ao cidadão via canais de comunicação",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Creches e escolas (vaga, qualidade da merenda, transporte escolar)",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Cadastro e intermediação de emprego",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Descarte irregular de resíduos",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Alvará",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Foco de dengue e outras arboviroses",
+    "secretaria_responsavel": "Ouvidoria Geral"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Contratos e licitações (assuntos jurídicos)",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Outros",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Lançamento e cobrança do ISS (Imposto sobre Serviços)",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Consultoria e assessoramento jurídico aos órgãos municipais",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Construção irregular",
+    "secretaria_responsavel": "Procuradoria Geral"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Administração"
+  },
+  {
+    "assunto": "Levantamento de depósito",
+    "secretaria_responsavel": "Secretaria Municipal de Administração"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Administração"
+  },
+  {
+    "assunto": "Reconhecimento de tempo de serviço / triênios",
+    "secretaria_responsavel": "Secretaria Municipal de Administração"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Administração"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Cadastro Único (CadÚnico)",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Demora ou dificuldade na concessão de benefícios sociais",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Benefício de Prestação Continuada (BPC/LOAS)",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Adaptação de calçadas e vias públicas",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria Municipal de Assistência Social e Direitos Humanos"
+  },
+  {
+    "assunto": "Programas e políticas de fomento à cultura",
+    "secretaria_responsavel": "Secretaria Municipal de Cultura e Turismo"
+  },
+  {
+    "assunto": "Conservação do patrimônio histórico e cultural",
+    "secretaria_responsavel": "Secretaria Municipal de Cultura e Turismo"
+  },
+  {
+    "assunto": "Eventos culturais (organização, acesso, cancelamentos)",
+    "secretaria_responsavel": "Secretaria Municipal de Cultura e Turismo"
+  },
+  {
+    "assunto": "Projeto institucional",
+    "secretaria_responsavel": "Secretaria Municipal de Cultura e Turismo"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Falta de mediadores",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Equipe multidisciplinar (psicólogo, terapeuta, fisioterapeuta, etc.)",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Falta de professores",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Gestão escolar",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Transporte escolar",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Violência ou bullying nas escolas",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Direitos e programas sociais",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Matrícula escolar",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Inclusão e acessibilidade (alunos com deficiência)",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Educação"
+  },
+  {
+    "assunto": "Uso irregular de áreas destinadas ao esporte e lazer",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Programas de esporte e lazer para jovens e adultos",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Inclusão e acessibilidade em programas esportivos",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Implementação de projetos de esporte e lazer",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Acesso a espaços esportivos e de lazer",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Projetos comunitários e sociais de esporte e lazer",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Incentivo ao esporte amador",
+    "secretaria_responsavel": "Secretaria Municipal de Esporte e Lazer"
+  },
+  {
+    "assunto": "Alvará",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Emissão de guias de recolhimento (taxas, ISS, IPTU)",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Comércio irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Desmatamento irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Nota Fiscal de Serviços",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Irregularidades em MEI ou microempresas",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Fiscalização de obras irregulares",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Tributos municipais (ITBI e IPTU) e dívida ativa",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Alvará de funcionamento (emissão, renovação ou cancelamento)",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Certidão Negativa de Débitos (CND municipal)",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Informação e Orientação pública",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Transferência de titularidade",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Fiscalização comercial e industrial",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Fiscalização de atividades comerciais",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Regularização fundiária e registro de imóveis",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Encerramento de empresas (baixa ou cancelamento)",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Atendimento aos empresários",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Fiscalização de feiras e ambulantes",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Lançamento e cobrança do ISS (Imposto sobre Serviços)",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Isenção ou anistia tributária",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais das unidades",
+    "secretaria_responsavel": "Secretaria Municipal de Fazenda"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Planejamento estratégico do executivo municipal",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Concessões públicas municipais",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Concursos Públicos",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Abrigos e centros de acolhimento",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Fiscalização de serviços terceirizados",
+    "secretaria_responsavel": "Secretaria Municipal de Governo"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Poluição Ambiental (Ar, Solo, Água e Som)",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Poda e remoção de árvore",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Fiscalização de licenciamentos ambientais",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Coleta seletiva e reciclagem",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Animais silvestres em áreas urbanas",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Apicultura",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Bueiros, rios, valões e redes de esgotos",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Áreas de preservação urbana",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Queimadas e resíduos orgânicos",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Ruídos de obras e transporte",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Monitoramento de qualidade do ar",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais da unidade",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Descarte irregular de resíduos",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Parques e áreas verdes públicas",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Outros",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Comércio irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Desmatamento irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Fiscalização legal de poluição sonora",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Regularização de terras e uso do solo rural",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Propriedade abandonada (terreno, casa, galpão e prédio)",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Educação Ambiental",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Conservação de calçadas e passeios públicos",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Direitos e acesso a programas sociais",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Poluição por indústrias",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Fiscalização de comércio de animais silvestres",
+    "secretaria_responsavel": "Secretaria Municipal de Meio Ambiente"
+  },
+  {
+    "assunto": "Limpeza urbana e retirada de entulho",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Capina e roçada urbana",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Revitalização de áreas degradadas",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Bueiros, rios, valões e redes de esgotos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Asfaltamento e pavimentação",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Manutenção de praças e parques",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Infraestrutura urbana",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Conservação de calçadas e passeios públicos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Implementação de braço de luz",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Drenagem e combate a alagamentos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Instalação de pontos de ônibus",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Manutenção de abrigos de ônibus",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais da unidade",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais das unidades",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Substituição de tampas e grelhas de esgoto",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Registro de matrícula e averbação no Cartório de Registro de Imóveis",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Agropecuária",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Propriedade abandonada (terreno, casa, galpão e prédio)",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "saneamento básico",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Construção e manutenção de pontes e passarelas em região urbana",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Qualidade dos equipamentos esportivos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "reparo da minha calçada, que o caminhão de entulho quebrou.",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Construção irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Ruídos de obras e transportes",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Descarte irregular de resíduos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "instalação de bueiro",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Quebra molas",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Enchentes e alagamentos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Outros",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Vistorias técnicas estruturais",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Limpeza de Rios e Valões",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Sinalização de trânsito",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Implementação de projetos de esporte e lazer",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Condições higiênico-sanitárias de bares, restaurantes e lanchonetes",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "estamos precisando se uma casamba de lixo e limpeza no valão",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Saneamento básico, entupimento de esgoto",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Regularização de terras e uso do solo rural",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Conserto de calçada.",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Reparo de calçada",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Barreiras arquitetônicas em vias e calçadas",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Conflitos de limites, confrontações e conflitos de vizinhança",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Conservação de prédios e equipamentos públicos",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Apicultura",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Hortas comunitárias",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Adaptação de calçadas e vias públicas",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Instalação de braço de luz",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "vazamento de água",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Obstrução de via pública (móveis e fixas)",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Planos de contingência e evacuação",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Poluição por indústrias",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Desobstrução de redes de esgoto.",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "lixo com muito ao lado do campo, a prefeitura limpa , a população não",
+    "secretaria_responsavel": "Secretaria Municipal de Obras e Agricultura"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Proteção Animal"
+  },
+  {
+    "assunto": "Maus tratos aos animais",
+    "secretaria_responsavel": "Secretaria Municipal de Proteção Animal"
+  },
+  {
+    "assunto": "Animais abandonados em vias públicas",
+    "secretaria_responsavel": "Secretaria Municipal de Proteção Animal"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria Municipal de Proteção Animal"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais da unidade",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Equipe de enfermagem",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Marcação de Exame",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Tempo de espera para exames",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Atendimento de urgência e emergência",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Marcação de consulta",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de comunicação",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Equipe administrativa",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Demora, grosseria ou falta de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Equipe médica",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Equipe multidisciplinar (psicologo, terapeuta, fisioterapeuta, etc.)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Atendimento prioritário não respeitado em repartições e serviços",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Tempo de espera para cirurgia",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de medicamentos e insumos (remédios e fraldas)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Demora no resultado de exames",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Atendimento odontológico",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Direitos e programas sociais",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Aparelho auditivo",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Internação e transferência hospitalar",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Tempo de espera para atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Atendimento domiciliar (home care)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Tempo de espera em fila SISREG",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Acessibilidade em unidades de saúde",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Marcação de cirurgia",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Outros",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Demora na entrega das lentes",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Condição insalubre",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Informação e Orientação pública",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de profissionais",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de pagamento",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Fiscalização de estabelecimentos comerciais e industriais",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Prontuário médico",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Controle de vetores urbanos (ratos, mosquitos, baratas e etc)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de exames na unidade",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Abuso de Autoridade",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Maus tratos aos pacientes",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Atendimento à saúde mental",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Fila de espera para procedimentos",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Condições higiênico-sanitárias de bares, restaurantes e lanchonetes",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Extravio de pertences (celular, rádio, relógio, bolsa e etc)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Vacinação",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Denúncia de clínicas, consultórios ou hospitais irregulares",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Banco de leite materno",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Irregularidades em alimentos e bebidas (validade, armazenamento, adulteração)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Outro",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Tempo de atedimento com o psicólogo",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Projeto institucional de saúde",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de médicos especialistas",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Criação de unidade de saúde",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Comercialização de produtos sem registro sanitário",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Falta de maqueiro na unidade",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Castração e controle populacional",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Limpeza urbana e retirada de entulho",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Fiscalização de medicamentos e produtos de saúde (farmácias, drogarias, clínicas)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Condilçao insalubre",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Estacionamento irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Campanhas de prevenção e conscientização",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Vigilância Sanitária",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Fila para procedimentos",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Fornecimento de próteses e órteses",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "NEGLIGENCIA MÉDICA",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Uso e descarte irregular de agrotóxicos ou químicos",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Saúde da família (ESF)",
+    "secretaria_responsavel": "Secretaria Municipal de Saúde"
+  },
+  {
+    "assunto": "Furtos e roubos em áreas públicas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Estacionamento irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Bloqueio ou interdição de vias",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Uso irregular de espaço público",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Obstrução de via pública (móveis e fixas)",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Segurança em áreas urbanas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Veículo abandonado",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Multas de transito",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Segurança pública",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Prevenção de acidentes e campanhas educativas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Assédio",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Monitoramento por câmeras",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Sinalização de trânsito",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Quebra molas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Ocupação irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Informação e Orientação pública",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Limpeza urbana e retirada de entulho",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Fiscalização de bares e casas noturnas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Guarda Municipal",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Comércio irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Uso de drogas em via pública / flagrante de crime",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Poluição Ambiental (Ar, Solo, Água e Som)",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Instalação de pontos de ônibus",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Fiscalização legal de poluição sonora",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Barreiras arquitetônicas em vias e calçadas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Quebra-molas",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Asfaltamento e pavimentação",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Conduta irregular de funcionário",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Programa Tarifa Zero",
+    "secretaria_responsavel": "Secretaria Municipal de Segurança Pública"
+  },
+  {
+    "assunto": "Troca de lâmpadas",
+    "secretaria_responsavel": "Secretaria Municipal de Transportes e Serviços Públicos"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Transportes e Serviços Públicos"
+  },
+  {
+    "assunto": "Instalação de pontos de ônibus",
+    "secretaria_responsavel": "Secretaria Municipal de Transportes e Serviços Públicos"
+  },
+  {
+    "assunto": "Fiscalização legal de poluição sonora",
+    "secretaria_responsavel": "Secretaria Municipal de Transportes e Serviços Públicos"
+  },
+  {
+    "assunto": "Transporte público urbano",
+    "secretaria_responsavel": "Secretaria Municipal de Transportes e Serviços Públicos"
+  },
+  {
+    "assunto": "Construção irregular",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Fechamento ou interdição de imóveis irregulares",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Propriedade abandonada (terreno, casa, galpão e prédio)",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Conflitos de limites, confrontações e conflitos de vizinhança",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Risco em construções irregulares",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Obstrução de via pública (fixas)",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Ocupação irregular de áreas públicas ou particulares",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Conservação de calçadas e passeios públicos",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Estrutura, limpeza e materiais das unidades de atendimento",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Poluição Ambiental (Ar, Solo, Água e Som)",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Averbação de alterações (construções, ampliações, mudança de uso)",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Não há dados",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  },
+  {
+    "assunto": "Barreiras arquitetônicas em vias e calçadas",
+    "secretaria_responsavel": "Secretaria Municipal de Urbanismo e Habitação"
+  }
+]

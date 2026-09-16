@@ -21,7 +21,9 @@ class PermanentTelemetry:
         top_candidates: List[Any],
         answer: str,
         sources_used: List[str],
-        confidence_level: str
+        confidence_level: str,
+        router_ms: float = 0.0,
+        guardrails_ms: float = 0.0
     ):
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         telemetry_dir = os.path.join(base_dir, "metrics", "telemetry")
@@ -54,11 +56,13 @@ class PermanentTelemetry:
             "timestamp": datetime.now().isoformat(),
             "query": query,
             "latency_ms": {
+                "router": round(router_ms, 2),
                 "retrieval": round(retrieval_ms, 2),
                 "ranking": round(ranking_ms, 2),
                 "context_builder": round(context_ms, 2),
+                "guardrails": round(guardrails_ms, 2),
                 "llm": round(llm_ms, 2),
-                "total": round(retrieval_ms + ranking_ms + context_ms + llm_ms, 2)
+                "total": round(router_ms + retrieval_ms + ranking_ms + context_ms + guardrails_ms + llm_ms, 2)
             },
             "candidates_found": candidates_found,
             "confidence_level": confidence_level,

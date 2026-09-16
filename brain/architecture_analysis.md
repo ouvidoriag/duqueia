@@ -153,11 +153,15 @@ O **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) de nível em
 
 ## 4. Auditoria de Segurança, LGPD e Blindagem POP
 
-### 4.1 Input Guardrails
+### 4.1 Input & FastGate Guardrails
 - **Prompt Injection**: Intercepta tentativas de desvio ("ignore instruções anteriores", "você agora é...").
 - **SQL Injection**: Detecta comandos SQL perigosos (`DROP TABLE`, `UNION SELECT`, `DELETE FROM`).
 - **LGPD / Privacidade de Terceiros**: Impede buscas por CPFs de terceiros, nomes de munícipes ou andamento de processos de vizinhos. Resposta de bloqueio padronizada sem expor dados.
 - **Competência Municipal**: Filtra perguntas sobre esferas Federal/Estadual (Metrô, INSS, Rodovias Federais, etc.) e emite recusa por falta de competência da Prefeitura de Duque de Caxias.
+- **Emergência Defesa Civil (199)**: Roteamento instantâneo (0ms) para risco de desabamento, alagamentos graves e desabamentos de imóvel.
+- **Emergência Segurança Pública (190)**: Roteamento instantâneo (0ms) para tráfico de drogas, crimes e emergências policiais (Polícia Militar 190 + Colab SMSP).
+- **Proteção ao Menor / Escalona Humanamente**: Intercepta relatos de agressão, maus-tratos ou abuso de crianças/adolescentes, acionando o Conselho Tutelar, Disque 100, PM 190 e Ouvidoria Geral.
+- **Trava de Responsabilidade Jurídica Patrimonial (Legal Shield)**: Para danos materiais (ex: queda de árvore em veículo), orienta abertura de Processo Administrativo via Procuradoria Geral / Ouvidoria sem promessa verbal de indenização.
 
 ### 4.2 Fallback e Redirecionamento Direto para Ouvidoria Geral
 Quando as buscas no RAG não atingem o limiar de confiança exigido (`score < threshold`), a resposta substitui mensagens genéricas de erro pelo direcionamento direto:
@@ -165,9 +169,10 @@ Quando as buscas no RAG não atingem o limiar de confiança exigido (`score < th
 - **WhatsApp Ouvidoria Geral**: `(21) 99824-5903`
 - **Plataforma Colab**: Instrução para preenchimento de dados essenciais (CPF, endereço completo com ponto de referência e fotos).
 
-### 4.3 Agente Coletor (Triagem de Esclarecimento Contextual)
+### 4.3 Agente Coletor (Triagem de Esclarecimento Contextual & Proximidade)
 Quando `needs_clarification: true`, o sistema aciona o modo **Agente Coletor**:
-- Avalia o histórico recente de conversas para preservar o contexto dos turnos anteriores.
+- Avalia o histórico recente de conversas para preservar o contexto dos turnos anteriores e proibir a repetição de procedimentos genéricos.
+- Coleta amigável de **Bairro** e **Rua** para solicitações de equipamentos/serviços mais próximos.
 - Realiza perguntas amigáveis e **estritamente incrementais (uma solicitação por vez)** para evitar sobrecarregar o cidadão.
 - Direciona o munícipe a abrir o chamado na plataforma **Colab** vinculando-o à Secretaria adequada.
 

@@ -1,0 +1,589 @@
+[
+  {
+    "id": "bairro-centro",
+    "nome": "Centro",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central / Comercial",
+    "faixa_cep": "25010-000 a 25025-000",
+    "aliases": [
+      "Centro",
+      "Centro de Caxias",
+      "Caxias Centro",
+      "Calçadão de Caxias"
+    ]
+  },
+  {
+    "id": "bairro-25-de-agosto",
+    "nome": "25 de Agosto",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central / Hospitalar / Residencial Nãobre",
+    "faixa_cep": "25070-000 a 25075-990",
+    "aliases": [
+      "Bairro 25 de Agosto",
+      "Vinte e Cinco de Agosto",
+      "Jardim 25 de Agosto",
+      "25"
+    ]
+  },
+  {
+    "id": "bairro-parque-lafaiete",
+    "nome": "Parque Lafaiete",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central / Eixo Nilo Peçanha",
+    "faixa_cep": "25015-000 a 25020-000",
+    "aliases": [
+      "Lafaiete",
+      "Parque Lafaiete"
+    ]
+  },
+  {
+    "id": "bairro-doutor-laureano",
+    "nome": "Doutor Laureano",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central / Hospital do Olho",
+    "faixa_cep": "25060-000 a 25065-000",
+    "aliases": [
+      "Dr. Laureano",
+      "Laureano",
+      "Doutor Laureano"
+    ]
+  },
+  {
+    "id": "bairro-gramacho",
+    "nome": "Jardim Gramacho",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Litoral / Baía de Guanabara",
+    "faixa_cep": "25055-000 a 25059-000",
+    "aliases": [
+      "Gramacho",
+      "Jardim Gramacho",
+      "Aterro do Gramacho",
+      "Polo de Reciclagem"
+    ]
+  },
+  {
+    "id": "bairro-corte-oito",
+    "nome": "Corte Oito",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Ferroviária",
+    "faixa_cep": "25060-100 a 25060-500",
+    "aliases": [
+      "Corte 8",
+      "Corte Oito",
+      "Estação Corte Oito"
+    ]
+  },
+  {
+    "id": "bairro-olavo-bilac",
+    "nome": "Olavo Bilac",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central",
+    "faixa_cep": "25035-000 a 25040-000",
+    "aliases": [
+      "Olavo Bilac",
+      "Bilac"
+    ]
+  },
+  {
+    "id": "bairro-vila-sarapui",
+    "nome": "Vila Sarapuíííí",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Bacia do Sarapuíííí",
+    "faixa_cep": "25050-000 a 25054-000",
+    "aliases": [
+      "Sarapuíííí",
+      "Vila Sarapuíííí"
+    ]
+  },
+  {
+    "id": "bairro-parque-centenario",
+    "nome": "Parque Centenário",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central",
+    "faixa_cep": "25030-000 a 25035-000",
+    "aliases": [
+      "Centenário",
+      "Parque Centenário"
+    ]
+  },
+  {
+    "id": "bairro-parque-fluminense",
+    "nome": "Parque Fluminense",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Residencial",
+    "faixa_cep": "25040-000 a 25045-000",
+    "aliases": [
+      "Parque Fluminense",
+      "Fluminense"
+    ]
+  },
+  {
+    "id": "bairro-parque-beira-mar",
+    "nome": "Parque Beira Mar",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Eixo Washington Luís",
+    "faixa_cep": "25085-000 a 25086-000",
+    "aliases": [
+      "Beira Mar",
+      "Parque Beira Mar",
+      "UPA Beira Mar"
+    ]
+  },
+  {
+    "id": "bairro-periquitos",
+    "nome": "Periquitos",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central",
+    "faixa_cep": "25030-100 a 25030-500",
+    "aliases": [
+      "Periquitos",
+      "Bairro dos Periquitos"
+    ]
+  },
+  {
+    "id": "bairro-bar-dos-cavalheiros",
+    "nome": "Bar dos Cavalheiros",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central",
+    "faixa_cep": "25015-100 a 25015-900",
+    "aliases": [
+      "Bar dos Cavalheiros",
+      "Cavalheiros"
+    ]
+  },
+  {
+    "id": "bairro-vila-sao-luis",
+    "nome": "Vila São Luís",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central / Eixo Washington Luís",
+    "faixa_cep": "25065-000 a 25070-000",
+    "aliases": [
+      "Vila São Luís",
+      "São Luís",
+      "Vila Sao Luis"
+    ]
+  },
+  {
+    "id": "bairro-parque-das-missoes",
+    "nome": "Parque das Missões",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Litoral / Rodovia Washington Luís",
+    "faixa_cep": "25080-000 a 25085-000",
+    "aliases": [
+      "Parque das Missões",
+      "Missões"
+    ]
+  },
+  {
+    "id": "bairro-engenho-do-porto",
+    "nome": "Engenho do Porto",
+    "distrito": "1º Distrito",
+    "distrito_nome": "Duque de Caxias (Sede)",
+    "regiao": "Central",
+    "faixa_cep": "25010-300 a 25010-900",
+    "aliases": [
+      "Engenho do Porto"
+    ]
+  },
+  {
+    "id": "bairro-campos-eliseos",
+    "nome": "Campos Elíseos",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Industrial / Polo Petroquímico",
+    "faixa_cep": "25225-000 a 25235-000",
+    "aliases": [
+      "Campos Elíseos",
+      "Campos Eliseos",
+      "REDUC",
+      "Polo Petroquímico"
+    ]
+  },
+  {
+    "id": "bairro-saracuruna",
+    "nome": "Saracuruna",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Nó Ferroviário e Hospitalar",
+    "faixa_cep": "25211-000 a 25215-000",
+    "aliases": [
+      "Saracuruna",
+      "Estação de Saracuruna",
+      "Adão Pereira Nunes"
+    ]
+  },
+  {
+    "id": "bairro-jardim-primavera",
+    "nome": "Jardim Primavera",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Centro Cívico e Administrativo",
+    "faixa_cep": "25215-000 a 25220-000",
+    "aliases": [
+      "Jardim Primavera",
+      "Primavera",
+      "Centro Cívico",
+      "Sede da Prefeitura"
+    ]
+  },
+  {
+    "id": "bairro-vila-rosario",
+    "nome": "Vila Rosário",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Campos Elíseos",
+    "faixa_cep": "25220-100 a 25220-500",
+    "aliases": [
+      "Vila Rosário",
+      "Rosário"
+    ]
+  },
+  {
+    "id": "bairro-pilar",
+    "nome": "Pilar",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Histórica / Baía de Guanabara",
+    "faixa_cep": "25230-000 a 25231-000",
+    "aliases": [
+      "Pilar",
+      "Igreja do Pilar",
+      "Nãossa Senhora do Pilar do Iguaçu"
+    ]
+  },
+  {
+    "id": "bairro-figueira",
+    "nome": "Figueira",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Residencial / Estrada da Figueira",
+    "faixa_cep": "25233-000 a 25235-000",
+    "aliases": [
+      "Figueira",
+      "Bairro Figueira"
+    ]
+  },
+  {
+    "id": "bairro-sao-bento",
+    "nome": "São Bento",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Histórica / Museu Vivo",
+    "faixa_cep": "25045-000 a 25050-000",
+    "aliases": [
+      "São Bento",
+      "Museu Vivo do São Bento"
+    ]
+  },
+  {
+    "id": "bairro-chacaras-rio-petropolis",
+    "nome": "Chácaras Rio-Petrópolis",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Eixo Logístico BR-040",
+    "faixa_cep": "25230-100 a 25230-900",
+    "aliases": [
+      "Chácaras Rio-Petrópolis",
+      "Chácaras",
+      "Rio-Petrópolis"
+    ]
+  },
+  {
+    "id": "bairro-parque-eldorado",
+    "nome": "Parque Eldorado",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Campos Elíseos",
+    "faixa_cep": "25240-000 a 25243-000",
+    "aliases": [
+      "Eldorado",
+      "Parque Eldorado"
+    ]
+  },
+  {
+    "id": "bairro-cidade-dos-meninos",
+    "nome": "Cidade dos Meninos",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Campos Elíseos",
+    "faixa_cep": "25235-100 a 25235-900",
+    "aliases": [
+      "Cidade dos Meninos"
+    ]
+  },
+  {
+    "id": "bairro-jardim-leal",
+    "nome": "Jardim Leal",
+    "distrito": "2º Distrito",
+    "distrito_nome": "Campos Elíseos",
+    "regiao": "Campos Elíseos",
+    "faixa_cep": "25040-100 a 25040-500",
+    "aliases": [
+      "Jardim Leal",
+      "Leal"
+    ]
+  },
+  {
+    "id": "bairro-imbarie",
+    "nome": "Imbariêêêê",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Central do 3º Distrito / Ferroviária",
+    "faixa_cep": "25265-000 a 25270-000",
+    "aliases": [
+      "Imbariêêêê",
+      "Imbariêêêe",
+      "Estação Imbariêêêê"
+    ]
+  },
+  {
+    "id": "bairro-santa-cruz-da-serra",
+    "nome": "Santa Cruz da Serra",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Comercial e Gastronômica / Eixo BR-040",
+    "faixa_cep": "25255-000 a 25260-000",
+    "aliases": [
+      "Santa Cruz da Serra",
+      "Santa Cruz",
+      "Maternidade de Santa Cruz"
+    ]
+  },
+  {
+    "id": "bairro-taquara",
+    "nome": "Taquaraa",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Ambiental / Parque Natural da Taquaraa",
+    "faixa_cep": "25270-100 a 25270-900",
+    "aliases": [
+      "Taquaraa",
+      "Taquaraa de Caxias",
+      "Parque da Taquaraa"
+    ]
+  },
+  {
+    "id": "bairro-parada-angelica",
+    "nome": "Parada Angélica",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Ferroviária",
+    "faixa_cep": "25272-000 a 25275-000",
+    "aliases": [
+      "Parada Angélica",
+      "Angélica",
+      "Estação Parada Angélica"
+    ]
+  },
+  {
+    "id": "bairro-parque-equitativa",
+    "nome": "Parque Equitativa",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25260-100 a 25260-800",
+    "aliases": [
+      "Equitativa",
+      "Parque Equitativa"
+    ]
+  },
+  {
+    "id": "bairro-nova-campinas",
+    "nome": "Nãova Campinas",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25268-000 a 25270-000",
+    "aliases": [
+      "Nãova Campinas",
+      "Campinas"
+    ]
+  },
+  {
+    "id": "bairro-parada-morabi",
+    "nome": "Parada Morabi",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Ferroviária",
+    "faixa_cep": "25271-000 a 25272-000",
+    "aliases": [
+      "Parada Morabi",
+      "Morabi"
+    ]
+  },
+  {
+    "id": "bairro-parque-paulista",
+    "nome": "Parque Paulista",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25260-000 a 25261-000",
+    "aliases": [
+      "Parque Paulista",
+      "Paulista"
+    ]
+  },
+  {
+    "id": "bairro-santa-lucia",
+    "nome": "Santa Lúcia",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25261-100 a 25261-900",
+    "aliases": [
+      "Santa Lúcia",
+      "Santa Lucia"
+    ]
+  },
+  {
+    "id": "bairro-chacaras-arcampo",
+    "nome": "Chácaras Arcampo",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25270-000 a 25271-000",
+    "aliases": [
+      "Chácaras Arcampo",
+      "Arcampo"
+    ]
+  },
+  {
+    "id": "bairro-vila-urussai",
+    "nome": "Vila Urussaí",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25275-100 a 25275-900",
+    "aliases": [
+      "Urussaí",
+      "Vila Urussaí"
+    ]
+  },
+  {
+    "id": "bairro-vila-maria-helena",
+    "nome": "Vila Maria Helena",
+    "distrito": "3º Distrito",
+    "distrito_nome": "Imbariêêêê",
+    "regiao": "Imbariêêêê",
+    "faixa_cep": "25272-100 a 25272-900",
+    "aliases": [
+      "Maria Helena",
+      "Vila Maria Helena"
+    ]
+  },
+  {
+    "id": "bairro-xerem",
+    "nome": "Xerém",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Serra dos Órgãos / Polo de Ciência e Ecoturismo",
+    "faixa_cep": "25245-000 a 25250-000",
+    "aliases": [
+      "Xerém",
+      "Xerem",
+      "Vila de Xerém",
+      "INMETRO Xerém"
+    ]
+  },
+  {
+    "id": "bairro-mantiqueira",
+    "nome": "Mantiqueira",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Serra de Petrópolis / APA Petrópolis",
+    "faixa_cep": "25250-100 a 25250-800",
+    "aliases": [
+      "Mantiqueira",
+      "Mantiqueira de Xerém"
+    ]
+  },
+  {
+    "id": "bairro-santo-antonio",
+    "nome": "Santo Antônio",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Xerém",
+    "faixa_cep": "25243-000 a 25245-000",
+    "aliases": [
+      "Santo Antônio",
+      "Santo Antônio de Xerém"
+    ]
+  },
+  {
+    "id": "bairro-amapa",
+    "nome": "Amapáááá",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Preservação Ambiental / Reserva do Tinguá",
+    "faixa_cep": "25250-000 a 25252-000",
+    "aliases": [
+      "Amapáááá",
+      "Bairro Amapáááá",
+      "Amapáááá de Xerém"
+    ]
+  },
+  {
+    "id": "bairro-capivari",
+    "nome": "Capivari",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Xerém",
+    "faixa_cep": "25245-100 a 25245-900",
+    "aliases": [
+      "Capivari",
+      "Rio Capivari"
+    ]
+  },
+  {
+    "id": "bairro-vila-santa-alice",
+    "nome": "Vila Santa Alice",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Xerém",
+    "faixa_cep": "25245-500 a 25246-000",
+    "aliases": [
+      "Santa Alice",
+      "Vila Santa Alice"
+    ]
+  },
+  {
+    "id": "bairro-vila-suburbana",
+    "nome": "Vila Suburbana",
+    "distrito": "4º Distrito",
+    "distrito_nome": "Xerém",
+    "regiao": "Xerém",
+    "faixa_cep": "25245-200 a 25245-600",
+    "aliases": [
+      "Vila Suburbana",
+      "Suburbana"
+    ]
+  },
+  {
+    "id": "bairro-vila-sao-jose",
+    "nome": "Vila São Josééé",
+    "distrito_id": 1,
+    "distrito_nome": "1º Distrito - Duque de Caxias (Sede)",
+    "faixa_cep": "25045-000 a 25045-999",
+    "aliases": [
+      "Vila São Josééé",
+      "São Josééé",
+      "V. São Josééé"
+    ],
+    "distrito": "1º Distrito"
+  }
+]

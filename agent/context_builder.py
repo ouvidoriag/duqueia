@@ -35,6 +35,15 @@ class ContextBuilder:
                 if cand.retrieval_score > grouped_sources[src]["max_score"]:
                     grouped_sources[src]["max_score"] = cand.retrieval_score
 
+        # Ordena fontes garantindo que Regras Canônicas fiquem no topo absoluto
+        def source_sort_key(src_key):
+            data = grouped_sources[src_key]
+            cat = data.get("category", "").lower()
+            is_regra = 1 if ("regra" in cat or src_key.startswith("regras_negocio") or src_key.startswith("bancoduqueia (regra_")) else 0
+            return (is_regra, data["max_score"])
+
+        ordered_sources.sort(key=source_sort_key, reverse=True)
+
         context_blocks = []
         sources_used = []
         final_candidates = []
@@ -45,10 +54,15 @@ class ContextBuilder:
             final_candidates.append(data["candidate_obj"])
             merged_content = "\n".join(data["contents"])
             
-            context_blocks.append(
-                f"--- FONTE: {src} | CATEGORIA: {data['category']} | SCORE: {data['max_score']:.2f} ---\n"
-                f"{merged_content}"
-            )
+            cat = data.get("category", "").lower()
+            is_regra = "regra" in cat or src.startswith("regras_negocio") or src.startswith("bancoduqueia (regra_")
+            
+            if is_regra:
+                header = f"--- [DIRETRIZ DE GOVERNANÇA MÁXIMA E OBRIGATÓRIA] FONTE: {src} | PRIORIDADE: MÁXIMA ---"
+            else:
+                header = f"--- FONTE: {src} | CATEGORIA: {data['category']} | SCORE: {data['max_score']:.2f} ---"
+
+            context_blocks.append(f"{header}\n{merged_content}")
 
         context_text = "\n\n".join(context_blocks)
         return context_text, sources_used, final_candidates
