@@ -164,3 +164,56 @@ FROM services s
 LEFT JOIN secretarias sec ON s.secretaria_id = sec.id
 LEFT JOIN categories c ON s.category_id = c.id
 WHERE s.status = 'published';
+
+-- Tabela 'regras_negocio': Regras canônicas de negócio e governança institucional com prioridade máxima.
+CREATE TABLE IF NOT EXISTS regras_negocio (
+    id TEXT PRIMARY KEY,
+    tipo TEXT,
+    tipo_label TEXT,
+    tema TEXT,
+    assunto TEXT,
+    conteudo TEXT,
+    tags TEXT,
+    prioridade TEXT DEFAULT 'MAXIMA',
+    boost_weight REAL DEFAULT 3.0,
+    autor TEXT,
+    data_homologacao TEXT,
+    links_oficiais TEXT,
+    homologado_por TEXT
+);
+
+-- Tabela 'leis_municipais': Legislação, decretos e atos normativos oficiais de Duque de Caxias.
+CREATE TABLE IF NOT EXISTS leis_municipais (
+    id TEXT PRIMARY KEY,
+    numero TEXT,
+    ano INTEGER,
+    tipo TEXT,
+    ementa TEXT,
+    orgao_emissor TEXT,
+    data_publicacao TEXT,
+    situacao TEXT,
+    assuntos TEXT,
+    fonte_url TEXT
+);
+
+-- Tabela 'linhas_tarifa_zero': Rotas e itinerários do programa de transporte gratuito (Decreto nº 8.120/2023).
+CREATE TABLE IF NOT EXISTS linhas_tarifa_zero (
+    id TEXT PRIMARY KEY,
+    numero_linha TEXT,
+    nome_linha TEXT,
+    itinerario TEXT,
+    horario TEXT,
+    tarifa REAL DEFAULT 0.0,
+    secretarias_gestoras TEXT,
+    base_legal TEXT
+);
+
+-- Tabela 'bairros_distritos': Divisões territoriais oficiais, distritos e regiões de Duque de Caxias.
+CREATE TABLE IF NOT EXISTS bairros_distritos (
+    id TEXT PRIMARY KEY,
+    nome TEXT,
+    distrito INTEGER,
+    distrito_nome TEXT,
+    regiao TEXT,
+    aliases TEXT
+);

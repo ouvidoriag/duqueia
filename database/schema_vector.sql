@@ -40,3 +40,22 @@ CREATE TABLE IF NOT EXISTS embedding_metadata (
     model TEXT,
     dimension INTEGER
 );
+
+-- Tabela 'chunks': Fragmentos atômicos unificados de documentos, serviços e regras de negócio.
+CREATE TABLE IF NOT EXISTS chunks (
+    id TEXT PRIMARY KEY,
+    tipo TEXT,
+    titulo TEXT,
+    conteudo TEXT,
+    metadata_json TEXT,
+    vetor_blob BLOB
+);
+
+-- Tabela Virtual 'chunks_fts': Índice FTS5 de texto completo de ultra-alta velocidade (0ms) para busca híbrida.
+CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
+    id UNINDEXED,
+    titulo,
+    conteudo,
+    tipo,
+    tokenize = 'unicode61 remove_diacritics 1'
+);

@@ -128,6 +128,26 @@ def setup_database():
         VALUES (?, ?, ?, ?, ?);
         """, cras_units)
         conn_main.commit()
+
+    # Verifica se os dados mestres do BANCODUQUEIA precisam ser ingeridos em main.db
+    cur_main.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='regras_negocio';")
+    has_regras = cur_main.fetchone()
+    needs_ingest_main = False
+    if not has_regras:
+        needs_ingest_main = True
+    else:
+        cur_main.execute("SELECT COUNT(*) FROM regras_negocio;")
+        if cur_main.fetchone()[0] == 0:
+            needs_ingest_main = True
+
+    if needs_ingest_main:
+        log("Populando dados mestres institucionais do BANCODUQUEIA em main.db...")
+        try:
+            from scripts.ingest_bancoduqueia_to_main import main as ingest_main
+            ingest_main()
+        except Exception as e_ing:
+            log(f"Aviso na ingestão de dados mestres: {e_ing}")
+
     conn_main.close()
 
     # ==============================================================================
@@ -136,6 +156,26 @@ def setup_database():
     schema_vector = os.path.join(db_dir, "schema_vector.sql")
     indexes_vector = os.path.join(db_dir, "indexes_vector.sql")
     conn_vector, cur_vector = init_db(DATABASE_VECTOR, schema_vector, indexes_vector, "Busca Semântica (vector.db)")
+
+    # Verifica se os 1.575 chunks mestres e índice FTS5 precisam ser ingeridos
+    cur_vector.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='chunks';")
+    has_chunks = cur_vector.fetchone()
+    needs_ingest_vec = False
+    if not has_chunks:
+        needs_ingest_vec = True
+    else:
+        cur_vector.execute("SELECT COUNT(*) FROM chunks;")
+        if cur_vector.fetchone()[0] == 0:
+            needs_ingest_vec = True
+
+    if needs_ingest_vec:
+        log("Populando chunks mestres e índice FTS5 do BANCODUQUEIA em vector.db...")
+        try:
+            from scripts.ingest_bancoduqueia_to_vector import main as ingest_vec
+            ingest_vec()
+        except Exception as e_vec:
+            log(f"Aviso na ingestão vetorial: {e_vec}")
+
     conn_vector.close()
 
     # ==============================================================================
