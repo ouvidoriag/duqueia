@@ -97,8 +97,7 @@ class GeminiClient:
         if not self.api_keys:
             return
         active_key = self.api_keys[self.current_key_index]
-        masked = active_key[:8] + "..." + active_key[-8:] if len(active_key) > 16 else "***"
-        print(f"[GeminiClient] Chave ativa [{self.current_key_index}]: {masked}", file=sys.stderr)
+        print(f"[GeminiClient] Chave ativa [index={self.current_key_index}]", file=sys.stderr)
 
         if _USE_NEW_SDK:
             # Novo SDK: instancia Client com a chave
@@ -146,57 +145,61 @@ class GeminiClient:
 
     def execute_with_rotation(self, func, model_name: str = None, *args, **kwargs):
         """
-        Executa uma funcao da API do Gemini com roteamento robusto, rotação de chaves
-        e Exponential Backoff com Jitter.
-        Distingue erros de programacao de erros de cota/indisponibilidade (429/503/500).
+        Executa uma função da API do Gemini com roteamento desacoplado:
+        - 503 / High Demand: problema de capacidade do modelo. Tenta máx 2x e abandona para fallback de modelo.
+        - 429 / 500 / Timeout: problema de cota/rede da chave. Rotaciona chave (máx 4 tentativas).
+        - 400 / 401 / 403 / 404: erro não-recuperável. Aborta imediatamente sem retry.
         """
         if not self.api_keys:
             raise RuntimeError("Nenhuma chave de API disponivel no sistema.")
 
         import random
-        max_attempts = len(self.api_keys) * 2
+
+        max_attempts = min(len(self.api_keys), 4)
         consecutive_503 = 0
+
         for attempt in range(max_attempts):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                # 1. Classifica o erro
+                # 1. Erro não-recuperável (código, modelo inexistente, argumento inválido)
                 if not self.is_retryable_error(e):
                     print(f"[GeminiClient] ERRO NÃO RECUPERÁVEL para {model_name}: {e}. Abortando execução.", file=sys.stderr)
                     raise e
-                
-                # Se o erro for 503 (sobrecarga/alta demanda do modelo nos servidores do Google),
-                # trocar de chave não resolve porque o problema é a infraestrutura daquele modelo.
-                # Permitimos no máximo 2 tentativas antes de estourar para acionar o fallback de modelo.
+
                 err_str = str(e).lower()
+
+                # 2. Erro 503 (Capacidade do Modelo) -> Failover rápido de modelo
                 if "503" in err_str or "high demand" in err_str or "unavailable" in err_str:
                     consecutive_503 += 1
+                    print(f"[GeminiClient] 503 no modelo {model_name} (tentativa {consecutive_503}/2).", file=sys.stderr)
                     if consecutive_503 >= 2:
-                        print(f"[GeminiClient] Modelo {model_name} em alta demanda (503). Acionando failover rápido para próximo modelo...", file=sys.stderr)
+                        print(f"[GeminiClient] 503 persistente em {model_name}. Abandonando modelo para acionar fallback...", file=sys.stderr)
                         raise e
 
-                # 2. Erro recuperável (429, 500, timeout)
-                # Pausa com Exponential Backoff + Jitter randômico para evitar sobrecarregar o Gemini
-                backoff_wait = (2 ** min(attempt, 4)) + random.uniform(0.1, 1.0)
-                print(f"[GeminiClient] Erro recuperável na tentativa {attempt + 1}/{max_attempts} ({e}). "
-                      f"Aguardando {backoff_wait:.2f}s (backoff+jitter)...", file=sys.stderr)
-                time.sleep(backoff_wait)
-                
-                # Coloca a chave atual em cooldown de 60 segundos para este modelo
+                    wait = 2.0 + random.uniform(0.1, 0.8)
+                    time.sleep(wait)
+                    continue
+
+                # 3. Erro 429 / 500 / Timeout (Cota ou Instabilidade da Chave) -> Rotação
+                wait = min(2 ** attempt, 8) + random.uniform(0.1, 1.0)
+                print(f"[GeminiClient] Erro recuperável (tentativa {attempt + 1}/{max_attempts} | key_index={self.current_key_index}): {e}. "
+                      f"Aguardando {wait:.2f}s...", file=sys.stderr)
+                time.sleep(wait)
+
+                # Coloca a chave atual em cooldown para este modelo
                 cooldown_key = (self.current_key_index, model_name) if model_name else self.current_key_index
                 self.key_cooldowns[cooldown_key] = time.time() + 60.0
-                
+
                 if attempt == max_attempts - 1:
                     break
-                
-                # Rotaciona chave de API
+
                 try:
                     self.rotate_key(model_name=model_name)
                 except RuntimeError:
-                    # Se todas as chaves estão temporariamente em cooldown, aguarda um momento extra e tenta continuar
                     time.sleep(1.0)
 
-        raise RuntimeError(f"Todas as chaves de API falharam ou atingiram limite de cota para o modelo {model_name}.")
+        raise RuntimeError(f"Todas as {max_attempts} tentativas falharam para o modelo {model_name}.")
 
     # --------------------------------------------------------------------------
     # EMBEDDINGS

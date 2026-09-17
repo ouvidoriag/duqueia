@@ -17,6 +17,11 @@ class ToolRouter:
         "service_location":       ["structured_db", "geo_units"],
         "OUVIDORIA_MANIFESTACAO": ["questionnaires"],
         "RAG_GERAL":              ["structured_db", "faq_chunks"],
+        "RAG_SERVICO":            ["structured_db", "faq_chunks"],
+        "informacao":             ["structured_db", "faq_chunks"],
+        "solicitacao":            ["structured_db", "faq_chunks"],
+        "servico":                ["structured_db", "faq_chunks"],
+        "saude":                  ["structured_db", "faq_chunks"],
         "AMBIGUO_LUZ":            ["structured_db", "faq_chunks"],
         "AMBIGUO_BARULHO":        ["structured_db", "faq_chunks"],
         "PROGRAMACAO":            [],
@@ -31,7 +36,7 @@ class ToolRouter:
         Retorna uma lista de ferramentas ordenadas por relevância para a intenção.
         Se 'queries' contiver nomes de bairros, pode adicionar geo_units.
         """
-        base_tools = ToolRouter.TOOL_MAP.get(intent, ["faq_chunks"])
+        base_tools = ToolRouter.TOOL_MAP.get(intent, ["structured_db", "faq_chunks"])
         
         # Heurísticas de refinamento
         selected = list(base_tools)

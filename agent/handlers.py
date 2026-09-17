@@ -790,7 +790,10 @@ class RagHandler(BaseHandler):
         is_essential = any(k in query_lower for k in essential_keywords)
         effective_threshold = 0.25 if is_essential else agent.similarity_threshold
         
-        if not results or results[0]["similarity"] < effective_threshold:
+        relevant_results = [r for r in results if r.get("similarity", 0.0) >= effective_threshold]
+        relevant_results.sort(key=lambda r: r.get("similarity", 0.0), reverse=True)
+
+        if not relevant_results:
             elapsed = time.time() - start_time
             agent.log_execution_metrics(query, retrieval_time, 0, elapsed, 0, 0, 0)
             return {
@@ -807,8 +810,6 @@ class RagHandler(BaseHandler):
                     "keywords": extract_query_keywords(query)
                 }
             }
-            
-        relevant_results = [r for r in results if r["similarity"] >= effective_threshold]
         
         # 5. Calibração da Confiança (Antecipada)
         base_score = relevant_results[0]["similarity"]
@@ -1060,7 +1061,7 @@ class RagHandler(BaseHandler):
                 "não possui informação", "não há dados disponíveis sobre"
             ]
             ans_lower = answer.lower()
-            if not has_regra and any(trig in ans_lower for trig in unprovided_triggers):
+            if top_score < 0.70 and not has_regra and any(trig in ans_lower for trig in unprovided_triggers):
                 try:
                     from agent.fallback import build_controlled_web_fallback
                     web_fb = build_controlled_web_fallback(effective_query, agent.gemini_client)

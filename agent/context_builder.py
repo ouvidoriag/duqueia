@@ -67,12 +67,22 @@ class ContextBuilder:
                 if cand.retrieval_score > grouped_sources[src]["max_score"]:
                     grouped_sources[src]["max_score"] = cand.retrieval_score
 
-        # 3. Ordena fontes garantindo que Regras Canônicas fiquem no topo absoluto
+        # 3. Ordena fontes garantindo que Regras Canônicas relevantes fiquem no topo,
+        # mas priorizando serviços com correspondência direta muito alta (>= 0.88)
         def source_sort_key(src_key):
             data = grouped_sources[src_key]
             cat = data.get("category", "").lower()
             is_regra = 1 if ("regra" in cat or src_key.startswith("regras_negocio") or src_key.startswith("bancoduqueia (regra_")) else 0
-            return (is_regra, data["max_score"])
+            score = data["max_score"]
+            if is_regra and score >= 0.85:
+                tier = 3
+            elif score >= 0.88:
+                tier = 2
+            elif is_regra:
+                tier = 1
+            else:
+                tier = 0
+            return (tier, score)
 
         ordered_sources.sort(key=source_sort_key, reverse=True)
 

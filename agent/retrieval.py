@@ -577,13 +577,30 @@ def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
                 except Exception:
                     tags = []
 
-                match_text = f"{tema or ''} {assunto or ''} {cont or ''} {' '.join(tags)}".lower()
-                matches = sum(1 for t in search_terms if t in match_text)
+                meta_text = f"{tema or ''} {assunto or ''} {' '.join(tags)}".lower()
+                cont_text = (cont or '').lower()
 
-                if matches > 0:
+                meta_matches = sum(1 for t in search_terms if t in meta_text)
+                cont_matches = sum(1 for t in search_terms if t in cont_text)
+
+                # Uma regra canônica de governança deve bater com o tema/assunto/tags da busca,
+                # ou com pelo menos 2 termos do conteúdo (ou 100% se for termo único).
+                # Evita que uma citação acidental em 3.000 caracteres dê match falso de 1.0!
+                is_valid_match = False
+                score = 0.0
+
+                if meta_matches > 0:
+                    is_valid_match = True
                     boost_val = float(boost or 3.0)
-                    score = min(0.96 + (matches * 0.02 * boost_val), 1.0)
+                    match_ratio = meta_matches / max(len(search_terms), 1)
+                    score = min(0.85 + (match_ratio * 0.10) + (min(cont_matches, 3) * 0.02 * boost_val), 1.0)
+                elif cont_matches >= 2 or (len(search_terms) == 1 and cont_matches >= 1):
+                    is_valid_match = True
+                    match_ratio = cont_matches / max(len(search_terms), 1)
+                    score = min(0.60 + (match_ratio * 0.20), 0.85)
 
+                if is_valid_match:
+                    boost_val = float(boost or 3.0)
                     structured_text = (
                         f"[DIRETRIZ DE GOVERNANÇA MÁXIMA E OBRIGATÓRIA — AUDITADO]\n"
                         f"Tema: {tema}\n"
@@ -641,8 +658,20 @@ def retrieve_fts_chunks(query: str, query_keywords: list, top_k: int = 5) -> lis
                 except Exception:
                     meta = {}
 
+                tit_lower = (tit or '').lower()
+                cont_lower = (cont or '').lower()
+                term_matches = sum(1 for w in search_words if w in tit_lower or w in cont_lower)
+                match_ratio = term_matches / max(len(search_words), 1)
+
                 boost = float(meta.get("boost_weight", 1.0))
-                calibrated = min(max(0.75 + (boost * 0.08) - (rank * 0.01), 0.65), 0.98)
+                # Se pelo menos 50% das palavras de busca bateram ou todas bateram
+                if match_ratio >= 0.5:
+                    base_score = 0.70 + (match_ratio * 0.20)
+                    calibrated = min(max(base_score + (boost * 0.04) - (rank * 0.01), 0.65), 0.98)
+                else:
+                    # Apenas 1 palavra incidental em texto longo
+                    base_score = 0.50 + (match_ratio * 0.15)
+                    calibrated = min(max(base_score - (rank * 0.01), 0.45), 0.72)
 
                 candidates.append({
                     "source": f"bancoduqueia ({cid})",
@@ -950,12 +979,22 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         # Fator Multiplicativo: final_score = base_score * completeness_score
         c["similarity"] = min(max(round(base_score * completeness, 4), 0.0), 1.0)
 
-    # Ordena todos juntos garantindo prioridade MÁXIMA para Regras Canônicas de Negócio
+    # Ordena todos juntos garantindo prioridade para Regras Canônicas de Negócio relevantes,
+    # sem permitir que regras irrelevantes (< 0.70) fiquem acima de serviços diretos (>= 0.75)
     def get_candidate_sort_key(c):
         cat = str(c.get("category", "")).lower()
         src = str(c.get("source", "")).lower()
+        sim = c.get("similarity", 0.0)
         is_regra = 1 if ("regra" in cat or src.startswith("regras_negocio") or src.startswith("bancoduqueia (regra_")) else 0
-        return (is_regra, c.get("similarity", 0.0))
+        if is_regra and sim >= 0.70:
+            tier = 3
+        elif sim >= 0.75:
+            tier = 2
+        elif is_regra:
+            tier = 1
+        else:
+            tier = 0
+        return (tier, sim)
 
     all_candidates.sort(key=get_candidate_sort_key, reverse=True)
     
