@@ -155,6 +155,7 @@ class GeminiClient:
 
         import random
         max_attempts = len(self.api_keys) * 2
+        consecutive_503 = 0
         for attempt in range(max_attempts):
             try:
                 return func(*args, **kwargs)
@@ -164,7 +165,17 @@ class GeminiClient:
                     print(f"[GeminiClient] ERRO NÃO RECUPERÁVEL para {model_name}: {e}. Abortando execução.", file=sys.stderr)
                     raise e
                 
-                # 2. Erro recuperável (429, 503, 500, timeout)
+                # Se o erro for 503 (sobrecarga/alta demanda do modelo nos servidores do Google),
+                # trocar de chave não resolve porque o problema é a infraestrutura daquele modelo.
+                # Permitimos no máximo 2 tentativas antes de estourar para acionar o fallback de modelo.
+                err_str = str(e).lower()
+                if "503" in err_str or "high demand" in err_str or "unavailable" in err_str:
+                    consecutive_503 += 1
+                    if consecutive_503 >= 2:
+                        print(f"[GeminiClient] Modelo {model_name} em alta demanda (503). Acionando failover rápido para próximo modelo...", file=sys.stderr)
+                        raise e
+
+                # 2. Erro recuperável (429, 500, timeout)
                 # Pausa com Exponential Backoff + Jitter randômico para evitar sobrecarregar o Gemini
                 backoff_wait = (2 ** min(attempt, 4)) + random.uniform(0.1, 1.0)
                 print(f"[GeminiClient] Erro recuperável na tentativa {attempt + 1}/{max_attempts} ({e}). "

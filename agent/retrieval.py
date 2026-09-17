@@ -678,6 +678,63 @@ def compute_rrf_fusion(rankings: list, k: int = 60) -> dict:
             rrf_scores[src]["score"] += 1.0 / (k + rank)
     return rrf_scores
 
+_VECTOR_INDEX_CACHE = None
+
+def _get_vector_index_cache():
+    """Mantém em memória os vetores normalizados e metadados para busca vetorial instantânea (sub-milissegundo)."""
+    global _VECTOR_INDEX_CACHE
+    if _VECTOR_INDEX_CACHE is not None:
+        return _VECTOR_INDEX_CACHE
+
+    try:
+        import numpy as np
+        rows = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
+        metadata_list = []
+        vecs = []
+        for row in rows:
+            source, category, content, emb_str, meta_str, kw_str = row
+            try:
+                meta = json.loads(meta_str) if meta_str else {}
+            except Exception:
+                meta = {}
+            try:
+                chunk_keywords = json.loads(kw_str) if kw_str else []
+            except Exception:
+                chunk_keywords = []
+
+            title = meta.get("title", source)
+            emb = None
+            if emb_str:
+                try:
+                    emb = json.loads(emb_str)
+                except Exception:
+                    emb = None
+
+            metadata_list.append({
+                "source": source,
+                "category": category,
+                "content": content,
+                "title": title,
+                "chunk_keywords": chunk_keywords,
+                "has_embedding": emb is not None and len(emb) == 3072
+            })
+            vecs.append(emb if (emb and len(emb) == 3072) else [0.0] * 3072)
+
+        mat = np.array(vecs, dtype=np.float32)
+        norms = np.linalg.norm(mat, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        mat_norm = mat / norms
+
+        _VECTOR_INDEX_CACHE = {
+            "matrix": mat_norm,
+            "metadata": metadata_list
+        }
+    except Exception as e:
+        print(f"[VectorCache Error] Falha ao construir cache vetorial em memória: {e}", file=sys.stderr)
+        _VECTOR_INDEX_CACHE = None
+
+    return _VECTOR_INDEX_CACHE
+
 def retrieve_context(query: str, db_path: str, using_real: bool, similarity_threshold: float, gemini_client, reranker, top_k: int = 5, intent_info: dict = None, tools_selected: list = None) -> list:
     """Busca híbrida baseada na arquitetura LORS: orquestração multi-query gerada pela LLM/Planner."""
     if not os.path.exists(db_path):
@@ -779,40 +836,62 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                 vector_candidates.extend(fts_chunks)
 
             query_vector = main_query_vector
-            try:
-                rows_chunks = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
-                for row in rows_chunks:
-                    source, category, content, emb_str, meta_str, kw_str = row
-                    try:
-                        meta = json.loads(meta_str) if meta_str else {}
-                    except Exception:
-                        meta = {}
-                    try:
-                        chunk_keywords = json.loads(kw_str) if kw_str else []
-                    except Exception:
-                        chunk_keywords = []
-
-                    title = meta.get("title", source)
-
-                    if using_real and query_vector:
+            v_cache = _get_vector_index_cache()
+            if v_cache is not None and using_real and query_vector and len(query_vector) == 3072:
+                try:
+                    import numpy as np
+                    q_arr = np.array(query_vector, dtype=np.float32)
+                    q_norm = np.linalg.norm(q_arr)
+                    if q_norm > 0:
+                        q_arr = q_arr / q_norm
+                    sims = v_cache["matrix"] @ q_arr
+                    for i, meta in enumerate(v_cache["metadata"]):
+                        semantic_score = float(sims[i]) if meta["has_embedding"] else 0.0
+                        vector_candidates.append({
+                            "source": meta["source"],
+                            "category": meta["category"],
+                            "content": meta["content"],
+                            "semantic_score": semantic_score,
+                            "chunk_keywords": meta["chunk_keywords"],
+                            "title": meta["title"]
+                        })
+                except Exception as e:
+                    print(f"[LORS Fast Vector Error] Falha no cálculo vetorial numpy: {e}", file=sys.stderr)
+            else:
+                try:
+                    rows_chunks = query_db(DATABASE_VECTOR, "SELECT source, category, content, embedding, metadata, keywords FROM duque_ia_chunks")
+                    for row in rows_chunks:
+                        source, category, content, emb_str, meta_str, kw_str = row
                         try:
-                            emb = json.loads(emb_str)
-                            semantic_score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
+                            meta = json.loads(meta_str) if meta_str else {}
                         except Exception:
-                            semantic_score = 0.0
-                    else:
-                        semantic_score = calculate_keyword_score(q_sub, content, title)
+                            meta = {}
+                        try:
+                            chunk_keywords = json.loads(kw_str) if kw_str else []
+                        except Exception:
+                            chunk_keywords = []
 
-                    vector_candidates.append({
-                        "source": source,
-                        "category": category,
-                        "content": content,
-                        "semantic_score": semantic_score,
-                        "chunk_keywords": chunk_keywords,
-                        "title": title
-                    })
-            except Exception as e:
-                print(f"[LORS Chunks Error] Falha na busca vetorial de chunks: {e}", file=sys.stderr)
+                        title = meta.get("title", source)
+
+                        if using_real and query_vector:
+                            try:
+                                emb = json.loads(emb_str)
+                                semantic_score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
+                            except Exception:
+                                semantic_score = 0.0
+                        else:
+                            semantic_score = calculate_keyword_score(q_sub, content, title)
+
+                        vector_candidates.append({
+                            "source": source,
+                            "category": category,
+                            "content": content,
+                            "semantic_score": semantic_score,
+                            "chunk_keywords": chunk_keywords,
+                            "title": title
+                        })
+                except Exception as e:
+                    print(f"[LORS Chunks Error] Falha na busca vetorial de chunks: {e}", file=sys.stderr)
 
     # 3. Consolidação e Deduplicação dos Resultados do LORS
     # Ordena chunks vetoriais pelo score semântico decrescente

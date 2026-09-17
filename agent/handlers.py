@@ -747,8 +747,18 @@ class RagHandler(BaseHandler):
             effective_query = rewrite_query_with_history(query, history, agent.gemini_client)
 
         
+        handler_start = time.time()
+        
         # 1. Análise da Query (Roteamento/Informações adicionais)
-        intent_info = QueryAnalyzer.analyze(effective_query, agent.gemini_client)
+        router_start = time.time()
+        triage_intent = (triage_info.get("intent") or "").lower()
+        if triage_intent in ("gis", "institutional", "general"):
+            from agent.models import QueryIntent
+            intent_map = {"gis": QueryIntent.GIS, "institutional": QueryIntent.INSTITUTIONAL, "general": QueryIntent.GENERAL}
+            intent_info = {"intent": intent_map[triage_intent], "confidence": triage_info.get("confidence", 0.9), "entities": []}
+        else:
+            intent_info = QueryAnalyzer.analyze(effective_query, gemini_client=None)
+        router_ms = (time.time() - router_start) * 1000.0
         
         # 2. Busca RAG Híbrida
         retrieval_start = time.time()
@@ -771,7 +781,8 @@ class RagHandler(BaseHandler):
                 results = history_results
                 effective_query = search_query
                 
-        retrieval_time = time.time() - retrieval_start
+        retrieval_ms = (time.time() - retrieval_start) * 1000.0
+        retrieval_time = retrieval_ms / 1000.0
         
         # 3. Guardrail de Retrieval
         query_lower = effective_query.lower()
@@ -946,6 +957,7 @@ class RagHandler(BaseHandler):
         
         # 5. Geração de Resposta (LLM ou Fallback Offline)
         llm_start = time.time()
+        prompt_start = time.time()
         
         if agent.using_real:
             system_instruction = (
@@ -985,6 +997,7 @@ class RagHandler(BaseHandler):
                 DuqueIAAgent._interaction_map = {}
             gemini_interaction_id = DuqueIAAgent._interaction_map.get(conversation_id) if conversation_id else None
             
+            prompt_ms = (time.time() - prompt_start) * 1000.0
             gemini_start = time.time()
             try:
                 answer, new_conv_id, working_model = agent.gemini_client.generate_interaction(
@@ -1019,6 +1032,8 @@ class RagHandler(BaseHandler):
                             + "\n".join(f"- {s}" for s in sentences[:5]) +
                             f"\n\n*Fonte: {best_match['source']} (Fallback Offline)*"
                         )
+            gemini_ms = (time.time() - gemini_start) * 1000.0
+            post_start = time.time()
 
             # Sanitização determinística de campos nulos/None na resposta final
             patterns_null = [
@@ -1057,6 +1072,9 @@ class RagHandler(BaseHandler):
                 except Exception as e_web:
                     print(f"[RAGHandler Post-LLM Fallback Warning] Falha na busca web pós-LLM: {e_web}", file=sys.stderr)
         else:
+            prompt_ms = 0.0
+            gemini_ms = 0.0
+            post_start = time.time()
             if base_score < effective_threshold:
                 answer = build_fallback_guidance(query)
             else:
@@ -1155,6 +1173,21 @@ class RagHandler(BaseHandler):
                     conditions = [f"(servico_nome LIKE '%{w}%' OR descricao LIKE '%{w}%')" for w in search_words]
                     sql_query = f"SELECT * FROM vw_ia_servicos WHERE {' OR '.join(conditions)};"
                 break
+
+        post_ms = (time.time() - post_start) * 1000.0
+        total_handler_ms = (time.time() - handler_start) * 1000.0
+
+        tree_telemetry = (
+            f"\nRAG_HANDLER\n"
+            f"├── retrieval/busca       : {retrieval_ms:8.2f} ms\n"
+            f"├── reranking             : {ranking_ms:8.2f} ms\n"
+            f"├── montagem contexto     : {context_ms:8.2f} ms\n"
+            f"├── montagem prompt       : {prompt_ms:8.2f} ms\n"
+            f"├── Gemini                : {gemini_ms:8.2f} ms\n"
+            f"├── pós-processamento     : {post_ms:8.2f} ms\n"
+            f"└── TOTAL                 : {total_handler_ms:8.2f} ms\n"
+        )
+        print(tree_telemetry, file=sys.stderr)
                 
         return {
             "answer": answer.strip(),
@@ -1164,7 +1197,13 @@ class RagHandler(BaseHandler):
             "intent_detected": intent_info["intent"].value,
             "triage_info": triage_info,
             "metrics": {
-                "retrieval_time_ms": round(retrieval_time * 1000, 2),
+                "retrieval_time_ms": round(retrieval_ms, 2),
+                "ranking_time_ms": round(ranking_ms, 2),
+                "context_time_ms": round(context_ms, 2),
+                "prompt_time_ms": round(prompt_ms, 2),
+                "gemini_time_ms": round(gemini_ms, 2),
+                "post_processing_time_ms": round(post_ms, 2),
+                "total_handler_time_ms": round(total_handler_ms, 2),
                 "llm_time_ms": round(llm_time * 1000, 2),
                 "total_time_ms": round(total_time * 1000, 2),
                 "tokens_used": tokens_usados,
