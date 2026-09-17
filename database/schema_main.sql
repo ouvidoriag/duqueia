@@ -217,3 +217,18 @@ CREATE TABLE IF NOT EXISTS bairros_distritos (
     regiao TEXT,
     aliases TEXT
 );
+
+-- Tabela 'logradouros_enderecos': Endereços georreferenciados com Latitude, Longitude, CEP e numeração de Duque de Caxias.
+CREATE TABLE IF NOT EXISTS logradouros_enderecos (
+    id INTEGER PRIMARY KEY,
+    bairro_id INTEGER,
+    bairro_nome TEXT,
+    distrito_nome TEXT,
+    logradouro TEXT NOT NULL,
+    numero TEXT,
+    complemento TEXT,
+    cep TEXT,
+    latitude REAL,
+    longitude REAL,
+    precisao_geo TEXT
+);

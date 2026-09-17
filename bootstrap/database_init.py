@@ -148,6 +148,25 @@ def setup_database():
         except Exception as e_ing:
             log(f"Aviso na ingestão de dados mestres: {e_ing}")
 
+    # Verifica se os logradouros e endereços georreferenciados precisam ser ingeridos
+    cur_main.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='logradouros_enderecos';")
+    has_logr = cur_main.fetchone()
+    needs_ingest_end = False
+    if not has_logr:
+        needs_ingest_end = True
+    else:
+        cur_main.execute("SELECT COUNT(*) FROM logradouros_enderecos;")
+        if cur_main.fetchone()[0] == 0:
+            needs_ingest_end = True
+
+    if needs_ingest_end:
+        log("Populando logradouros e endereços georreferenciados em main.db...")
+        try:
+            from scripts.ingest_enderecos_to_main import main as ingest_end
+            ingest_end()
+        except Exception as e_end:
+            log(f"Aviso na ingestão de endereços: {e_end}")
+
     conn_main.close()
 
     # ==============================================================================
