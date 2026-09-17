@@ -298,6 +298,14 @@ class GeminiClient:
                             config["temperature"] = temperature
                         if max_output_tokens is not None:
                             config["max_output_tokens"] = max_output_tokens
+                        else:
+                            config["max_output_tokens"] = 8192
+
+                        # Desativa thinking excessivo em modelos Flash (evita consumir cota de tokens e truncar resposta)
+                        try:
+                            config["thinking_config"] = genai_types.ThinkingConfig(thinking_budget=0)
+                        except Exception:
+                            pass
                         
                         resp = self._client.models.generate_content(
                             model=m,
@@ -309,6 +317,13 @@ class GeminiClient:
                             p_tok = getattr(meta, "prompt_token_count", "?")
                             c_tok = getattr(meta, "candidates_token_count", "?")
                             print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
+                        
+                        # Alerta se finish_reason foi MAX_TOKENS (resposta truncada)
+                        if hasattr(resp, "candidates") and resp.candidates:
+                            cand = resp.candidates[0]
+                            f_reason = getattr(cand, "finish_reason", None)
+                            if f_reason and "MAX_TOKENS" in str(f_reason):
+                                print(f"[GeminiClient Warning] Resposta cortada por limite de tokens ({m})! finish_reason={f_reason}", file=sys.stderr)
                         return resp.text, None
                 else:
                     def _call(m=current_model):
@@ -407,6 +422,15 @@ class GeminiClient:
                             config["temperature"] = temperature
                         if max_output_tokens is not None:
                             config["max_output_tokens"] = max_output_tokens
+                        else:
+                            config["max_output_tokens"] = 8192
+
+                        # Desativa thinking excessivo em modelos Flash (evita consumir cota de tokens e truncar resposta)
+                        try:
+                            config["thinking_config"] = genai_types.ThinkingConfig(thinking_budget=0)
+                        except Exception:
+                            pass
+                        
                         resp = self._client.models.generate_content(
                             model=m,
                             contents=prompt,
@@ -417,6 +441,12 @@ class GeminiClient:
                             p_tok = getattr(meta, "prompt_token_count", "?")
                             c_tok = getattr(meta, "candidates_token_count", "?")
                             print(f"[GeminiClient] Telemetria [{m}]: prompt_tokens={p_tok}, candidate_tokens={c_tok}", file=sys.stderr)
+                        
+                        if hasattr(resp, "candidates") and resp.candidates:
+                            cand = resp.candidates[0]
+                            f_reason = getattr(cand, "finish_reason", None)
+                            if f_reason and "MAX_TOKENS" in str(f_reason):
+                                print(f"[GeminiClient Warning] Resposta cortada por limite de tokens ({m})! finish_reason={f_reason}", file=sys.stderr)
                         return resp.text
                 else:
                     def _call(m=current_model):

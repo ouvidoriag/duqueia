@@ -993,7 +993,7 @@ class RagHandler(BaseHandler):
                     model=session_model,
                     previous_interaction_id=gemini_interaction_id,
                     temperature=0.15,
-                    max_output_tokens=2048
+                    max_output_tokens=8192
                 )
                 if new_conv_id and conversation_id:
                     DuqueIAAgent._interaction_map[conversation_id] = new_conv_id
