@@ -207,4 +207,46 @@ Conforme a reforma administrativa e estruturação de dados mestres, a Prefeitur
 | **IPMDC** | Instituto de Previdência dos Servidores Públicos de Duque de Caxias | Rua Passos da Pátria, 120 - 25 de Agosto | (21) 2672-5700 |
 | **CONS** | Projetos Transversais / Programas Especiais | Prefeitura Municipal de Duque de Caxias | Central de Atendimento |
 
+---
+
+## 9. Suíte de Mascotes Setoriais das Secretarias Municipais (`public/assets/personagens/secretarias/`)
+
+Para elevar a transparência pública e a humanização do atendimento, cada secretaria e órgão municipal possui seu respectivo **Mascote Setorial Oficial** com crachá e insígnias personalizadas, recortados em alta resolução e integrados aos frontends:
+
+| Arquivo de Mascote | Sigla | Pasta Municipal | Atribuições & Temas Chave |
+| :--- | :--- | :--- | :--- |
+| `secretaria_sms.png` | **SMS** | Saúde | UPHs 24h, USFs, Hospital Moacyr do Carmo, Farmácia Básica, Vacinas |
+| `secretaria_smoa.png` | **SMOA** | Obras e Agricultura | Operação Tapa-buraco, Pavimentação, Drenagem de Galerias, Bueiros |
+| `secretaria_smpa.png` | **SMPA** | Proteção Animal | Castramóvel, Castração Gratuita de Cães e Gatos, Feiras de Adoção |
+| `secretaria_smtsp.png` | **SMTSP** | Transportes e Serviços Públicos | Iluminação Pública (Postes/Lâmpadas), Ônibus Tarifa Zero, Sinalização |
+| `secretaria_smcsrpter.png` | **SMCSRPTER** | Comunicação, Trabalho & Ouvidoria | Ouvidoria Geral (Colab), SINE Caxias, Intermediação de Empregos |
+| `secretaria_smct.png` | **SMCT** | Cultura e Turismo | Teatro Raul Cortez, Museu Histórico, Biblioteca Leonel Brizola |
+| `secretaria_smel.png` | **SMEL** | Esporte e Lazer | Vila Olímpica de Duque de Caxias, Polos Esportivos, Artes Marciais |
+| `secretaria_sme.png` | **SME** | Educação | Matrículas Escolares, Creches, Merenda e Transporte Escolar |
+| `secretaria_fundec.png` | **FUNDEC** | Escola Técnica | Cursos Técnicos Gratuitos, Polos FUNDEC e Inclusão Digital |
+| `secretaria_smasdh.png` | **SMASDH** | Assistência Social | CRAS, CREAS, CadÚnico, Bolsa Família e Proteção Social |
+| `secretaria_smf.png` | **SMF** | Fazenda | IPTU, ISS, Nota Carioca, Certidões Negativas e Parcelamento |
+| `secretaria_sma.png` | **SMA** | Administração | Servidores Públicos, Concursos, Folha de Pagamento, RH |
+| `secretaria_smsp.png` | **SMSP** | Segurança e Ordem Pública | Guarda Civil Municipal, Fiscalização de Postura, Choque de Ordem |
+| `secretaria_smma.png` | **SMMA** | Meio Ambiente | Licenciamento Ambiental, Poda de Árvores, Parque da Taquara |
+| `secretaria_smdc.png` | **SMDC** | Defesa Civil | Prevenção de Desastres, Sistema de Sirenes, Plantão 199 |
+| `secretaria_smgim.png` | **SMGIM** | Inclusão e Mulher | Centro de Referência da Mulher, Combate à Violência, PCD |
+| `secretaria_pgm.png` | **PGM** | Procuradoria Geral | Representação Jurídica, Execução Fiscal e Dívida Ativa |
+| `secretaria_cgm.png` | **CGM** | Controladoria Geral | Auditoria Interna, Portal da Transparência, Prestação de Contas |
+| `secretaria_ipmdc.png` | **IPMDC** | Previdência Servidores | Aposentadorias, Pensões e Censo Previdenciário |
+| `secretaria_smuh.png` | **SMUH** | Urbanismo e Habitação | Habite-se, Alvarás de Construção, Regularização Fundiária |
+| `secretaria_smg.png` | **SMG** | Governo | Gabinete do Prefeito, Articulação Política e Atos Oficiais |
+| `secretaria_cons.png` | **CONS** | Consolidado Transversal | Indicadores de Desempenho e Metas Multissetoriais |
+
+### Dinâmica no Frontend:
+1. **No Chat (`chat.html`):**
+   * Ao detectar o assunto correspondente à secretaria, o avatar da resposta (`bot-thumb`) assume o mascote oficial setorial com crachá.
+   * Renderiza um crachá clicável (`.secretaria-badge-card`) acima da resposta com a sigla e o nome completo da secretaria.
+   * Alterna temporariamente o avatar do cabeçalho oficial para o mascote setorial por 6 segundos.
+   * Ao clicar em qualquer avatar ou crachá, ativa um lightbox modal interativo para visualização em alta resolução.
+2. **No Dashboard (`dashboard.html`):**
+   * Exibe uma vitrine institucional completa dos 22 Mascotes Setoriais e das 12 Poses Genéricas do Duque IA.
+   * Cada card possui zoom modal ao clique com detalhamento das responsabilidades municipais.
+
+
 

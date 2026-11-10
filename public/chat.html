@@ -332,14 +332,76 @@
     }
 
     .bot-thumb {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      object-fit: contain;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      margin-top: 4px;
+      background: #001a40;
+      padding: 2px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .bot-thumb:hover {
+      transform: scale(1.08);
+    }
+
+    /* Crachá Setorial com Mascote da Secretaria */
+    .secretaria-badge-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%);
+      border: 1px solid #bae6fd;
+      border-radius: 14px;
+      padding: 0.35rem 0.75rem;
+      margin-bottom: 0.65rem;
+      box-shadow: 0 2px 6px rgba(0, 63, 153, 0.08);
+      cursor: pointer;
+      width: fit-content;
+      max-width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .secretaria-badge-card:hover {
+      background: #e0f2fe;
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 63, 153, 0.14);
+    }
+
+    .secretaria-badge-card img {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
-      object-fit: cover;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #001a40;
+      padding: 2px;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      margin-top: 4px;
-      background: #ffffff;
+    }
+
+    .sec-badge-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+      overflow: hidden;
+    }
+
+    .sec-badge-sigla {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #003f99;
+      letter-spacing: -0.2px;
+    }
+
+    .sec-badge-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #475569;
+      white-space: normal;
     }
 
     .bubble-wrapper {
@@ -643,7 +705,7 @@
       
       <!-- Card de Apresentação e Boas-Vindas -->
       <div class="welcome-card" id="welcomeCard">
-        <img class="welcome-avatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque IA Oficial">
+        <img class="welcome-avatar" id="welcomeAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque IA Oficial" title="Clique para ampliar o mascote oficial">
         <div class="welcome-text">
           <h2>Olá! Seja muito bem-vindo ao Duque IA.</h2>
           <p>
@@ -757,9 +819,108 @@
       confiante:   'assets/personagens/duque_confiante_bracos_cruzados.png'
     };
 
+    // Catálogo Oficial dos Mascotes das Secretarias Municipais com Crachá
+    const SECRETARIA_AVATARS = {
+      'SMS':       { sigla: 'SMS',       name: 'Secretaria Municipal de Saúde', file: 'assets/personagens/secretarias/secretaria_sms.png' },
+      'SMOA':      { sigla: 'SMOA',      name: 'Secretaria Municipal de Obras e Agricultura', file: 'assets/personagens/secretarias/secretaria_smoa.png' },
+      'SMPA':      { sigla: 'SMPA',      name: 'Secretaria Municipal de Proteção Animal', file: 'assets/personagens/secretarias/secretaria_smpa.png' },
+      'SMTSP':     { sigla: 'SMTSP',     name: 'Secretaria Municipal de Transportes e Serviços Públicos', file: 'assets/personagens/secretarias/secretaria_smtsp.png' },
+      'SMCSRPTER': { sigla: 'SMCSRPTER', name: 'Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral', file: 'assets/personagens/secretarias/secretaria_smcsrpter.png' },
+      'SMCT':      { sigla: 'SMCT',      name: 'Secretaria Municipal de Cultura e Turismo', file: 'assets/personagens/secretarias/secretaria_smct.png' },
+      'SMEL':      { sigla: 'SMEL',      name: 'Secretaria Municipal de Esporte e Lazer', file: 'assets/personagens/secretarias/secretaria_smel.png' },
+      'SME':       { sigla: 'SME',       name: 'Secretaria Municipal de Educação', file: 'assets/personagens/secretarias/secretaria_sme.png' },
+      'FUNDEC':    { sigla: 'FUNDEC',    name: 'Fundação de Apoio à Escola Técnica (FUNDEC)', file: 'assets/personagens/secretarias/secretaria_fundec.png' },
+      'SMASDH':    { sigla: 'SMASDH',    name: 'Secretaria Municipal de Assistência Social e Direitos Humanos', file: 'assets/personagens/secretarias/secretaria_smasdh.png' },
+      'SMF':       { sigla: 'SMF',       name: 'Secretaria Municipal de Fazenda', file: 'assets/personagens/secretarias/secretaria_smf.png' },
+      'SMA':       { sigla: 'SMA',       name: 'Secretaria Municipal de Administração', file: 'assets/personagens/secretarias/secretaria_sma.png' },
+      'SMSP':      { sigla: 'SMSP',      name: 'Secretaria Municipal de Segurança e Ordem Pública', file: 'assets/personagens/secretarias/secretaria_smsp.png' },
+      'SMMA':      { sigla: 'SMMA',      name: 'Secretaria Municipal de Meio Ambiente', file: 'assets/personagens/secretarias/secretaria_smma.png' },
+      'SMDC':      { sigla: 'SMDC',      name: 'Secretaria Municipal de Defesa Civil', file: 'assets/personagens/secretarias/secretaria_smdc.png' },
+      'SMGIM':     { sigla: 'SMGIM',     name: 'Secretaria Municipal de Gestão, Inclusão e Mulher', file: 'assets/personagens/secretarias/secretaria_smgim.png' },
+      'PGM':       { sigla: 'PGM',       name: 'Procuradoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_pgm.png' },
+      'CGM':       { sigla: 'CGM',       name: 'Controladoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_cgm.png' },
+      'IPMDC':     { sigla: 'IPMDC',     name: 'Instituto de Previdência dos Servidores Públicos (IPMDC)', file: 'assets/personagens/secretarias/secretaria_ipmdc.png' },
+      'SMUH':      { sigla: 'SMUH',      name: 'Secretaria Municipal de Urbanismo e Habitação', file: 'assets/personagens/secretarias/secretaria_smuh.png' },
+      'SMG':       { sigla: 'SMG',       name: 'Secretaria Municipal de Governo', file: 'assets/personagens/secretarias/secretaria_smg.png' },
+      'CONS':      { sigla: 'CONS',      name: 'Consolidado (Projetos e Programas Transversais)', file: 'assets/personagens/secretarias/secretaria_cons.png' }
+    };
+
     let sessionId = 'sess_' + Date.now();
     let librasMode = false;
     let avatarTimer = null;
+
+    // Detecção inteligente de secretaria responsável
+    function detectSecretaria(text, data = null) {
+      if (!text) return null;
+      const combined = (text + ' ' + (data?.intent_detected || '') + ' ' + (data?.sources?.join(' ') || '')).toLowerCase();
+
+      // Ordem criteriosa para evitar colisões
+      if (/\b(smpa|castramóvel|castramovel|castração|castracao|animais|animal|veterinári|cachorr|gato|zoonose|pet\b|pets\b)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMPA'];
+      }
+      if (/\b(sms\b|saúde|saude|hospital|uph|usf|posto de saúde|médic|vacina|moacyr do carmo|upa\b|farmácia básica)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMS'];
+      }
+      if (/\b(smoa|tapa-buraco|tapa buraco|buraco|asfalto|recapeamento|drenagem|galeria|bueiro|esgoto|pavimentação|obras e agricultura)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMOA'];
+      }
+      if (/\b(smtsp|lâmpada|lampada|poste|iluminação|iluminacao|luz apagada|tarifa zero|ônibus|onibus|transporte público|trânsito|sinal de trânsito)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMTSP'];
+      }
+      if (/\b(smcsrpter|ouvidoria|ouvidoria geral|colab|sine\b|sine caxias|balcão de empregos|vagas de emprego|trabalho e renda|carteira de trabalho|elogio|reclamação à ouvidoria)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMCSRPTER'];
+      }
+      if (/\b(smct\b|cultura e turismo|teatro raul cortez|museu da taquara|biblioteca leonel brizola|centro niemeyer|patrimônio cultural)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMCT'];
+      }
+      if (/\b(smel\b|esporte e lazer|vila olímpica|vila olimpica|artes marciais|natação|jogos estudantis|complexo esportivo)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMEL'];
+      }
+      if (/\b(fundec\b|escola técnica|qualificação profissional|cursos gratuitos fundec)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['FUNDEC'];
+      }
+      if (/\b(sme\b|escola|creche|matrícula escolar|matricula|merenda escolar|educação infantil|cmei)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SME'];
+      }
+      if (/\b(smasdh|cras\b|creas\b|bolsa família|cadastro único|cadúnico|assistência social|vulnerabilidade social)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMASDH'];
+      }
+      if (/\b(smf\b|iptu|iss\b|certidão negativa|nota carioca|tributo|dívida ativa|taxa de iluminação)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMF'];
+      }
+      if (/\b(smdc|defesa civil|deslizamento|enchente|alagamento|chuva forte|sirene|199\b)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMDC'];
+      }
+      if (/\b(smma|meio ambiente|poda de árvore|corte de árvore|desmatamento|queimada|licenciamento ambiental|parque da taquara)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMMA'];
+      }
+      if (/\b(smsp|guarda municipal|segurança e ordem|ordem pública|perturbação do sossego|som alto)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMSP'];
+      }
+      if (/\b(smgim|mulher|violência doméstica|centro de referência da mulher|inclusão|pcd|acessibilidade)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMGIM'];
+      }
+      if (/\b(smuh|urbanismo|habitação|habite-se|alvará de construção|regularização fundiária|minha casa minha vida)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMUH'];
+      }
+      if (/\b(ipmdc|aposentadoria do servidor|pensão por morte|censo previdenciário|previdência municipal)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['IPMDC'];
+      }
+      if (/\b(pgm\b|procuradoria-geral|procuradoria geral|execução judicial|parecer jurídico)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['PGM'];
+      }
+      if (/\b(cgm\b|controladoria-geral|controladoria geral|auditoria interna|portal da transparência)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['CGM'];
+      }
+      if (/\b(sma\b|concurso público|contracheque|recursos humanos|administração de servidores)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMA'];
+      }
+      if (/\b(smg\b|secretaria de governo|gabinete do prefeito|prefeito de duque de caxias)\b/i.test(combined)) {
+        return SECRETARIA_AVATARS['SMG'];
+      }
+
+      return null;
+    }
 
     // Transição de avatar do Duque IA
     function setAvatarState(state) {
@@ -788,6 +949,14 @@
     imageModal.addEventListener('click', () => {
       imageModal.classList.remove('active');
     });
+
+    const welcomeAvatarEl = document.getElementById('welcomeAvatar');
+    if (welcomeAvatarEl) {
+      welcomeAvatarEl.addEventListener('click', () => {
+        modalImg.src = welcomeAvatarEl.src;
+        imageModal.classList.add('active');
+      });
+    }
 
     // Toggle Libras
     librasToggleBtn.addEventListener('click', () => {
@@ -845,16 +1014,42 @@
       const row = document.createElement('div');
       row.className = `message-row ${sender}`;
 
+      const sec = (sender === 'bot') ? detectSecretaria(text, data) : null;
+
       if (sender === 'bot') {
         const thumb = document.createElement('img');
         thumb.className = 'bot-thumb';
-        thumb.src = AVATARS.acolhe;
-        thumb.alt = 'Duque IA';
+        thumb.src = sec ? sec.file : AVATARS.acolhe;
+        thumb.alt = sec ? sec.sigla : 'Duque IA';
+        thumb.title = sec ? `${sec.sigla} • ${sec.name} (Clique para ampliar)` : 'Duque IA (Clique para ampliar)';
+        thumb.addEventListener('click', () => {
+          modalImg.src = thumb.src;
+          imageModal.classList.add('active');
+        });
         row.appendChild(thumb);
       }
 
       const bubbleWrap = document.createElement('div');
       bubbleWrap.className = 'bubble-wrapper';
+
+      // Crachá Setorial com Mascote da Secretaria
+      if (sender === 'bot' && sec) {
+        const secBadge = document.createElement('div');
+        secBadge.className = 'secretaria-badge-card';
+        secBadge.title = `Clique para ver o crachá oficial da ${sec.name}`;
+        secBadge.innerHTML = `
+          <img src="${sec.file}" alt="${sec.sigla}">
+          <div class="sec-badge-text">
+            <span class="sec-badge-sigla">${sec.sigla}</span>
+            <span class="sec-badge-name">${sec.name}</span>
+          </div>
+        `;
+        secBadge.addEventListener('click', () => {
+          modalImg.src = sec.file;
+          imageModal.classList.add('active');
+        });
+        bubbleWrap.appendChild(secBadge);
+      }
 
       const bubble = document.createElement('div');
       bubble.className = 'message-bubble';
@@ -967,18 +1162,32 @@
           setAvatarState('acolhe');
           appendMessage('bot', `Desculpe, ocorreu uma instabilidade temporária: ${data.error}`);
         } else {
-          // Seleção dinâmica do personagem conforme a temática da resposta
-          const ansLower = (data.answer || '').toLowerCase();
-          if (ansLower.includes('uph') || ansLower.includes('hospital') || ansLower.includes('saúde') || ansLower.includes('posto de saúde') || ansLower.includes('vacina') || ansLower.includes('médico')) {
-            setAvatarState('saude');
-          } else if (ansLower.includes('telefone') || ansLower.includes('ouvidoria') || ansLower.includes('(21)') || ansLower.includes('whatsapp')) {
-            setAvatarState('telefone');
-          } else if (ansLower.includes('passo a passo') || ansLower.includes('colab') || ansLower.includes('documentos') || ansLower.includes('protocolo')) {
-            setAvatarState('tablet');
-          } else if (ansLower.includes('cultura') || ansLower.includes('turismo') || ansLower.includes('teatro') || ansLower.includes('esporte') || ansLower.includes('vila olímpica') || ansLower.includes('fundec')) {
-            setAvatarState('jovem');
+          // Verifica se a resposta está associada a uma secretaria específica
+          const sec = detectSecretaria(data.answer, data);
+          if (sec) {
+            headerAvatar.style.opacity = '0.4';
+            setTimeout(() => {
+              headerAvatar.src = sec.file;
+              headerAvatar.style.opacity = '1';
+            }, 150);
+            if (avatarTimer) clearTimeout(avatarTimer);
+            avatarTimer = setTimeout(() => {
+              setAvatarState('acolhe');
+            }, 6000);
           } else {
-            setAvatarState('joinha');
+            // Seleção dinâmica do personagem conforme a temática da resposta
+            const ansLower = (data.answer || '').toLowerCase();
+            if (ansLower.includes('uph') || ansLower.includes('hospital') || ansLower.includes('saúde') || ansLower.includes('posto de saúde') || ansLower.includes('vacina') || ansLower.includes('médico')) {
+              setAvatarState('saude');
+            } else if (ansLower.includes('telefone') || ansLower.includes('ouvidoria') || ansLower.includes('(21)') || ansLower.includes('whatsapp')) {
+              setAvatarState('telefone');
+            } else if (ansLower.includes('passo a passo') || ansLower.includes('colab') || ansLower.includes('documentos') || ansLower.includes('protocolo')) {
+              setAvatarState('tablet');
+            } else if (ansLower.includes('cultura') || ansLower.includes('turismo') || ansLower.includes('teatro') || ansLower.includes('esporte') || ansLower.includes('vila olímpica') || ansLower.includes('fundec')) {
+              setAvatarState('jovem');
+            } else {
+              setAvatarState('joinha');
+            }
           }
           appendMessage('bot', data.answer, data);
         }
