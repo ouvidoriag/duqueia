@@ -537,6 +537,8 @@
       display: flex;
       align-items: flex-end;
       gap: 0.6rem;
+      position: relative;
+      z-index: 85;
     }
 
     .chat-textarea {
@@ -643,6 +645,204 @@
       .message-row { max-width: 92%; }
       .welcome-card { flex-direction: column; text-align: center; }
       .header-info p { display: none; }
+    }
+
+    /* ── Mascote Flutuante Inteligente Duque IA ─────────────────── */
+    .duque-mascot-wrapper {
+      position: fixed;
+      bottom: 24px;
+      right: calc(50% - 430px - 145px); /* Posicionado exteriormente à direita do chat container (860px) */
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1180px) {
+      .duque-mascot-wrapper {
+        right: 18px;
+        bottom: 82px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .duque-mascot-wrapper {
+        right: 12px;
+        bottom: 74px;
+        transform: scale(0.85);
+        transform-origin: bottom right;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .duque-mascot-wrapper {
+        right: 8px;
+        bottom: 72px;
+        transform: scale(0.75);
+        transform-origin: bottom right;
+      }
+    }
+
+    .mascot-body {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: auto;
+      animation: mascotFloat 4s ease-in-out infinite;
+      filter: drop-shadow(0 10px 22px rgba(0, 34, 85, 0.22));
+      transition: transform 0.25s ease, filter 0.25s ease;
+    }
+
+    .mascot-body:hover {
+      transform: scale(1.06);
+      filter: drop-shadow(0 14px 28px rgba(0, 63, 153, 0.3));
+    }
+
+    @keyframes mascotFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mascot-body {
+        animation: none !important;
+      }
+    }
+
+    .mascot-figure {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: auto;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .mascot-figure.switching {
+      opacity: 0.2;
+      transform: scale(0.92);
+    }
+
+    /* Botão Minimizar / Fechar */
+    .mascot-btn-toggle {
+      position: absolute;
+      top: -4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .mascot-body:hover .mascot-btn-toggle {
+      opacity: 1;
+    }
+
+    .mascot-btn-toggle:hover {
+      background: #003f99;
+      color: #ffffff;
+      border-color: #003f99;
+      transform: scale(1.15);
+    }
+
+    /* Micro-balão de Fala */
+    .mascot-speech-bubble {
+      background: #ffffff;
+      border: 1px solid #bae6fd;
+      border-radius: 16px;
+      padding: 0.5rem 0.85rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: #0f172a;
+      box-shadow: 0 6px 16px rgba(0, 43, 102, 0.14);
+      max-width: 200px;
+      margin-bottom: 8px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(6px) scale(0.95);
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .mascot-speech-bubble.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .mascot-bubble-tail {
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #ffffff;
+    }
+
+    /* Versão Minimizada (Pílula Discreta) */
+    .mascot-minimized-badge {
+      display: none;
+      align-items: center;
+      gap: 0.45rem;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 24px;
+      padding: 0.35rem 0.75rem 0.35rem 0.45rem;
+      box-shadow: 0 4px 14px rgba(0, 34, 85, 0.15);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.2s ease;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #003f99;
+    }
+
+    .mascot-minimized-badge:hover {
+      background: #f0f7ff;
+      border-color: #0284c7;
+      transform: scale(1.05);
+    }
+
+    .mascot-minimized-badge img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: contain;
+      background: #001a40;
+    }
+
+    .duque-mascot-wrapper.minimized .mascot-body,
+    .duque-mascot-wrapper.minimized .mascot-speech-bubble {
+      display: none;
+    }
+
+    .duque-mascot-wrapper.minimized .mascot-minimized-badge {
+      display: flex;
     }
   </style>
 </head>
@@ -769,6 +969,33 @@
       </button>
     </div>
 
+  </div>
+
+  <!-- Componente Mascote Flutuante Inteligente Duque IA -->
+  <div id="duqueMascot" class="duque-mascot-wrapper" role="complementary" aria-label="Mascote Virtual Duque IA">
+    <!-- Micro-balão de Fala Contextual -->
+    <div id="mascotBubble" class="mascot-speech-bubble" aria-live="polite">
+      <span id="mascotBubbleText">Olá! Sou o Duque. Como posso ajudar?</span>
+      <div class="mascot-bubble-tail"></div>
+    </div>
+
+    <!-- Corpo do Mascote com Levitação 3D -->
+    <div class="mascot-body" id="mascotBody" title="Clique para conversar com o Duque!">
+      <img id="mascotImg" src="assets/mascot/duque-welcome.png" alt="Mascote Duque IA" class="mascot-figure">
+      
+      <!-- Botão de Minimizar / Fechar -->
+      <button id="mascotToggleBtn" class="mascot-btn-toggle" title="Minimizar Mascote" aria-label="Minimizar Mascote">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Badge Minimizado para Restaurar -->
+    <button id="mascotPillMinimized" class="mascot-minimized-badge" title="Expandir Duque IA">
+      <img src="assets/mascot/duque-idle.png" alt="Duque IA">
+      <span>Duque IA</span>
+    </button>
   </div>
 
   <!-- Modal Lightbox da Foto -->
@@ -1105,9 +1332,161 @@
       }
     }
 
+    // ── Componente Mascote Flutuante Contextual Duque IA ─────────────────────
+    class DuqueMascotController {
+      constructor() {
+        this.wrapper    = document.getElementById('duqueMascot');
+        this.img        = document.getElementById('mascotImg');
+        this.bubble     = document.getElementById('mascotBubble');
+        this.bubbleText = document.getElementById('mascotBubbleText');
+        this.toggleBtn  = document.getElementById('mascotToggleBtn');
+        this.pillBadge  = document.getElementById('mascotPillMinimized');
+        this.body       = document.getElementById('mascotBody');
+
+        this.currentState = 'welcome';
+        this.isMinimized  = false;
+        this.bubbleTimer  = null;
+        this.idleTimer    = null;
+
+        // Poses mapeadas da pasta assets/mascot/ com canal alfa de alta resolução
+        this.poses = {
+          idle:       'assets/mascot/duque-idle.png',
+          welcome:    'assets/mascot/duque-welcome.png',
+          listening:  'assets/mascot/duque-listening.png',
+          thinking:   'assets/mascot/duque-thinking.png',
+          happy:      'assets/mascot/duque-happy.png',
+          explaining: 'assets/mascot/duque-explaining.png',
+          empathetic: 'assets/mascot/duque-empathetic.png',
+          serious:    'assets/mascot/duque-serious.png',
+          goodbye:    'assets/mascot/duque-goodbye.png',
+          error:      'assets/mascot/duque-error.png',
+          pets:       'assets/mascot/duque-pets.png',
+          works:      'assets/mascot/duque-works.png',
+          education:  'assets/mascot/duque-education.png',
+          telephone:  'assets/mascot/duque-telephone.png'
+        };
+
+        this.init();
+      }
+
+      init() {
+        if (!this.wrapper) return;
+
+        // Clique no mascote: fala frase de acolhimento e foca no input
+        this.body?.addEventListener('click', (e) => {
+          if (e.target.closest('#mascotToggleBtn')) return;
+          this.reactClick();
+        });
+
+        // Alternar minimizar / restaurar
+        this.toggleBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.minimize();
+        });
+
+        this.pillBadge?.addEventListener('click', () => {
+          this.restore();
+        });
+
+        // Apresentação inicial após carregar a página
+        setTimeout(() => {
+          this.say('Olá! Sou o Duque. Estou aqui para ajudar você!');
+        }, 900);
+
+        this.scheduleIdle(7000);
+      }
+
+      setState(stateName, speechText = null, autoIdleMs = 6000) {
+        if (!this.poses[stateName]) stateName = 'idle';
+        this.currentState = stateName;
+
+        if (this.idleTimer) clearTimeout(this.idleTimer);
+
+        // Transição suave
+        if (this.img) {
+          this.img.classList.add('switching');
+          setTimeout(() => {
+            this.img.src = this.poses[stateName];
+            this.img.classList.remove('switching');
+          }, 150);
+        }
+
+        if (speechText) {
+          this.say(speechText);
+        }
+
+        if (stateName !== 'idle' && autoIdleMs > 0) {
+          this.scheduleIdle(autoIdleMs);
+        }
+      }
+
+      setSecretariaMascot(secFile, secSigla, speechText = null) {
+        if (this.idleTimer) clearTimeout(this.idleTimer);
+
+        if (this.img) {
+          this.img.classList.add('switching');
+          setTimeout(() => {
+            this.img.src = secFile;
+            this.img.classList.remove('switching');
+          }, 150);
+        }
+
+        if (speechText) {
+          this.say(speechText);
+        }
+
+        this.scheduleIdle(7000);
+      }
+
+      say(text, duration = 5000) {
+        if (!text || !this.bubble || !this.bubbleText) return;
+        if (this.bubbleTimer) clearTimeout(this.bubbleTimer);
+
+        this.bubbleText.textContent = text;
+        this.bubble.classList.add('visible');
+
+        this.bubbleTimer = setTimeout(() => {
+          this.bubble.classList.remove('visible');
+        }, duration);
+      }
+
+      scheduleIdle(delayMs = 6000) {
+        if (this.idleTimer) clearTimeout(this.idleTimer);
+        this.idleTimer = setTimeout(() => {
+          this.setState('idle');
+        }, delayMs);
+      }
+
+      reactClick() {
+        const greetings = [
+          'Tudo bem? Como posso te orientar hoje?',
+          'Pode perguntar sobre qualquer serviço municipal!',
+          'Estou conectado com todas as secretarias de Caxias!',
+          'Precisa de uma UPH, agendamento ou Ouvidoria?'
+        ];
+        const randomG = greetings[Math.floor(Math.random() * greetings.length)];
+        this.setState('happy', randomG, 5000);
+        chatInput?.focus();
+      }
+
+      minimize() {
+        this.isMinimized = true;
+        this.wrapper?.classList.add('minimized');
+      }
+
+      restore() {
+        this.isMinimized = false;
+        this.wrapper?.classList.remove('minimized');
+        this.say('Estou de volta! Como posso ajudar?', 3500);
+      }
+    }
+
+    const duqueMascot = new DuqueMascotController();
+
     // Indicador de Consulta RAG
     function showTyping() {
       setAvatarState('pensando');
+      duqueMascot?.setState('thinking', 'Pesquisando na base oficial de Duque de Caxias...');
       const box = document.createElement('div');
       box.className = 'message-row bot';
       box.id = 'typingIndicator';
@@ -1146,6 +1525,7 @@
       sendBtn.disabled = true;
 
       appendMessage('user', text);
+      duqueMascot?.setState('listening', 'Entendido! Deixa comigo...');
       showTyping();
 
       try {
@@ -1160,6 +1540,7 @@
 
         if (data.error) {
           setAvatarState('acolhe');
+          duqueMascot?.setState('error', 'Ops! Tive uma instabilidade na conexão.');
           appendMessage('bot', `Desculpe, ocorreu uma instabilidade temporária: ${data.error}`);
         } else {
           // Verifica se a resposta está associada a uma secretaria específica
@@ -1174,19 +1555,43 @@
             avatarTimer = setTimeout(() => {
               setAvatarState('acolhe');
             }, 6000);
+
+            // Reação contextual do mascote inteligente
+            if (sec.sigla === 'SMS') {
+              duqueMascot?.setState('empathetic', 'Encontrei as informações de Saúde!');
+            } else if (sec.sigla === 'SMPA') {
+              duqueMascot?.setState('pets', 'Castramóvel e bem-estar animal!');
+            } else if (sec.sigla === 'SMOA') {
+              duqueMascot?.setState('works', 'Orientações sobre obras e tapa-buraco!');
+            } else if (sec.sigla === 'SME') {
+              duqueMascot?.setState('education', 'Orientações sobre educação e escolas!');
+            } else if (sec.sigla === 'FUNDEC') {
+              duqueMascot?.setState('education', 'Cursos e polos da FUNDEC!');
+            } else if (sec.sigla === 'SMCSRPTER') {
+              duqueMascot?.setState('serious', 'Canais da Ouvidoria e Empregos!');
+            } else if (sec.sigla === 'SMTSP') {
+              duqueMascot?.setState('explaining', 'Iluminação pública e transportes!');
+            } else {
+              duqueMascot?.setSecretariaMascot(sec.file, sec.sigla, `Orientações da ${sec.sigla}!`);
+            }
           } else {
             // Seleção dinâmica do personagem conforme a temática da resposta
             const ansLower = (data.answer || '').toLowerCase();
             if (ansLower.includes('uph') || ansLower.includes('hospital') || ansLower.includes('saúde') || ansLower.includes('posto de saúde') || ansLower.includes('vacina') || ansLower.includes('médico')) {
               setAvatarState('saude');
+              duqueMascot?.setState('empathetic', 'Orientações da rede municipal de saúde!');
             } else if (ansLower.includes('telefone') || ansLower.includes('ouvidoria') || ansLower.includes('(21)') || ansLower.includes('whatsapp')) {
               setAvatarState('telefone');
+              duqueMascot?.setState('telephone', 'Canais de contato da Ouvidoria!');
             } else if (ansLower.includes('passo a passo') || ansLower.includes('colab') || ansLower.includes('documentos') || ansLower.includes('protocolo')) {
               setAvatarState('tablet');
+              duqueMascot?.setState('explaining', 'Veja o passo a passo para solicitar!');
             } else if (ansLower.includes('cultura') || ansLower.includes('turismo') || ansLower.includes('teatro') || ansLower.includes('esporte') || ansLower.includes('vila olímpica') || ansLower.includes('fundec')) {
               setAvatarState('jovem');
+              duqueMascot?.setState('goodbye', 'Programação de cultura e esporte!');
             } else {
               setAvatarState('joinha');
+              duqueMascot?.setState('happy', 'Pronto! Aqui está a informação.');
             }
           }
           appendMessage('bot', data.answer, data);
@@ -1194,6 +1599,7 @@
       } catch (err) {
         removeTyping();
         setAvatarState('acolhe');
+        duqueMascot?.setState('error', 'Ops, erro de conexão com o servidor municipal.');
         appendMessage('bot', 'Erro de conexão com o servidor municipal. Por favor, tente novamente em instantes.');
       } finally {
         sendBtn.disabled = false;
@@ -1214,6 +1620,12 @@
       }
     });
 
+    chatInput.addEventListener('focus', () => {
+      if (duqueMascot?.currentState === 'idle') {
+        duqueMascot.setState('listening', 'Estou ouvindo... Pode digitar!');
+      }
+    });
+
     chatInput.addEventListener('input', () => {
       chatInput.style.height = 'auto';
       chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
@@ -1222,6 +1634,7 @@
     newChatBtn.addEventListener('click', () => {
       sessionId = 'sess_' + Date.now();
       setAvatarState('acolhe');
+      duqueMascot?.setState('welcome', 'Nova conversa iniciada! Como posso ajudar você?');
       messagesArea.innerHTML = '';
       appendMessage('bot', 'Olá! Iniciei uma nova sessão de atendimento para você. Como posso te ajudar agora?');
     });
