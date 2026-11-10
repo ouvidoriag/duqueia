@@ -200,4 +200,45 @@ Crie e mantenha: .env.example e docker-compose.yml.
 
 ### Verificação Preventiva e Reuso de Código
 - Sempre analise minuciosamente a estrutura de pastas do projeto (`/data`, `/scripts`, `/agent`, `/ingestion`) e os scripts existentes antes de criar novos arquivos ou recriar lógicas de negócio.
-- Evite redundâncias e dê preferência por estender e reaproveitar parsers, indexadores, ferramentas e suítes de testes que já se encontram implementados no projeto.
+- Evite redundâncias e dê preferência por estender e reaproveitar parsers, indexadores, ferramentas e suítes de testes que já se encontram implementados no projeto.
+
+---
+
+## FASE 10 - ARQUITETURA CONSOLIDADA DE PRODUÇÃO, CHAVES E AGENTES
+
+### 1. Servidor e Gateway de Produção
+* **Porta Oficial:** Porta **`3000`** padronizada em todos os ambientes (`server.js`, `ecosystem.config.js`, `config/settings.py`, `.env`).
+* **Reverse Proxy Nginx:** Na Máquina Virtual, o Nginx mapeia `http://ogm.duquedecaxias.rj.gov.br/duqueia/` diretamente para o upstream `duque_ia_backend` (`server 127.0.0.1:3000;`).
+* **Rotas Relativas no Frontend:** Toda requisição no frontend (`chat.html` e `dashboard.html`) DEVE utilizar caminhos estritamente relativos (`api/chat`, `api/metrics`, `api/feedback`, `audio/...`), garantindo que funcione tanto em desenvolvimento (`localhost:3000`) quanto através do subcaminho do Nginx (`/duqueia/`).
+* **WorkerPool Multi-threaded:** O `server.js` gerencia um pool de **4 workers Python persistentes** via stdin/stdout com protocolo JSON, isolamento de memória e hot-reload sob demanda.
+
+### 2. Gestão de Chave e Modelos Cognitivos
+* **Chave Paga do Google Cloud:** Utiliza uma única chave oficial com faturamento ativo associada ao projeto `projects/526814071543`, inserida exclusivamente no `.env` (`GEMINI_API_KEYS=AQ.Ab8RN6ICrOM5...`). O arquivo `.env` NUNCA é versionado no Git.
+* **Dupla de Modelos Cognitivos:**
+  * **Triador Rápido (`gemini-3.1-flash-lite`):** Responsável pela triagem de intenção, detecção de ambiguidade e coleta incremental de contexto em menos de ~1,5s.
+  * **Motor RAG e Resposta Factual (`gemini-3.8-flash`):** Responsável pela síntese analítica final com base no contexto injetado, com raciocínio de alta precisão e sem alucinações.
+  * **Modelo de Embeddings (`gemini-embedding-2`):** Vetores semânticos densos de 3.072 dimensões.
+  * **Síntese de Voz Nativa (`gemini-3.1-flash-tts-preview`):** Áudio 24kHz Studio WAV com timeout ampliado de 25s.
+* **Atalho Inteligente de Reranking:** Se a busca híbrida obtiver score de similaridade `>= 0.70`, o reranking de rede é dispensado (0ms), economizando tokens e tempo.
+
+### 3. Segregação Física de Bancos de Dados (4 Bases SQLite em WAL)
+1. **`data/db/main.db`:** Dados relacionais, 644 serviços, equipamentos públicos, faixas de CEP e regras de negócio.
+2. **`data/db/vector.db`:** 1.575 chunks mestres indexados com busca vetorial e trigramas.
+3. **`data/db/cache.db`:** Cache semântico de respostas frequentes com retorno em ~3ms.
+4. **`data/db/telemetry.db`:** Auditoria em tempo real, tokens consumidos, histórico de conversas e latências.
+
+### 4. Grafo de Execução de Agentes (Pipeline Cognitivo)
+A mensagem do munícipe percorre:
+1. `fast_gate`: Validações de regex, bloqueio de injection e palavras proibidas.
+2. `entity_resolver`: Normalização geográfica (4 distritos, 40 bairros mestres, apelidos e equipamentos de Duque de Caxias).
+3. `triage`: Agente com `gemini-3.1-flash-lite` que avalia histórico multiturno e intenção. Se faltar dados, assume papel de **Agente Coletor Incremental** (`needs_clarification`).
+4. `tool_router`: Direciona o fluxo para o handler adequado:
+   * `RAG_HANDLER`: Busca híbrida + Gemini 3.8-flash + guardrails.
+   * `AMBIGUITY_HANDLER`: Resposta de esclarecimento amigável ao munícipe.
+   * `OUT_OF_SCOPE_HANDLER`: Bloqueio com redirecionamento para Ouvidoria Geral.
+5. `output_guardrail`: Blindagem de dados sensíveis (LGPD) e validação factual.
+
+### 5. Diretrizes para Frontend e Apresentação
+* **`public/chat.html`:** Interface de atendimento humanizada com o atendente virtual do DUQUE IA. Deve utilizar os avatares disponíveis em `public/assets/` (`atendente_caxias_headset_acolhe.png`, `atendente_notebook_pensando.png`, `atendente_caxias_joinha.png`, etc.) alternando dinamicamente de acordo com o estado da conversa (acolhendo, pensando/pesquisando, respondendo).
+* **`public/dashboard.html`:** Painel de observabilidade executivo que consome `telemetry.db` através do endpoint `api/metrics`. Deve exibir métricas de latência, volume de atendimentos por secretaria, conformidade de respostas, economia de tokens e mapa de calor de demandas.
+
