@@ -208,7 +208,7 @@
     /* ── Área de Mensagens (Feed) ────────────────────────────── */
     .messages-area {
       flex: 1;
-      padding: 1.25rem 1.4rem;
+      padding: 1.25rem 1.4rem 2.8rem 1.4rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -593,77 +593,46 @@
       .header-info p { display: none; }
     }
 
-    /* ── Mascote Flutuante Inteligente Duque IA ─────────────────── */
+    /* ── Mascote Inteligente Duque IA Apoiado na Caixa de Digitação ── */
     .duque-mascot-wrapper {
-      position: fixed;
-      bottom: 32px;
-      right: calc(50% - 430px - 195px); /* Flutuando livremente à direita do chat container (860px) */
-      z-index: 90;
+      position: absolute;
+      bottom: 100%; /* Apoiado perfeitamente sobre a borda superior da input-bar */
+      right: 1.2rem; /* Canto inferior direito, alinhado sobre os botões */
+      z-index: 30;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      align-items: flex-end; /* Mantém o balão e o mascote alinhados à direita */
       user-select: none;
       pointer-events: none;
-    }
-
-    @media (max-width: 1290px) {
-      .duque-mascot-wrapper {
-        right: 20px;
-        bottom: 96px; /* Flutua confortavelmente acima da barra de digitação */
-      }
-    }
-
-    @media (max-width: 768px) {
-      .duque-mascot-wrapper {
-        right: 14px;
-        bottom: 90px;
-        transform: scale(0.85);
-        transform-origin: bottom right;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .duque-mascot-wrapper {
-        right: 10px;
-        bottom: 84px;
-        transform: scale(0.74);
-        transform-origin: bottom right;
-      }
+      margin-bottom: 0px;
     }
 
     .mascot-body {
       position: relative;
-      width: 180px;
-      height: 180px;
+      width: 135px;
+      height: 135px;
       display: flex;
-      align-items: center;
+      align-items: flex-end; /* Base do mascote encostada na borda superior */
       justify-content: center;
       cursor: pointer;
       pointer-events: auto;
-      animation: mascotFloat 4s ease-in-out infinite;
-      filter: drop-shadow(0 16px 32px rgba(0, 34, 85, 0.28)) drop-shadow(0 4px 12px rgba(0, 63, 153, 0.18));
+      filter: drop-shadow(0 -3px 12px rgba(0, 34, 85, 0.18));
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
-    }
-
-    @media (max-width: 1290px) {
-      .mascot-body {
-        width: 155px;
-        height: 155px;
-      }
+      transform-origin: bottom center; /* Animações e interações partem da linha de apoio */
+      animation: mascotBreathing 4s ease-in-out infinite;
     }
 
     .mascot-body:hover {
-      transform: scale(1.08) translateY(-4px);
-      filter: drop-shadow(0 20px 38px rgba(0, 63, 153, 0.38)) drop-shadow(0 6px 14px rgba(0, 63, 153, 0.24));
+      transform: scale(1.05);
+      filter: drop-shadow(0 -5px 16px rgba(0, 63, 153, 0.28));
     }
 
-    @keyframes mascotFloat {
+    @keyframes mascotBreathing {
       0%, 100% {
-        transform: translateY(0);
+        transform: scale(1);
       }
       50% {
-        transform: translateY(-8px);
+        transform: scale(1.018);
       }
     }
 
@@ -677,32 +646,34 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      object-position: bottom center; /* Ponto de apoio na linha da borda */
+      display: block;
       pointer-events: auto;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
     .mascot-figure.switching {
       opacity: 0.2;
-      transform: scale(0.92);
+      transform: scale(0.95);
     }
 
     /* Botão Minimizar / Fechar */
     .mascot-btn-toggle {
       position: absolute;
-      top: 0px;
-      right: 6px;
-      width: 24px;
-      height: 24px;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.95);
-      border: 1.5px solid #cbd5e1;
+      border: 1px solid #cbd5e1;
       color: #64748b;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       pointer-events: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
       opacity: 0;
       transition: all 0.2s ease;
       z-index: 10;
@@ -716,25 +687,25 @@
       background: #003f99;
       color: #ffffff;
       border-color: #003f99;
-      transform: scale(1.15);
+      transform: scale(1.1);
     }
 
     /* Balão de Fala Expressivo Duque IA */
     .mascot-speech-bubble {
       background: #ffffff;
       border: 1.5px solid #38bdf8;
-      border-radius: 18px;
-      padding: 0.6rem 1rem;
+      border-radius: 16px;
+      padding: 0.5rem 0.85rem;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       color: #002255;
-      box-shadow: 0 10px 28px rgba(0, 43, 102, 0.18);
-      max-width: 230px;
-      margin-bottom: 12px;
+      box-shadow: 0 8px 22px rgba(0, 43, 102, 0.16);
+      max-width: 215px;
+      margin-bottom: 6px;
       position: relative;
       opacity: 0;
-      transform: translateY(8px) scale(0.94);
+      transform: translateY(6px) scale(0.95);
       pointer-events: none;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       line-height: 1.35;
@@ -778,12 +749,11 @@
     .mascot-bubble-tail {
       position: absolute;
       bottom: -7px;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 52px; /* Aponta diretamente para a cabeça do Duque */
       width: 0;
       height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
       border-top: 7px solid #38bdf8;
     }
 
@@ -791,42 +761,43 @@
       content: '';
       position: absolute;
       top: -9px;
-      left: -6px;
+      left: -5px;
       width: 0;
       height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
       border-top: 6px solid #ffffff;
     }
 
-    /* Versão Minimizada (Pílula Discreta) */
+    /* Versão Minimizada (Pílula Discreta sobre a borda) */
     .mascot-minimized-badge {
       display: none;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       background: #ffffff;
       border: 1.5px solid #38bdf8;
-      border-radius: 24px;
-      padding: 0.4rem 0.85rem 0.4rem 0.5rem;
-      box-shadow: 0 6px 18px rgba(0, 34, 85, 0.18);
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem 0.3rem 0.45rem;
+      box-shadow: 0 4px 14px rgba(0, 34, 85, 0.14);
       cursor: pointer;
       pointer-events: auto;
       transition: all 0.2s ease;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: #003f99;
       font-family: 'Outfit', sans-serif;
+      margin-bottom: 6px;
     }
 
     .mascot-minimized-badge:hover {
       background: #f0f7ff;
       border-color: #0284c7;
-      transform: scale(1.05);
+      transform: translateY(-2px);
     }
 
     .mascot-minimized-badge img {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       object-fit: cover;
       background: #f1f5f9;
@@ -840,6 +811,43 @@
 
     .duque-mascot-wrapper.minimized .mascot-minimized-badge {
       display: flex;
+    }
+
+    /* ── Ajustes Responsivos do Mascote ────────────────────────── */
+    @media (max-width: 768px) {
+      .duque-mascot-wrapper {
+        right: 0.8rem;
+      }
+      .mascot-body {
+        width: 105px;
+        height: 105px;
+      }
+      .mascot-speech-bubble {
+        max-width: 175px;
+        font-size: 0.72rem;
+        padding: 0.45rem 0.75rem;
+      }
+      .mascot-bubble-tail {
+        right: 42px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .duque-mascot-wrapper {
+        right: 0.5rem;
+      }
+      .mascot-body {
+        width: 90px;
+        height: 90px;
+      }
+      .mascot-speech-bubble {
+        max-width: 150px;
+        font-size: 0.68rem;
+        padding: 0.35rem 0.6rem;
+      }
+      .mascot-bubble-tail {
+        right: 34px;
+      }
     }
   </style>
 </head>
@@ -939,6 +947,38 @@
 
     <!-- Barra de Digitação e Áudio -->
     <div class="input-bar">
+
+      <!-- Componente Mascote Inteligente Duque IA Apoiado na Caixa de Digitação -->
+      <div id="duqueMascot" class="duque-mascot-wrapper" role="complementary" aria-label="Mascote Virtual Duque IA">
+        <!-- Balão de Fala Contextual -->
+        <div id="mascotBubble" class="mascot-speech-bubble" aria-live="polite">
+          <div class="mascot-bubble-tag">
+            <span class="mascot-dot-live"></span>
+            <span>Duque IA</span>
+          </div>
+          <span id="mascotBubbleText" class="mascot-bubble-text">Olá! Sou o Duque. Como posso ajudar?</span>
+          <div class="mascot-bubble-tail"></div>
+        </div>
+
+        <!-- Corpo do Mascote apoiado na borda superior -->
+        <div class="mascot-body" id="mascotBody" title="Clique para interagir com o Duque!">
+          <img id="mascotImg" src="assets/mascot/duque-welcome.png" alt="Mascote Duque IA" class="mascot-figure">
+          
+          <!-- Botão de Minimizar / Fechar -->
+          <button id="mascotToggleBtn" class="mascot-btn-toggle" title="Minimizar Mascote" aria-label="Minimizar Mascote">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Badge Minimizado para Restaurar -->
+        <button id="mascotPillMinimized" class="mascot-minimized-badge" title="Expandir Duque IA">
+          <img src="assets/mascot/duque-idle.png" alt="Duque IA">
+          <span>Duque IA</span>
+        </button>
+      </div>
+
       <textarea
         class="chat-textarea"
         id="chatInput"
@@ -966,37 +1006,6 @@
       </button>
     </div>
 
-  </div>
-
-  <!-- Componente Mascote Flutuante Inteligente Duque IA -->
-  <div id="duqueMascot" class="duque-mascot-wrapper" role="complementary" aria-label="Mascote Virtual Duque IA">
-    <!-- Micro-balão de Fala Contextual -->
-    <div id="mascotBubble" class="mascot-speech-bubble" aria-live="polite">
-      <div class="mascot-bubble-tag">
-        <span class="mascot-dot-live"></span>
-        <span>Duque IA</span>
-      </div>
-      <span id="mascotBubbleText" class="mascot-bubble-text">Olá! Sou o Duque. Como posso ajudar?</span>
-      <div class="mascot-bubble-tail"></div>
-    </div>
-
-    <!-- Corpo do Mascote com Levitação 3D -->
-    <div class="mascot-body" id="mascotBody" title="Clique para conversar com o Duque!">
-      <img id="mascotImg" src="assets/mascot/duque-welcome.png" alt="Mascote Duque IA" class="mascot-figure">
-      
-      <!-- Botão de Minimizar / Fechar -->
-      <button id="mascotToggleBtn" class="mascot-btn-toggle" title="Minimizar Mascote" aria-label="Minimizar Mascote">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Badge Minimizado para Restaurar -->
-    <button id="mascotPillMinimized" class="mascot-minimized-badge" title="Expandir Duque IA">
-      <img src="assets/mascot/duque-idle.png" alt="Duque IA">
-      <span>Duque IA</span>
-    </button>
   </div>
 
   <!-- Modal Lightbox da Foto -->
