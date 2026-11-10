@@ -48,7 +48,9 @@ def find_fuzzy_match(word: str, targets: list, max_distance: int = 2) -> str | N
 # Dicionário de Aliases/Sinônimos populares das Secretarias para match offline rápido
 SECRETARIA_ALIASES = {
     "smo": "obras",
+    "smoa": "obras",
     "smu": "urbanismo",
+    "smuh": "urbanismo",
     "sms": "saude",
     "sme": "educacao",
     "smf": "fazenda",
@@ -56,9 +58,30 @@ SECRETARIA_ALIASES = {
     "meio ambiente": "meio ambiente",
     "fundec": "educação",
     "cras": "assistência social",
+    "smasdh": "assistência social",
     "posto de saude": "saúde",
     "defesa civil": "defesa civil",
-    "sdc": "defesa civil"
+    "sdc": "defesa civil",
+    "smdc": "defesa civil",
+    "smg": "governo",
+    "governo": "governo",
+    "smct": "cultura e turismo",
+    "cultura": "cultura e turismo",
+    "turismo": "cultura e turismo",
+    "smel": "esporte e lazer",
+    "esporte": "esporte e lazer",
+    "lazer": "esporte e lazer",
+    "vila olimpica": "esporte e lazer",
+    "smcsrpter": "comunicação",
+    "comunicacao": "comunicação",
+    "comunicação": "comunicação",
+    "trabalho": "trabalho",
+    "emprego": "trabalho",
+    "renda": "trabalho",
+    "sine": "trabalho",
+    "ouvidoria": "ouvidoria geral",
+    "ouvidoria geral": "ouvidoria geral",
+    "ogm": "ouvidoria geral"
 }
 
 
@@ -522,12 +545,42 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
             rows = cursor.fetchall()
         except Exception:
             return []
-            
-        results = []
-        for idx, row in enumerate(rows):
+
+        # Reranking cognitivo por casamento exato de palavra (fronteira \b) e sigla
+        scored_rows = []
+        q_tokens = [w.lower() for w in re.findall(r'\w+', query) if len(w) >= 3 and w not in ignore_words]
+        for row in rows:
             sec_id, name, code, address, phone, email, hours = row
             if not address and not phone and not email:
                 continue
+
+            name_lower = name.lower()
+            code_lower = (code or "").lower()
+            match_score = 0
+
+            # 1. Correspondência exata da sigla na query
+            if code_lower and code_lower in query.lower().split():
+                match_score += 100
+
+            # 2. Casamento de palavras inteiras (\b) no nome e código
+            for w in q_tokens + search_words:
+                if re.search(rf"\b{re.escape(w.lower())}\b", name_lower):
+                    match_score += 25
+                if w.lower() == code_lower:
+                    match_score += 35
+
+            # 3. Penalização leve para fundações guarda-chuva se secretaria específica for demandada
+            if "fundação" in name_lower and not any(f in query.lower() for f in ["fundec", "fundação"]):
+                match_score -= 10
+
+            if match_score > 0:
+                scored_rows.append((match_score, row))
+
+        scored_rows.sort(key=lambda x: x[0], reverse=True)
+            
+        results = []
+        for idx, (m_score, row) in enumerate(scored_rows):
+            sec_id, name, code, address, phone, email, hours = row
                 
             content_parts = [
                 "[FONTE OFICIAL ESTRUTURADA]",
@@ -543,8 +596,8 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
             ]
             structured_text = "\n".join(content_parts)
             
-            # Atribui score ligeiramente decrescente com base na ordenação de relevância do SQL
-            score = round(0.99 - (idx * 0.01), 2)
+            # Score de relevância calibrado
+            score = round(max(0.70, 0.99 - (idx * 0.03)), 2)
             
             results.append({
                 "source": f"secretarias (ID: {sec_id})",

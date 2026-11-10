@@ -535,34 +535,50 @@ class GoldenSourceResolver:
 
         conn.close()
 
+        scored = []
         for sec_id, name, code, address, phone, email, hours in rows:
             name_norm = normalize_text(name)
             code_norm = normalize_text(code) if code else ""
 
             # Extrai palavras significativas da secretaria (ex: saude, obras, fazenda, urbanismo, educacao)
-            words_sec = [w for w in name_norm.split() if len(w) >= 4 and w not in ["secretaria", "municipal", "de", "direitos", "humanos"]]
+            words_sec = [w for w in name_norm.split() if len(w) >= 4 and w not in ["secretaria", "municipal", "direitos", "humanos", "apoio", "para"]]
 
-            if (code_norm and re.search(rf"\b{re.escape(code_norm)}\b", q_norm)) or any(w in q_norm for w in words_sec):
-                ans = (
-                    f"O endereço da **{name} ({code})** é **{address or 'Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)'}**.\n\n"
-                )
-                if phone and phone.lower() not in ("não cadastrado", "none", ""):
-                    ans += f"• **Telefone:** **{phone}**\n"
-                if email and email.lower() not in ("não cadastrado", "none", ""):
-                    ans += f"• **E-mail:** **{email}**\n"
-                if hours and hours.lower() not in ("não cadastrado", "none", ""):
-                    ans += f"• **Horário de Atendimento:** {hours}\n"
-                else:
-                    ans += f"• **Horário de Atendimento:** Segunda a sexta-feira, das 9h às 17h\n"
+            score = 0
+            if code_norm and re.search(rf"\b{re.escape(code_norm)}\b", q_norm):
+                score += 100
+            for w in words_sec:
+                if re.search(rf"\b{re.escape(w)}\b", q_norm):
+                    score += 25
+            if "fundacao" in name_norm and "fundec" not in q_norm and "fundacao" not in q_norm:
+                score -= 15
 
-                ans += "\nPosso ajudar você com mais alguma informação, telefone ou serviços desta secretaria?"
+            if score > 0:
+                scored.append((score, sec_id, name, code, address, phone, email, hours))
 
-                return {
-                    "answer": ans,
-                    "sources": [f"secretarias ({name})"],
-                    "confidence": 1.0,
-                    "intent_detected": "golden_source_secretaria_resolved",
-                    "resolved_by": "GoldenSourceResolver"
-                }
+        if not scored:
+            return None
 
-        return None
+        scored.sort(key=lambda x: x[0], reverse=True)
+        best_score, sec_id, name, code, address, phone, email, hours = scored[0]
+
+        ans = (
+            f"O endereço da **{name} ({code})** é **{address or 'Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)'}**.\n\n"
+        )
+        if phone and phone.lower() not in ("não cadastrado", "none", ""):
+            ans += f"• **Telefone:** **{phone}**\n"
+        if email and email.lower() not in ("não cadastrado", "none", ""):
+            ans += f"• **E-mail:** **{email}**\n"
+        if hours and hours.lower() not in ("não cadastrado", "none", ""):
+            ans += f"• **Horário de Atendimento:** {hours}\n"
+        else:
+            ans += f"• **Horário de Atendimento:** Segunda a sexta-feira, das 9h às 17h\n"
+
+        ans += "\nPosso ajudar você com mais alguma informação, telefone ou serviços desta secretaria?"
+
+        return {
+            "answer": ans,
+            "sources": [f"secretarias ({name})"],
+            "confidence": 1.0,
+            "intent_detected": "golden_source_secretaria_resolved",
+            "resolved_by": "GoldenSourceResolver"
+        }

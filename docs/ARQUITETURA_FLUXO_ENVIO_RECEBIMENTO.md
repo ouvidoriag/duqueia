@@ -171,3 +171,35 @@ Com a base e o cérebro do sistema consolidados e limpos:
    * Cards executivos: Total de Atendimentos, Tempo Médio de Resposta, Economia de Tokens, Índice de Resolução.
    * Gráficos dinâmicos com Chart.js exibindo distribuição por secretarias e mapa de demandas mais frequentes.
 
+---
+
+## 8. Catálogo Estrutural Oficial das Secretarias e Órgãos Municipais (Atualizado)
+
+Conforme a reforma administrativa e estruturação de dados mestres, a Prefeitura Municipal de Duque de Caxias conta com as seguintes pastas e siglas oficiais cadastradas e indexadas no RAG:
+
+| Sigla | Nome Oficial da Secretaria / Órgão | Sede / Endereço | Contato / Canais |
+| :--- | :--- | :--- | :--- |
+| **SMS** | Secretaria Municipal de Saúde | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8800 |
+| **SMCSRPTER** | Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2652-3835 / WhatsApp: (21) 99824-5903 |
+| **SMCT** | Secretaria Municipal de Cultura e Turismo | Praça Humaitá, s/n - 25 de Agosto | (21) 2672-8890 / (21) 2771-8682 |
+| **SMEL** | Secretaria Municipal de Esporte e Lazer | Rua Garibaldi, s/n (Vila Olímpica) - 25 de Agosto | (21) 2652-7428 |
+| **SMG** | Secretaria Municipal de Governo | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2672-8801 |
+| **SMOA** | Secretaria Municipal de Obras e Agricultura | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8850 |
+| **SMTSP** | Secretaria Municipal de Transportes e Serviços Públicos | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8870 |
+| **SMDC** | Secretaria Municipal de Defesa Civil | Rua Silva Fernandes, 170 - Centro | 199 / 0800 0230 199 / (21) 2672-6199 |
+| **SMSP** | Secretaria Municipal de Segurança e Ordem Pública | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8880 |
+| **SME** | Secretaria Municipal de Educação | Rua Prefeito Bernardo Távora, s/n - 25 de Agosto | (21) 2671-6161 |
+| **SMF** | Secretaria Municipal de Fazenda | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2672-8820 |
+| **SMA** | Secretaria Municipal de Administração | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2672-8810 |
+| **SMASDH** | Secretaria Municipal de Assistência Social e Direitos Humanos | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-6650 |
+| **SMMA** | Secretaria Municipal de Meio Ambiente | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8860 |
+| **SMUH** | Secretaria Municipal de Urbanismo e Habitação | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8855 |
+| **SMGIM** | Secretaria Municipal de Gestão, Inclusão e Mulher | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-6680 |
+| **SMPA** | Secretaria Municipal de Proteção Animal | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-8865 |
+| **FUNDEC** | Fundação de Apoio à Escola Técnica, Ciência, Tecnologia, Esporte, Lazer, Cultura e Saúde | Av. Brig. Lima e Silva, 1618 - 25 de Agosto | (21) 2672-5650 |
+| **PGM** | Procuradoria-Geral do Município | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2672-8840 |
+| **CGM** | Controladoria-Geral do Município | Alameda Dona Mariana, 91 - 25 de Agosto | (21) 2672-8845 |
+| **IPMDC** | Instituto de Previdência dos Servidores Públicos de Duque de Caxias | Rua Passos da Pátria, 120 - 25 de Agosto | (21) 2672-5700 |
+| **CONS** | Projetos Transversais / Programas Especiais | Prefeitura Municipal de Duque de Caxias | Central de Atendimento |
+
+

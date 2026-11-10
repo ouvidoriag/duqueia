@@ -241,4 +241,11 @@ A mensagem do munícipe percorre:
 ### 5. Diretrizes para Frontend e Apresentação
 * **`public/chat.html`:** Interface de atendimento humanizada com o atendente virtual do DUQUE IA. Deve utilizar os avatares disponíveis em `public/assets/` (`atendente_caxias_headset_acolhe.png`, `atendente_notebook_pensando.png`, `atendente_caxias_joinha.png`, etc.) alternando dinamicamente de acordo com o estado da conversa (acolhendo, pensando/pesquisando, respondendo).
 * **`public/dashboard.html`:** Painel de observabilidade executivo que consome `telemetry.db` através do endpoint `api/metrics`. Deve exibir métricas de latência, volume de atendimentos por secretaria, conformidade de respostas, economia de tokens e mapa de calor de demandas.
+
+### 6. Estrutura Canônica de Secretarias e Pastas Municipais
+* **SMCT (Cultura e Turismo):** Pasta dedicada aos equipamentos culturais (Teatro Raul Cortez, Biblioteca Leonel Brizola, Museu da Taquara, Centro Niemeyer).
+* **SMEL (Esporte e Lazer):** Pasta dedicada aos complexos esportivos (Vila Olímpica de Duque de Caxias, polos de artes marciais, natação e Jogos Estudantis).
+* **SMG (Secretaria Municipal de Governo):** Articulação política, relações parlamentares e governança do executivo (sem a Ouvidoria Geral).
+* **SMCSRPTER (Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral):** Integração estratégica da Ouvidoria Geral do Município (OGM / Colab / Telefones 21 2652-3835 e WhatsApp 21 99824-5903), Assessoria de Imprensa, Comunicação Institucional e Políticas de Trabalho/Empregabilidade (SINE Caxias).
+
 
