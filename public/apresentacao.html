@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DUQUE IA — Dossiê Executivo Oficial (A4 Horizontal)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── Configurações de Impressão A4 Paisagem ── */
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Barra Flutuante de Controle (Oculta na Impressão) ── */
+    .toolbar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 40px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+      color: #ffffff;
+      transition: all 0.3s ease;
+    }
+    .toolbar:hover {
+      background: rgba(15, 23, 42, 0.98);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+    }
+    .toolbar button {
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .toolbar button:hover {
+      background: #0284c7;
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+    .toolbar button.primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border-color: #38bdf8;
+    }
+    .toolbar select {
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .toolbar span.slide-counter {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* ── Contêiner Principal dos Slides ── */
+    .deck-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      padding: 30px 0 100px 0;
+      width: 100%;
+    }
+
+    /* ── Prancha A4 Paisagem (297mm x 210mm) ── */
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      padding: 11mm 13mm 9mm 13mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      flex-shrink: 0;
+    }
+
+    /* ── Estilos do Cabeçalho Institucional ── */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      height: 48px;
+    }
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brasao-badge {
+      background: #0f2b48;
+      color: #ffffff;
+      font-weight: 800;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 9.5px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      line-height: 1.15;
+      text-align: center;
+    }
+    .brand-titles h1 {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 900;
+      color: #0b2546;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
+    .brand-titles h1 span {
+      color: #0284c7;
+    }
+    .brand-titles p {
+      margin: 2px 0 0 0;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    .header-slogan {
+      border-left: 2px solid #cbd5e1;
+      padding-left: 12px;
+      font-size: 11px;
+      color: #0f172a;
+      font-weight: 600;
+      max-width: 220px;
+      line-height: 1.25;
+    }
+    .slide-tag {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #0f2b48;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    /* ── Título da Prancha ── */
+    .headline-area {
+      margin: 8px 0 10px 0;
+    }
+    .headline-area h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #092c4c;
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+    }
+    .headline-area p {
+      margin: 3px 0 0 0;
+      font-size: 10.5px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    /* ── Conteúdo Central ── */
+    .slide-body {
+      flex-grow: 1;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* ── Rodapé Institucional ── */
+    .slide-footer {
+      border-top: 2px solid #e2e8f0;
+      padding-top: 6px;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 32px;
+    }
+    .footer-pills {
+      display: flex;
+      gap: 14px;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #0369a1;
+    }
+    .footer-signature {
+      text-align: right;
+    }
+    .footer-signature .city-title {
+      font-size: 11.5px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.4px;
+      line-height: 1;
+    }
+    .footer-signature .city-motto {
+      font-size: 8px;
+      color: #64748b;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* ── Componentes de Cards e Colunas ── */
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 9px;
+      width: 100%;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 9px 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 5px;
+      margin-bottom: 6px;
+    }
+    .card-badge {
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-title-group h3 {
+      margin: 0;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.15;
+    }
+    .card-title-group span {
+      font-size: 9px;
+      font-weight: 600;
+      color: #64748b;
+    }
+    .banner-highlight {
+      background: #f0f9ff;
+      border: 1px dashed #bae6fd;
+      border-radius: 5px;
+      padding: 5px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #0369a1;
+      margin-bottom: 6px;
+    }
+
+    .sec-block {
+      margin-bottom: 5px;
+    }
+    .sec-label {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #0284c7;
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .sec-text {
+      font-size: 9px;
+      color: #334155;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .formula-tag {
+      background: #e0f2fe;
+      border: 1px solid #7dd3fc;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      color: #0369a1;
+      text-align: center;
+      margin: 4px 0;
+    }
+    .code-tag {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      color: #0f172a;
+      display: inline-block;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    /* ── Hero / Avatar 3D ── */
+    .avatar-wrapper {
+      position: absolute;
+      bottom: 25px;
+      right: 25px;
+      width: 145px;
+      pointer-events: none;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+      z-index: 10;
+    }
+    .avatar-wrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── Modo de Visualização: Slide a Slide ── */
+    body.presentation-mode .slide {
+      display: none;
+      margin: 0 auto;
+    }
+    body.presentation-mode .slide.active {
+      display: flex;
+    }
+
+    /* ── Regras de Impressão Direta em PDF ── */
+    @media print {
+      body {
+        background: transparent !important;
+      }
+      .toolbar {
+        display: none !important;
+      }
+      .deck-container {
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+      .slide {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        display: flex !important;
+        margin: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Flutuante de Controle e Apresentação -->
+  <div class="toolbar" id="toolbar">
+    <button onclick="prevSlide()" title="Slide Anterior (Seta Esquerda)">⬅ Anterior</button>
+    <span class="slide-counter" id="slideCounter">01 / 10</span>
+    <button onclick="nextSlide()" title="Próximo Slide (Seta Direita / Barra de Espaço)">Próximo ➡</button>
+    
+    <select id="slideSelect" onchange="goToSlide(parseInt(this.value))">
+      <option value="1">Prancha 01 • Capa & Visão Geral</option>
+      <option value="2">Prancha 02 • A Jornada do Munícipe</option>
+      <option value="3">Prancha 03 • Arquitetura & Grafo Cognitivo</option>
+      <option value="4">Prancha 04 • Segurança & FastGate (< 1ms)</option>
+      <option value="5">Prancha 05 • Triagem & Agente Coletor</option>
+      <option value="6">Prancha 06 • Motor de Busca Híbrido</option>
+      <option value="7">Prancha 07 • Reranking & Módulo GIS</option>
+      <option value="8">Prancha 08 • Regras POP & Ouvidoria Geral</option>
+      <option value="9">Prancha 09 • Casos Práticos Reais</option>
+      <option value="10">Prancha 10 • Métricas Auditadas & Duque 2.0</option>
+    </select>
+
+    <button onclick="toggleMode()" id="modeBtn" title="Alternar entre Slide Único ou Documento Contínuo">📑 Modo Contínuo</button>
+    <button class="primary" onclick="window.print()" title="Exportar para PDF A4 Paisagem">🖨 Imprimir / Salvar PDF</button>
+  </div>
+
+  <div class="deck-container" id="deckContainer">
+
+    <!-- ==========================================
+         PRANCHA 01: CAPA & VISÃO GERAL
+         ========================================== -->
+    <section class="slide active" id="slide-1">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 01 de 10 • Apresentação Executiva</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Transformando o atendimento ao cidadão com inteligência artificial pública, segura e factual.</h2>
+        <p>O DUQUE IA conecta mais de 900 mil caxienses aos serviços da Prefeitura 24 horas por dia, com respostas verificadas em menos de 1 segundo.</p>
+      </div>
+
+      <div class="slide-body" style="align-items: center; gap: 20px;">
+        <div style="flex: 1.2;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="card" style="border-left: 4px solid #0284c7; padding: 10px;">
+              <h4 style="margin: 0 0 3px 0; font-size: 12px; font-weight: 800; color: #0f2b48;">💬 Canais Integrados</h4>
+              <p style="margin: 0; font-size: 9.5px; color: #64748b; line-height: 1.35;">Atendimento direto pelo Web Chat oficial e WhatsApp Municipal sem exigência de cadastros burocráticos.</p>
+            </div>
+            <div class="card" style="border-left: 4px solid #16a34a; padding: 10px;">
+              <h4 style="margin: 0 0 3px 0; font-size: 12px; font-weight: 800; color: #0f2b48;">🛡 Blindagem LGPD</h4>
+              <p style="margin: 0; font-size: 9.5px; color: #64748b; line-height: 1.35;">Proteção absoluta de dados pessoais e bloqueio imediato de consultas sobre processos ou CPFs de vizinhos.</p>
+            </div>
+            <div class="card" style="border-left: 4px solid #eab308; padding: 10px;">
+              <h4 style="margin: 0 0 3px 0; font-size: 12px; font-weight: 800; color: #0f2b48;">🗺 Mapeamento GIS</h4>
+              <p style="margin: 0; font-size: 9.5px; color: #64748b; line-height: 1.35;">Conhecimento territorial dos 152 bairros e localização das 443 unidades municipais (CRAS, Postos de Saúde e Escolas).</p>
+            </div>
+            <div class="card" style="border-left: 4px solid #8b5cf6; padding: 10px;">
+              <h4 style="margin: 0 0 3px 0; font-size: 12px; font-weight: 800; color: #0f2b48;">🤝 Ouvidoria & Colab</h4>
+              <p style="margin: 0; font-size: 9.5px; color: #64748b; line-height: 1.35;">Direcionamento protocolar para o aplicativo oficial Colab e contato telefônico auditado (2652-3835).</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex: 0.8; background: linear-gradient(135deg, #0f2b48 0%, #0369a1 100%); border-radius: 10px; padding: 18px; color: #ffffff;">
+          <div style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; display: inline-block; margin-bottom: 8px;">GOVERNANÇA 4.0</div>
+          <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 800;">Eficácia Comprovada em Dados</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+            <div style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+              <b style="font-size: 18px; color: #38bdf8;">644</b><br><span style="font-size: 8.5px; color: #e0f2fe;">Serviços Oficiais</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+              <b style="font-size: 18px; color: #38bdf8;">443</b><br><span style="font-size: 8.5px; color: #e0f2fe;">Unidades Físicas</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+              <b style="font-size: 18px; color: #38bdf8;">&lt; 1s</b><br><span style="font-size: 8.5px; color: #e0f2fe;">Tempo Médio</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+              <b style="font-size: 18px; color: #38bdf8;">100%</b><br><span style="font-size: 8.5px; color: #e0f2fe;">Auditabilidade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="avatar-wrapper">
+        <img src="assets/atendente_caxias_bracos_cruzados.png" alt="Atendente Virtual DUQUE IA">
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🛡 Segurança e transparência pública</div>
+          <div>⚡ Menos de 1 segundo de resposta</div>
+          <div>🏙 Tecnologia a serviço de Duque de Caxias</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 02: A JORNADA DO MUNÍCIPE
+         ========================================== -->
+    <section class="slide" id="slide-2">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 02 de 10 • A Jornada do Munícipe</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>A jornada do munícipe: do clique da pergunta até a resposta oficial verificada.</h2>
+        <p>Acompanhe como uma dúvida trafega por 5 etapas coordenadas, sem filas e com orientação precisa para o cidadão.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-5">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Entrada & Gateway</h3><span>(Recepção Segura)</span></div></div>
+              <div class="banner-highlight">💬 WhatsApp • Web Chat</div>
+              <div class="sec-block"><div class="sec-label">👤 Munícipe Envia</div><p class="sec-text">Digita em linguagem natural sem burocracia.</p><p class="sec-text" style="font-style: italic; background: #f8fafc; padding: 4px; border-left: 2px solid #0284c7; margin: 3px 0;">"Poste tá com lâmpada queimada aqui no Pilar."</p></div>
+              <div class="sec-block"><div class="sec-label">🛡 Proteção IP</div><p class="sec-text">Limite de 30 req/min por IP e canal contínuo Pipe UTF-8.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">server.js (34-50)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>FastGate Local</h3><span>(Filtro em &lt; 1 ms)</span></div></div>
+              <div class="banner-highlight">🛡 SQLi • Injeção • LGPD</div>
+              <div class="sec-block"><div class="sec-label">⚡ Filtro Imediato</div><p class="sec-text">Expressões em memória barram em tempo zero ataques cibernéticos.</p></div>
+              <div class="sec-block"><div class="sec-label">🔒 Blindagem LGPD</div><p class="sec-text">Se pedir CPF ou processo de vizinhos, recusa na hora.</p></div>
+              <div class="sec-block"><div class="sec-label">🏛 Competência</div><p class="sec-text">Recusa imediata de assuntos federais/estaduais.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Triagem & Coletor</h3><span>(Inteligência Verbal)</span></div></div>
+              <div class="banner-highlight">🏷 3 Níveis de Análise</div>
+              <div class="sec-block"><div class="sec-label">🧭 Classificação</div><p class="sec-text">N1 (Regex), N2 (Cache SQLite em 3ms) e N3 (Classificador Semântico com IA).</p></div>
+              <div class="sec-block"><div class="sec-label">🤖 Agente Coletor</div><p class="sec-text">Faltou detalhe? Pede <b>apenas uma informação por vez</b> com empatia (bairro e ponto de referência).</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/triage.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">4</div><div class="card-title-group"><h3>Busca Híbrida & GIS</h3><span>(Verdade Factual)</span></div></div>
+              <div class="banner-highlight">📍 443 Unidades • 152 Bairros</div>
+              <div class="sec-block"><div class="sec-label">📁 Três Fontes</div><p class="sec-text">• FTS5: Carta de 644 serviços.<br>• GIS: Unidades físicas no Pilar.<br>• Vetorial 768d: 1.575 chunks de leis.</p></div>
+              <div class="sec-block"><div class="sec-label">⚖️ RRF + Reranker</div><p class="sec-text">Reordena com 60% peso semântico e 40% peso híbrido.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/retrieval.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">5</div><div class="card-title-group"><h3>Resposta & Ouvidoria</h3><span>(Entrega Auditada)</span></div></div>
+              <div class="banner-highlight">✅ Formatação em Negrito</div>
+              <div class="sec-block"><div class="sec-label">📋 Regras POP</div><p class="sec-text">Fatos em negrito e instrução para abertura no aplicativo <b>Colab</b>.</p></div>
+              <div class="sec-block"><div class="sec-label">🔒 Output Guardrail</div><p class="sec-text">Anti-alucinação ativo. Se faltar dado, entrega a Ouvidoria Geral:<br>📞 <b>(21) 2652-3835</b></p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/telemetry.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🛡 Atendimento transparente e auditável</div>
+          <div>⚡ Menos de 1 segundo de tempo de resposta</div>
+          <div>🏙 Integração direta com a plataforma Colab</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 03: ARQUITETURA & GRAFO
+         ========================================== -->
+    <section class="slide" id="slide-3">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 03 de 10 • Arquitetura & Grafo</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>A engenharia por trás do sistema: orquestração desacoplada e grafo cognitivo resiliente.</h2>
+        <p>A máquina de estados LangGraph Lite e micro-bancos isolados em modo WAL garantem que leituras massivas nunca travem gravações.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>LangGraph Lite</h3><span>(Máquina de Estados)</span></div></div>
+              <div class="banner-highlight">🧭 Grafo Cognitivo Python</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Fluxo atômico encadeado: FastGate ➡️ EntityResolver ➡️ Triagem ➡️ ToolRouter ➡️ Handler especializado.</p></div>
+              <div class="sec-block"><div class="sec-label">🛡 Resiliência</div><p class="sec-text">Se qualquer nó remoto falhar, o grafo ativa rotas de contingência sem derrubar o atendimento.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/graph.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>WorkerPool & Pipe</h3><span>(Node.js + Python)</span></div></div>
+              <div class="banner-highlight">⚡ Streaming Contínuo UTF-8</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Pool com 4 workers Python permanentemente aquecidos na memória RAM conversando por <code>stdin</code> e <code>stdout</code>.</p></div>
+              <div class="sec-block"><div class="sec-label">🚀 Ganho de Tempo</div><p class="sec-text">Economiza 1,2 segundo de inicialização por mensagem, permitindo atendimento instantâneo.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">server.js (120-153)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Micro-Bancos SQLite</h3><span>(Persistência Desacoplada)</span></div></div>
+              <div class="banner-highlight">🗄 Concorrência sem Bloqueio (WAL)</div>
+              <div class="sec-block"><div class="sec-label">📁 4 Bancos Físicos</div><p class="sec-text">• <b>main.db:</b> 644 serviços e unidades.<br>• <b>vector.db:</b> 1.575 chunks de 768d.<br>• <b>cache.db:</b> Respostas em 3ms.<br>• <b>telemetry.db:</b> Logs e métricas.</p></div>
+              <div class="sec-block"><div class="sec-label">🔒 Modo WAL</div><p class="sec-text">Leituras massivas nunca geram contenção com logs.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">storage/manager.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">4</div><div class="card-title-group"><h3>Auditoria por Nó</h3><span>(Observabilidade Total)</span></div></div>
+              <div class="banner-highlight">📊 Telemetria em Milissegundos</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Cada nó carimba sua duração em milissegundos no payload final da requisição.</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Controle Público</div><p class="sec-text">Auditoria completa de tokens, tempo e custos de cada consulta realizada na cidade.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/telemetry.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🧭 Máquina de estados desacoplada</div>
+          <div>🗄 Micro-bancos segregados com modo WAL</div>
+          <div>⚡ Resiliência total contra falhas</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 04: SEGURANÇA & GUARDRAILS
+         ========================================== -->
+    <section class="slide" id="slide-4">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 04 de 10 • Segurança & Guardrails</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>A muralha de segurança: FastGate em tempo zero, proteção da LGPD e limites de competência.</h2>
+        <p>Cancelas determinísticas in-memory (&lt; 1 ms) barram ataques cibernéticos e protegem o município contra riscos jurídicos.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge" style="background: #b91c1c;">1</div><div class="card-title-group"><h3>Anti-Injeção</h3><span>(SQLi & Jailbreak)</span></div></div>
+              <div class="banner-highlight" style="background: #fef2f2; border-color: #fecaca; color: #991b1b;">🛡 Defesa Cibernética</div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⚡ O que bloqueia</div><p class="sec-text">• SQLi: <code>DROP TABLE</code>, <code>DELETE</code>, <code>UNION SELECT</code>.<br>• Prompt Injection: <i>"esqueça suas regras"</i>, <i>"aja como Dan"</i>.</p></div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⏱ Como funciona</div><p class="sec-text">Expressões em memória barram em <b>tempo zero</b> sem gastar tokens.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge" style="background: #b91c1c;">2</div><div class="card-title-group"><h3>Blindagem LGPD</h3><span>(Dados de Terceiros)</span></div></div>
+              <div class="banner-highlight" style="background: #fef2f2; border-color: #fecaca; color: #991b1b;">🔒 Privacidade Total</div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⚡ O que bloqueia</div><p class="sec-text">• Consultas por <b>CPF de terceiros</b>.<br">• Andamento de protocolos alheios.<br">• Nomes ou dados de vizinhos.</p></div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">🏛 Resposta Padrão</div><p class="sec-text">Recusa formal protocolar amparada na Lei nº 13.709/2018 (LGPD).</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge" style="background: #b91c1c;">3</div><div class="card-title-group"><h3>Competência Estrita</h3><span>(Municipal vs Federal)</span></div></div>
+              <div class="banner-highlight" style="background: #fef2f2; border-color: #fecaca; color: #991b1b;">🏛 Escudo Institucional</div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⚡ O que bloqueia</div><p class="sec-text">• Metrô, SuperVia, Detran, Cedae.<br">• INSS, Receita Federal, BR-040.<br">• Outros municípios (Rio, Magé).</p></div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">🎯 Direcionamento</div><p class="sec-text">Informa com clareza o órgão estadual/federal competente.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge" style="background: #b91c1c;">4</div><div class="card-title-group"><h3>Emergências & Trava</h3><span>(190, 192, 199 e Civil)</span></div></div>
+              <div class="banner-highlight" style="background: #fef2f2; border-color: #fecaca; color: #991b1b;">🚨 Rotas de Vida Imediatas</div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⚡ Desvio de Risco</div><p class="sec-text">• Desabamento ➡️ <b>Defesa Civil (199)</b>.<br">• Risco de Vida ➡️ <b>SAMU (192)</b>.<br">• Crimes ➡️ <b>Polícia (190)</b>.</p></div>
+              <div class="sec-block"><div class="sec-label" style="color: #b91c1c;">⚖️ Trava Civil</div><p class="sec-text">Árvore caiu em carro? Direciona à Procuradoria sem promessas verbais.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🛡 100% em conformidade com a LGPD</div>
+          <div>⚡ Filtragem in-memory em menos de 1 ms</div>
+          <div>🏛 Proteção contra responsabilidade civil indevida</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 05: TRIAGEM & AGENTE COLETOR
+         ========================================== -->
+    <section class="slide" id="slide-5">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 05 de 10 • Triagem & Agente Coletor</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Triagem inteligente e acolhimento: compreendendo a intenção real e coletando dados sem sobrecarregar.</h2>
+        <p>Se faltar informação, o robô atua como um atendente humano experiente: faz perguntas estritamente incrementais (uma por vez).</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Triagem Níveis 1 e 2</h3><span>(Regex & Cache Local)</span></div></div>
+              <div class="banner-highlight">⚡ Resposta em até 3 ms</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Nível 1: Determinístico</div><p class="sec-text">Reconhece saudações e agradecimentos sem gastar chamadas remotas.</p></div>
+              <div class="sec-block"><div class="sec-label">🗄 Nível 2: Cache SQLite</div><p class="sec-text">Consultas frequentes (como <i>"telefone da Ouvidoria"</i>) saem do <code>cache.db</code>.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/triage.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Nível 3: Semântico</h3><span>(Classificador com IA)</span></div></div>
+              <div class="banner-highlight">🤖 Extração de Intenção</div>
+              <div class="sec-block"><div class="sec-label">🎯 O que detecta</div><p class="sec-text">• Intenção do cidadão (Saúde, Obras, Ouvidoria).<br>• Bairro mencionado.<br>• Flag <code>needs_clarification</code>.</p></div>
+              <div class="sec-block"><div class="sec-label">🧭 Memória de Turnos</div><p class="sec-text">Mantém o histórico recente para não esquecer o contexto.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/triage.py (LLM)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Agente Coletor</h3><span>(Coleta Incremental)</span></div></div>
+              <div class="banner-highlight">🤝 1 Pergunta por Vez</div>
+              <div class="sec-block"><div class="sec-label">💡 A Regra de Ouro</div><p class="sec-text"><b>NUNCA faça questionários longos.</b> Se faltar o bairro, pergunte com acolhimento:</p><p class="sec-text" style="font-style: italic; background: #eff6ff; padding: 4px; border-left: 2px solid #0284c7; margin: 3px 0;">"Estamos prontos para te ajudar! Em qual <b>bairro</b> fica o problema?"</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Turno Seguinte</div><p class="sec-text">Pede ponto de referência e direciona ao Colab.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/handlers.py (Collector)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">4</div><div class="card-title-group"><h3>Ambiguidade</h3><span>(Exemplo: Som Alto)</span></div></div>
+              <div class="banner-highlight">⚖️ Triagem Jurídica</div>
+              <div class="sec-block"><div class="sec-label">🔍 O Dilema do Barulho</div><p class="sec-text">Perturbação pode ser crime residencial ou infração de alvará de comércio.</p></div>
+              <div class="sec-block"><div class="sec-label">🧭 Desempate Seguro</div><p class="sec-text">• <b>Vizinho:</b> Sem poder de polícia domiciliar ➡️ <b>PMERJ (190)</b>.<br>• <b>Comércio / Bar:</b> Ordem Pública ➡️ <b>Colab</b>.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/handlers.py (Ambiguity)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="avatar-wrapper">
+        <img src="assets/atendente_caxias_headset_acolhe.png" alt="Agente Coletor DUQUE IA">
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🤝 Atendimento gentil e humanizado</div>
+          <div>⚡ Coleta de apenas 1 dado por vez</div>
+          <div>🎯 Zero perda de contexto durante a conversa</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 06: MOTOR DE BUSCA HÍBRIDO
+         ========================================== -->
+    <section class="slide" id="slide-6">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 06 de 10 • Motor de Busca Híbrido</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>O motor de busca híbrido: unindo a precisão das palavras exatas ao poder semântico dos vetores.</h2>
+        <p>Busca híbrida sincronizada via SQLite FTS5 e Embeddings de 768 dimensões, fundidos pelo algoritmo matemático RRF.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Busca Textual FTS5</h3><span>(Full-Text Search Relacional)</span></div></div>
+              <div class="banner-highlight">🔍 Palavras Exatas • Siglas • Leis</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Índice invertido BM25 compilado dentro do SQLite. Quando o cidadão digita <i>"IPTU"</i>, <i>"Tarifa Zero"</i> ou <i>"Lei 1.664"</i>, localiza em <b>0 milissegundos</b>.</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Vantagem Técnica</div><p class="sec-text">Totalmente imune a erros de alucinação em números de leis, prazos e telefones.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">data/db/vector.db (chunks_fts)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Busca Vetorial Semântica</h3><span>(Embeddings de 768 Dimensões)</span></div></div>
+              <div class="banner-highlight">📐 Sentido Conceitual • Sinônimos</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Transforma a frase do cidadão em um vetor de 768 números. Se ele disser <i>"rua um breu"</i>, o modelo entende como <i>"troca de lâmpada em poste"</i>.</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Vantagem Técnica</div><p class="sec-text">Compreende a linguagem do cidadão comum mesmo sem termos técnicos da Prefeitura.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">data/db/vector.db (sqlite-vec)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Fusão RRF (Juiz Matemático)</h3><span>(Reciprocal Rank Fusion)</span></div></div>
+              <div class="banner-highlight">⚖️ Unificação dos Dois Melhores Mundos</div>
+              <div class="sec-block"><div class="sec-label">⚙️ A Fórmula de Ouro</div><p class="sec-text">O RRF pontua com base no ranking relativo de cada candidato:</p><div class="formula-tag">Score RRF = ∑ 1 / (60 + Posição)</div></div>
+              <div class="sec-block"><div class="sec-label">🏆 Resultado</div><p class="sec-text">Se um documento for bem pontuado por texto e por sentido, dispara para o topo com <b>100% de precisão</b>.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/retrieval.py (rrf_fuse)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🔍 Busca em 644 serviços catalogados</div>
+          <div>📐 Embeddings L2-normalizados de 768 dimensões</div>
+          <div>⚖️ Fusão matemática RRF comprovada</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 07: RERANKING & MÓDULO GIS
+         ========================================== -->
+    <section class="slide" id="slide-7">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 07 de 10 • Reranking & Módulo GIS</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Re-ranqueamento profundo e consciência territorial: inteligência que conhece as ruas de Caxias.</h2>
+        <p>O DUQUE IA combina reavaliação minuciosa com modelo Cross-Encoder e georreferenciamento de 443 unidades físicas nos 152 bairros.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Cross-Encoder Reranker</h3><span>(Avaliador Profundo)</span></div></div>
+              <div class="banner-highlight">⚖️ Entrevista Minuciosa</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Processa a <b>pergunta e o fragmento juntos</b>, captando contextos gramaticais sutis e descartando trechos superficiais.</p><div class="formula-tag">Nota = 0.60×Cross + 0.40×Híbrido</div></div>
+              <div class="sec-block"><div class="sec-label">🎯 Eliminação de Ruído</div><p class="sec-text">Filtra candidatos irrelevantes antes do envio para o redator.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/reranker.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Resolução de Bairros (GIS)</h3><span>(Ontologia Espacial)</span></div></div>
+              <div class="banner-highlight" style="background: #f0fdf4; border-color: #bbf7d0; color: #166534;">🗺 152 Bairros • 4 Distritos</div>
+              <div class="sec-block"><div class="sec-label">⚙️ Como funciona</div><p class="sec-text">Normaliza variações de nomes populares (<i>"Pilar"</i>, <i>"Imbariê"</i>, <i>"Xerém"</i>, <i>"Lote XV"</i>) para o código oficial do distrito.</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Proximidade Real</div><p class="sec-text">Garante que o munícipe receba orientações da unidade mais perto da sua casa.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/entity_resolver.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Golden Source: 443 Unidades</h3><span>(Base Física Oficial)</span></div></div>
+              <div class="banner-highlight" style="background: #f0fdf4; border-color: #bbf7d0; color: #166534;">🏥 CRAS • Postos • Escolas • UPAs</div>
+              <div class="sec-block"><div class="sec-label">📁 Dados Cadastrados</div><p class="sec-text">• 443 unidades físicas georreferenciadas.<br>• Endereço completo e telefones oficiais.<br>• Horários e dias de funcionamento.</p></div>
+              <div class="sec-block"><div class="sec-label">⚡ Resolução em 0 ms</div><p class="sec-text">Resolução determinística instantânea com <b>100% de precisão</b>.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">data/db/main.db (unidades)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>⚖️ Re-ranqueamento calibrado com peso 60/40</div>
+          <div>🗺 Consciência de todos os 152 bairros de Caxias</div>
+          <div>🏥 443 unidades físicas auditadas e georreferenciadas</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 08: REGRAS POP & OUVIDORIA
+         ========================================== -->
+    <section class="slide" id="slide-8">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 08 de 10 • Regras POP & Ouvidoria</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Regras institucionais do POP e blindagem da Ouvidoria: rigor público em cada caractere entregue.</h2>
+        <p>A inteligência artificial é estritamente regida pelo Procedimento Operacional Padrão (POP) da Ouvidoria Geral de Duque de Caxias.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Manual do POP</h3><span>(Padrão de Atendimento)</span></div></div>
+              <div class="banner-highlight">📋 Conduta Oficial</div>
+              <div class="sec-block"><div class="sec-label">✍️ Destaque Visual</div><p class="sec-text">Fatos críticos (<b>endereços</b>, <b>telefones</b>, <b>prazos</b>, <b>documentos</b>) DEVEM estar em <b>negrito</b>.</p></div>
+              <div class="sec-block"><div class="sec-label">🚫 Sem Prolixidade</div><p class="sec-text">Proibido saudações repetidas no meio do diálogo.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/handlers.py (POP)</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Canal Oficial Colab</h3><span>(Protocolos de Zeladoria)</span></div></div>
+              <div class="banner-highlight">📲 App Oficial de Caxias</div>
+              <div class="sec-block"><div class="sec-label">🏙 Resolução</div><p class="sec-text">Orienta abertura no app <b>Colab</b> (<code>duquedecaxias.colab.re</code>) para buracos, entulho e lâmpadas apagadas.</p></div>
+              <div class="sec-block"><div class="sec-label">📸 Dica Prática</div><p class="sec-text">Instrui a anexar fotos e pontos de referência.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">config/settings.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Output Guardrail</h3><span>(Auditor Anti-Alucinação)</span></div></div>
+              <div class="banner-highlight">🔒 Inspeção de Qualidade</div>
+              <div class="sec-block"><div class="sec-label">🔍 O que confere</div><p class="sec-text">1. Resposta tem base nos dados oficiais?<br>2. Inventou telefones ou contatos?<br>3. Respeitou a LGPD?</p></div>
+              <div class="sec-block"><div class="sec-label">🎯 Zero Fake News</div><p class="sec-text">A Prefeitura nunca emite promessas que não possa cumprir.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">agent/guardrails.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">4</div><div class="card-title-group"><h3>Fallback Ouvidoria</h3><span>(Redirecionamento Humano)</span></div></div>
+              <div class="banner-highlight">🤝 Atendimento Garantido</div>
+              <div class="sec-block"><div class="sec-label">📞 Contatos Auditados</div><p class="sec-text">Se o banco não tiver o dado, entrega contatos oficiais:<br>• Telefone: <b>(21) 2652-3835</b><br>• WhatsApp: <b>(21) 99824-5903</b><br>• E-mail: <b>ouvidoria@duquedecaxias.rj.gov.br</b></p></div>
+            </div>
+            <div><div class="sec-label">📍 Código</div><span class="code-tag">config/settings.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="avatar-wrapper">
+        <img src="assets/atendente_caxias_tablet.png" alt="Ouvidoria Geral DUQUE IA">
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>📋 Padronização de atendimento POP</div>
+          <div>🔒 Verificação anti-alucinação antes do envio</div>
+          <div>🤝 Contatos diretos da Ouvidoria Geral sempre à mão</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 09: CASOS PRÁTICOS REAIS
+         ========================================== -->
+    <section class="slide" id="slide-9">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 09 de 10 • Casos Práticos Reais</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Casos práticos do dia a dia: a revolução na ponta da linha para quem vive em Duque de Caxias.</h2>
+        <p>Veja como o DUQUE IA substitui filas telefônicas e desencontros de informação por resolução instantânea e acolhedora.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Iluminação & Obras</h3><span>(Poste sem Luz no Bairro)</span></div></div>
+              <div class="banner-highlight">💡 Zeladoria Urbana</div>
+              <div class="sec-block">
+                <p class="sec-text" style="background: #fef2f2; border-left: 2px solid #ef4444; padding: 4px; margin-bottom: 3px; font-size: 8px; color: #991b1b;"><b>Antes:</b> Cidadão ligava para a Light ou gabinete sem saber quem trocava a lâmpada.</p>
+                <p class="sec-text" style="background: #f0fdf4; border-left: 2px solid #22c55e; padding: 4px; font-size: 8px; color: #166534;"><b>Com DUQUE IA:</b> Explica que é Obras, capta o bairro com o Coletor e orienta o chamado no <b>Colab</b>.</p>
+              </div>
+              <div class="sec-block"><div class="sec-label">🎯 Impacto</div><p class="sec-text">Chamado cai direto na tela da equipe técnica com fotos.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Teste</div><span class="code-tag">test_triage_fallback.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Saúde & Vacinas</h3><span>(Vacinação Infantil no Pilar)</span></div></div>
+              <div class="banner-highlight">🏥 Localização de Unidades</div>
+              <div class="sec-block">
+                <p class="sec-text" style="background: #fef2f2; border-left: 2px solid #ef4444; padding: 4px; margin-bottom: 3px; font-size: 8px; color: #991b1b;"><b>Antes:</b> Mãe ia a posto longe e descobria que a vacina estava na unidade do próprio bairro.</p>
+                <p class="sec-text" style="background: #f0fdf4; border-left: 2px solid #22c55e; padding: 4px; font-size: 8px; color: #166534;"><b>Com DUQUE IA:</b> Cruza o bairro <b>Pilar</b> e entrega o endereço da UBS mais próxima e documentos.</p>
+              </div>
+              <div class="sec-block"><div class="sec-label">🎯 Impacto</div><p class="sec-text">Zero deslocamento inútil e garantia de imunização.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Teste</div><span class="code-tag">test_entity_resolver.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Som Alto</h3><span>(Residência vs Comércio)</span></div></div>
+              <div class="banner-highlight">📢 Triagem Jurídica</div>
+              <div class="sec-block">
+                <p class="sec-text" style="background: #fef2f2; border-left: 2px solid #ef4444; padding: 4px; margin-bottom: 3px; font-size: 8px; color: #991b1b;"><b>Antes:</b> Cidadão abria chamado indevido na Prefeitura sobre festa de vizinho.</p>
+                <p class="sec-text" style="background: #f0fdf4; border-left: 2px solid #22c55e; padding: 4px; font-size: 8px; color: #166534;"><b>Com DUQUE IA:</b> Residência ➡️ <b>PMERJ (190)</b>; Comércio/Bar ➡️ <b>Ordem Urbana no Colab</b>.</p>
+              </div>
+              <div class="sec-block"><div class="sec-label">🎯 Impacto</div><p class="sec-text">Cidadão não perde tempo e órgão correto é acionado.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Teste</div><span class="code-tag">test_barulho_multiturn.py</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">4</div><div class="card-title-group"><h3>Tentativa LGPD</h3><span>(Consulta a Dados de Terceiros)</span></div></div>
+              <div class="banner-highlight">🔒 Privacidade do Munícipe</div>
+              <div class="sec-block">
+                <p class="sec-text" style="background: #fef2f2; border-left: 2px solid #ef4444; padding: 4px; margin-bottom: 3px; font-size: 8px; color: #991b1b;"><b>Antes:</b> Risco de atendente ingênuo vazar o nome de quem denunciou obra do vizinho.</p>
+                <p class="sec-text" style="background: #f0fdf4; border-left: 2px solid #22c55e; padding: 4px; font-size: 8px; color: #166534;"><b>Com DUQUE IA:</b> Trava em &lt; 1 ms: <i>"Por respeito à LGPD, não fornecemos dados de terceiros."</i></p>
+              </div>
+              <div class="sec-block"><div class="sec-label">🎯 Impacto</div><p class="sec-text">Blindagem jurídica total para a Prefeitura.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Teste</div><span class="code-tag">test_audit_regression.py</span></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>🏙 Eficiência comprovada nas ruas de Caxias</div>
+          <div>⚡ Resolução em menos de 1 segundo</div>
+          <div>🛡 Respeito absoluto às leis e ao cidadão</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- ==========================================
+         PRANCHA 10: MÉTRICAS & ROADMAP
+         ========================================== -->
+    <section class="slide" id="slide-10">
+      <header class="slide-header">
+        <div class="brand-left">
+          <div class="brasao-badge">PREFEITURA<br>DUQUE DE CAXIAS<br><span style="font-size: 7px; font-weight: 400;">UNIDOS PELO TRABALHO</span></div>
+          <div class="brand-titles"><h1>DUQUE <span>IA</span></h1><p>Assistente Virtual da Prefeitura de Duque de Caxias</p></div>
+          <div class="header-slogan">Tecnologia, segurança e inteligência a serviço da nossa cidade.</div>
+        </div>
+        <div class="slide-tag">Prancha 10 de 10 • Métricas & Roadmap</div>
+      </header>
+
+      <div class="headline-area">
+        <h2>Resultados auditados e o futuro do município: governança sustentável e o plano Duque 2.0.</h2>
+        <p>O DUQUE IA entrega eficiência com sustentabilidade fiscal: com custo quase nulo por atendimento, o sistema prepara Caxias para o futuro.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">1</div><div class="card-title-group"><h3>Métricas Reais Auditadas</h3><span>(Base do Município)</span></div></div>
+              <div class="banner-highlight">📊 Eficácia Comprovada no Banco</div>
+              <div class="sec-block">
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; display: flex; justify-content: space-between; font-size: 8.5px;"><span>Carta de Serviços:</span><b>644 serviços</b></div>
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; display: flex; justify-content: space-between; font-size: 8.5px;"><span>Unidades Cadastradas:</span><b>443 postos/CRAS</b></div>
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; display: flex; justify-content: space-between; font-size: 8.5px;"><span>Bairros Mapeados:</span><b>152 bairros</b></div>
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; display: flex; justify-content: space-between; font-size: 8.5px;"><span>Tempo Médio:</span><b>~700 ms (&lt; 1s)</b></div>
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 4px; padding: 4px 6px; margin-bottom: 3px; display: flex; justify-content: space-between; font-size: 8.5px;"><span>Custo por Consulta:</span><b>&lt; $0.0001 USD</b></div>
+              </div>
+              <div class="sec-block"><div class="sec-label">🎯 Retorno Público</div><p class="sec-text">Atende dezenas de milhares de moradores com infraestrutura leve e econômica.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Banco</div><span class="code-tag">data/db/main.db</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">2</div><div class="card-title-group"><h3>Painel do Gestor Público</h3><span>(Telemetria em Tempo Real)</span></div></div>
+              <div class="banner-highlight">🗺 Inteligência de Dados</div>
+              <div class="sec-block"><div class="sec-label">📈 Mapa de Calor</div><p class="sec-text">Registra em <code>telemetry.db</code> as dúvidas mais comuns, informando ao Prefeito e Secretários onde faltam lâmpadas ou insumos.</p></div>
+              <div class="sec-block"><div class="sec-label">🛡 Controle de Cada Centavo</div><p class="sec-text">Auditoria de tokens de IA, garantindo controle fiscal estrito do recurso público.</p></div>
+            </div>
+            <div><div class="sec-label">📍 Banco</div><span class="code-tag">data/db/telemetry.db</span></div>
+          </div>
+
+          <div class="card">
+            <div>
+              <div class="card-header"><div class="card-badge">3</div><div class="card-title-group"><h3>Roadmap: Duque 2.0</h3><span>(Os Próximos Passos)</span></div></div>
+              <div class="banner-highlight">🚀 O Futuro da Cidade</div>
+              <div class="sec-block">
+                <div style="background: #f8fafc; border-left: 2px solid #0077b6; padding: 4px 6px; margin-bottom: 4px; font-size: 8px;"><b>1. Integração com SIG Municipal:</b>Polígonos GeoJSON de lotes, quadras e IPTU territorial exato.</div>
+                <div style="background: #f8fafc; border-left: 2px solid #0077b6; padding: 4px 6px; margin-bottom: 4px; font-size: 8px;"><b>2. Atendimento por Voz (WebRTC):</b>Cidadão manda áudio no WhatsApp e recebe resposta falada.</div>
+                <div style="background: #f8fafc; border-left: 2px solid #0077b6; padding: 4px 6px; margin-bottom: 4px; font-size: 8px;"><b>3. Cluster PGVector / Supabase:</b>Transição transparente para ambientes em nuvem de hiperescala.</div>
+              </div>
+            </div>
+            <div><div class="sec-label">📍 Estratégia</div><span class="code-tag">brain/ROADMAP_SIG_DUQUE_2.0.md</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="avatar-wrapper">
+        <img src="assets/atendente_caxias_joinha.png" alt="Duque IA Pronto para o Futuro">
+      </div>
+
+      <footer class="slide-footer">
+        <div class="footer-pills">
+          <div>📊 Sustentabilidade fiscal comprovada</div>
+          <div>🗺 Inteligência de dados para decisões de governo</div>
+          <div>🚀 Duque de Caxias na vanguarda da IA pública</div>
+        </div>
+        <div class="footer-signature">
+          <div class="city-title">DUQUE DE CAXIAS</div>
+          <div class="city-motto">UMA CIDADE CADA VEZ MELHOR</div>
+        </div>
+      </footer>
+    </section>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+    let isPresentationMode = true; // Por padrão, slide a slide
+
+    function updateView() {
+      const slides = document.querySelectorAll('.slide');
+      const counter = document.getElementById('slideCounter');
+      const select = document.getElementById('slideSelect');
+      const modeBtn = document.getElementById('modeBtn');
+
+      if (isPresentationMode) {
+        document.body.classList.add('presentation-mode');
+        modeBtn.innerText = "📑 Modo Contínuo";
+        slides.forEach((s, idx) => {
+          if (idx + 1 === currentSlide) {
+            s.classList.add('active');
+          } else {
+            s.classList.remove('active');
+          }
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        document.body.classList.remove('presentation-mode');
+        modeBtn.innerText = "📺 Modo Apresentação";
+        slides.forEach(s => s.classList.add('active'));
+      }
+
+      counter.innerText = (currentSlide < 10 ? '0' : '') + currentSlide + ' / ' + totalSlides;
+      select.value = currentSlide;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateView();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateView();
+      }
+    }
+
+    function goToSlide(n) {
+      if (n >= 1 && n <= totalSlides) {
+        currentSlide = n;
+        updateView();
+      }
+    }
+
+    function toggleMode() {
+      isPresentationMode = !isPresentationMode;
+      updateView();
+    }
+
+    // Navegação por teclado
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides);
+      }
+    });
+
+    // Inicia no modo apresentação
+    updateView();
+  </script>
+</body>
+</html>

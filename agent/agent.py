@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import time
+from typing import Optional, Dict, List, Any, Tuple, Union
 
 from utils.gemini_client import GeminiClient
 from utils.db_client import execute_db, query_one
@@ -52,25 +53,53 @@ gemini_client = GeminiClient()
 
 class DuqueIAAgent:
     """Agente de Atendimento Virtual RAG Inteligente para Duque de Caxias."""
+
+    # ---------------------------------------------------------------------- #
+    # Armazenamento em memória estática de sessões e histórico (Idiomático)  #
+    # ---------------------------------------------------------------------- #
+    _history: Dict[str, List[str]] = {}
+    _session_state: Dict[str, Any] = {}
+    _model_sessions: Dict[str, str] = {}
+    _interaction_map: Dict[str, str] = {}
+
+    # ---------------------------------------------------------------------- #
+    # Tuplas de termos para checagem rápida em mensagens (Redução de Código) #
+    # ---------------------------------------------------------------------- #
+    TERMOS_OBRAS: Tuple[str, ...] = (
+        "obra", "obras", "tapa-buraco", "tapa buraco", "asfalto", "pavimentacao", "pavimentação", "buraco"
+    )
+    TERMOS_ILUMINACAO: Tuple[str, ...] = (
+        "ilumina", "iluminação", "iluminacao", "lampada", "lâmpada", "luz", "poste", "postes"
+    )
+    TERMOS_BARULHO: Tuple[str, ...] = (
+        "barulho", "som", "ruido", "ruído", "festa", "musica", "música", "algazarra"
+    )
+
+    @classmethod
+    def _contains_any(cls, text: str, terms: Tuple[str, ...]) -> bool:
+        """Verifica de forma rápida e eficiente se o texto contém algum dos termos informados."""
+        if not text:
+            return False
+        t_lower = text.lower()
+        return any(term in t_lower for term in terms)
     
-    def __init__(self, db_path: str = DATABASE_MAIN, reranker: BaseReranker = None):
-        self.db_path = db_path
-        self.db_main = DATABASE_MAIN
-        self.db_vector = DATABASE_VECTOR
-        self.db_cache = DATABASE_CACHE
-        self.db_telemetry = DATABASE_TELEMETRY
+    def __init__(self, db_path: str = DATABASE_MAIN, reranker: Optional[BaseReranker] = None) -> None:
+        self.db_path: str = db_path
+        self.db_main: str = DATABASE_MAIN
+        self.db_vector: str = DATABASE_VECTOR
+        self.db_cache: str = DATABASE_CACHE
+        self.db_telemetry: str = DATABASE_TELEMETRY
         self.storage = storage_manager
         
         # Reranker de segundo estágio: GeminiCrossEncoder em produção, NoOpReranker offline.
-        # Inicializado após self.using_real — ver linha abaixo.
-        self._reranker_override = reranker
-        self.using_real = len(gemini_client.api_keys) > 0
-        self.similarity_threshold = 0.50 if self.using_real else 0.25
-        self.gemini_client = gemini_client
+        self._reranker_override: Optional[BaseReranker] = reranker
+        self.using_real: bool = len(gemini_client.api_keys) > 0
+        self.similarity_threshold: float = 0.50 if self.using_real else 0.25
+        self.gemini_client: GeminiClient = gemini_client
         
         # Ativa Cross-Encoder real em produção; offline usa passthrough NoOp
         if self._reranker_override is not None:
-            self.reranker = self._reranker_override
+            self.reranker: BaseReranker = self._reranker_override
         elif self.using_real:
             self.reranker = GeminiCrossEncoder(
                 gemini_client=gemini_client,
@@ -82,7 +111,7 @@ class DuqueIAAgent:
             self.reranker = NoOpReranker()
         
         # Tabela de roteamento de Handlers
-        self.handlers = {
+        self.handlers: Dict[str, Any] = {
             "SECURITY_HANDLER": SecurityHandler(),
             "CONVERSATION_HANDLER": ConversationHandler(),
             "COLLECTOR_HANDLER": CollectorHandler(),
@@ -96,18 +125,11 @@ class DuqueIAAgent:
         os.makedirs(os.path.join(os.path.dirname(self.db_path), "..", "logs"), exist_ok=True)
         os.makedirs(os.path.join(os.path.dirname(self.db_path), "..", "metrics"), exist_ok=True)
         
-        if not hasattr(DuqueIAAgent, "_history"):
-            DuqueIAAgent._history = {}
-        if not hasattr(DuqueIAAgent, "_session_state"):
-            DuqueIAAgent._session_state = {}
-        if not hasattr(DuqueIAAgent, "_model_sessions"):
-            DuqueIAAgent._model_sessions = {}
-        
         # Garante a existência e validação da metadata de embeddings no vector.db
         self._initialize_and_validate_embedding_metadata()
 
 
-    def _initialize_and_validate_embedding_metadata(self):
+    def _initialize_and_validate_embedding_metadata(self) -> None:
         """Valida se o provedor e modelo de embedding gravado na DB é idêntico ao configurado no cliente."""
         if not os.path.exists(self.db_vector):
             return
@@ -141,11 +163,20 @@ class DuqueIAAgent:
                 print(f"[Info] Modelo de embedding alterado: Banco={db_model}, Cliente={current_model} (dimensões compatíveis: {current_dimension})", file=sys.stderr)
 
 
-    def log_execution_metrics(self, user_query: str, retrieval_time: float, llm_time: float, 
-                              total_time: float, similarity_score: float, tokens_usados: int, 
-                              embedding_cost: float, rewritten_query: str = None, 
-                              structured_hit: bool = False, vector_count: int = 0, 
-                              selected_sources: list = None):
+    def log_execution_metrics(
+        self,
+        user_query: str,
+        retrieval_time: float,
+        llm_time: float, 
+        total_time: float,
+        similarity_score: float,
+        tokens_usados: int, 
+        embedding_cost: float,
+        rewritten_query: Optional[str] = None, 
+        structured_hit: bool = False,
+        vector_count: int = 0, 
+        selected_sources: Optional[List[str]] = None
+    ) -> None:
         """Salva as métricas exigidas pela Fase 5 e Instrumentação em arquivos csv e log."""
         base_dir = os.path.dirname(self.db_path)
         log_path = os.path.join(base_dir, "..", "logs", "execution.log")
@@ -172,7 +203,7 @@ class DuqueIAAgent:
             f.write(f"TELEMETRIA: RETRIEVAL={retrieval_time*1000:.2f}ms | LLM={llm_time*1000:.2f}ms | TOTAL={total_time*1000:.2f}ms | SIMILARITY={similarity_score:.4f} | TOKENS={tokens_usados}\n")
             f.write("====================================================\n\n")
 
-    def gerar_esclarecimento_contextual(self, query: str, triage_info: dict) -> str:
+    def gerar_esclarecimento_contextual(self, query: str, triage_info: Dict[str, Any]) -> str:
         """Gera uma pergunta ou orientação de esclarecimento contextualizada."""
         intent = triage_info.get("intent", "RAG_GERAL")
         reason = triage_info.get("reason", "")
@@ -184,20 +215,20 @@ class DuqueIAAgent:
                 "mais detalhes sobre o que você deseja saber (ex: telefone, endereço ou informações de um serviço específico)."
             )
             
-            if "obra" in query.lower() or "obras" in query.lower():
+            if self._contains_any(query, self.TERMOS_OBRAS):
                 fallback_msg = (
                     "Você poderia me dar mais detalhes sobre qual informação de **obras** você procura?\n\n"
                     "• Se for o **telefone** ou **endereço** da Secretaria de Obras;\n"
                     "• Informações sobre o andamento de uma **obra específica**;\n"
                     "• Como solicitar manutenção ou serviços públicos (**tapa-buraco, pavimentação**)."
                 )
-            elif "ilumina" in query.lower() or "lampada" in query.lower() or "luz" in query.lower():
+            elif self._contains_any(query, self.TERMOS_ILUMINACAO):
                 fallback_msg = (
                     "Você poderia detalhar melhor sua dúvida sobre iluminação?\n\n"
                     "• Se deseja solicitar troca de lâmpada em **poste na rua**;\n"
                     "• Se é sobre falta de energia na sua **residência** (Light)."
                 )
-            elif "barulho" in query.lower() or "som" in query.lower() or "ruido" in query.lower() or "festa" in query.lower():
+            elif self._contains_any(query, self.TERMOS_BARULHO):
                 fallback_msg = (
                     "Você poderia me esclarecer se o som alto vem de uma **residência particular (como a casa de um vizinho, apartamento ou festa privada)** "
                     "ou se é de um **evento realizado em espaço público (como um show na rua ou festa em praça)**?\n\n"
@@ -276,21 +307,21 @@ class DuqueIAAgent:
             print(f"[Clarification Warning] Erro ao gerar pergunta de esclarecimento dinâmica: {e}", file=sys.stderr)
             return fallback_msg
 
-    def process_query(self, user_query: str, conversation_id: str = None, history: list = None) -> dict:
+    def process_query(self, user_query: str, conversation_id: Optional[str] = None, history: Optional[List[str]] = None) -> Dict[str, Any]:
         """Método helper de alto nível que recebe query e histórico e retorna o dicionário com a resposta."""
-        if history and conversation_id and hasattr(DuqueIAAgent, "_history"):
+        if history and conversation_id:
             DuqueIAAgent._history[conversation_id] = history
         res_str = self.respond(user_query, conversation_id=conversation_id)
         return json.loads(res_str)
 
-    def respond(self, user_query: str, use_triage: bool = None, conversation_id: str = None) -> str:
+    def respond(self, user_query: str, use_triage: Optional[bool] = None, conversation_id: Optional[str] = None) -> str:
         """Wrapper para gerenciar o estado da conversa e responder JSON com validação de Output Guardrail."""
-        context_holder = {"conversation_id": conversation_id}
+        context_holder: Dict[str, Any] = {"conversation_id": conversation_id}
         
         # Obtém o histórico conversacional anterior à execução atual
-        hist = None
+        hist: Optional[List[str]] = None
         cid = conversation_id or context_holder.get("conversation_id")
-        if cid and hasattr(DuqueIAAgent, "_history") and cid in DuqueIAAgent._history:
+        if cid and cid in DuqueIAAgent._history:
             hist = DuqueIAAgent._history[cid]
             
         res_str = self._respond_raw(user_query, use_triage, context_holder)
@@ -328,9 +359,10 @@ class DuqueIAAgent:
         except Exception:
             return res_str
 
-    def _respond_raw(self, user_query: str, use_triage: bool = None, context_holder: dict = None) -> str:
+    def _respond_raw(self, user_query: str, use_triage: Optional[bool] = None, context_holder: Optional[Dict[str, Any]] = None) -> str:
         self._last_context = ""
         start_time = time.time()
+        triage_info: Optional[Dict[str, Any]] = None
 
         if use_triage is None:
             use_triage = USE_TRIAGE_LAYER
@@ -342,8 +374,8 @@ class DuqueIAAgent:
                 context_holder["conversation_id"] = conversation_id
 
         # Extrai o histórico no início para estar sempre disponível
-        hist = None
-        if conversation_id and hasattr(DuqueIAAgent, "_history") and conversation_id in DuqueIAAgent._history:
+        hist: Optional[List[str]] = None
+        if conversation_id and conversation_id in DuqueIAAgent._history:
             hist = DuqueIAAgent._history[conversation_id]
 
         # ---------------------------------------------------------------- #
@@ -361,7 +393,7 @@ class DuqueIAAgent:
                     agent=self
                 )
                 # Registra histórico
-                if conversation_id and hasattr(DuqueIAAgent, "_history"):
+                if conversation_id:
                     prev = DuqueIAAgent._history.get(conversation_id, [])
                     ans_text = result_dict.get("answer", "")
                     DuqueIAAgent._history[conversation_id] = (
@@ -401,7 +433,7 @@ class DuqueIAAgent:
                     start_time=start_time,
                     history=hist
                 )
-                if conversation_id and hasattr(DuqueIAAgent, "_history"):
+                if conversation_id:
                     prev = DuqueIAAgent._history.get(conversation_id, [])
                     ans_text = result_dict.get("answer", "")
                     DuqueIAAgent._history[conversation_id] = (
@@ -520,7 +552,7 @@ class DuqueIAAgent:
         rag_handler = self.handlers["RAG_HANDLER"]
         
         hist = None
-        if conversation_id and hasattr(DuqueIAAgent, "_history") and conversation_id in DuqueIAAgent._history:
+        if conversation_id and conversation_id in DuqueIAAgent._history:
             hist = DuqueIAAgent._history[conversation_id]
             
         result_dict = rag_handler.execute(
@@ -533,7 +565,7 @@ class DuqueIAAgent:
         )
         
         # Registra histórico completo com pergunta e resposta formatadas
-        if conversation_id and hasattr(DuqueIAAgent, "_history"):
+        if conversation_id:
             prev = DuqueIAAgent._history.get(conversation_id, [])
             ans_text = result_dict.get("answer", "")
             DuqueIAAgent._history[conversation_id] = (

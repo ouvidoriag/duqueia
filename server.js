@@ -25,11 +25,40 @@ const MIME_TYPES = {
 };
 
 
-// ── Configuração ─────────────────────────────────────────────────────────────
-const PYTHON_PATH = process.platform === 'win32' ? 'python' : 'python3';
-const PORT = process.env.PORT || 3001;
+// ── Configuração e Resolução do Runtime Python ───────────────────────────────
+function resolvePythonInterpreter() {
+  const venvUnix = path.join(__dirname, '.venv', 'bin', 'python');
+  const venvWin = path.join(__dirname, '.venv', 'Scripts', 'python.exe');
+  if (fs.existsSync(venvWin)) return venvWin;
+  if (fs.existsSync(venvUnix)) return venvUnix;
+  return process.platform === 'win32' ? 'python' : 'python3';
+}
+
+const PYTHON_PATH = resolvePythonInterpreter();
+const PORT = process.env.PORT || 3000;
 const AGENT_PATH = path.join(__dirname, 'agent', 'main.py');
 const MAX_WORKERS = Math.max(1, parseInt(process.env.MAX_WORKERS || '4', 10));
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
+
+/**
+ * Validação de autorização para endpoints administrativos ou dados sensíveis.
+ * Aceita cabeçalho 'x-admin-key' ou 'Authorization: Bearer <key>'.
+ * Se nenhuma chave estiver configurada no .env, restringe a requisições locais (loopback).
+ */
+function isAuthorizedAdmin(req) {
+  const authHeader = req.headers['authorization'] || '';
+  const adminKeyHeader = req.headers['x-admin-key'] || '';
+
+  if (ADMIN_API_KEY) {
+    if (adminKeyHeader === ADMIN_API_KEY) return true;
+    if (authHeader.startsWith('Bearer ') && authHeader.slice(7) === ADMIN_API_KEY) return true;
+    return false;
+  }
+
+  // Fallback seguro: se não há ADMIN_API_KEY no .env, permite apenas conexões locais de loopback
+  const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
+  return clientIp === '127.0.0.1' || clientIp === '::1' || clientIp === '::ffff:127.0.0.1';
+}
 
 // ── Rate Limiter em Memória por IP ───────────────────────────────────────────
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minuto
@@ -316,8 +345,22 @@ const server = http.createServer((req, res) => {
   }
 
   // ── Reload Workers (Hot-Reload de Código Python) ───────────────────────────
-  if ((req.url === '/api/admin/reload-workers' || req.url.endsWith('/api/admin/reload-workers')) && (req.method === 'POST' || req.method === 'GET')) {
-    console.log('[WorkerPool] Reiniciando todos os workers Python para recarregar código...');
+  if (req.url === '/api/admin/reload-workers' || req.url.endsWith('/api/admin/reload-workers')) {
+    if (req.method !== 'POST') {
+      res.writeHead(405, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Método não permitido. Utilize POST para recarregar workers.' }));
+      return;
+    }
+
+    if (!isAuthorizedAdmin(req)) {
+      const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+      console.warn(`[Security] Tentativa de reload de workers não autorizada bloqueada (IP: ${clientIp}).`);
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Acesso negado. Chave administrativa necessária (x-admin-key ou requisição local).' }));
+      return;
+    }
+
+    console.log('[WorkerPool] Sinal de reinicialização autorizado recebido. Reiniciando workers Python...');
     const currentCount = workerPool.length;
     for (const w of workerPool) {
       try {
@@ -458,7 +501,16 @@ const server = http.createServer((req, res) => {
 
         const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
         const limit = parseInt(parsedUrl.searchParams.get('limit')) || 200;
-        const responseRecords = limit > 0 ? uniqueRecords.slice(-limit) : uniqueRecords;
+        const rawRecords = limit > 0 ? uniqueRecords.slice(-limit) : uniqueRecords;
+
+        // Governança e LGPD: se a requisição não for de administrador autenticado, omite o texto da query
+        const isAdmin = isAuthorizedAdmin(req);
+        const responseRecords = isAdmin
+          ? rawRecords
+          : rawRecords.map(r => ({
+              ...r,
+              query: '[PROTEGIDO - LGPD]'
+            }));
 
         res.writeHead(200, {
           'Content-Type': 'application/json; charset=utf-8',
@@ -474,12 +526,27 @@ const server = http.createServer((req, res) => {
 
 
   // ── Arquivos Estáticos ──────────────────────────────────────────────────
-  const urlPath = req.url === '/' ? '/chat.html' : req.url;
-  const filePath = path.join(__dirname, 'public', urlPath);
+  const publicRoot = path.resolve(__dirname, 'public');
+  let cleanUrl = (req.url || '/').split('?')[0];
+  if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/chat.html';
 
-  // Proteção contra path traversal: impede acesso a arquivos fora de /public
-  if (!filePath.startsWith(path.join(__dirname, 'public'))) {
-    res.writeHead(403);
+  let decodedPath = '';
+  try {
+    decodedPath = decodeURIComponent(cleanUrl);
+  } catch (_) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Requisição inválida');
+    return;
+  }
+
+  // Remove separadores iniciais para evitar interpretação como raiz absoluta
+  const sanitizedRelative = decodedPath.replace(/^[/\\]+/, '');
+  const filePath = path.resolve(publicRoot, sanitizedRelative);
+  const relFromRoot = path.relative(publicRoot, filePath);
+
+  // Proteção rigorosa contra path traversal: garante que o caminho resolvido resida estritamente dentro de /public
+  if (relFromRoot.startsWith('..') || path.isAbsolute(relFromRoot) || !filePath.startsWith(publicRoot)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Acesso Proibido');
     return;
   }

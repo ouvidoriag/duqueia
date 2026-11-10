@@ -296,7 +296,7 @@
     async function fetchData() {
       try {
         const limit = document.getElementById("limitFilter").value;
-        const res = await fetch(`/api/metrics?limit=${limit}&_t=${Date.now()}`);
+        const res = await fetch(`api/metrics?limit=${limit}&_t=${Date.now()}`);
         if (!res.ok) throw new Error("Erro na resposta do servidor");
         const data = await res.json();
         

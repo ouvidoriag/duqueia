@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DUQUE IA — Relatório Detalhado de QA e Soluções Técnicas (A4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ─── RESET E CONFIGURAÇÕES GERAIS ─── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 8.5pt;
+      line-height: 1.35;
+      color: #1e293b;
+      background-color: #334155;
+      padding: 15px 0;
+    }
+
+    /* ─── BARRA DE IMPRESSÃO FLUTUANTE (SOME NA IMPRESSÃO) ─── */
+    .no-print-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 9999;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      border-radius: 6px;
+      width: 210mm;
+      margin: 0 auto 15px auto;
+    }
+
+    .no-print-bar h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11pt;
+      font-weight: 700;
+    }
+
+    .print-btn {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      border: none;
+      padding: 7px 18px;
+      font-size: 9pt;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .print-btn:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    /* ─── CONTAINER A4 NATURAL (FLUXO CONTÍNUO COM PÁGINAS A4 FÍSICAS) ─── */
+    .document-container {
+      width: 210mm;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 12mm 15mm 15mm 15mm;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      border-radius: 2px;
+    }
+
+    /* ─── CARD DE CASO (COMPACTO ENTRE BLOCOS, SEM ESPAÇO ESTICADO) ─── */
+    .case-card {
+      background: #ffffff;
+      border: 1px solid #94a3b8;
+      border-radius: 5px;
+      margin-bottom: 11px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .case-header {
+      background: #f1f5f9;
+      border-bottom: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .case-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-badge {
+      font-size: 6.8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    .status-otima {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    .status-ajuste {
+      background: #fef9c3;
+      color: #a16207;
+      border: 1px solid #fde047;
+    }
+
+    .status-erro {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+    }
+
+    /* ─── CORPO DO CARD COM ESPAÇAMENTOS CURTOS E TEXTO COMPLETO ─── */
+    .case-body {
+      padding: 7px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px; /* Espaço bem curtinho entre as opções conforme pedido */
+    }
+
+    .block-section {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .block-section .label {
+      font-size: 6.8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 1.5px;
+    }
+
+    .label-query { color: #2563eb; }
+    .label-obs { color: #b45309; }
+    .label-root { color: #b91c1c; }
+    .label-sol { color: #15803d; }
+
+    .query-text {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 3px solid #3b82f6;
+      padding: 4px 7px;
+      border-radius: 3px;
+      font-size: 8pt;
+      font-style: italic;
+      color: #1e3a8a;
+    }
+
+    .obs-text {
+      background: #fffbeb;
+      border: 1px solid #fef3c7;
+      border-left: 3px solid #f59e0b;
+      padding: 4px 7px;
+      border-radius: 3px;
+      font-size: 8pt;
+      color: #78350f;
+    }
+
+    .root-cause-box {
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      border-left: 3px solid #ef4444;
+      padding: 4px 7px;
+      border-radius: 3px;
+      font-size: 8pt;
+      color: #7f1d1d;
+    }
+
+    .solution-box {
+      background: #f0fdf4;
+      border: 1px solid #dcfce7;
+      border-left: 3px solid #22c55e;
+      padding: 4px 7px;
+      border-radius: 3px;
+      font-size: 8pt;
+      color: #14532d;
+    }
+
+    .solution-box ul {
+      margin-left: 14px;
+      margin-top: 2px;
+    }
+
+    .solution-box li {
+      margin-bottom: 2px;
+    }
+
+    /* ─── ESPAÇO PADRONIZADO PARA ANOTAÇÃO A CANETA ─── */
+    .handwritten-notes-box {
+      margin-top: 3px;
+      padding-top: 4px;
+      border-top: 1px dashed #cbd5e1;
+    }
+
+    .handwritten-label {
+      font-size: 6.5pt;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .handwritten-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 2px 0 1px 0;
+    }
+
+    .handwritten-lines .line {
+      border-bottom: 1px dotted #94a3b8;
+      height: 5px;
+      width: 100%;
+    }
+
+    /* ─── DIRETRIZES GERAIS (ÚLTIMA PÁGINA) ─── */
+    .guidelines-page {
+      break-before: page;
+      page-break-before: always;
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 2px solid #0284c7;
+    }
+
+    .guidelines-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .guideline-item {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-size: 7.5pt;
+      line-height: 1.3;
+    }
+
+    .guideline-item h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 8.2pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    /* ─── REGULAGEM RIGOROSA DE IMPRESSÃO A4 (@media print) ─── */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .no-print-bar {
+        display: none !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm 10mm 12mm;
+      }
+
+      .document-container {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      .case-card {
+        border: 1px solid #64748b !important;
+        margin-bottom: 10px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .guidelines-page {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE IMPRESSÃO FLUTUANTE -->
+  <div class="no-print-bar">
+    <div>
+      <h3>DUQUE IA — Relatório Detalhado de QA e Soluções Técnicas</h3>
+      <p style="font-size: 8pt; color: #94a3b8;">Textos 100% integrais e detalhados • Espaçamentos compactados para economia de folha A4</p>
+    </div>
+    <button class="print-btn" onclick="window.print()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+      </svg>
+      Imprimir / Salvar em PDF (A4)
+    </button>
+  </div>
+
+  <div class="document-container">
+
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 01 — Endereço do Equipamento de Saúde Próximo à Residência</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Ola, eu moro na rua teresa no ponto final de xerém. Gostaria de saber onde eu acho a clínica da família mais próxima, para eu me cadastrar e cuidar da minha saúde."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A resposta foi muito boa a nível de orientação. Porém, seria legal se conseguíssemos fazê-la ter acesso a alguma API do Maps ou base de endereço de equipamentos, confrontando ao endereço passado pela cidadã e informar qual equipamento público mais próximo."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O módulo <code>agent/entity_resolver.py</code> possui resolução determinística por nome de equipamento e por bairro ("xerém"), mas o pipeline atual não possui um módulo de cálculo de distância espacial (cálculo de distância geográfica (cálculo geográfico de distância (Haversine) ou Roteamento)) ativo no fluxo da rota conversacional quando o cidadão informa um logradouro específico ("rua teresa") e solicita a unidade "mais próxima". O mecanismo de busca (mecanismo de busca (retriever)) recorreu ao fragmento de texto (chunk) informativo geral de Atenção Básica da Saúde em vez de filtrar as coordenadas da base <code>equipamentos.json</code>.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Geocodificação de Logradouro:</strong> Conectar o resolvedor de endereços ao índice local de logradouros de Duque de Caxias ou API ArcGIS/Nominatim para obter a latitude e longitude da Rua Teresa (Xerém).</li><li><strong>Cálculo de Proximidade (Classificação dos Mais Próximos (Classificação dos Mais Próximos (Top-K) Geográfico)):</strong> Executar cálculo de distância em linha reta (fórmula de cálculo geográfico de distância (Haversine)) contra os 443 equipamentos cadastrados (<code>data/knowledge/bancoduqueia/dados_mestres/equipamentos.json</code>), filtrando por <code>categoria == "Saúde"</code> e <code>tipo in ["UBS", "USF", "Clínica da Família"]</code>.</li><li><strong>Resposta com Georreferenciamento:</strong> Retornar a unidade número 1 mais próxima (ex: UBS Mantiquira ou USF Xerém), com endereço exato, ponto de referência e link de rota do mapa.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 02 — Fazendinha do Autista Funciona?</span>
+        <span class="status-badge status-otima">Padrão Ouro (Ótima)</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Vi que vocês tem a fazendinha do autista. Como faz para inscrever meu filho lá? Ela já está funcionando e aberta ao público neste momento?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A resposta está ótima."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Correspondência exata (match perfeito) na Camada de Governança Canônica (<code>regra_00004</code> de <code>bancoduqueia/dados_mestres/regras_negocio.json</code>). O Filtro Rápido de Segurança (Filtro Rápido (Fast Gate)) identificou a entidade única "Fazendinha do Autista" e injetou os dados auditados com 100% de confiança, sem depender de inferência estocástica do LLM.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <p style='margin-bottom: 3px;'>Manter esse padrão estruturado como padrão de referência de ouro (padrão de referência (benchmark)) para todos os equipamentos especiais do município.</p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 03 — A Casa do Autista já está Funcionando?</span>
+        <span class="status-badge status-otima">Padrão Ouro (Ótima)</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"E a casa do autista, está funcionando também?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A resposta está ótima."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">A regra canônica <code>regra_00015</code> do Bancoduqueia define explicitamente o status da obra da Casa do Autista. Além disso, a gestão de múltiplos turnos de conversa (multi-turno) (<code>rewrite_query_with_history</code>) resolveu com sucesso a partícula de continuidade <em>"E a casa..."</em>.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <p style='margin-bottom: 3px;'>Preservar o mapeamento preventivo de equipamentos em fase de obras/projeto para evitar que a IA afirme falsamente que locais em construção já atendem o público.</p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 04 — Auxiliar no Resgate de um Morador de Rua</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Encontrei um morador de rua desmaiado. Ele precisa de ajuda. Como posso ajuda-lo a prefeitura pode me auxiliar?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A resposta foi boa, porém, poderia indicar o link para buscar o CRAS mais próximo e não o de Jardim Primavera, pq não disse que o ocorrido foi em Primavera."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Especificidade Alucinada (<em>Hallucinated Specificity</em> — presunção indevida de dados não informados) na camada de recuperação de unidades. Ao buscar serviços de assistência social pós-estabilização médica, a query relacional em <code>secretaria_unidades</code> ordenou por ID padrão e retornou o CRAS Jardim Primavera (ID 1). Como o munícipe não forneceu bairro, a IA presumiu aquela unidade física em vez de tratar a ausência de localidade.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul>
+              <li><strong>Priorização Médica Incondicional:</strong> Manter como primeiro passo o alerta de emergência médica para acionamento imediato do <strong>SAMU 192</strong> (ou Bombeiros 193).</li>
+              <li><strong>Mapeamento e Geocodificação do Endereço (Lógica do Caso 01):</strong> Conectar o resolvedor de endereços ao índice cartográfico de Duque de Caxias para obter a latitude e longitude do ponto onde o morador de rua foi encontrado (logradouro, praça ou bairro).</li>
+              <li><strong>Cálculo de Proximidade (Top-K Geográfico / Haversine):</strong> Executar cálculo espacial de distância contra os equipamentos de Assistência Social da base oficial, identificando o <strong>Centro POP</strong> (unidade especializada em população em situação de rua) e o <strong>CRAS/CREAS mais próximo</strong> do local com endereço exato, telefone e rota no mapa.</li>
+              <li><strong>Triagem de Esclarecimento Contextual (Agente Coletor para Endereço Ausente):</strong> Se o munícipe não informar a localização exata, a IA é proibida de presumir um CRAS arbitrário e pergunta de forma amigável: <em>"Para localizarmos o CRAS ou a equipe de abordagem social mais próxima do local, por favor me informe a rua ou bairro onde a pessoa se encontra."</em></li>
+            </ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 05 — Como Regularizo meu Imóvel e Dou Entrada no meu RGI</span>
+        <span class="status-badge status-otima">100% Guia Oficial SMUH</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Gostaria de saber como regularizo meu imóvel com RGI!"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A capacidade de fornecer outra resposta com proximidade conceitual, achei legal! Mas devemos verificar se não temos alguma informação sobre RGI para fornecer. Embora o município não consiga regularizar todos os casos, será que não tem um caminho melhor para orientar? Verificar nos sites oficiais e documentos do Urbanismo."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O RGI (Registro Geral de Imóveis) é ato registral de competência privativa dos Cartórios de Registro de Imóveis (1º e 2º Ofícios da Comarca de Duque de Caxias), e não um serviço emitido diretamente no balcão da Prefeitura. No entanto, a Prefeitura é responsável por emitir os atos autorizativos prévios (Habite-se, Desmembramento, Certidão de Dados Cadastrais/IPTU e REURB - Regularização Fundiária pela SMUH). Como a base de dados não continha um fragmento de texto oficial (fragmento de texto (chunk)) ligando a sigla "RGI" aos pré-requisitos municipais da SMUH, o sistema deu resposta de contingência defensiva (contingência (fallback)).</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Criação de Regra Canônica com base no Guia Oficial da SMUH ("Como Regularizar o Registro do Imóvel?"):</strong></li><li><strong>Cenário 1 — O imóvel já possui matrícula no Cartório?</strong> O cidadão identifica o Cartório de RGI competente pela localização. Na Secretaria de Urbanismo e Habitação (SMUH), abre <em>processo de logradouro/informações</em> para obter a certidão com o endereço oficial completo (logradouro atual, lote, quadra, loteamento, bairro e distrito).</li><li><strong>Cenário 2 — Possui escritura de compra e venda ou outro título?</strong> O caminho é apresentar o documento diretamente ao Cartório de Registro de Imóveis para formalização perante a matrícula registral.</li><li><strong>Cenário 3 — Tem apenas a posse e busca a propriedade (Usucapião)?</strong></li><li><em>Extrajudicial:</em> Advogado + Cartório de RGI + pesquisa prévia nos arquivos da SMUH/Prefeitura sobre desapropriação, modificação ou regularização anterior.</li><li><em>Judicial:</em> Advogado ou Defensoria Pública + Poder Judiciário. A SMUH elabora a planta do imóvel e memorial descritivo <strong>gratuitamente</strong> quando solicitado via ofício da Defensoria Pública.</li><li><strong>Regularização de Benfeitorias (Construída ou a Construir):</strong></li><li><em>Benfeitoria já construída:</em> Pesquisa na SMUH, contratação de profissional habilitado para levantamento, protocolo de legalização na SMUH, pagamento de taxas, emissão da certidão de legalização e averbação no RGI.</li><li><em>Benfeitoria a construir:</em> Consulta prévia de projeto, aprovação, emissão do alvará de obras, vistoria final do Habite-se na SMUH e averbação no RGI.</li><li><strong>Endereço e Contatos Oficiais da SMUH:</strong> Al. Bartolomeu Gusmão, nº 85 - Jardim Primavera, Duque de Caxias - RJ (CEP: 25215-320) • Telefones: (21) 2773-0202 / (21) 2776-0388.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 06 — Estabelecimento que Vende Carne Fede Muito</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Tem um estabelecimnto perto da minha rua que está fedendo muito. Eles vendem carne!"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Não possui o link para o Colab. A resposta também não ficou completa. Tínhamos que explicar que é a Vigilância Sanitária que realiza essa fiscalização e que pode ser aberta uma denúncia com esse tema e o assunto correto (explicar o assunto) no sistema de Ouvidoria de Duque de Caxias pelo Colab (informar o link do serviço de Ouvidoria do Portal Cidadão)."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O classificador de triagem não encontrou a palavra-chave "açougue" (o usuário escreveu <em>"estabelecimnto... vendem carne"</em>) na Carta de Serviços, e a taxonomia do Colab não estava vinculada às regras de Vigilância Sanitária de alimentos. O handler de contingência (fallback) não injetou o link parametrizado do Colab.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Sinônimos Semânticos na Ontologia:</strong> Mapear expressamente as falas reais do cidadão (<em>"estabelecimento fedendo"</em>, <em>"comércio fedendo"</em>, <em>"vende carne fedendo"</em>, <em>"açougue fedendo"</em>, <em>"peixaria fedendo"</em>, <em>"carne estragada"</em>, <em>"mau cheiro de comércio"</em>) para a <strong>Subsecretaria de Vigilância Sanitária (SMS)</strong> e fiscalização de alimentos.</li><li><strong>Direcionamento no Colab:</strong> Instruir o munícipe com precisão:</li><li><strong>Canal:</strong> Aplicativo Colab ou Portal Cidadão — Ouvidoria Geral;</li><li><strong>Tema / Categoria:</strong> Vigilância Sanitária;</li><li><strong>Assunto:</strong> Fiscalização de Comércio de Alimentos / Condições Higiênico-Sanitárias;</li><li><strong>Link:</strong> Inserir o link oficial da Ouvidoria no Portal Cidadão.</li><li><strong>Orientações do POP:</strong> Recomendar ao cidadão anexar fotos e indicar o nome de fachada e endereço exato com ponto de referência.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 07 — Barulho em Casa de Festa Noturna (Loop de Multi-turno)</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Relato inicial de barulho excessivo.</em>  
+<em> <strong>Resposta da IA (Turno 1):</strong>  
+  Pediu esclarecimento: </em>"Poderia me informar se o local do evento é um espaço público ou se há algum servidor envolvido...?"<em>  
+</em> <strong>Pergunta do Munícipe (Turno 2):</strong>  
+  <em>"É uma casa de festas, tem uma pessoa que é um dono. Pode entrar quem pagar"</em>  
+<em> <strong>Resposta da IA (Turno 2):</strong>  
+  Repetiu exatamente o mesmo padrão de exigência: </em>"Caso esse ocorrido envolva algum órgão, servidor ou serviço da Prefeitura... poderia informar em qual unidade ou secretaria esse fato aconteceu?"*</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Ela pede complemento de informações, eu envio a ela, porém não consegue assimilar e me retorna a mesma exigência de complementação. Neste caso eu já passei todas as informações de primeira, era pra ela me responder corretamente quem é o órgão que trata e me orientando a registrar uma denúncia na polícia e que não é competência da prefeitura, pois é o correto em casa de festas noturnas."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">1. <strong>Amnésia de Slot no Grafo:</strong> O <code>COLLECTOR_HANDLER</code> e o nó <code>node_triage</code> classificaram a segunda mensagem como <code>POSSIVEL_DENUNCIA</code> isolada, repetindo a exigência de esclarecimento e ignorando que o munícipe já havia informado que se tratava de uma casa de festas particular.<br>
+          2. <strong>Viés de "Servidor Público":</strong> O handler insistiu em investigar se a ocorrência envolvia servidor público municipal, falhando ao reconhecer um comércio privado.<br>
+          3. <strong>Ausência da Regra de Segurança Pública vs Fiscalização Integrada:</strong> Falta de regra canônica orientando que perturbação do sossego e ilícitos em flagrante competem à Polícia Militar (190), enquanto as irregularidades do estabelecimento competem a Meio Ambiente (SMMA), Urbanismo (SMUU) e Superintendência de Operações (SUOP).</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul>
+              <li><strong>Perturbação do Sossego e Ilícitos Penais (190 - Polícia Militar):</strong> Informar de imediato que barulho excessivo, perturbação do sossego, desordem ou suspeita de ilícitos penais em casas noturnas e eventos em andamento são matéria de <strong>Segurança Pública</strong>, devendo ser acionada a <strong>Polícia Militar pelo 190</strong>. A Prefeitura não atua com poder de polícia penal ou contenção armada.</li>
+              <li><strong>Matriz de Fiscalização Integrada de Poluição Sonora (Meio Ambiente, SMUU e SUOP):</strong> Para apuração administrativa das irregularidades da casa de festas via Ouvidoria / Colab:
+                <ul>
+                  <li><strong>Secretaria Municipal de Meio Ambiente (SMMA):</strong> Fiscalização técnica de poluição sonora com decibelímetro, verificação dos limites legais de emissão de ruído (Decreto nº 7.620/2020) e autuação por crime ambiental. <em>(Colab: Meio Ambiente → Assunto: Fiscalização legal de poluição sonora)</em>.</li>
+                  <li><strong>Secretaria Municipal de Urbanismo (SMUU / Posturas):</strong> Fiscalização do Alvará de Localização e Funcionamento, conformidade de zoneamento, isolamento acústico obrigatório e interdição do imóvel por descumprimento do Código de Posturas.</li>
+                  <li><strong>Superintendência de Operações / Ordem Pública (SUOP):</strong> Ações ostensivas de fiscalização em bares, festas e casas noturnas, coibição do uso indevido de vias públicas/calçadas e apreensão de aparelhos de som com a Guarda Municipal.</li>
+                </ul>
+              </li>
+              <li><strong>Consolidação de Memória de Turno:</strong> Ao receber a resposta no segundo turno (<em>"É uma casa de festas, tem uma pessoa que é um dono..."</em>), encerrar perguntas redundantes e emitir a resposta definitiva sem loops.</li>
+            </ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 08 — Regularização de Situação para Profissionais Liberais</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Sou profissional liberal e quero regularizar meu estabelecimento. Quero gerar o alvará e o certificado de vigilância sanitária. Como faço?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta bem ruim. Ignorou o da Vigilância Sanitária, depois informou que não temos isso disponíveis na nossa base oficial. Depois foi lá e achou a informação do alvará da Fazenda e como solicitar. Me parece que ela não está fazendo buscas nas internet para o que não tem na nossa base. Ela precisa buscar a internet quando não encontrar e retornar com a fonte em sites oficiais. Outra coisa, tem informação sobre certificado de vigilância sanitária na nossa carta de serviços se não me engano."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">1. <strong>Diluição Semântica de Múltiplas Entidades:</strong> O prompt do munícipe uniu dois serviços distintos: Alvará (SMF) e Certificado de Vigilância Sanitária (SMS). A busca vetorial unificada focou apenas nos termos de maior frequência lexical ("alvará"), descartando os fragmentos de texto (fragmentos de dados (chunks)) da Vigilância Sanitária.  
+  2. <strong>Busca Web Desativada:</strong> O módulo de contingência (fallback) não disparou a busca web institucional porque o mecanismo de busca (retriever) encontrou fragmentos de dados (chunks) parciais da SMF com score acima do threshold de contingência (fallback) total.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Splitter de Múltiplos Serviços (Decompositor de Múltiplas Consultas (Multi-Query Decomposer)):</strong> Detectar conjunções coordenativas ("e", "além de", "também") e quebrar a consulta em duas sub-buscas: Sub-busca A: <em>Alvará para profissional liberal</em>; Sub-busca B: <em>Licenciamento/Certificado de vigilância sanitária municipal</em>.</li><li><strong>Estruturação de Resposta em 2 Blocos:</strong></li><li><strong>Bloco 1 (Fazenda - SMF):</strong> Inscrição Municipal / ISS Profissional Liberal e emissão de Alvará via Portal do Contribuinte.</li><li><strong>Bloco 2 (Saúde - Vigilância Sanitária):</strong> Licença Sanitária para estabelecimentos de saúde, estética ou serviços regulados.</li><li><strong>Busca Web Ativa:</strong> Disparar varredura em sites oficiais (web scraping) no domínio <code>duquedecaxias.rj.gov.br</code> sempre que uma das sub-queries não atingir 80% de precisão nos fragmentos internos de dados (fragmentos de dados (chunks)).</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 09 — Retirada de Animal Silvestre (Gambá no Quintal)</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Tem um gambá preso no meu quintal. Gostaria de solicitar resgate como faço?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta não foi correta. A orientação não tem link do Colab. Disse que não temos isso na base oficial, mas o Meio Ambiente se não me engano, tem esta atribuição."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">1. O termo zoológico específico "gambá" não constava no vocabulário do fragmento de texto (chunk) da Carta de Serviços (que continha termos mais gerais como "fauna silvestre" e "proteção animal").  
+  2. O template do gerador de respostas possui campos automáticos vazios (campos de preenchimento (placeholders)) que, na ausência de metadados, imprimem strings mecânicas como <em>"Não especificado na base de dados fornecida"</em>.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Expansão de Ontologia de Fauna:</strong> Incluir termos populares de fauna urbana: <code>gambá</code>, <code>sariguê</code>, <code>cobra</code>, <code>morcego</code>, <code>coruja</code>, <code>gavião</code> mapeados para <strong>Secretaria Municipal de Meio Ambiente e Proteção Animal (SMMA) / Guarda Ambiental</strong>.</li><li><strong>Fluxo de Emergência vs Manejo:</strong></li><li>Animal agressivo ou risco iminente à vida: Acionar o <strong>Corpo de Bombeiros (193)</strong> ou Defesa Civil.</li><li>Resgate / Soltura de animal silvestre sem risco imediato: Solicitar à <strong>Guarda Ambiental / SMMA</strong> ou registrar no <strong>Colab</strong> (Tema: Meio Ambiente, Assunto: Resgate de Animais Silvestres), acompanhado do link direto.</li><li><strong>Sanitização de Templates:</strong> Eliminar linhas de texto que contenham <em>"Não especificado"</em>, omitindo campos vazios para não degradar a estética da mensagem.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 10 — Múltiplas Perguntas num Único Prompt + Interface do Chat</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Tenho um ninho de marimbondos na minha rua, está colocando em risco a todos. Além disso, tmbém gostaria de retirar entulho da minha porta. Fora isso também gostaria de fazer uma pode de uma árvore que tem no meu quinta. E no final, marcar uma consulta para mim no cardiologista."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A primeira resposta ela juntou assuntos que são de temas diferentes e disse erradamente que não tem nada base. Em mesmo que não tenha na base, não busca na internet em fontes confiáveis? Respondeu corretamente sobre a consulta. Parece que a capacidade de responder múltiplas perguntas no mesmo prompt, não está bom. Além disso a organização da respostas de múltiplas questões precisa ficr melhor organizada. OBS: NÃO FUNCIONA SHIFT+ENTER NO CHAT DA IA. DEVERIA."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">1. O sistema tentou gerar um único vetor semântico de busca (vetor semântico (embedding)) para uma mensagem com 4 tópicos conflitantes (Defesa Civil, Limpeza Urbana, Meio Ambiente e Saúde), ocorrendo saturação do espaço vetorial.  
+  2. No frontend (<code>public/js/chat.js</code>), o manipulador do evento <code>keydown</code> envia a mensagem ao detectar a tecla <code>Enter</code>, sem validar se a tecla modificadora <code>e.shiftKey</code> estava pressionada.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Módulo Decompositor de Múltiplas Perguntas (Prompt Decomposer):</strong> Antes da etapa de busca e recuperação (busca de dados (retrieval)), submeter mensagens com múltiplos conectivos a uma etapa local de decomposição:</li><li>Item 1: Ninho de marimbondo em rua pública -> <strong>Defesa Civil (199) / Bombeiros (193)</strong>;</li><li>Item 2: Retirada de entulho na calçada -> <strong>Secretaria de Obras e Serviços Públicos (Colab - Remoção de Entulho)</strong>;</li><li>Item 3: Poda de árvore em quintal particular -> <strong>Secretaria de Meio Ambiente (Avaliação Técnica)</strong>;</li><li>Item 4: Consulta com cardiologista -> <strong>Atenção Básica (UBS/USF) -> SISREG</strong>.</li><li><strong>Correção de Frontend (Shift + Enter):</strong> Adicionar no código do chat:</li></ul><p style='margin-bottom: 3px;'>```javascript</p><p style='margin-bottom: 3px;'>if (e.key === 'Enter' && !e.shiftKey) {</p><p style='margin-bottom: 3px;'>e.preventDefault();</p><p style='margin-bottom: 3px;'>sendMessage();</p><p style='margin-bottom: 3px;'>}</p><p style='margin-bottom: 3px;'>```</p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 11 — Falta de Água na Rua (Concessionárias)</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Quero abrir uma demanda de falta de água na minha rua. Como posso fazer?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta errada. Temos agora contato com a Águas do Rio, então essas demandas podem ser abertas pelo Colab com tema da Águas do Rio em Ouvidoria, ou então procurar os canais próprios da Água do Rio (a IA pode buscar na internet em fontes oficiais e responder corretamente). Também temos da Light e da Enel, então é bom ajustar estes contextos também."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">A base de conhecimento interna continha dados desatualizados anteriores à concessão do saneamento básico na Baixada Fluminense, citando a estatal antiga (CEDAE). O sistema não continha o cadastro da concessionária atual (<strong>Águas do Rio</strong>) nem da integração que a Ouvidoria Geral realiza pelo Colab.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Atualização Cadastral de Concessionárias:</strong></li><li><strong>Água e Esgoto:</strong> <strong>Águas do Rio</strong> (Telefone/WhatsApp: 0800 195 0 195).</li><li><strong>Energia Elétrica:</strong> <strong>Light</strong> (0800 021 0196) para os distritos atendidos ou <strong>Enel</strong> se aplicável.</li><li><strong>Duplo Canal de Resolução:</strong></li><li><strong>Canal Direto da Concessionária:</strong> Para religamento emergencial e vazamentos na rede pública.</li><li><strong>Canal da Ouvidoria Geral no Colab:</strong> Se a concessionária não resolver ou houver descumprimento reiterado, o munícipe pode abrir uma manifestação no Colab no tema <strong>"Ouvidoria - Concessionárias de Serviços Públicos"</strong> para intermediação e fiscalização do município.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 12 — Poda de Árvore em Local Particular</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Solicitação de avaliação para poda/corte de árvore em quintal com risco de queda.</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta correta, porém, não precisa recomendar entrar em contato com a secretaria para perguntar os documentos, uma vez que o cidadão já irá comparecer presencialmente para solicitar a poda."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O gerador de respostas aplica uma heurística de preenchimento que orienta o munícipe a "ligar para checar documentos" sempre que a tabela oficial não lista uma relação exaustiva de certidões.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <p style='margin-bottom: 3px;'>Ajustar a diretriz do Instrução Mestra do Sistema (System Prompt): Se a orientação principal for o comparecimento presencial na sede da Secretaria, orientar diretamente o kit básico documental padrão do cidadão (<strong>Documento de identidade com foto, CPF e comprovante de residência ou posse do imóvel</strong>) e eliminar frases de contato preliminar redundante.</p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 13 — Emergência em Ortopedia e Referência no Município</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Quebrei o pé e moro em Jardim Primavera, Duque de Caxias. Gostaria de saber qual é o hospital de referência em ortopedia mais próximo onde posso procurar atendimento."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"A resposta foi incorreta. Não podemos abordar somente sobre hospital de referência numa emergência médica. Precisamos recomendar a ida para o hospital de trauma mais próximo, que no nosso caso a referência é o Adão Pereira Nunes. Abordar sobre o programa Chegaram os Especialistas está errado."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Erro gravíssimo de classificação de contexto médico. A palavra "ortopedia" encontrou correspondência com a especialidade médica do programa eletivo <em>"Chegaram os Especialistas"</em>. O sistema falhou ao reconhecer o gatilho de trauma agudo (<em>"Quebrei o pé"</em>) e não acionou o protocolo de emergência hospitalar de urgência.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Barreira de Segurança de Entrada para Trauma e Emergência (Barreira de Segurança de Entrada (Input Guardrail)):</strong> Detectar expressões de trauma ortopédico imediato: <code>quebrei</code>, <code>fratura</code>, <code>osso quebrado</code>, <code>torção grave</code>, <code>trauma</code>.</li><li><strong>Bloqueio do SISREG Eletivo:</strong> Nesses casos, proibir sumariamente menções a programas de agendamento ambulatorial (<em>"Chegaram os Especialistas"</em> ou regulação ambulatorial).</li><li><strong>Direcionamento Hospitalar de Referência:</strong></li><li><strong>Hospital Municipal Dr. Moacyr Rodrigues do Carmo (HMMRC)</strong>;</li><li><strong>Hospital Estadual/Municipal Adão Pereira Nunes (Saracuruna)</strong> — referência regional de trauma e cirurgia ortopédica;</li><li><strong>UPHs e UPAs:</strong> Como portas de primeiro socorro para imobilização provisória e encaminhamento via ambulância.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 14 — Reparo de Canteiro Danificado</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Como solicitar o conserto de um canteiro danificado na calçada da rua.</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta errada. Deveria recomendar o comparecimento à Secretaria de Obras e Agricultura ou abrir uma reclamação no Colab com o tema de Obras e assunto correto. Colocar o link do Portal Cidadão."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">A palavra "canteiro" não encontrou correspondência na tabela de serviços estruturados da SMOA, gerando uma pontuação fraca no RAG e uma resposta aproximada sem links funcionais.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Mapeamento de Sinônimos de Vias e Logradouros:</strong> Vincular <code>canteiro</code>, <code>calçada pública</code>, <code>meio-fio</code>, <code>guia</code>, <code>praça pública</code> à <strong>Secretaria Municipal de Obras e Agricultura (SMOA)</strong>.</li><li><strong>Taxonomia no Colab:</strong> Indicar a categoria exata: <strong>Obras e Infraestrutura -> Reparo de Vias / Canteiros Públicos</strong>, fornecendo o link direto do Portal Cidadão.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 15 — Alvará de Funcionamento para Templo Religioso</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Templo religioso sem alvará: a Prefeitura pode interditar sumariamente? Quais licenças são necessárias e quais etapas administrativas existem?</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta errada. Alvará precisa ser dado pela Fazenda e isso tem nas nossas regras. Existe o Portal do Contribuinte. Precisamos verificar onde no Portal do Contribuinte se consegue o alvará e quais as devidas instruções. Ela não respondeu todas as questões perguntadas. Verificar se tem algum site oficial ou fonte confiável que tenha essas informações."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Consulta complexa e jurídica com múltiplos questionamentos. A IA não encontrou um fragmento de texto oficial (fragmento de texto (chunk)) com o termo exato "templo religioso" e assumiu postura de recusa completa em vez de decompor as premissas urbanísticas e tributárias gerais.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Regra de Alvará para Templos e Imunidade:</strong></li><li>Templos possuem <strong>imunidade tributária</strong> quanto a impostos sobre patrimônio e renda (Art. 150, VI, 'b' da CF), mas <strong>estão sujeitos ao poder de polícia administrativo</strong> da Prefeitura (Alvará de Localização e Funcionamento, Habite-se da SMUH e Certificado do CBMERJ).</li><li><strong>Procedimento de Alvará:</strong> Solicitação via <strong>Portal do Contribuinte (SMF)</strong>, com envio do Estatuto Social, CNPJ, Ata de Eleição da Diretoria e laudo do Corpo de Bombeiros.</li><li><strong>Processo Administrativo de Fiscalização:</strong> A Prefeitura não determina interdição sumária sem motivo grave de segurança: primeiro ocorre a <strong>Notificação Preliminar / Auto de Infração</strong>, concede-se prazo legal para defesa e regularização, e somente em caso de descumprimento ou risco iminente à integridade física dos fiéis ocorre a interdição.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 16 — Recurso e Defesa para Multas</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Recebi uma multa que considero indevida, mas não sei qual órgão municipal a aplicou. Como posso identificar o órgão responsável, consultar o processo administrativo e apresentar defesa ou recurso dentro do prazo?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta errada. Tem diferentes demandas na mesma questão. O órgão responsável no município por tratar isso é a JARI na Segurança Pública. Para consultar o processo administrativo precisa entrar em contato com o órgão e verificar qual caminho correto."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box"><strong>Falso Positivo Severo no Barreira de Proteção Jurídica (Guardrail) (<code>LEGAL_TRIGGERS</code>).</strong> O sistema de segurança interceptou a combinação das palavras "defesa", "recurso" e "multa" e interpretou que o usuário estava pedindo para a IA escrever uma petição de recurso judicial contra o município, quando na realidade tratava-se de uma simples dúvida sobre o rito administrativo e o órgão competente.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Refinamento do Barreira de Proteção Jurídica (Guardrail):</strong> O bloqueio deve atuar apenas se o usuário solicitar redação de petição (ex: <em>"Escreva uma petição de defesa"</em>, <em>"redija um recurso para anular minha multa"</em>). Dúvidas sobre <em>onde protocolar</em> ou <em>qual o prazo</em> devem ser liberadas normalmente.</li><li><strong>Roteamento para a JARI:</strong></li><li><strong>Órgão Responsável:</strong> <strong>JARI (Junta Administrativa de Recursos de Infrações)</strong>, vinculada à Secretaria Municipal de Segurança Pública e Transportes;</li><li><strong>Consulta de Processo:</strong> Setor de Protocolo Geral da Prefeitura ou sede da Secretaria de Transportes;</li><li><strong>Procedimento:</strong> Apresentação do formulário de recurso no prazo de 30 dias contados da notificação, anexando cópia da notificação, CNH, CRLV do veículo e provas documentais.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 17 — Diferença entre Pedido de Informação (e-SIC) e Manifestações (Ouvidoria)</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Quero saber quantos médicos estão lotados no posto e reclamar que não tem atendimento. Faço solicitação única ou separada?</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta não foi legal. Precisava diferenciar o pedido de informação de manifestações e mandar os links separados do e-SIC e do serviço de Ouvidoria do Colab para o cidadão cadastrar as demandas. Não orientou direito e não forneceu os links corretos."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">A IA acertou a lógica jurídica da Lei de Acesso à Informação (Lei 12.527) versus Lei da Ouvidoria (Lei 13.460), mas o template de resposta não possuía a injeção programática dos dois hiperlinks oficiais correspondentes.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Estruturação Prática em 2 Canais Distintos:</strong></li><li><strong>Canal 1: Pedido de Informação Pública (e-SIC / LAI):</strong> Para consultar dados estatísticos e quadro de servidores lotados -> Fornecer o link do <strong>e-SIC da Prefeitura de Duque de Caxias</strong> (<code>duquedecaxias.rj.gov.br/e-sic</code>).</li><li><strong>Canal 2: Reclamação / Ouvidoria:</strong> Para relatar a ausência de médicos no plantão do dia -> Fornecer o link do <strong>Colab (Módulo Ouvidoria)</strong>, tipo <em>Reclamação</em>.</li><li><strong>Instrução Resolutiva:</strong> Explicar expressamente que <strong>não devem ser feitas no mesmo protocolo</strong>, pois tramitam em sistemas e com prazos legais diferentes (20 dias para o e-SIC e 30 dias para a Ouvidoria).</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 18 — Um Amigo Quer Emagrecer</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"um amigo meu quer emagrecer, qual secretaria ele procura?"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta errada. Existe informação nos sites oficiais sobre emagrecimento. Inclusive na carta de serviços da Saúde tem sobre nutrição e outras questões que podem ajudar a orientar o cidadão qual unidade ele pode procurar. Parece que ela não está conseguindo concatenar os dados disponíveis e usar como fonte de conhecimento da forma correta."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">A gíria/termo popular "emagrecer" não encontrou correspondência direta (match) nos serviços formais de saúde (catalogados como "Consulta em Nutrição", "Acompanhamento de Doenças Crônicas" ou "Hiperdia"). Com score nulo, o RAG preencheu os campos de contexto (slots) do prompt com os fragmentos de texto residuais (fragmentos de dados (chunks)) de maior peso estrutural da base (PGM e FUNDEC).</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Sinônimos Clínicos:</strong> Mapear <code>emagrecer</code>, <code>perder peso</code>, <code>dieta</code>, <code>obesidade</code>, <code>nutricionista</code> para a rede de <strong>Atenção Primária da Secretaria Municipal de Saúde (SMS)</strong>.</li><li><strong>Porta de Entrada no SUS:</strong> O munícipe não vai direto a um serviço especializado de emagrecimento; ele deve comparecer à sua <strong>UBS ou USF (Clínica da Família)</strong> de referência para uma consulta com o Clínico Geral, que fará a avaliação e o encaminhamento para o serviço de <strong>Nutrição</strong> ou programas de saúde preventiva.</li><li><strong>Trava Anti-Alucinação:</strong> Se os fragmentos de dados (chunks) recuperados não tiverem relação semântica com saúde, suprimi-los imediatamente da resposta.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 19 — Falta de Iluminação Pública na Rua (Zeladoria vs Ouvidoria)</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Relato de lâmpada queimada na rua gerando escuridão e medo de assaltos em idosos.</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta incorreta. Ela deu recomendação para abrir pela Ouvidoria, uma demanda que é para ser solicitada em Zeladoria. É importante que a IA consiga diferenciar essas situações, pois ela tem acesso a essas informações. Precisa colocar o link certo para abertura na Zeladoria e informar a categoria correta."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Como a mensagem mencionava "assaltos", "violência" e "medo", o nó de triagem considerou o aspecto de segurança pública e direcionou o atendimento para a Ouvidoria Geral, em vez de isolar o fato gerador que era a <strong>troca de lâmpada queimada (Zeladoria Urbana)</strong>.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Isolamento do Fato Gerador Primário:</strong> Se a causa-raiz for poste apagado ou lâmpada queimada, a rota prioritária é sempre <strong>Zeladoria Urbana</strong>.</li><li><strong>Indicação Exata no Colab:</strong></li><li><strong>Módulo / Aba:</strong> Zeladoria Urbana;</li><li><strong>Categoria:</strong> Iluminação Pública;</li><li><strong>Assunto:</strong> Lâmpada Queimada / Manutenção de Iluminação LED;</li><li><strong>Link:</strong> Inserir o link direto do Colab para iluminação.</li><li><strong>Quando usar a Ouvidoria:</strong> Esclarecer que a Ouvidoria Geral só deve ser acionada caso o pedido de zeladoria já tenha sido aberto e o prazo legal de atendimento tenha expirado.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 20 — Demora na Marcação de Consulta (Ajuste de Tom Institucional)</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Reclamação de demora extrema para marcação de especialista para a mãe.</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta correta, porém, precisa ajustar essa mensagem final. O trecho sublinhado em vermelho pode sair. Pode ser que isso instigue o cidadão a criar problemas na regulação."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O LLM tentou adotar um tom de suporte empático ("defesa enfática dos interesses do cidadão (advocacy)"), mas acabou sugerindo uma postura combativa e de desconfiança contra a recepção do posto de saúde, criando risco de atrito interpessoal nas unidades municipais.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Ajuste de Tom no Instrução Mestra do Sistema (System Prompt):</strong> Estabelecer uma regra mandatória de neutralidade institucional e cooperação com as equipes de atendimento público.</li><li><strong>Substituição da Frase de Fechamento:</strong> Substituir o trecho por:</li></ul><p style='margin-bottom: 3px;'><em>"Ao comparecer à unidade, solicite o número do comprovante de inserção do pedido no SISREG. Com esse número em mãos, você poderá acompanhar o andamento da regulação nos canais oficiais de saúde do município com total transparência."</em></p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 21 — Denúncia de Conduta Irregular de Funcionário</span>
+        <span class="status-badge status-erro">Correção Necessária</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Quero denunciar um funcionário fantasma, ele nunca aparece na unidade pra trabalhar, em horário de expediente... Não tenho registro, mas posso informar o nome e a unidade onde ele deveria trabalhar."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta sem sentido. Não foi citado o órgão e ela inferiu sem fundamentação que estava falando sobre a Secretaria de Gestão Inclusão e Mulher e Secretaria de Saúde. Deu endereço das secretarias de forma incorreta também. A resposta certa seria indicar abrir demanda pelo canal de Ouvidoria no Colab (fornecendo o link do Portal Cidadão do serviço de Ouvidoria), no tipo denúncia."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Como a base de dados não continha um fragmento de texto oficial (fragmento de texto (chunk)) denominado <em>"funcionário fantasma"</em>, o mecanismo de busca (retriever) vetorial fez busca de alta aproximação por termos administrativos gerais e recuperou fragmentos aleatórios da SMGIM e SMS. O gerador de respostas tentou forçar uma amarração lógica inexistente em vez de direcionar para o canal geral de integridade.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Regra de Denúncia de Conduta de Servidor:</strong> Qualquer relato envolvendo funcionário fantasma, prevaricação, assédio, ausência de plantão ou irregularidade administrativa de servidores públicos deve ser encaminhado obrigatoriamente para a <strong>Ouvidoria Geral do Município / Controladoria Geral (CGM)</strong>.</li><li><strong>Canal do Colab:</strong> Enviar o link direto do serviço de Ouvidoria no Portal Cidadão, orientando a selecionar o tipo <strong>Denúncia</strong>.</li><li><strong>Segurança Jurídica:</strong> Ressaltar a garantia de sigilo de identidade do denunciante conforme a Lei Federal nº 13.460/2017 e orientar o munícipe a fornecer o maior número possível de dados (nome completo, lotação e fatos observados).</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 22 — Assistência por Casa Destruída por Chuva</span>
+        <span class="status-badge status-ajuste">Ajuste / Refinamento</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>Solicitação de auxílio emergencial para famílias com casas destruídas ou danificadas pela chuva.</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta mediana. Poderia sugerir verificar na listagem dos CRAS, identificar o mais próximo da região dela e comparecer para solicitar ajuda."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">O banco de dados relacional associa o serviço "Auxílio em Calamidades" diretamente à sede da SMASDH, sem desdobrar que o atendimento operacional territorial à população atingida é feito pela <strong>rede descentralizada de CRAS</strong> e pelos postos da Defesa Civil nos bairros.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <ul><li><strong>Descentralização do Atendimento Social:</strong> Em situações de perda de moradia por chuva ou enchente, instruir que a solicitação de Aluguel Social, Cesta Básica Emergencial e acolhimento provisório é feita no <strong>CRAS de referência territorial do bairro</strong>.</li><li><strong>Lista Completa dos CRAS:</strong> Fornecer o link ou a lista estruturada das unidades de CRAS dos 4 distritos para que o cidadão localize o mais perto de sua residência.</li><li><strong>Emergência Imediata:</strong> Se o local ainda estiver sob risco de novos deslizamentos ou desabamentos, reforçar o acionamento imediato da <strong>Defesa Civil pelo 199</strong>.</li></ul>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">Caso 23 — Diferenças entre Secretaria de Obras e Secretaria de Urbanismo</span>
+        <span class="status-badge status-otima">Padrão Ouro (Ótima)</span>
+      </div>
+      <div class="case-body">
+        <div class="block-section">
+          <span class="label label-query">🗣️ Pergunta do Munícipe</span>
+          <div class="query-text"><em>"Qual a diferença entre a secretaria de obras e a secretaria de urbanismo? Liste exemplos de serviços de cada uma delas para exemplificar a diferença de escopo"</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-obs">👁️ Observação da Avaliação</span>
+          <div class="obs-text"><em>"Resposta está boa."</em></div>
+        </div>
+        <div class="block-section">
+          <span class="label label-root">🔍 Por que a IA respondeu assim? (Causa Raiz no Pipeline)</span>
+          <div class="root-cause-box">Correspondência integral (match completo) com a regra de ontologia municipal <code>regra_canon_smoa_vs_smuh</code> cadastrada na governança do sistema.</div>
+        </div>
+        <div class="block-section">
+          <span class="label label-sol">💡 Solução Técnica Recomendada</span>
+          <div class="solution-box">
+            <p style='margin-bottom: 3px;'>Manter e adotar este formato comparativo como modelo para outras secretarias de fronteira de competência próxima (ex: Meio Ambiente vs Serviços Públicos).</p>
+          </div>
+        </div>
+        <!-- ÁREA PARA ANOTAÇÕES MANUAIS (CANETA) -->
+        <div class="handwritten-notes-box">
+          <span class="handwritten-label">✍️ Anotações / Observações Manuais:</span>
+          <div class="handwritten-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PÁGINA FINAL: 12 DIRETRIZES GERAIS DE MELHORIA -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="guidelines-page">
+      <h2 style="font-family: 'Outfit', sans-serif; font-size: 12pt; color: #0f172a; border-bottom: 2px solid #0284c7; padding-bottom: 3px; margin-bottom: 6px;">
+        Plano de Ação: 12 Diretrizes Gerais de Melhoria da Duque IA
+      </h2>
+      <div class="guidelines-grid">
+        <div class="guideline-item">
+          <h4><span>1.</span> Busca Exaustiva na Base</h4>
+          Reduzir limiar mínimo de corte antes de emitir resposta de "não há informação" e utilizar expansão de sinônimos na ontologia para termos populares.
+        </div>
+        <div class="guideline-item">
+          <h4><span>2.</span> Fontes Externas Oficiais</h4>
+          Ativar varredura de contingência em sites oficiais (varredura em sites oficiais (web scraping)) restrito a <code>site:duquedecaxias.rj.gov.br</code> quando a base interna for omissa.
+        </div>
+        <div class="guideline-item">
+          <h4><span>3.</span> Taxonomia Rigorosa</h4>
+          Diferenciar categoricamente Zeladoria (serviço primário), Ouvidoria (reclamações/denúncias), e-SIC (LAI) e competências externas (190/193).
+        </div>
+        <div class="guideline-item">
+          <h4><span>4.</span> Direcionamento Fundamentado</h4>
+          Eliminar inferências aleatórias. Se a consulta for genérica, direcionar para a Ouvidoria Geral em vez de atribuir uma pasta setorial arbitrária.
+        </div>
+        <div class="guideline-item">
+          <h4><span>5.</span> Links Parametrizados</h4>
+          Fornecer hiperlinks funcionais do Colab, Portal Cidadão e Portal do Contribuinte, especificando o Tema e o Assunto que o munícipe deve selecionar.
+        </div>
+        <div class="guideline-item">
+          <h4><span>6.</span> Memória de Multi-Turno</h4>
+          Armazenar dados contextuais preenchidos (campos de contexto (slots)) no estado da conversa (AgentState) para evitar repetição de perguntas já respondidas pelo munícipe.
+        </div>
+        <div class="guideline-item">
+          <h4><span>7.</span> Analisador de Múltiplas Intenções (Multi-Intent Parser)</h4>
+          Decompor prompts com múltiplos pedidos (ex: alvará + vigilância) em sub-queries independentes, estruturando a resposta em tópicos numerados.
+        </div>
+        <div class="guideline-item">
+          <h4><span>8.</span> Concatenação Multiconta</h4>
+          Permitir que fragmentos de dados (chunks) de secretarias distintas convivam no contexto final do LLM sem truncamento prematuro no RRF.
+        </div>
+        <div class="guideline-item">
+          <h4><span>9.</span> Respostas Resolutivas</h4>
+          Padronizar o formato: <strong>O que é</strong>, <strong>Onde fazer</strong>, <strong>Como fazer</strong>, <strong>Documentos</strong> e <strong>Prazos</strong> com dados destacados em negrito.
+        </div>
+        <div class="guideline-item">
+          <h4><span>10.</span> Higienização de Textos</h4>
+          Suprimir frases redundantes (ex: *"não especificado"*) e remover orientações combativas que possam criar atrito nos postos municipais.
+        </div>
+        <div class="guideline-item">
+          <h4><span>11.</span> Motor Geoespacial Classificação dos Mais Próximos (Top-K)</h4>
+          Integrar o cálculo de proximidade por coordenadas aos 443 equipamentos públicos cadastrados para indicar a unidade física mais perto da residência.
+        </div>
+        <div class="guideline-item">
+          <h4><span>12.</span> Usabilidade & Estética</h4>
+          Habilitar <code>Shift + Enter</code> para quebra de parágrafo no chat web e adotar hierarquia visual limpa e padronizada com emoticons institucionais.
+        </div>
+      </div>
+
+      <!-- Bloco de Assinaturas e Homologação na última folha -->
+      <div style="margin-top: 15px; border-top: 1px dashed #cbd5e1; padding-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="text-align: center;">
+          <div style="border-bottom: 1px solid #475569; width: 80%; margin: 20px auto 3px auto;"></div>
+          <span style="font-size: 7.5pt; font-weight: 700; color: #334155; text-transform: uppercase;">Responsável pela Avaliação de QA</span>
+        </div>
+        <div style="text-align: center;">
+          <div style="border-bottom: 1px solid #475569; width: 80%; margin: 20px auto 3px auto;"></div>
+          <span style="font-size: 7.5pt; font-weight: 700; color: #334155; text-transform: uppercase;">Ouvidoria Geral do Município</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

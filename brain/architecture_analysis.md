@@ -118,8 +118,8 @@ O **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) de nível em
 
 ### 2.2 Fluxo de Gerador de Embeddings (`ingestion/embed/`)
 - **Módulo**: `ingestion/embed/core.py` e `ingestion/embed/main.py`.
-- **Modelo de Embedding**: `gemini-embedding-2` (768 dimensões com normalização L2).
-- **Armazenamento**: Tabela `duque_ia_chunks` e índices vetoriais em `database/vector.db` (`sqlite-vec`).
+- **Modelo de Embedding**: `gemini-embedding-2` (3.072 dimensões com normalização L2 e suporte a hash determinístico local em modo offline).
+- **Armazenamento**: Tabela `duque_ia_chunks` e índices vetoriais em `database/vector.db` (`sqlite-vec` / SQLite blob).
 - **Estratégia de Chunking**: Chunking contextualizado com prefixo hierárquico (`[Documento: X | Seção: Y]`).
 
 ### 2.3 Fluxo de Retrieval e Reranking (`agent/retrieval.py` e `agent/reranker.py`)

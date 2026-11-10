@@ -258,7 +258,7 @@ class CollectorHandler(BaseHandler):
             is_servidor_misconduct = (
                 any(re.search(pat, effective_lower) for pat, _, _ in POSSIVEL_DENUNCIA_FAST_PATTERNS) or
                 any(w in effective_lower for w in ["servidor", "funcionário", "funcionario", "atendente", "médico", "medico", "guarda", "posto de saúde", "secretaria", "prefeitura", "mau atendimento", "mal atendido", "grosseria", "xing"])
-            ) and not any(w in effective_lower for w in ["som alto", "barulho", "comércio", "comercio", "estabelecimento", "obra", "buraco", "lixo", "iluminação"])
+            ) and not any(w in effective_lower for w in ["som alto", "barulho", "comércio", "comercio", "estabelecimento", "obra", "buraco", "lixo", "iluminação", "festa", "festas", "casa de festa", "casa de festas", "evento", "boate", "clube", "rua", "música", "musica"])
 
             if is_servidor_misconduct:
                 if agent.using_real:
@@ -317,6 +317,12 @@ class CollectorHandler(BaseHandler):
         else:
             tipo = triage_info.get("tipo_manifestacao", "geral")
         
+        # Se for relato de poluição sonora, barulho, evento ou casa de festas, delega diretamente ao RagHandler
+        # para aplicar a regra canônica oficial (190 PMERJ + fiscalização SMMA/SMUH/SUOP), evitando loops de perguntas.
+        if any(w in effective_lower for w in ["casa de festas", "casa de festa", "som alto", "barulho", "poluicao sonora", "poluição sonora", "festa noturna"]):
+            rag_h = RagHandler()
+            return rag_h.execute(query=query, triage_info=triage_info, agent=agent, conversation_id=conversation_id, start_time=start_time, history=history)
+
         if triage_info.get("needs_clarification"):
             answer = agent.gerar_esclarecimento_contextual(effective_query, triage_info)
             return {
@@ -386,7 +392,8 @@ class CollectorHandler(BaseHandler):
                 "   CRÍTICO: Sugira temas/categorias oficiais e reais. Nunca invente órgãos ou temas inexistentes.\n"
                 f"2. Informe os canais da Ouvidoria Geral como alternativa: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}** e e-mail **{OUVIDORIA_CONTACTS['email']}**.\n"
                 f"3. Dica rápida: oriente-o a ter em mãos a foto/vídeo e o endereço correto para o registro no Colab ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']})).\n"
-                "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento. NÃO faça perguntas desnecessárias se a demanda já estiver clara."
+                "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento. NÃO faça perguntas desnecessárias se a demanda já estiver clara.\n"
+                "5. **Distinção entre Pedido de Informação (e-SIC / LAI) e Reclamação (Ouvidoria)**: Se o cidadão perguntar se deve fazer solicitação única ou separada para obter dados/estatísticas públicas (ex: quantos médicos trabalham no posto) e reclamar de atendimento, oriente expressamente que DEVEM ser feitas em solicitações SEPARADAS: 1) O pedido de informação tramita pelo portal do **e-SIC da Prefeitura** (`https://duquedecaxias.rj.gov.br/e-sic`) com prazo de até 20 dias; 2) A reclamação sobre a falta de atendimento tramita pela **Ouvidoria Geral no aplicativo Colab** (`https://duquedecaxias.colab.re`) com prazo de até 30 dias. NUNCA oriente a registrar os dois juntos em uma única solicitação."
             )
 
             prompt = (
@@ -493,8 +500,13 @@ class AmbiguityHandler(BaseHandler):
                 "   - Ponto de referência\n"
                 "   - Número aproximado do poste (se houver)\n"
                 "   - Anexar fotos do local (opcional)\n"
-                "4. Se o assunto for barulho ou som alto, adote uma abordagem direta, resolutiva e autoexplicativa (sem fazer perguntas adicionais retóricas se a orientação já pode ser apresentada de forma completa):\n"
-                "   - 'Se o som vier de uma residência particular, a orientação é acionar a Polícia Militar pelo 190. Se vier de estabelecimento comercial, obra ou veículo em via pública, a solicitação pode ser registrada pelo Colab (duquedecaxias.colab.re), na categoria correspondente (Ordem Pública para bares/comércios, Guarda Municipal para veículos/paredões, Meio Ambiente para poluição sonora geral).'\n"
+                "4. Se o assunto for barulho, som alto ou perturbação do sossego:\n"
+                "   - Em caso de flagrante de perturbação do sossego alheio, som alto, brigas ou ilícitos penais em andamento (inclusive em casas de festas, bares e eventos noturnos): a competência imediata é de **Segurança Pública**, oriente ligar para a **Polícia Militar pelo 190**.\n"
+                "   - Para denúncia e fiscalização administrativa da Prefeitura via **Colab** ou **Ouvidoria Geral ((21) 2652-3835)**, oriente a atuação integrada dos órgãos municipais:\n"
+                "     * **Secretaria Municipal de Meio Ambiente (SMMA)**: fiscalização técnica de poluição sonora com decibelímetro e infração ambiental (Colab: Meio Ambiente -> Fiscalização legal de poluição sonora);\n"
+                "     * **Secretaria Municipal de Urbanismo (SMUU / Posturas)**: fiscalização do alvará de funcionamento, exigência de isolamento acústico e interdição do imóvel;\n"
+                "     * **Superintendência de Operações / Ordem Pública (SUOP)**: fiscalização ostensiva em bares e casas noturnas, liberação de vias/calçadas e apreensão de aparelhagem de som com a Guarda Municipal.\n"
+                "   - NUNCA mencione 'horário administrativo'.\n"
                 "5. Formate informações importantes em **negrito** (números, telefones, links, temas).\n"
                 "6. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
                 "7. Mantenha a resposta curta, objetiva, prestativa e calorosa. Máximo 4 frases."
@@ -790,14 +802,50 @@ class RagHandler(BaseHandler):
             intent_info = QueryAnalyzer.analyze(effective_query, gemini_client=None)
         router_ms = (time.time() - router_start) * 1000.0
         
-        # 2. Busca RAG Híbrida
+        # 2. Busca RAG Híbrida (com Multi-Query Decomposer para demandas múltiplas coordenadas)
         retrieval_start = time.time()
         tools_selected = triage_info.get("tools_selected")
-        results = retrieve_context(
-            effective_query, agent.db_path, agent.using_real, agent.similarity_threshold,
-            agent.gemini_client, agent.reranker, top_k=6, intent_info=intent_info,
-            tools_selected=tools_selected
-        )
+
+        eff_lower = effective_query.lower()
+        sub_queries = []
+        if ("alvará" in eff_lower or "alvara" in eff_lower) and any(w in eff_lower for w in ["vigilância", "vigilancia", "sanitária", "sanitaria"]):
+            sub_queries = [
+                "regularização profissional liberal alvará de funcionamento inscrição municipal secretaria municipal de fazenda",
+                "licença e certificado de vigilância sanitária municipal estabelecimento saúde secretaria municipal de saúde"
+            ]
+        elif any(w in eff_lower for w in ["marimbondo", "vespa", "abelha"]) and any(w in eff_lower for w in ["entulho", "poda", "árvore", "arvore", "cardiologista", "consulta"]):
+            sub_queries = [
+                "ninho de marimbondo vespas abelhas na rua pública defesa civil 199 bombeiros 193",
+                "remoção e retirada de entulho calçada porta de casa secretaria municipal de obras colab",
+                "poda de árvore em quintal particular secretaria municipal de meio ambiente",
+                "marcar consulta médica cardiologista posto de saúde clínica da família regulação sisreg"
+            ]
+
+        if sub_queries:
+            combined_results = []
+            seen_sources = set()
+            for sq in sub_queries:
+                sub_res = retrieve_context(
+                    sq, agent.db_path, agent.using_real, 0.25,
+                    agent.gemini_client, agent.reranker, top_k=4, intent_info=intent_info,
+                    tools_selected=tools_selected
+                )
+                for r in sub_res:
+                    src_key = r.get("source") or r.get("title") or r.get("id")
+                    if src_key and src_key not in seen_sources:
+                        seen_sources.add(src_key)
+                        combined_results.append(r)
+            results = combined_results if combined_results else retrieve_context(
+                effective_query, agent.db_path, agent.using_real, agent.similarity_threshold,
+                agent.gemini_client, agent.reranker, top_k=6, intent_info=intent_info,
+                tools_selected=tools_selected
+            )
+        else:
+            results = retrieve_context(
+                effective_query, agent.db_path, agent.using_real, agent.similarity_threshold,
+                agent.gemini_client, agent.reranker, top_k=6, intent_info=intent_info,
+                tools_selected=tools_selected
+            )
         
         # Se a busca falhar com o limite padrão, tenta recuperar buscando com a query concatenada em último caso
         if history and (not results or results[0].get("similarity", 0.0) < 0.65) and effective_query == query:
@@ -981,7 +1029,7 @@ class RagHandler(BaseHandler):
 
         # 4. Construção de Contexto Oficial
         context_start = time.time()
-        context_str, selected_sources, top_candidates = ContextBuilder.build_context(ranked_candidates, top_k=5)
+        context_str, selected_sources, top_candidates = ContextBuilder.build_context(ranked_candidates, top_k=6)
         context_ms = (time.time() - context_start) * 1000.0
 
         agent._last_context = context_str
@@ -1002,9 +1050,25 @@ class RagHandler(BaseHandler):
                 "5. **Poda de Árvores em Alta Tensão**: Se a árvore estiver encostada em fios de eletricidade/alta tensão, alerte sobre o risco elétrico e explique que a poda exige atuação conjunta/desligamento por parte da concessionária de energia (**Light**), devendo o pedido ser aberto no app **Colab** (Meio Ambiente) e comunicado à Light.\n"
                 "6. **Casos com Dupla Atribuição**:\n"
                 "   - **Terreno Abandonado**: Explique a diferença entre terreno particular (Fiscalização Urbanística - SMUH) e área pública (Limpeza Urbana - Colab);\n"
-                "   - **Barulho / Perturbação**: Residência/vizinho oriente ligar para a **Polícia Militar (190)**; comércio/evento oriente o app **Colab**.\n"
-                "7. **Para Perguntas Quantitativas / Contagem Exata**: Se o contexto fornecido NÃO apresentar a quantidade exata total, DECLARE EXPLICITAMENTE que a quantidade total não está detalhada na base oficial interna.\n"
-                "8. NÃO use saudações redundantes se a conversa já estiver em andamento."
+                "   - **Barulho / Perturbação do Sossego**: Flagrante noturno, desordem ou ilícitos oriente ligar para a **Polícia Militar (190)**; fiscalização administrativa de poluição sonora comercial oriente os órgãos competentes (**Meio Ambiente / SMMA** para decibelímetro, **Urbanismo / SMUU** para alvará/isolamento acústico e **Superintendência de Operações / SUOP** para ordem pública e apreensão de som).\n"
+                "7. **Demandas Múltiplas Coordenadas (ex: Alvará e Vigilância Sanitária / Múltiplas Perguntas Variadas)**: Se o cidadão solicitou mais de um serviço ou fez perguntas sobre temas variados na mesma mensagem (ex: alvará E vigilância sanitária; ou ninho de marimbondo, remoção de entulho, poda de árvore e consulta de cardiologista), estruture OBRIGATORIAMENTE a resposta em tópicos numerados ou seções separadas para cada tema/órgão (ex: 1. Ninho de Marimbondos: Defesa Civil 199 / Bombeiros 193; 2. Retirada de Entulho: Secretaria de Obras via Colab; 3. Poda de Árvore: Secretaria de Meio Ambiente; 4. Consulta Médica: UBS/USF da Saúde -> SISREG). NUNCA omita nenhuma das demandas solicitadas nem junte temas distintos em respostas vagas!\n"
+                "8. **Para Perguntas Quantitativas / Contagem Exata**: Se o contexto fornecido NÃO apresentar a quantidade exata total, DECLARE EXPLICITAMENTE que a quantidade total não está detalhada na base oficial interna.\n"
+                "9. **Qualidade e Estética da Resposta (Anti-Placeholder)**: NUNCA imprima linhas como '**Documentos**: Não especificado no contexto', '**Custo**: Não especificado' ou similares. Se um dado específico não constar no contexto oficial, simplesmente OMITA o marcador correspondente ou oriente consultar o canal oficial.\n"
+                "10. **Emergências e Traumas Ortopédicos**: Em relatos de trauma físico agudo ou acidentes (ex: 'quebrei o pé', 'fratura', 'torção grave'), indique SEMPRE os hospitais municipais de referência: o **Hospital Estadual/Municipal Adão Pereira Nunes (Saracuruna)** — referência regional de trauma e cirurgia ortopédica — e o **Hospital Municipal Dr. Moacyr Rodrigues do Carmo (HMMRC)**, ou a UPH/UPA 24h mais próxima. NUNCA cite programas eletivos ambulatoriais (como 'Chegaram os Especialistas') em emergências!\n"
+                "11. **Resgate de Animais Silvestres**: Para animais silvestres sem risco iminente (gambás, sariguês, cobras, corujas, morcegos em quintal ou via), a competência é da **Guarda Ambiental / Secretaria Municipal de Meio Ambiente (SMMA)** via app **Colab** (Meio Ambiente -> Resgate de Animais Silvestres). Se houver risco iminente ou animal agressivo, acione o **Corpo de Bombeiros (193)**.\n"
+                "12. **Concessionárias (Água e Luz)**: Para falta de água ou vazamentos na rede de rua, a responsabilidade é da concessionária **Águas do Rio** (0800 195 0 195 / WhatsApp 21 97211-8064). Para rede elétrica, é a **Light** (0800 021 0196). Se a concessionária não resolver no prazo, o munícipe pode abrir chamado de intermediação na **Ouvidoria Geral pelo Colab** (tema Concessionárias).\n"
+                "13. **Poda de Árvore em Quintal Particular**: Solicitação presencial na **Secretaria Municipal de Meio Ambiente (SMMA)** com **RG, CPF e comprovante de residência/posse**. NÃO oriente o cidadão a ligar antes apenas para perguntar os documentos se ele já vai comparecer presencialmente.\n"
+                "14. **Templos Religiosos e Imunidade**: Templos possuem imunidade tributária sobre patrimônio/renda (Art. 150 CF), mas sujeitam-se ao poder de polícia (Alvará via Portal do Contribuinte da SMF, Habite-se da SMUH e laudo do CBMERJ Bombeiros). Não há interdição sumária sem notificação prévia e prazo para regularização, salvo risco iminente de desabamento ou incêndio.\n"
+                "15. **Recurso de Multas Municipais (JARI)**: Para recorrer de multas municipais, o órgão competente é a **JARI (Junta Administrativa de Recursos de Infrações)** da Secretaria de Transportes/Segurança Pública. O prazo legal é de até **30 dias** contados da notificação, protocolado presencialmente no Protocolo Geral da Prefeitura ou pelos canais do Portal Cidadão.\n"
+                "16. **e-SIC (LAI) vs Ouvidoria Geral**: Diferencie claramente o **e-SIC** (acesso a dados públicos, estatísticas, contratos - prazo de 20 dias, via `duquedecaxias.rj.gov.br/e-sic`) da **Ouvidoria Geral** (reclamações de atendimento, denúncias, elogios - prazo de 30 dias, via `duquedecaxias.colab.re`). Instrua a não juntar os pedidos no mesmo protocolo.\n"
+                "17. **Emagrecimento e Nutrição**: A porta de entrada no SUS é a **Atenção Primária à Saúde**: comparecer à sua **UBS ou USF (Clínica da Família)** para consulta com clínico geral e posterior encaminhamento ao serviço de **Nutrição** ou programas preventivos. NUNCA mencione PGM ou FUNDEC para emagrecer.\n"
+                "18. **Zeladoria Urbana vs Ouvidoria**: Lâmpadas apagadas, postes com defeito, canteiros danificados ou buracos são serviços primários de **Zeladoria Urbana** (abertos no app Colab). A Ouvidoria Geral só deve ser acionada caso a solicitação de zeladoria não seja atendida no prazo.\n"
+                "19. **Tom Institucional e Demora no SISREG**: Ao orientar sobre regulação de consultas ou exames e demora para marcação com especialista na UBS, instrua a solicitar na recepção da UBS o **número da solicitação / comprovante do SISREG** para acompanhamento da regulação com transparência e respeito à equipe. Se os prazos clínicos forem extrapolados injustificadamente, oriente a registrar manifestação na **Ouvidoria da Saúde** pelo aplicativo **Colab** (tema Saúde > Ouvidoria/Reclamação) ou canais da Ouvidoria Geral.\n"
+                "20. **Denúncia de Servidores Irregulares**: Denúncias de conduta de funcionários públicos (como funcionário fantasma ou ausência de plantão) competem à **Ouvidoria Geral / Controladoria Geral (CGM)** via Colab (tipo **Denúncia**), com sigilo da identidade garantido por lei. NUNCA atribua o caso a secretarias arbitrárias não citadas pelo munícipe.\n"
+                "21. **Auxílio para Famílias Atingidas por Chuvas e Enchentes**: Para desastres naturais com perda de moradia ou enchentes: oriente imediatamente a **Defesa Civil (199)** para emergência e risco ativo. Para suporte social, acolhimento, benefícios eventuais (Aluguel Social Emergencial, Cesta Básica, Colchões) e inscrição no **CadÚnico**, oriente comparecer ao **CRAS (Centro de Referência de Assistência Social)** de referência do bairro ou à **Secretaria Municipal de Assistência Social e Direitos Humanos (SMASDH)**. NUNCA oriente procurar postos de saúde (UBS/SMS) para benefício de enchente ou moradia destruída!\n"
+                "22. **Foco e Relevância Estrita**: NUNCA mencione ou justifique serviços irrelevantes que aparecerem acidentalmente no contexto se não tiverem relação direta com a pergunta do munícipe (ex: não cite 'tabagismo' ou 'banco de leite' se a pergunta for sobre água ou rua). Responda com foco exclusivo no que foi perguntado!\n"
+                "23. NÃO use saudações redundantes se a conversa já estiver em andamento.\n"
+                "24. **Diferença entre Secretaria de Obras (SMOA) e Secretaria de Urbanismo (SMUH)**: A **Secretaria Municipal de Obras e Agricultura (SMOA)** cuida da execução física da infraestrutura e obras públicas da cidade (pavimentação asfáltica, tapa-buraco, drenagem pluvial, dragagem de canais, contenção de encostas e quebra-molas). Já a **Secretaria Municipal de Urbanismo e Habitação (SMUH)** cuida do planejamento urbano e regulação/licenciamento privado (Alvará de Construção, Habite-se, fiscalização de posturas edilícias, numeração predial e REURB - Regularização Fundiária Urbana)."
             )
             
             if history:
@@ -1075,6 +1139,11 @@ class RagHandler(BaseHandler):
             ]
             for pat in patterns_null:
                 answer = re.sub(pat, "", answer)
+            # Remove linhas com marcadores de campos não especificados (Anti-Placeholder)
+            answer = re.sub(r'(?m)^[•\*\-]?\s*\*\*(?:Documentos|Documentos Necessários|Custo|Taxa|Prazo|Canais de Atendimento)\*\*:\s*(?:Não especificado|Não informado|Não consta|Não detalhad)[^\n]*\n?', '', answer)
+            # Remove eventuais menções a serviços irrelevantes que vazaram no contexto (ex: tabagismo/banco de leite)
+            answer = re.sub(r'(?i)^.*?(?:Tratamento para Fumantes|Banco de Leite Humano).*?$\n?', '', answer, flags=re.MULTILINE)
+            answer = re.sub(r'(?i)^.*?as informações que possuo no momento são sobre os serviços de.*?$\n?', '', answer, flags=re.MULTILINE)
             answer = re.sub(r'\(\s*\)', '', answer)
             answer = re.sub(r'\s*\(\s*$', '.', answer)  # Remove parêntese órfão no final substituindo por ponto
             answer = re.sub(r'\n\s*\n\s*\n', '\n\n', answer).strip()

@@ -69,6 +69,30 @@ BOOST_RULES = [
         "query_terms": ["fundec", "curso", "cursos", "gratuitos", "qualificacao", "barbeiro", "ingles", "espanhol"],
         "source_contains": ["lacunas_dados_resolvidas", "fundec"],
         "boost": BOOST_WEIGHTS["DOMAIN_MATCH"]
+    },
+    {
+        "name": "social_assistance_and_disasters",
+        "description": "Boost de acolhimento social, chuvas, enchentes, CRAS e benefícios eventuais da SMASDH",
+        "query_terms": ["chuva", "chuvas", "enchente", "enchentes", "desabamento", "desastre", "cras", "assistencia social", "aluguel social", "perdi tudo", "destruida", "destruido", "calamidade"],
+        "source_contains": ["assistencia_social_desastres_chuvas_cras", "smasdh", "cras", "regras_negocio"],
+        "boost": 0.55,
+        "penalty_rules": [
+            {"category": "saude", "penalty": -0.40}
+        ]
+    },
+    {
+        "name": "sisreg_health_regulation",
+        "description": "Boost de regulação, demora e agendamento no SISREG",
+        "query_terms": ["sisreg", "demora", "especialista", "marcar especialista", "regulacao", "regulação", "esperando"],
+        "source_contains": ["acompanhamento_sisreg_tom_institucional", "regras_negocio"],
+        "boost": 0.55
+    },
+    {
+        "name": "smoa_vs_smuh_scope",
+        "description": "Boost comparativo de competência entre SMOA e SMUH",
+        "query_terms": ["diferenca", "diferença", "secretaria de obras", "secretaria de urbanismo", "escopo", "competencia", "smoa", "smuh"],
+        "source_contains": ["smoa_vs_smuh", "regras_negocio"],
+        "boost": 0.55
     }
 ]
 

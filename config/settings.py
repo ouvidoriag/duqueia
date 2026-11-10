@@ -18,10 +18,11 @@ DATABASE_TELEMETRY = os.path.abspath(os.getenv("DATABASE_TELEMETRY", os.path.joi
 DEFAULT_DB_PATH = DATABASE_MAIN
 
 # Configurações de execução e ambiente
+PORT = int(os.getenv("PORT", "3000"))
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "info")
 USE_TRIAGE_LAYER = os.getenv("USE_TRIAGE_LAYER", "true").lower() == "true"
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 GEMINI_FAST_MODEL = os.getenv("GEMINI_FAST_MODEL", "gemini-3.1-flash-lite")
 GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.1-flash-lite")
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2")

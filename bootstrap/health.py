@@ -4,6 +4,13 @@ import sqlite3
 import shutil
 import importlib.util
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 def log_health(status: bool, check_name: str, detail: str = ""):
     icon = "✓" if status else "✗"
     color_label = "PASS" if status else "FAIL"

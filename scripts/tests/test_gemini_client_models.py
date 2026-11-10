@@ -2,8 +2,9 @@ import sys
 import os
 from dotenv import load_dotenv
 
-# Adiciona o diretório pai (raiz) ao sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 # Carrega variáveis do arquivo .env
 load_dotenv()

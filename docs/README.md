@@ -10,6 +10,7 @@ Navegue pelos módulos usando os links abaixo:
 
 ### 1. [Módulo 01 - Projeto](01-Projeto/Visao-Geral.md)
 - [Visão Geral](01-Projeto/Visao-Geral.md) — Escopo, regras e objetivos.
+- [Estrutura de Pastas e Diretórios](ESTRUTURA_PROJETO.md) — Guia detalhado de cada pasta do projeto.
 - [Arquitetura](01-Projeto/Arquitetura.md) — Diagrama e componentes do sistema RAG.
 - [Fluxo de Dados](01-Projeto/Fluxo.md) — Como a informação é recebida, processada e respondida.
 

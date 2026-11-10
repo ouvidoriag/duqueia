@@ -84,12 +84,12 @@ class GeminiClient:
 
 
     def _sanitize_model_name(self, model_name: str) -> str:
-        """Garante o uso exclusivo de modelos Flash. Se um modelo Pro for solicitado, redireciona para gemini-2.5-flash."""
+        """Garante o uso exclusivo de modelos Flash. Se um modelo Pro for solicitado, redireciona para o modelo Flash padrão."""
         if not model_name:
             return self._sanitize_model_name(self.generation_model_name)
         if "pro" in model_name.lower():
-            print(f"[GeminiClient] AVISO: Modelo Pro '{model_name}' bloqueado por diretriz do sistema. Redirecionando para 'gemini-2.5-flash'.", file=sys.stderr)
-            return "gemini-2.5-flash"
+            print(f"[GeminiClient] AVISO: Modelo Pro '{model_name}' bloqueado por diretriz do sistema. Redirecionando para '{self.generation_model_name}'.", file=sys.stderr)
+            return self.generation_model_name
         return model_name
 
     def _configure_current_key(self):
@@ -266,10 +266,10 @@ class GeminiClient:
         
         # Fallbacks padrão de alta performance (APENAS modelos Flash)
         default_fallbacks = [
-            "gemini-2.5-flash",
+            "gemini-3.8-flash",
             "gemini-3.1-flash-lite",
+            "gemini-2.5-flash",
             "gemini-2.5-flash-lite",
-            "gemini-3.5-flash",
             "gemini-2.0-flash"
         ]
         for m in default_fallbacks:
@@ -390,10 +390,10 @@ class GeminiClient:
         
         # Fallbacks padrão de alta performance (APENAS modelos Flash)
         default_fallbacks = [
-            "gemini-2.5-flash",
+            "gemini-3.8-flash",
             "gemini-3.1-flash-lite",
+            "gemini-2.5-flash",
             "gemini-2.5-flash-lite",
-            "gemini-3.5-flash",
             "gemini-2.0-flash"
         ]
         for m in default_fallbacks:
@@ -499,7 +499,36 @@ class GeminiClient:
                 print(f"[GeminiClient] Falha com o modelo {current_model}: {e}. Tenta próximo modelo de fallback.", file=sys.stderr)
                 time.sleep(0.5)
 
-        raise last_exception if last_exception else RuntimeError("Todos os modelos falharam na geração de conteúdo.")
+    def count_tokens(self, contents, model: str = None) -> int:
+        """
+        Conta o número exato de tokens antes de enviar a requisição (pre-flight check).
+        Suporta SDK >= 2.0 (google.genai) e SDK legado (google.generativeai).
+        """
+        if not self.api_keys:
+            if isinstance(contents, str):
+                return max(1, len(contents) // 4)
+            return 100
+
+        target_model = self._sanitize_model_name(model if model else self.generation_model_name)
+
+        def _call(m=target_model):
+            if _USE_NEW_SDK:
+                res = self._client.models.count_tokens(
+                    model=m,
+                    contents=contents
+                )
+                return getattr(res, "total_tokens", len(str(contents)) // 4)
+            else:
+                model_obj = genai.GenerativeModel(model_name=m)
+                res = model_obj.count_tokens(contents)
+                return getattr(res, "total_tokens", len(str(contents)) // 4)
+
+        try:
+            return self.execute_with_rotation(_call, model_name=target_model)
+        except Exception as e:
+            if isinstance(contents, str):
+                return max(1, len(contents) // 4)
+            return 150
 
     # --------------------------------------------------------------------------
     # FALLBACK LOCAL (SEM CHAVE)
@@ -790,15 +819,15 @@ class GeminiClient:
                         return True
                     raise ValueError("Nenhum dado de áudio retornado pelo modelo de TTS.")
 
-                # Executa com rotação de chaves visando alta tolerância a falhas e timeout rígido de 10s
+                # Executa com rotação de chaves visando alta tolerância a falhas e timeout de 25s para áudios longos
                 import concurrent.futures
                 success = False
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                     future = executor.submit(self.execute_with_rotation, _call_tts, model_name="gemini-3.1-flash-tts-preview")
                     try:
-                        success = future.result(timeout=10.0)
+                        success = future.result(timeout=25.0)
                     except concurrent.futures.TimeoutError:
-                        print("[GeminiClient] Timeout de 10s atingido na Interactions API (TTS). Cancelando e usando fallback...", file=sys.stderr)
+                        print("[GeminiClient] Timeout de 25s atingido na Interactions API (TTS). Cancelando e usando fallback...", file=sys.stderr)
                     except Exception as tts_err:
                         print(f"[GeminiClient] Erro na thread de TTS: {tts_err}", file=sys.stderr)
 

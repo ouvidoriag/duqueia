@@ -20,7 +20,18 @@
       "isenção para táxi",
       "desconto táxi"
     ],
-    "keywords": ["taxista", "ipi", "icms", "carro", "veículo", "isenção", "isencao", "desconto", "táxi", "taxi"],
+    "keywords": [
+      "taxista",
+      "ipi",
+      "icms",
+      "carro",
+      "veículo",
+      "isenção",
+      "isencao",
+      "desconto",
+      "táxi",
+      "taxi"
+    ],
     "active": 1
   },
   {
@@ -45,7 +56,17 @@
       "rematrícula",
       "rematricula"
     ],
-    "keywords": ["matrícula", "matricula", "escola", "creche", "alunos", "vaga", "inscrição", "inscricao", "filho"],
+    "keywords": [
+      "matrícula",
+      "matricula",
+      "escola",
+      "creche",
+      "alunos",
+      "vaga",
+      "inscrição",
+      "inscricao",
+      "filho"
+    ],
     "active": 1
   },
   {
@@ -66,7 +87,15 @@
       "passagem elevada",
       "passagem elevada pedestres"
     ],
-    "keywords": ["quebra", "mola", "lombada", "redutor", "velocidade", "trânsito", "rua"],
+    "keywords": [
+      "quebra",
+      "mola",
+      "lombada",
+      "redutor",
+      "velocidade",
+      "trânsito",
+      "rua"
+    ],
     "active": 1
   },
   {
@@ -86,7 +115,14 @@
       "pavimentação",
       "pavimentacao"
     ],
-    "keywords": ["buraco", "tapa", "asfalto", "pavimentação", "rua", "cratera"],
+    "keywords": [
+      "buraco",
+      "tapa",
+      "asfalto",
+      "pavimentação",
+      "rua",
+      "cratera"
+    ],
     "active": 1
   },
   {
@@ -104,7 +140,14 @@
       "pagar iptu",
       "débito iptu"
     ],
-    "keywords": ["iptu", "imposto", "carnê", "segunda via", "fazenda", "tributo"],
+    "keywords": [
+      "iptu",
+      "imposto",
+      "carnê",
+      "segunda via",
+      "fazenda",
+      "tributo"
+    ],
     "active": 1
   },
   {
@@ -122,7 +165,433 @@
       "iluminacao publica",
       "poste apagado"
     ],
-    "keywords": ["lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz", "rua"],
+    "keywords": [
+      "lâmpada",
+      "lampada",
+      "poste",
+      "iluminação",
+      "iluminacao",
+      "luz",
+      "rua"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "VIGILANCIA_SANITARIA_ALIMENTOS",
+    "entity_type": "saude",
+    "canonical_name": "Fiscalização de Comércio de Alimentos e Condições Higiênico-Sanitárias",
+    "secretaria": "Secretaria Municipal de Saúde - Subsecretaria de Vigilância Sanitária",
+    "aliases": [
+      "estabelecimento fedendo",
+      "estabelecimento fedendo muito",
+      "comércio fedendo",
+      "comercio fedendo",
+      "vende carne fedendo",
+      "vende carne com mau cheiro",
+      "açougue fedendo",
+      "acougue fedendo",
+      "peixaria fedendo",
+      "mau cheiro de comércio",
+      "mau cheiro de comercio",
+      "carne estragada",
+      "carne podre",
+      "denúncia açougue",
+      "denuncia acougue",
+      "fiscalização açougue"
+    ],
+    "keywords": [
+      "açougue",
+      "acougue",
+      "carne",
+      "fedendo",
+      "fede",
+      "cheiro",
+      "mau cheiro",
+      "estabelecimento",
+      "vigilância",
+      "sanitária",
+      "alimentos",
+      "comércio"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "RESGATE_FAUNA_SILVESTRE",
+    "entity_type": "meio_ambiente",
+    "canonical_name": "Resgate de Animais Silvestres e Fauna Urbana",
+    "secretaria": "Secretaria Municipal de Meio Ambiente e Proteção Animal",
+    "aliases": [
+      "gamba",
+      "gambá",
+      "sarigue",
+      "sariguê",
+      "resgate de gamba",
+      "resgate de gambá",
+      "bicho no quintal",
+      "animal silvestre",
+      "animal silvestre no quintal",
+      "cobra no quintal",
+      "resgate de animais",
+      "morcego no quintal",
+      "coruja no quintal",
+      "gavião ferido"
+    ],
+    "keywords": [
+      "gambá",
+      "gamba",
+      "sariguê",
+      "sarigue",
+      "cobra",
+      "animal",
+      "silvestre",
+      "resgate",
+      "meio ambiente",
+      "guarda ambiental"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "EMERGENCIA_ORTOPEDIA",
+    "entity_type": "saude",
+    "canonical_name": "Atendimento de Emergência Ortopédica e Trauma Agudo",
+    "secretaria": "Secretaria Municipal de Saúde",
+    "aliases": [
+      "quebrei o pé",
+      "quebrei o pe",
+      "quebrei o braço",
+      "quebrei a perna",
+      "fratura",
+      "fratura exposta",
+      "trauma ortopedico",
+      "emergencia ortopedica",
+      "hospital de ortopedia",
+      "ortopedista de emergencia",
+      "hospital adao pereira nunes",
+      "saracuruna ortopedia"
+    ],
+    "keywords": [
+      "quebrei",
+      "fratura",
+      "ortopedia",
+      "trauma",
+      "adão pereira nunes",
+      "saracuruna",
+      "moacyr do carmo",
+      "emergência",
+      "hospital"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "RECURSO_MULTAS_JARI",
+    "entity_type": "transporte",
+    "canonical_name": "Recurso e Defesa de Multas de Trânsito Municipais (JARI)",
+    "secretaria": "Secretaria Municipal de Transportes e Serviços Públicos",
+    "aliases": [
+      "recurso de multa",
+      "recorrer de multa",
+      "multa indevida",
+      "defesa de multa",
+      "jari",
+      "processo de multa",
+      "impugnar multa",
+      "recurso jari",
+      "cancelar multa prefeitura"
+    ],
+    "keywords": [
+      "multa",
+      "recurso",
+      "jari",
+      "trânsito",
+      "defesa",
+      "autuação",
+      "notificação",
+      "transportes"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "NUTRICAO_EMAGRECIMENTO",
+    "entity_type": "saude",
+    "canonical_name": "Atendimento Nutricional e Promoção da Saúde",
+    "secretaria": "Secretaria Municipal de Saúde",
+    "aliases": [
+      "emagrecer",
+      "quer emagrecer",
+      "perder peso",
+      "nutricionista",
+      "consulta nutricionista",
+      "dieta",
+      "obesidade",
+      "programa de emagrecimento",
+      "acompanhamento nutricional"
+    ],
+    "keywords": [
+      "emagrecer",
+      "peso",
+      "nutrição",
+      "nutricionista",
+      "dieta",
+      "saúde",
+      "clínica da família",
+      "ubs"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "DENUNCIA_SERVIDOR_PUBLICO",
+    "entity_type": "ouvidoria",
+    "canonical_name": "Denúncia de Conduta e Irregularidade Funcional de Servidor",
+    "secretaria": "Ouvidoria Geral do Município / Controladoria Geral",
+    "aliases": [
+      "funcionario fantasma",
+      "funcionário fantasma",
+      "denunciar funcionario",
+      "denunciar funcionário",
+      "servidor que nao trabalha",
+      "servidor que não trabalha",
+      "desvio funcional",
+      "falta de plantao"
+    ],
+    "keywords": [
+      "funcionário",
+      "fantasma",
+      "servidor",
+      "denúncia",
+      "ouvidoria",
+      "controladoria",
+      "sigilo"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "ALVARA_PROFISSIONAL_LIBERAL",
+    "entity_type": "fazenda",
+    "canonical_name": "Alvará e Regularização de Profissional Liberal / Licença Sanitária",
+    "secretaria": "Secretaria Municipal de Fazenda e Secretaria de Saúde",
+    "aliases": [
+      "profissional liberal",
+      "alvara profissional liberal",
+      "alvará profissional liberal",
+      "regularizar estabelecimento profissional liberal",
+      "alvara e vigilancia sanitaria",
+      "certificado vigilancia sanitaria consultorio"
+    ],
+    "keywords": [
+      "profissional",
+      "liberal",
+      "alvará",
+      "vigilância",
+      "sanitária",
+      "fazenda",
+      "consultório",
+      "iss"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "REPARO_CANTEIRO_CALCADA",
+    "entity_type": "obras",
+    "canonical_name": "Conserto e Reparo de Canteiros, Calçadas e Guias de Rua",
+    "secretaria": "Secretaria Municipal de Obras e Agricultura",
+    "aliases": [
+      "canteiro danificado",
+      "conserto de canteiro",
+      "canteiro quebrado",
+      "reparo de canteiro",
+      "calcada danificada",
+      "calçada danificada",
+      "reparo de calcada",
+      "meio-fio quebrado"
+    ],
+    "keywords": [
+      "canteiro",
+      "calçada",
+      "reparo",
+      "obras",
+      "meio-fio",
+      "rua",
+      "danificado"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "ALVARA_TEMPLO_RELIGIOSO",
+    "entity_type": "fazenda",
+    "canonical_name": "Alvará e Funcionamento de Templos Religiosos e Igrejas",
+    "secretaria": "Secretaria Municipal de Fazenda e Secretaria de Urbanismo",
+    "aliases": [
+      "alvara templo",
+      "alvará templo",
+      "alvara igreja",
+      "alvará igreja",
+      "templo religioso sem alvara",
+      "interdicao igreja",
+      "interdição de templo",
+      "licencas igreja"
+    ],
+    "keywords": [
+      "templo",
+      "religioso",
+      "igreja",
+      "alvará",
+      "imunidade",
+      "urbanismo",
+      "bombeiros",
+      "interdição"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "ASSISTENCIA_DESASTRES_CHUVAS",
+    "entity_type": "assistencia_social",
+    "canonical_name": "Atendimento a Famílias Atingidas por Chuvas e Desastres (CRAS)",
+    "secretaria": "Secretaria Municipal de Assistência Social e Direitos Humanos",
+    "aliases": [
+      "casa destruida pela chuva",
+      "casa destruída pela chuva",
+      "enchente auxilio",
+      "perdi tudo na chuva",
+      "aluguel social chuva",
+      "cesta basica enchente",
+      "cras chuva",
+      "desabamento chuva"
+    ],
+    "keywords": [
+      "chuva",
+      "enchente",
+      "desabamento",
+      "cras",
+      "aluguel social",
+      "defesa civil",
+      "assistência"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "DIFERENCA_ESIC_OUVIDORIA",
+    "entity_type": "ouvidoria",
+    "canonical_name": "Diferença entre Pedido de Informação (e-SIC) e Ouvidoria (Colab)",
+    "secretaria": "Ouvidoria Geral do Município",
+    "aliases": [
+      "diferenca esic ouvidoria",
+      "diferença e-sic e ouvidoria",
+      "quantos medicos estao lotados no posto",
+      "quantos servidores estao lotados",
+      "pedido de informacao e reclamacao"
+    ],
+    "keywords": [
+      "e-sic",
+      "esic",
+      "lai",
+      "ouvidoria",
+      "médicos",
+      "lotados",
+      "reclamação",
+      "informação"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "SOCORRO_MORADOR_RUA",
+    "entity_type": "assistencia_social",
+    "canonical_name": "Socorro Emergencial a Morador de Rua Desmaiado e Centro POP",
+    "secretaria": "Secretaria Municipal de Assistência Social e Direitos Humanos / SAMU",
+    "aliases": [
+      "morador de rua desmaiado",
+      "pessoa em situacao de rua desmaiada",
+      "socorro morador de rua",
+      "morador de rua passando mal",
+      "ajudar morador de rua desmaiado"
+    ],
+    "keywords": [
+      "morador",
+      "rua",
+      "desmaiado",
+      "samu",
+      "192",
+      "centro pop",
+      "abordagem",
+      "social"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "DENUNCIA_FUNCIONARIO_FANTASMA",
+    "entity_type": "ouvidoria",
+    "canonical_name": "Denúncia de Funcionário Fantasma e Desvio de Servidor",
+    "secretaria": "Ouvidoria Geral do Município / Controladoria Geral (CGM)",
+    "aliases": [
+      "funcionario fantasma",
+      "servidor fantasma",
+      "nao vai trabalhar",
+      "nao aparece para trabalhar",
+      "recebe sem trabalhar",
+      "servidor sumido",
+      "ausencia de plantao",
+      "prevaricacao"
+    ],
+    "keywords": [
+      "funcionario",
+      "fantasma",
+      "servidor",
+      "trabalhar",
+      "expediente",
+      "denuncia",
+      "ouvidoria",
+      "cgm"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "CONCESSIONARIA_AGUAS_DO_RIO",
+    "entity_type": "concessionaria",
+    "canonical_name": "Serviços e Rede de Água e Esgoto (Águas do Rio)",
+    "secretaria": "Ouvidoria Geral do Município (Concessionárias)",
+    "aliases": [
+      "aguas do rio",
+      "falta de agua",
+      "sem agua na rua",
+      "vazamento de agua",
+      "vazamento de esgoto",
+      "esgoto entupido",
+      "baixa pressao agua"
+    ],
+    "keywords": [
+      "aguas",
+      "rio",
+      "agua",
+      "esgoto",
+      "vazamento",
+      "falta",
+      "concessionaria"
+    ],
+    "active": 1
+  },
+  {
+    "entity_id": "CANTEIRO_E_CALCADA_SMOA",
+    "entity_type": "obras",
+    "canonical_name": "Reparo de Vias, Canteiros Públicos e Calçadas",
+    "secretaria": "Secretaria Municipal de Obras e Agricultura",
+    "aliases": [
+      "canteiro danificado",
+      "conserto de canteiro",
+      "reparo de calçada",
+      "calcada danificada",
+      "meio-fio quebrado",
+      "guia de sarjeta",
+      "paralelepipedo solto",
+      "passeio publico"
+    ],
+    "keywords": [
+      "canteiro",
+      "calcada",
+      "meio-fio",
+      "guia",
+      "obras",
+      "smoa",
+      "calcamento"
+    ],
     "active": 1
   }
 ]

@@ -1,8 +1,8 @@
 {
   "versao_schema": "2.0",
   "titulo": "Tabela Canônica de Regras de Negócio e Restrições - DUQUE IA",
-  "total_regras": 57,
-  "data_atualizacao": "2026-09-14",
+  "total_regras": 74,
+  "data_atualizacao": "2026-10-23 12:00:00",
   "fonte_primaria": "Ouvidoria Geral do Município / Diretoria da Ouvidoria Geral",
   "regras": [
     {
@@ -1478,25 +1478,34 @@
     },
     {
       "id": "regra_canon_concessionaria_aguas_rio",
-      "tipo": "CONCESSIONARIA_EXTERNA",
-      "tipo_label": "Delimitação de Concessionária Externa",
-      "tema": "Água e Esgotamento Sanitário",
-      "assunto": "Águas do Rio vs Município / CEDAE",
-      "conteudo": "A concessionária responsável pelos serviços de abastecimento de água encanada, reparo de vazamentos na rede de água e esgotamento sanitário no município de Duque de Caxias é exclusivamente a ÁGUAS DO RIO. É estritamente proibido indicar a CEDAE para atendimentos e serviços operacionais de rede ao munícipe.",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Água e Esgoto — Concessionária Águas do Rio e Fluxo Oficial da Ouvidoria (Equipe Gildo/Nikolas)",
+      "tema": "Concessionárias de Serviços Públicos",
+      "assunto": "Falta de Água, Vazamentos e Intermediação Oficial com a Águas do Rio via Ouvidoria / Colab",
+      "conteudo": "Para demandas de falta de água, baixa pressão ou vazamentos de esgoto e rede pública em Duque de Caxias:\n\n1. **CONCESSIONÁRIA EXCLUSIVA NO MUNICÍPIO (ÁGUAS DO RIO):**\n• A concessionária responsável exclusiva pelos serviços de abastecimento de água encanada e esgotamento sanitário em Duque de Caxias é a **ÁGUAS DO RIO**.\n• **É terminantemente proibido citar a CEDAE** para atendimento de rede ou solicitação de serviços de campo.\n\n2. **CANAL DIRETO DA CONCESSIONÁRIA (ATENDIMENTO EMERGENCIAL):**\n• **Telefone e WhatsApp:** **0800 195 0 195** (Ligação gratuita e atendimento 24 horas para manobras de rede, religamento e reparo emergencial de vazamentos).\n\n3. **FLUXO OFICIAL DA OUVIDORIA GERAL NO COLAB (EQUIPE GILDO / NIKOLAS):**\n• O munícipe pode abrir a demanda diretamente nos canais da Prefeitura pelo aplicativo **Colab** (https://duquedecaxias.colab.re/) ou Portal Cidadão Ouvidoria.\n• **Tema Oficial no Colab:** **Serviços e Rede de Água e Esgoto (Águas do Rio)**\n• **Assunto Oficial:** **Falta de água - ÁGUAS DO RIO** (ou *Vazamento de água - ÁGUAS DO RIO*, *Esgoto entupido - ÁGUAS DO RIO*).\n• **Atuação da Ouvidoria Geral:** A equipe da Ouvidoria (sob supervisão da Diretoria / Gildo e Nikolas) possui canal direto de intermediação e cobrança com a concessionária para monitoramento de prazos legais e fiscalização do cumprimento do serviço.",
       "tags": [
-        "agua",
         "falta de agua",
-        "esgoto",
-        "vazamento",
+        "sem agua",
         "aguas do rio",
-        "cedae proibido"
+        "esgoto",
+        "vazamento de agua",
+        "cedae proibido",
+        "concessionaria",
+        "fluxo ouvidoria aguas do rio",
+        "gildo",
+        "nikolas"
       ],
       "prioridade": "MAXIMA",
       "boost_weight": 3.0,
-      "autor": "Ouvidoria Geral do Município",
-      "data_homologacao": "2026-09-14 15:00",
+      "autor": "Diretoria da Ouvidoria Geral (Gildo / Nikolas)",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/",
+        "https://aguasdorio.com.br/"
+      ],
       "homologado_por": [
-        "Diretoria da Ouvidoria Geral"
+        "Diretoria da Ouvidoria Geral",
+        "Coordenação Técnica de Concessionárias"
       ]
     },
     {
@@ -1548,30 +1557,740 @@
     },
     {
       "id": "regra_canon_poluicao_sonora_4_destinos",
-      "tipo": "DESAMBIGUACAO_MULTIPLA",
-      "tipo_label": "Desambiguação de Poluição Sonora em 4 Destinações",
-      "tema": "Fiscalização e Perturbação do Sossego",
-      "assunto": "Roteamento Canônico de Barulho",
-      "conteudo": "A fiscalização de poluição sonora divide-se estritamente conforme a origem: 1. Ruído de obras públicas ou particulares em andamento: Secretaria Municipal de Urbanismo e Habitação (SMUH). 2. Ruído de estabelecimentos comerciais, indústrias e templos religiosos: Secretaria Municipal de Meio Ambiente (SMMA). 3. Bares na calçada, festas de rua, carros de som e feiras: Superintendência de Ordem Pública (SMSP/SOP). 4. Flagrante noturno e emergência de madrugada: 190 (Polícia Militar / PMERJ).",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Poluição Sonora — Flagrante Policial (190) e Fiscalização Municipal (SMMA, SMUH, SUOP)",
+      "tema": "Poluição Sonora, Ordem Pública e Meio Ambiente",
+      "assunto": "Perturbação do Sossego Noturno (190 PMERJ) e Fiscalização Integrada de Alvará e Ruído (SMMA, SMUH, SUOP)",
+      "conteudo": "Para ocorrências de perturbação do sossego alheio, som alto e casas de festas em Duque de Caxias:\n\n1. **CASOS NOTURNOS, FLAGRANTES E ILÍCITOS PENAIS — ACIONE O 190 (POLÍCIA MILITAR):**\n• Se o fato estiver ocorrendo no momento (flagrante), à noite ou de madrugada, com perturbação do sossego, aglomeração violenta ou ilícitos penais, o munícipe deve acionar imediatamente a **Polícia Militar pelo telefone 190**. A intervenção imediata de contenção e manutenção da ordem pública compete à PMERJ (Art. 144 da CF/88).\n\n2. **FISCALIZAÇÃO ADMINISTRATIVA DA PREFEITURA (SEM REDUNDÂNCIAS):**\nPara denúncia e vistoria do estabelecimento comercial/casa de festas, a atuação municipal divide-se estritamente entre:\n• **Secretaria Municipal de Meio Ambiente e Proteção Animal (SMMA):** Fiscalização técnica de poluição sonora com aparelho decibelímetro, medição dos níveis de pressão sonora conforme limites do Decreto Municipal nº 7.620/2020 e autuação por infração ambiental. *(Canal Colab: Meio Ambiente > Fiscalização de Poluição Sonora)*.\n• **Secretaria Municipal de Urbanismo e Habitação (SMUH / Posturas):** Fiscalização de Alvará de Localização e Funcionamento, conformidade do zoneamento urbano, exigência do projeto acústico obrigatório e interdição do imóvel por descumprimento de posturas.\n• **Superintendência de Operações / Ordem Pública (SUOP):** Fiscalização ostensiva de bares, eventos, ruas e feiras, coibição de ocupação irregular de calçadas e apreensão de equipamentos sonoros com apoio da Guarda Municipal.\n\n3. **CANAIS DA OUVIDORIA GERAL:**\n• As manifestações administrativas podem ser abertas pelo aplicativo **Colab** (https://duquedecaxias.colab.re/) ou pelos telefones da Ouvidoria Geral: **(21) 2652-3835** e WhatsApp **(21) 99824-5903**.",
       "tags": [
         "barulho",
         "poluicao sonora",
         "som alto",
-        "igreja",
-        "obra",
-        "bar",
-        "carro de som",
-        "smuh",
+        "casa de festas",
+        "casa noturna",
+        "festa noturna",
+        "perturbação do sossego",
+        "190",
+        "policia militar",
         "smma",
-        "smsp",
-        "pmerj"
+        "smuh",
+        "suop",
+        "decibelimetro",
+        "alvara"
       ],
       "prioridade": "MAXIMA",
       "boost_weight": 3.0,
-      "autor": "Ouvidoria Geral do Município",
-      "data_homologacao": "2026-09-14 15:00",
+      "autor": "Ouvidoria Geral / SMMA / SMUH / SUOP",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/"
+      ],
       "homologado_por": [
+        "Secretaria de Meio Ambiente",
+        "Secretaria de Urbanismo",
+        "Superintendência de Operações",
         "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_regularizacao_imovel_rgi_smuh",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Regularização de Imóveis, Habite-se e Cartório de RGI (SMUH)",
+      "tema": "Urbanismo, Habitação e Registro de Imóveis",
+      "assunto": "Regularização Imobiliária, RGI e Atos Autorizativos da SMUH (Documento Oficial do Urbanismo)",
+      "conteudo": "**DOCUMENTAÇÃO E FONTES OFICIAIS DO URBANISMO (SMUH):**\nRegras fundamentadas no **Guia Oficial de Regularização Imobiliária da Secretaria Municipal de Urbanismo e Habitação (SMUH)**, na **Lei Complementar nº 08/2021 (Programa Municipal de Regularização Fundiária Urbana - REURB)**, no **Código de Obras Municipal (Lei nº 1.077/1991)** e nas normas da Corregedoria Geral da Justiça do TJ/RJ para os Cartórios do 1º e 2º Ofícios de Registro de Imóveis de Duque de Caxias.\n\n1. **COMPETÊNCIA MUNICIPAL VS CARTÓRIO DE RGI:**\n• O RGI (Registro Geral de Imóveis) é ato privativo dos Cartórios de Registro de Imóveis (1º Ofício: 1º e 2º Distritos; 2º Ofício: 3º e 4º Distritos).\n• A Prefeitura (SMUH) não emite a certidão de matrícula do RGI, mas é a responsável exclusiva por todos os atos administrativos prévios obrigatórios.\n\n2. **FLUXO PRÁTICO POR CENÁRIO DO MUNÍCIPE:**\n• **Cenário 1 — Imóvel já possui Matrícula no Cartório:** O cidadão comparece à SMUH para abrir processo de certidão de logradouro/informações cadastrais oficiais (lote, quadra, logradouro oficial e bairro) para averbação e atualização no Cartório de RGI.\n• **Cenário 2 — Possui Escritura ou Título de Compra e Venda:** Apresenta o título diretamente ao Cartório de RGI correspondente para registro na matrícula.\n• **Cenário 3 — Posse e Regularização por Usucapião:**\n  - Extrajudicial: Requerimento via advogado/defensor diretamente no Cartório de RGI, com certidão de não-desapropriação emitida pela SMUH.\n  - Judicial: Via Defensoria Pública ou advogado. A SMUH elabora a planta do imóvel e memorial descritivo **gratuitamente** quando oficiada pela Defensoria Pública do Estado.\n• **Cenário 4 — Obras e Benfeitorias (Construídas ou a Construir):**\n  - Obra existente: Laudo técnico de engenheiro/arquiteto credenciado, protocolo de legalização na SMUH, taxas de licença e emissão do Habite-se para posterior averbação no RGI.\n  - Obra nova: Consulta prévia de zoneamento, aprovação do projeto arquitetônico, alvará de obras e vistoria final do Habite-se.\n• **Cenário 5 — REURB (Lei Complementar nº 08/2021):** Núcleos urbanos informais consolidados recebem titulação de legitimação fundiária diretamente pela SMUH (REURB-S Social gratuita).\n\n3. **ATENDIMENTO PRESENCIAL E CONTATOS DA SMUH:**\n• **Endereço:** Alameda Bartolomeu Gusmão, nº 85 – Jardim Primavera, Duque de Caxias - RJ (CEP: 25215-320).\n• **Telefones:** (21) 2773-0202 / (21) 2776-0388 / (21) 2783-6066.\n• **E-mail:** semuh@duquedecaxias.rj.gov.br | **Horário:** Segunda a sexta, das 09h às 17h.",
+      "tags": [
+        "rgi",
+        "regularizar imovel",
+        "registro de imovel",
+        "habite-se",
+        "smuh",
+        "urbanismo",
+        "escritura",
+        "usucapiao",
+        "desmembramento",
+        "reurb",
+        "documento do urbanismo"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Urbanismo e Habitação (SMUH) / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Urbanismo e Habitação",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_alvara_profissional_liberal_e_vigilancia_sanitaria",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Profissional Liberal — Alvará (SMF), Licença Sanitária (SMS) e Registro Jucerja",
+      "tema": "Fazenda, Tributos e Vigilância Sanitária",
+      "assunto": "Alvará para Profissional Liberal, Licença Sanitária e Consulta na Jucerja / Portais Oficiais",
+      "conteudo": "Para regularização de profissional liberal e obtenção de alvará e licença sanitária em Duque de Caxias:\n\n1. **SECRETARIA MUNICIPAL DE FAZENDA (SMF) — ALVARÁ E ISS AUTÔNOMO:**\n• Solicitação pelo **Portal do Contribuinte** (https://portalcontribuinte.duquedecaxias.rj.gov.br/) ou presencial na Praça Roberto Silveira, 31 - Jardim 25 de Agosto.\n• Documentos: RG, CPF, comprovante de residência e carteira de registro no Conselho de Classe Profissional ativo (OAB, CRM, CRO, CREA, etc.).\n\n2. **SUBSECRETARIA DE VIGILÂNCIA SANITÁRIA (SMS) — LICENÇA SANITÁRIA:**\n• Obrigatória para consultórios médicos, odontológicos, fisioterapia, estética e serviços de saúde/beleza.\n• Solicitação mediante processo administrativo com alvará preliminar, memorial descritivo e PGRSS quando exigido.\n\n3. **JUNTA COMERCIAL DO ESTADO DO RIO DE JANEIRO (JUCERJA):**\n• Para profissionais que atuam sob natureza jurídica societária ou empresária, consultar e emitir atos cadastrais pelo site oficial da **Jucerja** (https://www.jucerja.rj.gov.br/).",
+      "tags": [
+        "profissional liberal",
+        "alvara profissional liberal",
+        "certificado vigilancia sanitaria",
+        "licenca sanitaria",
+        "jucerja",
+        "portal do contribuinte",
+        "iss autonomo"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria de Fazenda / Vigilância Sanitária / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://portalcontribuinte.duquedecaxias.rj.gov.br/",
+        "https://www.jucerja.rj.gov.br/"
+      ],
+      "homologado_por": [
+        "Secretaria de Fazenda",
+        "Subsecretaria de Vigilância Sanitária",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_resgate_fauna_silvestre_gamba_cobras",
+      "tipo": "REGRA_NEGOCIO",
+      "tipo_label": "Resgate de Animais Silvestres em Propriedades e Vias Públicas",
+      "tema": "Meio Ambiente e Proteção Animal",
+      "assunto": "Resgate e Manejo de Fauna Silvestre (Gambás, Cobras, Aves e Mamíferos)",
+      "conteudo": "Em caso de animais silvestres (gambá/sariguê, cobra, coruja, morcego ou gavião) encontrados em quintais, residências ou vias públicas em Duque de Caxias:\n\n1. **RISCO IMINENTE OU ANIMAL AGRESSIVO:**\n• Se houver risco imediato à vida de pessoas ou animais domésticos, acione o **Corpo de Bombeiros Militar pelo 193** ou a **Defesa Civil pelo 199**. Não tente capturar ou agredir o animal silvestre.\n\n2. **RESGATE E SOLTURA SEM RISCO IMEDIATO (MANEJO AMBIENTAL):**\n• **Órgão Responsável:** **Secretaria Municipal de Meio Ambiente e Proteção Animal (SMMA)** através do Grupamento de Defesa Ambiental / Guarda Ambiental.\n• **Como Solicitar no Colab:** Acesse o aplicativo **Colab** (https://duquedecaxias.colab.re/) > Selecione a categoria **Meio Ambiente** > Assunto: **Resgate de Animais Silvestres / Proteção Animal**.\n• **Informações Necessárias:** Endereço completo, ponto de referência e fotos do animal no local para avaliação da equipe de resgate e soltura em habitat seguro (como a Reserva de Tinguá).",
+      "tags": [
+        "gamba",
+        "sarigue",
+        "resgate de gamba",
+        "cobra no quintal",
+        "animal silvestre",
+        "resgate de animais silvestres",
+        "guarda ambiental",
+        "meio ambiente"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Meio Ambiente e Proteção Animal / Guarda Ambiental",
+      "data_homologacao": "2026-10-14 15:00",
+      "homologado_por": [
+        "Secretaria Municipal de Meio Ambiente",
+        "Guarda Ambiental Municipal",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_emergencia_trauma_ortopedia",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Emergência Hospitalar — Traumas, Fraturas e Quedas Agudas (Sem Risco de Falso Negativo)",
+      "tema": "Saúde Pública e Emergência Hospitalar",
+      "assunto": "Urgência Médica de Trauma Ortopédico, Fraturas e Proibição de Direcionamento Eletivo",
+      "conteudo": "**DIRETRIZ DE SEGURANÇA CLÍNICA — TRAUMA ORTOPÉDICO E URGÊNCIA:**\nPara qualquer relato de trauma agudo, suspeita de fratura, queda violenta, incapacidade súbita de andar ou dor incapacitante pós-impacto (ex: \"quebrei o pé\", \"bati com o joelho e não ando\", \"braço entortou\", \"queda de laje/escada\", \"fratura exposta\"):\n\n1. **PRIORIDADE DE EMERGÊNCIA — PROIBIÇÃO ABSOLUTA DE AGENDAMENTO ELETIVO:**\n• O caso é de urgência médica hospitalar. **É estritamente proibido direcionar o cidadão para o programa ambulatório eletivo ('Chegaram os Especialistas') ou para regulação eletiva de postos de saúde.**\n• Em caso de impossibilidade de locomoção ou risco iminente, acione imediatamente o **SAMU (192)** ou os **Bombeiros (193)**.\n\n2. **HOSPITAIS MUNICIPAIS DE REFERÊNCIA EM TRAUMA 24 HORAS:**\n• **Hospital Estadual/Municipal Adão Pereira Nunes (Saracuruna):** Centro de excelência e referência regional em traumatologia de alta complexidade e cirurgia ortopédica de urgência (Rodovia Washington Luís, km 109 - Jardim Primavera / Saracuruna).\n• **Hospital Municipal Dr. Moacyr Rodrigues do Carmo (HMMRC):** Emergência 24 horas para primeiro atendimento, raio-x e imobilização ortopédica (Rodovia Washington Luís, 3200 - Parque Duque).\n• **UPHs e UPAs 24 Horas:** Unidades Pré-Hospitalares municipais atuam como portas de socorro rápido para imobilização provisória e encaminhamento regulado de ambulância.",
+      "tags": [
+        "quebrei o pe",
+        "ortopedia emergencia",
+        "hospital ortopedia",
+        "trauma ortopedico",
+        "fratura",
+        "osso quebrado",
+        "dor apos queda",
+        "torcao grave",
+        "adao pereira nunes",
+        "saracuruna",
+        "moacyr do carmo",
+        "samu 192"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Saúde / Complexo Hospitalar Adão Pereira Nunes",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://saude.duquedecaxias.rj.gov.br/"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Saúde",
+        "Diretoria Médica HMAPN",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_reparo_canteiro_calcada_publica",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Manutenção Viária — Canteiros, Calçadas e Vias Públicas (SMOA / Colab)",
+      "tema": "Infraestrutura e Zeladoria Urbana",
+      "assunto": "Reparo de Canteiros Danificados, Calçadas Públicas, Meio-fio e Passeio Público",
+      "conteudo": "Para solicitações de conserto de canteiros danificados, calçadas esburacadas, paralelepípedos soltos ou meios-fios destruídos em Duque de Caxias:\n\n1. **ÓRGÃO RESPONSÁVEL:**\n• **Secretaria Municipal de Obras e Agricultura (SMOA)**, encarregada da conservação de vias, praças e equipamentos urbanos públicos.\n\n2. **COMO SOLICITAR NO COLAB:**\n• **Aplicativo:** Acesse o **Colab** (https://duquedecaxias.colab.re/) ou o Portal Cidadão.\n• **Categoria / Tema:** **Obras e Infraestrutura**\n• **Assunto:** **Reparo de Vias / Canteiros Públicos / Calçadas Danificadas**\n• **Dados Obrigatórios:** Logradouro com número de referência em frente, bairro e foto nítida do local para triagem da equipe operacional.",
+      "tags": [
+        "canteiro danificado",
+        "conserto de canteiro",
+        "calcada publica",
+        "reparo de calcada",
+        "smoa",
+        "obras",
+        "meio-fio",
+        "passeio publico",
+        "paralelepipedo",
+        "asfalto quebrado",
+        "mureta",
+        "guia de sarjeta"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Obras e Agricultura / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Obras e Agricultura",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_alvara_templo_religioso_fiscalizacao",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Templos Religiosos — Imunidade Tributária, Alvará e Poder de Polícia (SMF/SMUH/CBMERJ)",
+      "tema": "Fazenda, Urbanismo e Segurança Pública",
+      "assunto": "Alvará de Funcionamento para Templos Religiosos, Imunidade Constitucional e Rito de Fiscalização",
+      "conteudo": "**BASE JURÍDICA E NORMATIVA AUDITADA:**\nNormas fundamentadas no **Artigo 150, VI, 'b' da Constituição Federal de 1988**, no **Código Tributário Municipal (Lei nº 1.664/2002)**, no **Código de Posturas de Duque de Caxias (Lei nº 1.464/1999)** e no **Decreto Estadual nº 42/2018 (COSCIP - Corpo de Bombeiros Militar do RJ)**.\n\n1. **IMUNIDADE TRIBUTÁRIA VS PODER DE POLÍCIA ADMINISTRATIVO:**\n• Os templos de qualquer culto possuem **imunidade tributária estrita** sobre impostos que recaiam sobre seu patrimônio, renda e serviços vinculados às suas finalidades essenciais (Art. 150, VI, 'b' da CF).\n• **Todavia, não estão dispensados das normas de segurança, higiene e poder de polícia da Prefeitura**. Necessitam de Alvará de Localização e Funcionamento para garantir a integridade dos fiéis e o sossego da vizinhança.\n\n2. **LICENÇAS E PROCEDIMENTO DE OBTENÇÃO:**\n• **Alvará de Localização e Funcionamento:** Requerido via **Portal do Contribuinte (SMF)** (https://portalcontribuinte.duquedecaxias.rj.gov.br/) com envio de CNPJ, Estatuto Social e Ata de Eleição da Diretoria.\n• **Habite-se / Regularidade Edilícia:** Emitido pela SMUH.\n• **Certificado de Aprovação do CBMERJ:** Laudo do Corpo de Bombeiros Militar atestando prevenção contra incêndio, rotas de fuga e extintores.\n• **Isolamento Acústico:** Limites sonoros conformes às posturas municipais.\n\n3. **RITO ADMINISTRATIVO DE FISCALIZAÇÃO E INTERDIÇÃO:**\n• A Prefeitura **não interdita sumariamente** templos religiosos sem a devida constatação de grave e iminente risco estrutural.\n• O procedimento administrativo regular exige:\n  1. Notificação Preliminar com prazo hábil (30 a 60 dias) para apresentação e regularização de documentos;\n  2. Auto de Infração somente em caso de inércia injustificada;\n  3. A interdição é medida de extrema exceção restrita a risco iminente de desabamento ou incêndio constatado pelas autoridades técnicas.",
+      "tags": [
+        "templo religioso",
+        "alvara igreja",
+        "alvara templo",
+        "interdicao de igreja",
+        "fiscalizacao igreja",
+        "imunidade tributaria templos",
+        "smuh",
+        "smf",
+        "cbmerj",
+        "codigo de posturas",
+        "art 150 cf"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Fazenda / Secretaria de Urbanismo / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://portalcontribuinte.duquedecaxias.rj.gov.br/"
+      ],
+      "homologado_por": [
+        "Secretaria de Fazenda",
+        "Secretaria de Urbanismo",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_recurso_multas_jari_transito",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Multas de Trânsito — JARI Municipal, Defesa Prévia e Recursos (CTB)",
+      "tema": "Transportes, Trânsito e Segurança Pública",
+      "assunto": "Recursos de Multas Municipais, Consulta de Processo e JARI (Fundamentação no CTB e CONTRAN)",
+      "conteudo": "**BASE LEGAL OFICIAL AUDITADA:**\nProcedimento fundamentado na **Lei Federal nº 9.503/1997 (Código de Trânsito Brasileiro - CTB, Arts. 281, 285 e 286)**, na **Resolução CONTRAN nº 900/2022** e no **Decreto Municipal nº 6.012/2011** que regulamenta a Junta Administrativa de Recursos de Infrações (JARI) vinculada à Secretaria Municipal de Transportes e Serviços Públicos (SMTSP).\n\n1. **IDENTIFICAÇÃO DO ÓRGÃO AUTUADOR:**\n• Verifique o cabeçalho da Notificação de Autuação. Se a autuação foi lavrada pela Prefeitura de Duque de Caxias (Guarda Municipal / SMTSP), o julgamento é de competência privativa da **JARI Municipal**.\n• Se aplicada na Rodovia Washington Luís (BR-040), compete à PRF/ANTT; se em rodovias estaduais ou vias do Detran, compete ao DETRAN-RJ.\n\n2. **PRAZOS E PROCEDIMENTO DE RECURSO:**\n• **Prazo Legal:** Mínimo de 30 dias contados da notificação (expresso na Notificação de Penalidade).\n• **Onde Apresentar:** Presencialmente no Setor de Protocolo Geral da Prefeitura (Alameda Esmeralda, 206 - Jardim Primavera) ou na sede da SMTSP.\n• **Documentos Obrigatórios:** Requerimento/Formulário de Recurso assinado, cópia da notificação da multa, cópia da CNH do motorista, cópia do CRLV do veículo e documentos comprobatórios (fotos, notas, comprovantes).",
+      "tags": [
+        "recurso de multa",
+        "multa indevida",
+        "jari",
+        "defesa de multa",
+        "processo de multa",
+        "secretaria de transportes",
+        "recurso de transito",
+        "ctb",
+        "resolucao contran 900"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Transportes e Serviços Públicos / JARI",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br"
+      ],
+      "homologado_por": [
+        "Junta Administrativa de Recursos de Infrações - JARI",
+        "Secretaria de Transportes",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_diferenca_esic_lai_vs_ouvidoria_colab",
+      "tipo": "REGRA_NEGOCIO",
+      "tipo_label": "Diferença entre Pedido de Informação (e-SIC/LAI) e Ouvidoria (Colab)",
+      "tema": "Transparência Pública e Ouvidoria Geral",
+      "assunto": "Diferença entre Pedido de Acesso à Informação Pública (e-SIC / LAI) e Reclamações de Ouvidoria (Colab)",
+      "conteudo": "Pedidos de informação institucional e reclamações de atendimento devem ser formalizados em **CANAIS SEPARADOS**, pois são regidos por leis federais distintas e tramitam com prazos diferentes:\n\n1. **CANAL 1: PEDIDO DE ACESSO À INFORMAÇÃO PÚBLICA (e-SIC / LAI — LEI 12.527/2011):**\n• **Finalidade:** Obter dados estatísticos, relatórios, quadro de funcionários/médicos lotados em postos, cópias de contratos e informações governamentais.\n• **Onde Solicitar:** Portal do e-SIC da Prefeitura de Duque de Caxias (https://duquedecaxias.rj.gov.br/e-sic) ou no Setor de Informação ao Cidadão no Protocolo Geral.\n• **Prazo Legal:** Até 20 dias corridos (prorrogáveis por mais 10 dias justificadamente).\n\n2. **CANAL 2: RECLAMAÇÃO / MANIFESTAÇÃO DE OUVIDORIA (LEI 13.460/2017):**\n• **Finalidade:** Reclamar de falta de atendimento, ausência de médicos no plantão, demora ou mau atendimento de servidores.\n• **Onde Solicitar:** Aplicativo **Colab** (https://duquedecaxias.colab.re/) ou Portal Cidadão Ouvidoria (https://portal.duquedecaxias.rj.gov.br/ouvidoria) selecionando o tipo **Reclamação**.\n• **Prazo Legal:** Até 30 dias corridos para resposta da Ouvidoria Geral.\n\n**Importante:** Não junte as duas demandas em um mesmo protocolo, pois tramitam em sistemas e secretarias diferentes.",
+      "tags": [
+        "quantos medicos estao lotados",
+        "esic",
+        "lai",
+        "acesso a informacao",
+        "diferenca esic ouvidoria",
+        "reclamar falta de medico",
+        "ouvidoria e-sic"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Controladoria Geral do Município / Ouvidoria Geral de Duque de Caxias",
+      "data_homologacao": "2026-10-14 15:00",
+      "homologado_por": [
+        "Controladoria Geral do Município",
+        "Ouvidoria Geral do Município"
+      ]
+    },
+    {
+      "id": "regra_canon_atencao_saude_nutricao_emagrecimento",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Saúde — Atendimento Nutricional, Emagrecimento e Atenção Primária (PNAB / SUS)",
+      "tema": "Atenção Primária à Saúde",
+      "assunto": "Acesso a Nutricionista, Emagrecimento Saudável e Porta de Entrada no SUS (SMS)",
+      "conteudo": "**BASE NORMATIVA OFICIAL AUDITADA:**\nDiretriz fundamentada na **Política Nacional de Atenção Básica (PNAB - Portaria de Consolidação MS nº 2/2017)**, na Linha de Cuidado do Sobrepeso e Obesidade do Ministério da Saúde e na **Carta de Serviços da Secretaria Municipal de Saúde (SMS) de Duque de Caxias** (disponível em https://saude.duquedecaxias.rj.gov.br/).\n\n1. **PORTA DE ENTRADA OBRIGATÓRIA NO SUS (UBS / USF):**\n• O atendimento nutricional no SUS não funciona por livre demanda em clínicas isoladas. O munícipe deve procurar sua **Unidade Básica de Saúde (UBS)** ou **Unidade de Saúde da Família (USF - Clínica da Família)** mais próxima de sua casa.\n\n2. **FLUXO ASSISTENCIAL DE EMAGRECIMENTO E NUTRIÇÃO:**\n• **1ª Etapa:** Consulta inicial com o **Clínico Geral ou Médico de Família** para exame físico geral e solicitação de exames laboratoriais preventivos (glicemia, colesterol, tireoide, etc.).\n• **2ª Etapa:** Havendo indicação clínica, o médico emite o encaminhamento para o serviço de **Nutrição** da unidade de saúde ou polo de referência.\n• **3ª Etapa:** Acompanhamento com nutricionista e inclusão em grupos educativos de hábitos saudáveis, academias da saúde e controle de doenças crônicas.\n\n3. **DOCUMENTOS EXIGIDOS:**\n• Cartão Nacional do SUS, documento oficial de identidade com foto (RG ou CPF) e comprovante de residência em Duque de Caxias.",
+      "tags": [
+        "emagrecer",
+        "quer emagrecer",
+        "perder peso",
+        "nutricionista",
+        "dieta",
+        "clinica da familia",
+        "saude nutricao",
+        "pnab sus",
+        "carta de servicos saude"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Saúde / Coordenação de Atenção Primária",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://saude.duquedecaxias.rj.gov.br/unidades-de-saude.php"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Saúde",
+        "Diretoria de Atenção Primária",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_iluminacao_publica_zeladoria_vs_ouvidoria",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Iluminação Pública — Distinção Didática entre Zeladoria Urbana e Ouvidoria Geral",
+      "tema": "Zeladoria Urbana vs Ouvidoria Geral",
+      "assunto": "Troca de Lâmpadas Queimadas e Delimitação Categórica entre Zeladoria e Ouvidoria no Colab",
+      "conteudo": "**DELIMITAÇÃO CATEGÓRICA DE FLUXOS NO COLAB:**\n\n1. **QUANDO USAR A ZELADORIA URBANA (CANAL PRIMÁRIO DE SERVIÇO):**\n• Para solicitar a execução física da manutenção pela primeira vez: lâmpada de poste apagada, lâmpada queimada, piscando ou rua às escuras.\n• **Caminho no Colab:** Aplicativo **Colab** (https://duquedecaxias.colab.re/) > Aba **Zeladoria Urbana** > Categoria: **Iluminação Pública** > Assunto: **Lâmpada Queimada / Manutenção de Iluminação LED**.\n• **Dados a informar:** Nome da rua, altura aproximada do número, bairro e código/plaqueta do poste se houver.\n\n2. **QUANDO USAR A OUVIDORIA GERAL (CANAL SECUNDÁRIO DE CONTROLE):**\n• A Ouvidoria Geral só deve ser acionada caso o munícipe já tenha aberto o protocolo inicial na Zeladoria Urbana e o prazo regulamentar de atendimento tenha expirado sem resolução pela concessionária/secretaria, ou caso haja reiterado descumprimento do serviço.\n• **Caminho:** Colab > **Ouvidoria Geral** > Tipo: **Reclamação** (informando o número do protocolo anterior da Zeladoria).",
+      "tags": [
+        "lampada queimada",
+        "poste apagado",
+        "iluminacao publica",
+        "zeladoria iluminacao",
+        "escuridao na rua",
+        "colab zeladoria",
+        "distincao ouvidoria zeladoria"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria de Transportes e Serviços Públicos / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Transportes e Serviços Públicos",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_acompanhamento_sisreg_tom_institucional",
+      "tipo": "REGRA_NEGOCIO",
+      "tipo_label": "Regulação de Consultas e Exames — SISREG (SMS)",
+      "tema": "Saúde Pública e Regulação",
+      "assunto": "Consulta, Acompanhamento de Pedidos e Prazos no SISREG com Transparência",
+      "conteudo": "Para consultar e acompanhar pedidos de consultas com médicos especialistas ou exames pelo SUS em Duque de Caxias:\n\n1. **FLUXO DE REGULAÇÃO MUNICIPAL (SISREG):**\n• Todas as solicitações de especialistas e exames complexos são cadastradas pelas Unidades Básicas de Saúde (UBS/USF) no **SISREG (Sistema de Regulação)** e reguladas conforme critérios clínicos de prioridade e disponibilidade regional.\n\n2. **COMO ACOMPANHAR COM TRANSPARÊNCIA:**\n• Ao passar pela consulta na unidade de saúde, solicite à recepção o **número do comprovante de inserção do pedido no SISREG**.\n• Com esse número em mãos, o cidadão pode acompanhar o andamento da regulação nos canais oficiais de saúde do município e junto à gerência de sua unidade de saúde de referência com total transparência e tranquilidade.",
+      "tags": [
+        "demora marcacao especialista",
+        "sisreg",
+        "fila do sus",
+        "acompanhar regulacao",
+        "marcar especialista",
+        "consulta especialista"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Saúde / Complexo Regulador Municipal",
+      "data_homologacao": "2026-10-14 15:00",
+      "homologado_por": [
+        "Secretaria Municipal de Saúde",
+        "Coordenação do SISREG",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_denuncia_irregularidade_servidor_ouvidoria",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Denúncia de Servidores, Funcionário Fantasma e Prevaricação (Ouvidoria Geral / CGM)",
+      "tema": "Integridade Pública e Ouvidoria Geral",
+      "assunto": "Denúncia de Funcionário Fantasma, Desvio Funcional e Garantia de Sigilo da Lei 13.460/2017",
+      "conteudo": "Para denúncias de servidores com conduta irregular, funcionário fantasma, não comparecimento ao expediente de trabalho ou ausência de plantão:\n\n1. **ÓRGÃO COMPETENTE:**\n• **Ouvidoria Geral do Município / Controladoria Geral do Município (CGM)**. É expressamente vedado atribuir essas denúncias a secretarias setoriais arbitrárias (como Secretaria da Mulher ou Meio Ambiente).\n\n2. **ONDE E COMO REGISTRAR NO COLAB:**\n• Acesse o aplicativo **Colab** (https://duquedecaxias.colab.re/) ou Portal Cidadão Ouvidoria (https://portal.duquedecaxias.rj.gov.br/ouvidoria).\n• Selecione o tipo de manifestação: **Denúncia**.\n\n3. **GARANTIA LEGAL DE SIGILO ABSOLUTO (LEI FEDERAL Nº 13.460/2017):**\n• O munícipe pode registrar a denúncia de forma anônima ou sob sigilo de identidade, garantido por lei federal.\n• **Elementos Importantes para Apuração:** Nome completo do servidor (se souber), secretaria ou unidade pública onde deveria cumprir expediente, endereço do local e descrição detalhada dos dias e horários da irregularidade presenciada.",
+      "tags": [
+        "funcionario fantasma",
+        "servidor fantasma",
+        "nao trabalha",
+        "nao vai trabalhar",
+        "recebe sem trabalhar",
+        "prevaricacao",
+        "denunciar servidor",
+        "irregularidade servidor",
+        "cgm",
+        "ouvidoria denuncia"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Ouvidoria Geral do Município / Controladoria Geral do Município",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://portal.duquedecaxias.rj.gov.br/ouvidoria",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Controladoria Geral do Município",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_assistencia_social_desastres_chuvas_cras",
+      "tipo": "REGRA_NEGOCIO",
+      "tipo_label": "Assistência Social Descentralizada em Desastres e Chuvas (CRAS)",
+      "tema": "Assistência Social e Defesa Civil",
+      "assunto": "Atendimento a Famílias Atingidas por Chuvas, Enchentes e Desabamentos (CRAS e Defesa Civil)",
+      "conteudo": "Para famílias que tiveram casas danificadas ou destruídas por fortes chuvas, enchentes ou desabamentos em Duque de Caxias:\n\n1. **RISCO ATIVO E EMERGÊNCIA IMEDIATA:**\n• Se houver risco contínuo de deslizamento, rachaduras na estrutura ou enchente com risco de vida, ligue imediatamente para a **Defesa Civil pelo 199** ou para o **Corpo de Bombeiros pelo 193**.\n\n2. **ACOLHIMENTO SOCIAL E BENEFÍCIOS DESCENTRALIZADOS NOS BAIRROS (CRAS):**\n• O atendimento socioassistencial às famílias desabrigadas ou desalojadas **é realizado de forma descentralizada na rede de CRAS (Centros de Referência de Assistência Social)** do município, próximo à sua residência (e não na sede administrativa central).\n• **Benefícios Disponibilizados pelo CRAS:**\n  - Inclusão no **Aluguel Social / Benefício Eventual de Vulnerabilidade Temporária**;\n  - Concessão de **Cesta Básica Emergencial**, colchões e kit de higiene;\n  - Cadastramento no Cadastro Único (CadÚnico) e acolhimento provisório;\n  - Encaminhamento gratuito para 2ª via de documentos civis perdidos na enchente.\n• Compareça ao CRAS de referência do seu bairro para atendimento imediato pela equipe de assistência social.",
+      "tags": [
+        "casa destruida pela chuva",
+        "enchente auxilio",
+        "perdi tudo na chuva",
+        "aluguel social",
+        "cras chuva",
+        "cesta basica enchente",
+        "defesa civil 199",
+        "assistencia social chuva"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Assistência Social e Direitos Humanos / Defesa Civil",
+      "data_homologacao": "2026-10-14 15:00",
+      "homologado_por": [
+        "Secretaria Municipal de Assistência Social e Direitos Humanos",
+        "Subsecretaria de Defesa Civil",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_socorro_morador_rua_samu_centro_pop",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Socorro a Pessoa em Situação de Rua — Georreferenciamento e Assistência Social",
+      "tema": "Emergência Médica e Assistência Social",
+      "assunto": "Socorro a Morador de Rua Desmaiado, Georreferenciamento Territorial (Lógica Caso 01) e Centro POP",
+      "conteudo": "Ao receber relato de pessoa em situação de rua desmaiada, acidentada ou necessitando de auxílio em Duque de Caxias:\n\n1. **1º PASSO — EMERGÊNCIA MÉDICA IMEDIATA (PRIORIDADE ABSOLUTA):**\n• Acionar imediatamente o **SAMU pelo 192** ou o **Corpo de Bombeiros pelo 193**.\n• Como a pessoa está desmaiada, o atendimento de suporte à vida e estabilização médica é prioritário e indispensável. Não mova a vítima sem orientação médica.\n\n2. **2º PASSO — GEORREFERENCIAMENTO E APOIO SOCIAL TERRITORIAL (LÓGICA DO CASO 01):**\n• **Regra de Localização:** O sistema aplica a mesma lógica de cálculo de proximidade e geocodificação do Caso 01.\n• **Com Bairro/Endereço Informado:** A IA identifica a coordenada geográfica da ocorrência e indica o **Centro POP (Centro de Referência Especializado para População em Situação de Rua)** ou o **CRAS de referência territorial mais próximo** para a abordagem social contínua.\n• **Sem Endereço Informado (Agente Coletor):** É expressamente proibido arbitrar um CRAS genérico (como o CRAS Jardim Primavera). A IA adota o comportamento de Agente Coletor: *\"Para que a equipe de abordagem social do Centro POP ou do CRAS de referência localize a pessoa, por favor informe a rua, praça ou bairro onde ela se encontra.\"*\n• **Canal Digital:** Solicitação de abordagem social pode ser aberta via **Colab** (https://duquedecaxias.colab.re/) no Tema: Assistência Social > Abordagem Social a Pessoas em Situação de Rua.",
+      "tags": [
+        "morador de rua desmaiado",
+        "socorro morador de rua",
+        "samu 192",
+        "pessoa desmaiada",
+        "centro pop",
+        "abordagem social",
+        "cras rua",
+        "resgate morador de rua",
+        "logica caso 01"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Secretaria Municipal de Assistência Social e Direitos Humanos / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Secretaria Municipal de Assistência Social e Direitos Humanos",
+        "Coordenação do SAMU",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_padrao_estruturado_benchmark",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Padrão Estruturado de Ouro para Equipamentos e Regras Canônicas (Benchmark)",
+      "tema": "Governança Canônica e Arquitetura do Sistema",
+      "assunto": "Especificação do Padrão Estruturado de Referência (Golden Benchmark)",
+      "conteudo": "O Padrão Estruturado de Ouro (Golden Benchmark) adotado no DUQUE IA define os requisitos arquiteturais e documentais mandatórios para homologação de dados mestres de equipamentos especiais e regras de negócio:\n\n1. **ESTRUTURA DE METADADOS OBRIGATÓRIOS (SCHEMA CANÔNICO):**\n• **ID Único:** Identificador semântico imutável (`regra_canon_*` ou `equipamento_*`).\n• **Tema e Assunto:** Taxonomia estrita vinculada ao catálogo da Ouvidoria Geral e Carta de Serviços.\n• **Diretriz Oficial Auditada:** Texto factual, normativo, claro e resolutivo (sem termos ambíguos ou evasivos).\n• **Tags de Busca Canônica:** Conjunto abrangente de sinônimos populares, gírias locais e termos técnicos para ativação determinística no Fast Gate.\n• **Nível de Prioridade e Boost:** Prioridade MÁXIMA com peso de relevância (boost_weight >= 3.0) para sobreposição a dados estocásticos do LLM.\n• **Rastreabilidade e Autoria:** Identificação do órgão gestor, autor técnico, data de homologação e instâncias de validação institucional.\n• **Links Oficiais Validados:** URLs ativas no domínio oficial da Prefeitura (`duquedecaxias.rj.gov.br`) e canais Colab.\n\n2. **COMPORTAMENTO NO PIPELINE (FAST GATE LAYER):**\n• Ao detectar entidades do padrão ouro (ex: Fazendinha do Autista, Casa do Autista, Concessionárias), o sistema injeta os dados homologados com 100% de confiança, bloqueando alucinações e inferências probabilísticas não ancoradas.",
+      "tags": [
+        "padrao estruturado",
+        "benchmark",
+        "governanca canonica",
+        "fast gate",
+        "regra de ouro",
+        "schema canonico",
+        "equipamentos especiais"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.5,
+      "autor": "Arquiteto de IA & Diretoria da Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Coordenação Técnica de IA",
+        "Secretaria Municipal de Governo"
+      ]
+    },
+    {
+      "id": "regra_canon_estabelecimento_fedendo_vigilancia_sanitaria",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Fiscalização de Estabelecimento Fedendo, Açougues e Alimentos (Vigilância Sanitária)",
+      "tema": "Vigilância Sanitária e Saúde Pública",
+      "assunto": "Fiscalização de Estabelecimento Fedendo, Comércio de Alimentos, Açougues e Carne Estragada",
+      "conteudo": "Para denúncias de estabelecimentos com mau cheiro forte, carnes impróprias ou comércio de alimentos em condições inadequadas em Duque de Caxias:\n\n1. **ÓRGÃO COMPETENTE E ATRIBUIÇÃO:**\n• A fiscalização de estabelecimentos comerciais de alimentos (açougues, peixarias, supermercados, feiras, restaurantes e frigoríficos) compete privativamente à **Subsecretaria de Vigilância Sanitária (SMS / DVS)**.\n• O órgão apura condições de higiene, acondicionamento térmico de carnes, descarte de resíduos putrescíveis, validade de produtos e licença sanitária.\n\n2. **ONDE E COMO REGISTRAR NO COLAB (CANAL OFICIAL):**\n• **Aplicativo / Portal:** Acesse o **Colab** (https://duquedecaxias.colab.re/) ou o Portal Cidadão Ouvidoria.\n• **Tema / Categoria:** **Vigilância Sanitária**\n• **Assunto:** **Fiscalização de Comércio de Alimentos / Condições Higiênico-Sanitárias**\n• **Orientações do POP:** Recomende ao munícipe anexar fotos, informar o nome de fachada do estabelecimento, endereço completo com número e ponto de referência para a equipe técnica de fiscalização sanitária.",
+      "tags": [
+        "estabelecimento fedendo",
+        "comercio fedendo",
+        "vende carne",
+        "vende carne fedendo",
+        "acougue fedendo",
+        "peixaria fedendo",
+        "carne estragada",
+        "mau cheiro de comercio",
+        "mau cheiro",
+        "vigilancia sanitaria",
+        "fiscalizacao de alimentos"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Subsecretaria de Vigilância Sanitária / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/",
+        "https://portal.duquedecaxias.rj.gov.br/ouvidoria"
+      ],
+      "homologado_por": [
+        "Subsecretaria de Vigilância Sanitária",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    },
+    {
+      "id": "regra_canon_marimbondos_multiplas_demandas",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Remoção de Ninho de Marimbondos e Animais Peçonhentos (Bombeiros, Defesa Civil e Meio Ambiente)",
+      "tema": "Defesa Civil, Bombeiros e Meio Ambiente",
+      "assunto": "Ninho de Marimbondos em Via Pública, Risco à População e Órgãos Competentes",
+      "conteudo": "Para ocorrências de ninhos de marimbondos, vespas ou enxames de abelhas colocando a população em risco em Duque de Caxias:\n\n1. **RISCO IMINENTE À INTEGRIDADE FÍSICA EM VIA PÚBLICA:**\n• Acione imediatamente o **Corpo de Bombeiros Militar pelo 193** ou a **Defesa Civil Municipal pelo 199**.\n• Ambas as corporações realizam intervenções técnicas e isolamento de área quando insetos agressivos oferecem perigo iminente a pedestres e crianças.\n\n2. **APOIO TÉCNICO E MANEJO AMBIENTAL (SMMA):**\n• A **Secretaria Municipal de Meio Ambiente e Proteção Animal (SMMA)** atua em suporte para o manejo ecológico seguro e preservação de insetos polinizadores protegidos (como abelhas sem ferrão) em cooperação com órgãos de resgate.\n• Para registro preventivo no Colab: Tema Meio Ambiente > Resgate e Proteção Animal.",
+      "tags": [
+        "marimbondo",
+        "ninho de marimbondo",
+        "vespas",
+        "enxame de abelha",
+        "bombeiros 193",
+        "defesa civil 199",
+        "meio ambiente",
+        "smma"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.0,
+      "autor": "Defesa Civil / Corpo de Bombeiros / SMMA / Ouvidoria Geral",
+      "data_homologacao": "2026-10-23 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Subsecretaria de Defesa Civil",
+        "Secretaria de Meio Ambiente",
+        "Diretoria da Ouvidoria Geral"
+      ]
+    }
+  ],
+  "regras_negocio": [
+    {
+      "id": "regra_canon_tarifa_zero_transporte_gratuito",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Programa Tarifa Zero - Ônibus Municipais Gratuitos",
+      "tema": "Transportes, Serviços Públicos e Mobilidade Urbana",
+      "assunto": "Gratuidade da Tarifa dos Ônibus Municipais do Programa Tarifa Zero (Decreto nº 8.120/2023)",
+      "conteudo": "O Programa Tarifa Zero de Duque de Caxias, instituído e regulamentado pelo Decreto Municipal nº 8.120/2023, garante transporte público municipal inteiramente GRATUITO a toda a população em suas linhas circulares. O valor da passagem é de R$ 0,00 (ZERO REAIS). Não há cobrança de tarifa, bilhetagem eletrônica paga nem exigência de pagamento em dinheiro para embarcar nos coletivos do programa. Os ônibus operam sob gestão da Secretaria Municipal de Transportes e Serviços Públicos (SMTSP) e interligam bairros e distritos da cidade, tais como: Capivari x Figueira, Aviário x Xerém, Parque Eldorado x Xerém (via Cantão), Vila Operária x Hosp. Daniel Lipp, Vila Maria Helena x Parque Equitativa, entre outros. Para dúvidas, itinerários ou horários, o munícipe pode consultar a Ouvidoria Geral pelo Colab ou telefone (21) 2652-3835.",
+      "tags": [
+        "tarifa zero",
+        "onibus gratuito",
+        "preco da passagem",
+        "valor da passagem",
+        "quanto custa o onibus",
+        "tarifa",
+        "passagem municipal",
+        "decreto 8120",
+        "transporte publico gratuito",
+        "smtsp",
+        "linhas tarifa zero",
+        "onibus de graca"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 3.5,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Transportes e Serviços Públicos",
+      "data_homologacao": "2026-10-26 10:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Secretaria Municipal de Transportes e Serviços Públicos"
+      ]
+    },
+    {
+      "id": "regra_canon_fazendinha_do_autista",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Fazendinha do Autista - Equipamento Municipal em Funcionamento",
+      "tema": "Gestão, Inclusão e Mulher (Fazendinha do Autista e Programas de Inclusão)",
+      "assunto": "Funcionamento, Inscrição e Atendimento na Fazendinha do Autista (Xerém)",
+      "conteudo": "A Fazendinha do Autista é um equipamento público municipal de Duque de Caxias em PLENO FUNCIONAMENTO E ABERTO AO PÚBLICO, localizado na Rua Marcio S. Silva, 2846 - Parque Ana Dantas, distrito de Xerém. A unidade oferece gratuitamente arteterapia, equoterapia, fisioterapia, psicologia, hortoterapia, musicalização e terapia com animais no desenvolvimento de habilidades, cognição e socialização de crianças e jovens com Transtorno do Espectro Autista (TEA). COMO INSCREVER: O atendimento é presencial. O responsável deve comparecer diretamente à unidade munido dos documentos da criança e do responsável (Documento pessoal/RG, Certidão de Nascimento, Cartão do SUS, Comprovante de Residência em Duque de Caxias e Laudo Médico/Diagnóstico com CID de TEA). CUSTO: 100% Gratuito. FILA DE ESPERA: Não há fila de espera para abertura do pedido. PRAZO DO PROCEDIMENTO: Em média de 5 a 15 dias úteis para inclusão nas terapias. CANAIS DE CONTATO OFICIAIS: Telefone / WhatsApp: (21) 99482-8304 | E-mail: fazendinhadoautista@gmail.com | Instagram: https://www.instagram.com/fazendinhadoautista. ATENÇÃO: A Fazendinha em Xerém está aberta e ativa. Não confundir com a Casa do Autista (Rua Jandira), que é obra em implantação.",
+      "tags": [
+        "fazendinha do autista",
+        "fazendinha",
+        "autista",
+        "autismo",
+        "tea",
+        "equoterapia",
+        "xerem",
+        "rua marcio s silva",
+        "como inscrever na fazendinha",
+        "fazendinha esta funcionando",
+        "parque ana dantas",
+        "terapia com animais",
+        "laudo autismo"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 4.0,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Governo",
+      "data_homologacao": "2026-10-26 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Coordenação de Inclusão"
+      ]
+    },
+    {
+      "id": "regra_canon_casa_do_autista_rua_jandira_status",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Casa do Autista (1º Distrito) - Obra em Implantação vs Atendimento em Xerém",
+      "tema": "Gestão, Inclusão e Mulher (Fazendinha do Autista e Programas de Inclusão)",
+      "assunto": "Status da Casa do Autista da Rua Jandira (1º Distrito) vs Atendimento Ativo na Fazendinha (Xerém)",
+      "conteudo": "A Casa do Autista, localizada na Rua Jandira (atrás do Restaurante Popular, Parque Vila Nova, 1º Distrito de Duque de Caxias), é um projeto municipal em fase de obras e estruturação para futuro centro de atendimento multidisciplinar especializado (com fisioterapia, fonoaudiologia, pedagogia, psicologia, psiquiatria, nutrição, espaço cultural e circo). Ela ainda NÃO está aberta para atendimento imediato de rotina nem consultas ao público na Rua Jandira. ORIENTAÇÃO AO CIDADÃO: Se o munícipe precisa de atendimento terapêutico e inclusivo IMEDIATO para seu filho com autismo/TEA hoje, o encaminhamento correto é a FAZENDINHA DO AUTISTA, localizada na Rua Marcio S. Silva, 2846 - Parque Ana Dantas - Xerém, que se encontra em pleno funcionamento com equoterapia, fisioterapia, arteterapia e suporte multiprofissional gratuito (Telefone/WhatsApp: 21 99482-8304). Para dúvidas sobre o cronograma das obras da Casa do Autista, contate a Secretaria Municipal de Saúde ou a Ouvidoria Geral pelo Colab.",
+      "tags": [
+        "casa do autista",
+        "rua jandira",
+        "levar filho na casa do autista",
+        "casa do autista esta funcionando",
+        "parque vila nova",
+        "atendimento autista rua jandira",
+        "diferenca casa do autista fazendinha"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 4.0,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Saúde",
+      "data_homologacao": "2026-10-26 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Secretaria Municipal de Saúde"
+      ]
+    },
+    {
+      "id": "regra_canon_isencao_iptu_aposentados_pensionistas",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Isenção de IPTU para Aposentados e Pensionistas - Secretaria de Fazenda",
+      "tema": "Fiscalização e tributos",
+      "assunto": "Isenção de IPTU para Aposentados, Pensionistas e Idosos com mais de 65 anos (SMF)",
+      "conteudo": "A Prefeitura Municipal de Duque de Caxias, através da Secretaria Municipal de Fazenda (SMF), assegura o direito à ISENÇÃO DE IPTU para contribuintes aposentados ou pensionistas com idade igual ou superior a 65 anos, que sejam titulares de um único imóvel utilizado exclusivamente para sua própria residência e atendam aos limites de metragem e remuneração previstos no Código Tributário Municipal. COMO SOLICITAR: O benefício é solicitado mediante Abertura de Processo Administrativo presencial na Secretaria Municipal de Fazenda. ONDE COMPARECER: Praça Roberto Silveira, nº 31 - Jardim 25 de Agosto, Duque de Caxias - RJ (Sede da Fazenda Municipal). DOCUMENTOS NECESSÁRIOS: 1. Documento de Identidade (RG) e CPF; 2. Comprovante de Concessão do Benefício do INSS/Aposentadoria comprovando a condição e o valor do provento mensal; 3. Carnê do IPTU do imóvel ou Certidão de Ônus Reais/RGI comprovando titularidade de único imóvel; 4. Comprovante de Residência em nome do requerente. CUSTO: Gratuito para protocolar. CANAIS DE ATENDIMENTO: Portal do Contribuinte da SMF (https://duquedecaxias.rj.gov.br/) e Ouvidoria Geral pelo Colab.",
+      "tags": [
+        "isencao iptu aposentado",
+        "isencao de iptu",
+        "iptu aposentados",
+        "desconto iptu idoso",
+        "como pedir isencao de iptu",
+        "fazenda iptu isencao",
+        "praca roberto silveira 31",
+        "isencao 65 anos"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 4.0,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Fazenda",
+      "data_homologacao": "2026-10-26 12:00",
+      "links_oficiais": [
+        "https://duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Secretaria Municipal de Fazenda"
+      ]
+    },
+    {
+      "id": "regra_canon_vaga_creche_matricula_escolar_sme",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Matrícula e Vagas em Creches e Escolas Municipais - Secretaria de Educação",
+      "tema": "Educação",
+      "assunto": "Ingresso, Reserva de Vagas e Matrícula em Creches e Escolas da Rede Municipal (SME)",
+      "conteudo": "O processo de ingresso, inscrição e reserva de vagas em Creches Municipais, Educação Infantil e Ensino Fundamental em Duque de Caxias é unificado e gerenciado pela Secretaria Municipal de Educação (SME). COMO SOLICITAR VAGA EM CRECHE OU ESCOLA: 1. Inscrição Oficial Online: As inscrições ocorrem de forma 100% online através do Portal Oficial da Educação de Duque de Caxias (https://educacao.duquedecaxias.rj.gov.br/) durante o período oficial divulgado no calendário anual de matrículas. 2. Atendimento Presencial e Casos Especiais: Os responsáveis também podem buscar orientação presencialmente na sede da Secretaria Municipal de Educação (SME), localizada na Rua Prefeito Bernardo Távora, s/n - 25 de Agosto, Duque de Caxias - RJ, especialmente para matrícula de crianças com deficiência (PcD), autismo/TEA ou suporte da equipe multiprofissional. DOCUMENTOS PARA MATRÍCULA: Certidão de Nascimento da criança, Cartão de Vacinação atualizado, Comprovante de Residência em Duque de Caxias, Documento de Identidade e CPF do responsável legal e Cartão do SUS. CUSTO: 100% Gratuito. DÚVIDAS E CALENDÁRIO: Consulte a Ouvidoria Geral pelo Colab ou telefone (21) 2652-3835.",
+      "tags": [
+        "vaga em creche",
+        "creche municipal",
+        "matricula creche",
+        "vaga escola municipal",
+        "como conseguir vaga na creche",
+        "educacao infantil duque de caxias",
+        "sme matricula",
+        "rua prefeito bernardo tavora"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 4.0,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Educação",
+      "data_homologacao": "2026-10-26 12:00",
+      "links_oficiais": [
+        "https://educacao.duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Secretaria Municipal de Educação"
+      ]
+    },
+    {
+      "id": "regra_canon_transferencia_escolar_alunos_sme",
+      "tipo": "REGRA_DE_NEGOCIO",
+      "tipo_label": "Transferência de Aluno entre Escolas Municipais - Secretaria de Educação",
+      "tema": "Educação",
+      "assunto": "Transferência de Aluno entre Escolas Municipais ou de Outras Redes (SME)",
+      "conteudo": "A transferência escolar de alunos (entre unidades da rede municipal de Duque de Caxias ou vindos de redes estaduais, privadas ou de outros municípios) é coordenada pela Secretaria Municipal de Educação (SME). PASSO A PASSO PARA SOLICITAR TRANSFERÊNCIA: 1. Na Escola Atual (Origem): O responsável comparece à secretaria da escola onde o aluno está matriculado e solicita a Declaração de Transferência ou Histórico Escolar atualizado. 2. Na Escola Pretendida (Destino): Apresentar a Declaração de Transferência na secretaria da escola municipal de destino para averiguação imediata de vaga na turma. 3. Se não houver vaga imediata na escola desejada: Comparecer ao Setor de Matrículas da Secretaria Municipal de Educação (SME), na Rua Prefeito Bernardo Távora, s/n - 25 de Agosto, para que o setor realize o encaminhamento oficial para a unidade escolar municipal mais próxima da residência. DOCUMENTOS: Declaração de transferência, RG/Certidão do aluno, documento do responsável e comprovante de residência. CUSTO: Gratuito.",
+      "tags": [
+        "transferencia de aluno",
+        "transferir de escola",
+        "mudar de escola",
+        "transferencia escolar",
+        "mudar meu filho de escola",
+        "declaracao de transferencia",
+        "sme transferencia"
+      ],
+      "prioridade": "MAXIMA",
+      "boost_weight": 4.0,
+      "autor": "Ouvidoria Geral e Secretaria Municipal de Educação",
+      "data_homologacao": "2026-10-26 12:00",
+      "links_oficiais": [
+        "https://educacao.duquedecaxias.rj.gov.br",
+        "https://duquedecaxias.colab.re/"
+      ],
+      "homologado_por": [
+        "Diretoria da Ouvidoria Geral",
+        "Secretaria Municipal de Educação"
       ]
     }
   ]

@@ -142,6 +142,7 @@ RAG_GERAL_FAST_PATTERNS = [
     
     # Transportes, Mobilidade e Canais da Prefeitura
     (r"\b(?:ônibus|onibus|transporte|tarifa\s+zero|passe\s+livre|estacionamento|sinal|semáforo|semaforo)\b", "RAG_GERAL", "Serviço de transportes e mobilidade detectado localmente."),
+    (r"\b(?:multas?|recorrer\s+de\s+multa|recurso\s+de\s+multa|jari|defesa\s+prévia|defesa\s+previa|autuação|autuacao|processo\s+de\s+multa)\b", "RAG_GERAL", "Consulta sobre multas e recursos de trânsito detectada localmente."),
     (r"\b(?:ouvidoria|colab|telefone|endereço|endereco|contato|horário|horario|secretaria|prefeitura)\b", "RAG_GERAL", "Consulta informativa de canais/secretarias detectada localmente.")
 ]
 
@@ -509,6 +510,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- Se o histórico contém uma dúvida sobre luz/iluminação (AMBIGUO_LUZ) e o usuário desambigua para postes ou lâmpadas da rua = RAG_GERAL (needs_clarification=false).\n"
         "- Manifestação de Ouvidoria com protocolo/atraso ou sem assunto = OUVIDORIA_MANIFESTACAO (needs_clarification=true se sem assunto).\n"
         "- Barulho sem local explícito = AMBIGUO_BARULHO (needs_clarification=true).\n"
+        "- JURIDICO = Usar APENAS se o cidadão solicitar explicitamente que a IA formule petição jurídica, redija recurso/parecer legal ou elabore argumentos em ação judicial contra a prefeitura. Dúvidas sobre onde recorrer de multas municipais (JARI), prazos legais para recorrer de infrações, como consultar processos administrativos ou localização de secretarias NÃO são JURIDICO -> use RAG_GERAL.\n"
         "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n\n"
         f"{history_context}"
         f"Consulta: \"{query}\"\n\n"

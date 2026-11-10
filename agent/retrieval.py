@@ -214,10 +214,15 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
         "como", "solicitar", "fazer", "quero", "preciso", "saber", "favor", "onde", "para", "pedir", 
         "registrar", "reclamar", "reclamacao", "denuncia", "denunciar", "obter", "tirar", 
         "telefone", "contato", "endereco", "com", "qual", "quais", "quem", "sobre", 
-        "atendimento", "entro", "entrar", "servico", "serviço", "geral", "informacao", "informações"
+        "atendimento", "entro", "entrar", "servico", "serviço", "geral", "informacao", "informações",
+        "quanto", "quantos", "quanta", "quantas", "custa", "valor", "preco", "preço"
     ]
     entity_words = ["rua", "ruas", "avenida", "avenidas", "bairro", "bairros", "distrito", "lote", "lotes", "quadra", "quadras", "numero", "num"]
-    noise_words = ["municipal", "prefeitura", "secretaria", "unidades", "unidade", "rede", "publica", "pública", "ensino", "duque", "caxias", "rio", "janeiro"]
+    noise_words = [
+        "municipal", "municipais", "municipio", "município", "prefeitura", "secretaria", "secretarias",
+        "unidades", "unidade", "rede", "publica", "pública", "publico", "público", "publicos", "públicos",
+        "ensino", "duque", "caxias", "rio", "janeiro", "dos", "das", "aos", "nas", "nos", "pelo", "pela", "pelos", "pelas"
+    ]
     
     query_lower = query.lower().replace("limepza", "limpeza").replace("fiscalisacao", "fiscalização").replace("fiscaisacao", "fiscalização")
     
@@ -558,7 +563,15 @@ def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
     if not main_db:
         return []
 
-    stop_words = {"como", "onde", "qual", "para", "fazer", "quero", "saber", "favor", "solicitar", "prefeitura", "duque", "caxias"}
+    stop_words = {
+        "como", "onde", "qual", "quais", "quem", "para", "fazer", "quero", "saber", "favor", 
+        "solicitar", "prefeitura", "duque", "caxias", "que", "voces", "você", "voce", "tem", 
+        "ela", "ele", "eles", "elas", "meu", "minha", "meus", "minhas", "esta", "está", 
+        "estao", "estão", "neste", "nesta", "nesse", "nessa", "momento", "agora", "ja", "já",
+        "faz", "fazem", "publico", "público", "publica", "pública", "publicos", "públicos",
+        "geral", "informacao", "informações", "posso", "pode", "podem", "dos", "das", "aos",
+        "rua", "bairro", "local", "aqui", "perto"
+    }
     search_terms = [w.lower() for w in query_keywords if len(w) >= 3 and w.lower() not in stop_words]
     if not search_terms:
         return []

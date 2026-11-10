@@ -12,32 +12,28 @@
 ├── package.json                  # Scripts npm e build command de dependências
 │
 ├── data/                         # DIRETÓRIO UNIFICADO DE DADOS
+│   ├── db/                       # BANCOS DE DADOS SEGREGADOS (Modo WAL)
+│   │   ├── main.db               # 443 unidades físicas, 152 bairros, 644 serviços, regras
+│   │   ├── vector.db             # 2.427 chunks, embeddings 3072 dim, índice FTS5
+│   │   ├── cache.db              # Cache semântico e triagens frequentes L1
+│   │   └── telemetry.db          # Histórico de tempos milissegundo a milissegundo
 │   ├── raw/                      # Dados brutos (CSVs, Excel, PDFs e URLs de input)
-│   │   ├── raw_csv_files/
-│   │   ├── raw_excel_files/
-│   │   ├── raw_pdf_files/
-│   │   └── raw_web_urls/
-│   ├── knowledge/                # Base de conhecimento Markdown (anterior bancoia)
-│   │   ├── CRIADO/
-│   │   ├── IAzeladoria/
-│   │   ├── OFICIOS/
-│   │   └── POP/
+│   ├── knowledge/                # Base de conhecimento Markdown e Cartas de Serviços
 │   └── processed/                # Dados estruturados convertidos em JSON
 │
 ├── agent/                        # Camada do Agente Conversacional (Cognitivo)
-│   ├── main.py                   # CLI / modo-pipe — entry point do processo Python (UTF-8 stdin/stdout/stderr)
+│   ├── main.py                   # CLI / modo-pipe — entry point do processo Python (UTF-8 stdin/stdout)
 │   ├── agent.py                  # DuqueIAAgent — orquestrador principal
+│   ├── graph.py                  # Grafo de estados (LangGraph Lite) com cronometria de nós
+│   ├── entity_resolver.py        # Camada Golden Source determinística (443 unidades, 152 bairros, <10ms)
 │   ├── triage.py                 # Triagem de 3 camadas (Fast Gate → SQLite Cache → Gemini LLM)
-│   ├── router.py                 # Roteamento semântico (GIS, INSTITUTIONAL, GENERAL)
-│   ├── retrieval.py              # Dynamic Hybrid RAG (mistura vetor + estruturado classificados por similaridade)
+│   ├── retrieval.py              # Dynamic Hybrid RAG (Vetor 3072 dim + FTS5 BM25 via RRF)
 │   ├── guardrails.py             # Input / Privacy (LGPD) / Competency / Legal / Output guardrails
-│   ├── scoring.py                # similaridade de cosseno (cosseno 85% + keyword overlap 15%)
-│   ├── fallback.py               # Redirecionamento da Ouvidoria Geral (Telefone/E-mail)
+│   ├── scoring.py                # Similaridade de cosseno e pesos de boost de regras
+│   ├── fallback.py               # Redirecionamento da Ouvidoria Geral (Telefone/WhatsApp/E-mail)
 │   ├── confidence.py             # Calibração de confiança pós-retrieval
-│   ├── reranker.py               # Interface BaseReranker / NoOpReranker (extensível)
-│   ├── config.py                 # KEYWORD_POLICY, LIST_INTENT_MAP, EMBEDDING_DIMS
-│   ├── models.py                 # Enums de intenções
-│   └── duque_ia.db               # Banco SQLite unificado ( chunks 3072 dim + estruturado + cache de triagem )
+│   ├── reranker.py               # LocalReranker com atalho de alta confiança (0ms)
+│   └── handlers/                 # Handlers especializados (authority, collector, ambiguity, security)
 │
 ├── ingestion/                    # Pipeline de Ingestão de Dados
 │   ├── parser/                   # Scripts de parsing de dados sob data/raw/ e data/knowledge/

@@ -13,8 +13,8 @@ O **Duque IA** é a plataforma de atendimento virtual que ajuda os cidadãos a l
 - **Frontend**: HTML5, CSS3 Vanilla, JavaScript (com suporte a micro-animações, design premium e responsividade mobile).
 - **Backend**: Node.js (Runtime do Servidor, proxy HTTP, isolamento de subprocessos por sessionId).
 - **RAG & IA**: Python 3.10+ (agente principal, indexador de PDF/Excel, gerador de embeddings e triagem de intenções).
-- **Banco de Dados**: SQLite local (`duque_ia.db`) atuando de forma relacional e vetorial.
-- **LLM**: Google Gemini API (modelos `gemini-3.1-flash-lite`, `gemini-2.5-flash` e embeddings `gemini-embedding-2`).
+- **Banco de Dados**: SQLite local segregado em 4 bancos (`main.db`, `vector.db`, `cache.db`, `telemetry.db`) operando em modo WAL de alta performance.
+- **LLM**: Google Gemini API (modelos `gemini-2.5-flash`, `gemini-1.5-flash` e embeddings `text-embedding-004`).
 
 ---
 
@@ -23,24 +23,33 @@ O **Duque IA** é a plataforma de atendimento virtual que ajuda os cidadãos a l
   Navegador (HTML/CSS/JS)
             │  (HTTP / POST /api/chat)
             ▼
-   Servidor Node.js (server.js)
-            │  (Process Spawn / IPC)
+   Servidor Node.js (server.js) — Pool de 4 Workers Python
+            │  (Stdin / Stdout IPC)
             ▼
-    Agente Python (agent/main.py)
-      ├── Triagem Semântica (triage.py)
-      ├── Guardrails (LGPD/Competência)
-      └── RAG Local (SQLite: duque_ia_chunks)
+    Agente Python (agent/graph.py)
+      ├── Fast Gate & Golden Source (agent/entity_resolver.py — 443 unidades em <1ms)
+      ├── Triagem Semântica (agent/triage.py)
+      ├── Guardrails (LGPD/Competência/Privacidade)
+      └── RAG Híbrido (SQLite: vector.db com FTS5 + Embeddings + RRF)
 ```
 
 ---
 
-## 📂 Estrutura de Pastas e Projetos
-- `/agent` — Arquivos do agente conversacional Python, guardrails, triage e o banco SQLite.
-- `/docs` — Documentação técnica completa organizada em módulos (SSOT).
-- `/data` — Fontes de dados de conhecimento brutas (`raw`), processadas (`processed`) e indexadas.
-- `/ingestion` — Scripts e parsers de leitura para PDFs, planilhas e páginas da web.
-- `/public` — Assets estáticos do frontend (chat, arquitetura, prompts, organograma).
-- `/scripts` — Utilitários de setup, execução e baterias de testes.
+## 📂 Estrutura de Pastas do Projeto
+Para uma explicação detalhada de cada pasta e arquivo do repositório, consulte o guia completo:
+👉 **[Guia Completo da Estrutura de Diretórios](docs/ESTRUTURA_PROJETO.md)**
+
+- `/agent` — Núcleo de Inteligência Artificial, LangGraph, Golden Source, Handlers e Guardrails.
+- `/bootstrap` — Diagnóstico de saúde (`health.py`), integridade e inicialização.
+- `/data` — Bancos SQLite (`data/db/`), bases brutas (`raw`), processadas (`processed`) e conhecimento (`knowledge`).
+- `/database` — DDLs canônicos dos schemas SQL e índices.
+- `/docs` — Central oficial de documentação técnica (10 módulos temáticos).
+- `/ingestion` — Pipeline de leitura de cartas de serviço, parsers e indexação vetorial.
+- `/public` — Interface web estática (chat, dashboard, CSS Vanilla e áudio).
+- `/scripts` — Utilitários de manutenção e suíte de testes automatizados (`scripts/tests/`).
+- `/storage` — Camada de repositórios tipados (Repository Pattern para SQLite).
+- `/utils` — Roteamento de LLMs, clientes Gemini/Groq e busca web de contingência.
+- `/voice` — Processamento de áudio, codecs e transcrição de voz.
 
 ---
 

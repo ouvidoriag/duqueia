@@ -163,6 +163,12 @@ def node_fast_gate(state: AgentState, ctx: GraphContext) -> AgentState:
     if result:
         triage = _add_routing_metadata(result)
         next_node = triage.get("next_agent", "RAG_HANDLER")
+        # Se for RAG_HANDLER ou consulta informativa, tenta primeiro a Golden Source Layer (0ms, 100% de precisão)
+        if next_node == "RAG_HANDLER":
+            return state.with_update(
+                triage_info=triage,
+                next_node="entity_resolver"
+            )
         return state.with_update(
             triage_info=triage,
             next_node=next_node
@@ -184,7 +190,7 @@ def node_entity_resolver(state: AgentState, ctx: GraphContext) -> AgentState:
                 "answer": res["answer"],
                 "sources": res["sources"],
                 "confidence": res["confidence"],
-                "intent": res["intent_detected"],
+                "intent_detected": res["intent_detected"],
                 "_graph": {
                     "nodes_executed": state.nodes_executed,
                     "resolved_by": res["resolved_by"],
@@ -196,6 +202,10 @@ def node_entity_resolver(state: AgentState, ctx: GraphContext) -> AgentState:
         import sys
         print(f"[Graph EntityResolver Warning] {e}", file=sys.stderr)
         
+    # Se já tinha triage_info com RAG_HANDLER vindo do fast_gate, encaminha para enriquecimento do tool_router
+    if state.triage_info and state.triage_info.get("next_agent") == "RAG_HANDLER":
+        return state.with_update(next_node="tool_router")
+
     return state.with_update(next_node="triage")
 
 

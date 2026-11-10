@@ -392,6 +392,10 @@
       font-size: 0.92rem;
       outline: none;
       transition: border-color .2s, box-shadow .2s;
+      resize: none;
+      min-height: 44px;
+      max-height: 140px;
+      line-height: 1.4;
     }
 
     .chat-input::placeholder { color: #a1afbf; }
@@ -497,14 +501,13 @@
 
     <!-- Input -->
     <div class="input-area">
-      <input
-        type="text"
+      <textarea
         class="chat-input"
         id="chatInput"
-        placeholder="Escreva sua mensagem..."
-        autocomplete="off"
-        maxlength="500"
-      >
+        placeholder="Escreva sua mensagem... (Shift+Enter para pular linha)"
+        rows="1"
+        maxlength="1000"
+      ></textarea>
       <button class="mic-btn" id="micBtn" title="Gravar Áudio">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2.5"
@@ -686,8 +689,9 @@
       if (sender === 'bot' && data?.response_audio_url) {
         const audioContainer = document.createElement('div');
         audioContainer.style.marginTop = '8px';
+        const botAudioUrl = (data.response_audio_url || '').replace(/^\/+/, '');
         audioContainer.innerHTML = `
-          <audio controls src="${data.response_audio_url}" style="width: 100%; max-width: 250px; height: 32px; display: block; outline: none;"></audio>
+          <audio controls src="${botAudioUrl}" style="width: 100%; max-width: 250px; height: 32px; display: block; outline: none;"></audio>
         `;
         bubble.appendChild(audioContainer);
       }
@@ -766,11 +770,12 @@
       if (!text || sendBtn.disabled) return;
 
       chatInput.value   = '';
+      chatInput.style.height = 'auto';
       sendBtn.disabled  = true;
       appendMessage('user', text);
       showTyping();
       try {
-        const res  = await fetch('/api/chat', {
+        const res  = await fetch('api/chat', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ message: text, sessionId })
@@ -796,7 +801,16 @@
 
     // ── Eventos ──────────────────────────────────────────────────────────────
     sendBtn.addEventListener('click', handleSend);
-    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+    });
 
     newChatBtn.addEventListener('click', () => {
       sessionId = 'sess_' + Date.now();
@@ -870,7 +884,7 @@
                 const base64Audio = reader.result;
 
                 try {
-                  const res = await fetch('/api/chat', {
+                  const res = await fetch('api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ audio: base64Audio, sessionId })

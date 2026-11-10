@@ -3,7 +3,9 @@ import sys
 import json
 
 # Ajusta path para importar módulos da raiz
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 from voice.voice_router import VoiceRouter
 from agent.agent import DuqueIAAgent
@@ -25,7 +27,7 @@ def main():
         print(f" -> Resposta formatada: {data.get('answer')[:120]}...")
         audio_url = data.get("response_audio_url")
         if audio_url:
-            full_audio_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "public", audio_url.lstrip("/")))
+            full_audio_path = os.path.join(ROOT_DIR, "public", audio_url.lstrip("/"))
             print(f" -> Áudio gerado em: {full_audio_path}")
             if os.path.exists(full_audio_path):
                 print(" -> [OK] Arquivo de áudio gerado com sucesso!")

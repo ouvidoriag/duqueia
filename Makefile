@@ -17,14 +17,13 @@
 help:
 	@echo "=============================================================================="
 	@echo "                      Comandos Disponíveis no DUQUE IA"
-	@echo "=============================================================================="
-	@echo "make setup              - Executa scripts/setup/setup_supabase.py para iniciar o DB"
-	@echo "make parse_pdfs         - Extrai textos de PDFs reais e importa Markdown para JSON"
-	@echo "make parse_csv          - Executa parser de CSVs da pasta data/raw/raw_csv_files/"
-	@echo "make parse_excel        - Executa parser de arquivos Excel (.xlsx, .xls)"
+	@echo "make setup              - Executa bootstrap de inicialização do banco SQLite local"
+	@echo "make parse_pdfs         - Extrai textos de PDFs reais e importa para JSON"
+	@echo "make parse_assuntos     - Ingere mapeamento de assuntos por secretaria (Colab)"
+	@echo "make parse_carta_servico- Ingere Carta de Serviços Municipal em Excel"
+	@echo "make sync_excel         - Sincroniza planilha Excel atualizada para serviços estruturados"
 	@echo "make parse_web          - Executa raspagem de sites a partir de data/raw/raw_web_urls/urls.txt"
-	@echo "make parse_carta_servico- Ingere Carta de Servico Municipal (data/knowledge/CARTA_DE_SERVICO*.xlsx)"
-	@echo "make parse_oficios      - Ingere PDFs de oficios da pasta data/knowledge/OFICIOS/"
+	@echo "make parse_oficios      - Ingere PDFs de ofícios municipais via OCR"
 	@echo "make parse_all          - Executa todos os parsers listados acima sequencialmente"
 	@echo "make embed              - Roda o pipeline de chunking e gravacao no banco SQLite"
 	@echo "make test_retrieval     - Roda os testes de metricas de recuperacao (Precision/Recall)"
@@ -37,39 +36,35 @@ help:
 
 # Cria as tabelas e índices no banco de dados local SQLite
 setup:
-	python scripts/setup/setup_supabase.py
+	python -c "from bootstrap.database_init import setup_database; setup_database()"
 
 # Ingestão de PDFs e Markdown
 parse_pdfs:
 	python ingestion/parser/parse_pdfs.py
 
-# Ingestão de arquivos CSV
-parse_csv:
-	python ingestion/parser/parse_csv.py
-
 # Ingestão de mapeamento de Assuntos por Secretaria (Colab)
 parse_assuntos:
 	python ingestion/parser/parse_assuntos.py
 
-# Ingestão de planilhas Excel
-parse_excel:
-	python ingestion/parser/parse_excel.py
+# Ingere a Carta de Servicos Municipal (Excel)
+parse_carta_servico:
+	python ingestion/parser/parse_carta_servico.py
+
+# Sincroniza planilha Excel atualizada para JSONs estruturados
+sync_excel:
+	python ingestion/parser/sync_updated_excel.py
 
 # Ingestão de URLs da internet
 parse_web:
 	python ingestion/parser/parse_web.py
 
-# Executa todas as ingestoes e gera a base consolidada de JSONs
-parse_all: parse_pdfs parse_csv parse_assuntos parse_excel parse_web parse_carta_servico parse_oficios
-	@echo "[Pipeline] Todos os parsers foram executados com sucesso!"
-
-# Ingere a Carta de Servicos Municipal (Excel do data/knowledge/)
-parse_carta_servico:
-	python ingestion/parser/parse_carta_servico.py
-
-# Ingere os PDFs de Oficios do data/knowledge/OFICIOS/ (OCR via Gemini Vision)
+# Ingere os PDFs de Oficios (OCR via Gemini Vision)
 parse_oficios:
 	python ingestion/parser/parse_oficios_ocr.py
+
+# Executa todas as ingestoes e gera a base consolidada de JSONs
+parse_all: parse_pdfs parse_assuntos parse_carta_servico sync_excel parse_web parse_oficios
+	@echo "[Pipeline] Todos os parsers foram executados com sucesso!"
 
 # Modo interativo de testes rapidos
 test_ask:

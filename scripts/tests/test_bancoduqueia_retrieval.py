@@ -17,7 +17,7 @@ import sqlite3
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DB_VECTOR = os.path.join(BASE_DIR, "data", "db", "vector.db")
 
 def test_fts(query, top_k=3):

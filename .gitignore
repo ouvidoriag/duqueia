@@ -37,8 +37,8 @@ scratch/
 !data/db/vector.db
 !data/db/cache.db
 !data/db/telemetry.db
+data/backups/
 archive/database_backups/
-
 
 # Logs e Métricas Locais
 logs/
@@ -48,12 +48,28 @@ metrics/
 # Arquivos de Áudio e Uploads de Usuários (Chat de Voz)
 public/audio/*.wav
 public/audio/*.mp3
+public/audio/*.webm
+public/audio/*.ogg
 !public/audio/.gitkeep
 public/uploads/*
 !public/uploads/.gitkeep
 
+# Dossiês e Relatórios Pesados Gerados Localmente
+*.pdf
+*.docx
+!data/knowledge/OFICIOS/*.pdf
+!data/raw/raw_pdf_files/*.pdf
+docs/audio_demonstracao/
+docs/apresentacao_executiva_a4/
+data/resultados_todas_as_perguntas.json
+data/todas_as_perguntas_consolidadas.json
+scripts/results_*.json
+player_audio_respostas.html
 
-# Arquivos Temporários de Sistema e Editores
+# Arquivos Temporários de Escritório e Sistema
+~$*
+~$*.docx
+~$*.xlsx
 .DS_Store
 .DS_Store?
 ._*
