@@ -170,3 +170,4 @@ Com a base e o cérebro do sistema consolidados e limpos:
    * Conexão visual direta aos dados de `telemetry.db` via `/api/metrics`.
    * Cards executivos: Total de Atendimentos, Tempo Médio de Resposta, Economia de Tokens, Índice de Resolução.
    * Gráficos dinâmicos com Chart.js exibindo distribuição por secretarias e mapa de demandas mais frequentes.
+

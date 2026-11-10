@@ -3,264 +3,349 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Duque IA — Atendimento Virtual</title>
+  <title>Duque IA — Atendimento Virtual da Prefeitura de Duque de Caxias</title>
+  
+  <!-- Tipografia Oficial: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg:            #f0f4f8;
-      --surface:       #ffffff;
-      --surface-hover: #f7f9fc;
-      --border:        #dde3ec;
-      --accent:        #1d4ed8;
-      --accent-light:  #eff6ff;
-      --accent-hover:  #1e40af;
-      --user-bubble:   #1d4ed8;
-      --bot-bubble:    #ffffff;
-      --text-primary:  #0f172a;
-      --text-secondary:#64748b;
-      --text-on-accent:#ffffff;
-      --green:         #16a34a;
-      --libras:        #0369a1;
-      --libras-light:  #e0f2fe;
-      --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-      --shadow-md:     0 4px 16px rgba(0,0,0,.08);
-      --shadow-lg:     0 12px 40px rgba(0,0,0,.10);
-      --radius-card:   20px;
-      --radius-bubble: 18px;
+      --brand-primary:   #003f99;
+      --brand-dark:      #002255;
+      --brand-light:     #e8f1fc;
+      --brand-accent:    #0284c7;
+      --bg-page:         #f1f5f9;
+      --surface:         #ffffff;
+      --surface-subtle:  #f8fafc;
+      --border:          #cbd5e1;
+      --border-light:    #e2e8f0;
+      --text-main:       #0f172a;
+      --text-muted:      #475569;
+      --text-soft:       #64748b;
+      --user-bubble:     #003f99;
+      --bot-bubble:      #ffffff;
+      --green:           #10b981;
+      --libras:          #0284c7;
+      --shadow-sm:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:       0 4px 12px rgba(0, 43, 102, 0.08);
+      --shadow-lg:       0 12px 36px rgba(0, 34, 85, 0.12);
+      --radius-card:     24px;
+      --radius-bubble:   18px;
     }
 
-    /* ── VLibras: Ícone de acessibilidade no header (apenas ícone) ── */
-    .libras-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
       padding: 0;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      flex-shrink: 0;
     }
-    .libras-toggle-btn:hover {
-      border-color: var(--libras);
-      color: var(--libras);
-      background: var(--libras-light);
-    }
-    .libras-toggle-btn.active {
-      background: var(--libras);
-      border-color: var(--libras);
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(3,105,161,.3);
-    }
-    .libras-toggle-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* ── VLibras: Barra de status (modo ativo) ───────────────── */
-    .libras-status-bar {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.35rem 1rem;
-      background: var(--libras);
-      color: #fff;
-      font-size: 0.73rem;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0.2px;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      animation: slideDown 0.3s ease;
-    }
-    .libras-status-bar.visible { display: flex; }
-    @keyframes slideDown {
-      from { transform: translateY(-100%); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
+      background: radial-gradient(circle at 15% 15%, #e2e8f0 0%, #cbd5e1 100%);
+      color: var(--text-main);
       height: 100vh;
+      height: 100dvh;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
     }
 
-    /* ── Card principal ─────────────────────────────────── */
+    /* ── Container Principal ─────────────────────────────────── */
     .chat-container {
-      width: 92%;
-      max-width: 780px;
-      height: 88vh;
+      width: 95%;
+      max-width: 860px;
+      height: 94vh;
+      height: 94dvh;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255, 255, 255, 0.8);
       border-radius: var(--radius-card);
       box-shadow: var(--shadow-lg);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      position: relative;
     }
 
-    /* ── Header ─────────────────────────────────────────── */
+    /* ── Header Institucional ────────────────────────────────── */
     .chat-header {
-      padding: 1.1rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      padding: 0.9rem 1.4rem;
+      border-bottom: 1px solid var(--border-light);
+      background: linear-gradient(135deg, #002b66 0%, #003f99 100%);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
+      z-index: 10;
     }
 
     .header-left {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.9rem;
     }
 
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(29,78,216,.25);
+    /* Avatar Fotográfico Interativo com Transição Suave */
+    .avatar-wrapper {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      padding: 2px;
+      background: linear-gradient(135deg, #38bdf8, #60a5fa);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
       flex-shrink: 0;
-      object-fit: cover;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
 
-    .avatar:hover {
-      transform: scale(1.08);
+    .avatar-wrapper:hover {
+      transform: scale(1.05);
     }
 
-    /* Modal de Zoom da Foto */
-    .image-modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      background: #ffffff;
       transition: opacity 0.3s ease;
-      cursor: pointer;
-    }
-    .image-modal.active {
-      display: flex;
-      opacity: 1;
-    }
-    .image-modal img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .image-modal.active img {
-      transform: scale(1);
     }
 
-    .title-area h1 {
+    .header-info h1 {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: .2px;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-info p {
+      font-size: 0.75rem;
+      color: #bae6fd;
+      font-weight: 500;
+      margin-top: 2px;
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
-      font-size: 0.72rem;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 0.15rem 0.55rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: #6ee7b7;
       font-weight: 600;
-      color: var(--green);
-      margin-top: 0.1rem;
+      margin-top: 3px;
     }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--green);
+      width: 6px;
+      height: 6px;
+      background: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 0 2px rgba(22,163,74,.2);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
       animation: pulse-dot 2s infinite;
     }
 
     @keyframes pulse-dot {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(22,163,74,.2); }
-      50%       { box-shadow: 0 0 0 5px rgba(22,163,74,.08); }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.2); opacity: 0.7; }
     }
 
-    .new-chat-btn {
-      background: var(--accent-light);
-      border: 1px solid #bfdbfe;
-      color: var(--accent);
-      padding: 0.5rem 1rem;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 0.45rem 0.85rem;
       border-radius: 10px;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
       font-weight: 600;
-      font-size: 0.8rem;
-      transition: background .2s, border-color .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
     }
 
-    .new-chat-btn:hover {
-      background: #dbeafe;
-      border-color: #93c5fd;
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
     }
 
-    /* ── Área de Mensagens ───────────────────────────────── */
+    /* ── VLibras Status Bar ──────────────────────────────────── */
+    .libras-status-bar {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--libras);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+    .libras-status-bar.visible { display: flex; }
+
+    /* ── Área de Mensagens (Feed) ────────────────────────────── */
     .messages-area {
       flex: 1;
-      padding: 1.5rem;
+      padding: 1.25rem 1.4rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.1rem;
       scroll-behavior: smooth;
-      background: var(--bg);
+      background: var(--surface-subtle);
     }
 
-    .messages-area::-webkit-scrollbar { width: 5px; }
-    .messages-area::-webkit-scrollbar-track { background: transparent; }
+    .messages-area::-webkit-scrollbar { width: 6px; }
     .messages-area::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 10px;
     }
 
-    /* ── Bolhas ─────────────────────────────────────────── */
-    .message {
-      max-width: 76%;
+    /* Card de Boas-Vindas Humanizado com Foto Oficial */
+    .welcome-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
       display: flex;
-      flex-direction: column;
-      animation: fade-up .28s ease-out forwards;
+      gap: 1.2rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      animation: fadeIn 0.4s ease-out;
     }
 
-    @keyframes fade-up {
-      from { opacity: 0; transform: translateY(6px); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .message.user { align-self: flex-end; }
-    .message.bot  { align-self: flex-start; }
+    .welcome-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 63, 153, 0.15);
+      flex-shrink: 0;
+      background: var(--brand-light);
+    }
+
+    .welcome-text h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      color: var(--brand-dark);
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .welcome-text p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Sugestões Rápidas (Chips de Serviços) */
+    .chips-section {
+      margin-top: 0.8rem;
+    }
+
+    .chips-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .chip-btn {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--brand-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .chip-btn:hover {
+      background: var(--brand-light);
+      border-color: var(--brand-accent);
+      color: var(--brand-primary);
+      transform: translateY(-1px);
+    }
+
+    /* ── Mensagens Individuais ────────────────────────────────── */
+    .message-row {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 82%;
+      animation: slideUp 0.25s ease-out forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .bot-thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 4px;
+      background: #ffffff;
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
 
     .message-bubble {
       padding: 0.85rem 1.15rem;
@@ -270,271 +355,366 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .user .message-bubble {
-      background: var(--user-bubble);
-      color: #fff;
+    .message-row.user .message-bubble {
+      background: linear-gradient(135deg, #003f99, #0284c7);
+      color: #ffffff;
       border-bottom-right-radius: 4px;
     }
 
-    .bot .message-bubble {
-      background: var(--bot-bubble);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
+    .message-row.bot .message-bubble {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
       border-bottom-left-radius: 4px;
     }
 
-    /* Markdown rendering */
-    .message-bubble strong { font-weight: 600; }
-    .message-bubble em     { font-style: italic; }
-    .message-bubble p      { margin-bottom: .5rem; }
+    /* Markdown dentro da resposta */
+    .message-bubble strong { font-weight: 700; color: #002255; }
+    .message-row.user .message-bubble strong { color: #ffffff; }
+    .message-bubble p { margin-bottom: 0.5rem; }
     .message-bubble p:last-child { margin-bottom: 0; }
-    .message-bubble ul     { padding-left: 1.2rem; margin-bottom: .5rem; }
-    .message-bubble li     { margin-bottom: .2rem; }
+    .message-bubble ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+    .message-bubble li { margin-bottom: 0.25rem; }
+    
     .message-bubble a {
-      color: #2563eb;
+      color: #0284c7;
       text-decoration: underline;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      font-weight: 600;
     }
-    .message-bubble a:hover {
-      color: #1d4ed8;
-    }
+    .message-row.user .message-bubble a { color: #ffffff; }
 
-
-    /* ── Metadados XAI ──────────────────────────────────── */
+    /* Metadados e Tags Técnicas */
     .meta-info {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.4rem;
       align-items: center;
       flex-wrap: wrap;
       margin-top: 0.35rem;
       padding: 0 0.2rem;
     }
+    .message-row.user .meta-info { justify-content: flex-end; }
 
-    .user .meta-info { justify-content: flex-end; }
-
-    .xai-tag {
+    .tag-meta {
       background: #f1f5f9;
-      border: 1px solid var(--border);
-      padding: 0.15rem 0.45rem;
-      border-radius: 5px;
+      border: 1px solid #e2e8f0;
+      padding: 0.12rem 0.45rem;
+      border-radius: 6px;
       font-size: 0.68rem;
-      color: var(--text-secondary);
-      font-weight: 500;
+      color: var(--text-soft);
+      font-weight: 600;
     }
 
-    .metrics-tag {
+    .tag-time {
       font-size: 0.7rem;
       font-weight: 600;
-      color: var(--accent);
+      color: var(--text-soft);
     }
 
-    /* ── Typing indicator ───────────────────────────────── */
-    .typing-indicator {
+    /* Reprodutor de Áudio Nativo */
+    .audio-player-box {
+      margin-top: 0.6rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.4rem 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .audio-player-box audio {
+      width: 100%;
+      height: 32px;
+      outline: none;
+    }
+
+    /* ── Indicador de Pesquisa (Typing) ──────────────────────── */
+    .typing-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      padding: 0.65rem 1rem;
+      border-radius: 16px;
+      width: fit-content;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .typing-text {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+
+    .dots-wave {
       display: flex;
       gap: 4px;
-      align-items: center;
-      padding: 0.2rem 0.1rem;
     }
 
-    .dot {
-      width: 7px;
-      height: 7px;
-      background: #94a3b8;
+    .dot-w {
+      width: 6px;
+      height: 6px;
+      background: var(--brand-accent);
       border-radius: 50%;
-      animation: bounce 1.3s infinite ease-in-out both;
+      animation: dotPulse 1.2s infinite ease-in-out both;
     }
-    .dot:nth-child(1) { animation-delay: -.3s; }
-    .dot:nth-child(2) { animation-delay: -.15s; }
+    .dot-w:nth-child(1) { animation-delay: -0.32s; }
+    .dot-w:nth-child(2) { animation-delay: -0.16s; }
 
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0); opacity: .4; }
-      40%           { transform: scale(1);  opacity: 1; }
+    @keyframes dotPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40%           { transform: scale(1.1); opacity: 1; }
     }
 
-    /* ── Separador de data ──────────────────────────────── */
-    .date-separator {
+    /* ── Barra de Entrada (Input) ────────────────────────────── */
+    .input-bar {
+      padding: 0.9rem 1.4rem;
+      background: #ffffff;
+      border-top: 1px solid var(--border-light);
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 0.6rem;
-      color: var(--text-secondary);
-      font-size: 0.72rem;
-      font-weight: 500;
-      margin: 0.3rem 0;
     }
 
-    .date-separator::before,
-    .date-separator::after {
-      content: '';
+    .chat-textarea {
       flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ── Área de Input ──────────────────────────────────── */
-    .input-area {
-      padding: 1rem 1.2rem;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      display: flex;
-      gap: 0.7rem;
-      align-items: center;
-    }
-
-    .chat-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
       padding: 0.75rem 1rem;
-      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       font-family: 'Inter', sans-serif;
       font-size: 0.92rem;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
+      color: var(--text-main);
+      background: var(--surface-subtle);
       resize: none;
-      min-height: 44px;
-      max-height: 140px;
-      line-height: 1.4;
+      outline: none;
+      line-height: 1.45;
+      max-height: 120px;
+      transition: border-color 0.2s;
     }
 
-    .chat-input::placeholder { color: #a1afbf; }
-
-    .chat-input:focus {
-      border-color: var(--accent);
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+    .chat-textarea:focus {
+      border-color: var(--brand-accent);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
     }
 
-    .send-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
+    .btn-icon {
       width: 44px;
       height: 44px;
+      border-radius: 12px;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 3px 10px rgba(29,78,216,.28);
-      transition: background .2s, transform .1s, box-shadow .2s;
+      transition: all 0.2s ease;
       flex-shrink: 0;
     }
 
-    .send-btn:hover  { background: var(--accent-hover); box-shadow: 0 4px 14px rgba(29,78,216,.35); }
-    .send-btn:active { transform: scale(0.95); }
-    .send-btn:disabled { background: #93c5fd; cursor: not-allowed; box-shadow: none; }
-
-    .mic-btn {
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 3px 10px rgba(16,185,129,.28);
-      transition: background .2s, transform .1s, box-shadow .2s;
-      flex-shrink: 0;
+    .btn-mic {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
     }
-
-    .mic-btn:hover { background: #059669; box-shadow: 0 4px 14px rgba(16,185,129,.35); }
-    .mic-btn:active { transform: scale(0.95); }
-    .mic-btn:disabled { background: #a7f3d0; cursor: not-allowed; box-shadow: none; }
-    .mic-btn.recording {
+    .btn-mic:hover {
+      background: #e2e8f0;
+      color: var(--brand-dark);
+    }
+    .btn-mic.recording {
       background: #ef4444;
-      box-shadow: 0 0 0 4px rgba(239,68,68,.35);
-      animation: pulse-mic 1.5s infinite;
+      color: #ffffff;
+      border-color: #ef4444;
+      animation: pulse-red 1.5s infinite;
     }
 
-    @keyframes pulse-mic {
-      0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(239,68,68,.6); }
-      50% { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(239,68,68,0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(239,68,68,0); }
+    @keyframes pulse-red {
+      0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+      70%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .btn-send {
+      background: linear-gradient(135deg, #003f99, #0284c7);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 63, 153, 0.25);
+    }
+    .btn-send:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-send:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Modal de Zoom da Foto */
+    .image-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+    .image-modal.active { display: flex; }
+    .image-modal img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 640px) {
+      .chat-container {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+      }
+      .message-row { max-width: 92%; }
+      .welcome-card { flex-direction: column; text-align: center; }
+      .header-info p { display: none; }
     }
   </style>
 </head>
 <body>
 
   <div class="chat-container">
-    <!-- Header -->
+    
+    <!-- Header Oficial PMDC -->
     <header class="chat-header">
       <div class="header-left">
-        <img class="avatar" src="/fotoperfil.png" alt="Duque IA">
-        <div class="title-area">
-          <h1>Duque IA</h1>
-          <div class="status-badge">
-            <span class="status-dot"></span>
-            Online — Assistente Oficial
-          </div>
+        <div class="avatar-wrapper" id="avatarTrigger" title="Clique para ampliar o crachá oficial">
+          <img class="avatar-img" id="headerAvatar" src="assets/atendente_caxias_headset_acolhe.png" alt="Atendente Oficial Duque IA">
+        </div>
+        <div class="header-info">
+          <h1>
+            Duque IA
+            <span class="status-badge"><span class="status-dot"></span> Online</span>
+          </h1>
+          <p>Prefeitura de Duque de Caxias • Ouvidoria Geral</p>
         </div>
       </div>
-      <div style="display: flex; gap: 0.5rem; align-items: center;">
-        <!-- Botão VLibras: ícone de mãos, abre o widget ao clicar -->
-        <button class="libras-toggle-btn" id="librasToggleBtn" title="Acessibilidade em Libras">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <!-- mão aberta / gesto de Libras -->
+
+      <div class="header-actions">
+        <!-- Botão VLibras -->
+        <button class="btn-header" id="librasToggleBtn" title="Ativar acessibilidade em Libras">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
             <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
             <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
             <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
           </svg>
+          Libras
         </button>
-        <a href="/dashboard.html" class="new-chat-btn" style="text-decoration: none; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); display: inline-flex; align-items: center;">Dashboard</a>
-        <button class="new-chat-btn" id="newChatBtn">Nova conversa</button>
+
+        <!-- Link para o Dashboard (Estritamente Relativo) -->
+        <a href="dashboard.html" class="btn-header" title="Painel de Observabilidade e Métricas">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          Dashboard
+        </a>
+
+        <!-- Nova Conversa -->
+        <button class="btn-header" id="newChatBtn" title="Iniciar nova conversa">
+          Novo Chat
+        </button>
       </div>
     </header>
-    <!-- Barra de status Libras (fica visível quando modo ativo) -->
+
+    <!-- Barra de Status Libras -->
     <div class="libras-status-bar" id="librasStatusBar">
-      🪧 Modo Libras ativo — as respostas serão traduzidas automaticamente pelo VLibras
+      🪧 Modo Libras Ativo — As respostas serão interpretadas pelo avatar virtual VLibras
     </div>
 
-    <!-- Área de Mensagens -->
+    <!-- Feed de Mensagens -->
     <div class="messages-area" id="messagesArea">
-      <div class="date-separator">Hoje</div>
-      <!-- Boas-vindas renderizada pelo JS -->
+      
+      <!-- Card de Apresentação e Boas-Vindas -->
+      <div class="welcome-card" id="welcomeCard">
+        <img class="welcome-avatar" src="assets/atendente_caxias_headset_acolhe.png" alt="Atendente Oficial">
+        <div class="welcome-text">
+          <h2>Olá! Seja muito bem-vindo ao Duque IA.</h2>
+          <p>
+            Sou a atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>. Estou pronta para tirar suas dúvidas sobre serviços, prazos, secretarias, unidades de saúde e registrar solicitações da Ouvidoria Geral.
+          </p>
+          
+          <div class="chips-section">
+            <div class="chips-label">Perguntas Frequentes:</div>
+            <div class="chips-grid">
+              <button class="chip-btn" onclick="sendQuickPrompt('Como funciona o Castramóvel e castração gratuita de animais?')">
+                🐾 Castramóvel & Pets
+              </button>
+              <button class="chip-btn" onclick="sendQuickPrompt('Como solicitar o conserto de lâmpada de poste apagada?')">
+                💡 Iluminação Pública
+              </button>
+              <button class="chip-btn" onclick="sendQuickPrompt('Como pedir operação tapa-buraco na minha rua?')">
+                🚗 Tapa-Buraco / Obras
+              </button>
+              <button class="chip-btn" onclick="sendQuickPrompt('Como agendar consulta ou encontrar um posto de saúde?')">
+                🏥 Saúde / UPH e USF
+              </button>
+              <button class="chip-btn" onclick="sendQuickPrompt('Quais são os telefones e contatos da Ouvidoria Geral de Duque de Caxias?')">
+                📞 Contatos da Ouvidoria
+              </button>
+              <button class="chip-btn" onclick="sendQuickPrompt('Como funciona o ônibus Tarifa Zero no município?')">
+                🚌 Ônibus Tarifa Zero
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Input -->
-    <div class="input-area">
+    <!-- Barra de Digitação e Áudio -->
+    <div class="input-bar">
       <textarea
-        class="chat-input"
+        class="chat-textarea"
         id="chatInput"
-        placeholder="Escreva sua mensagem... (Shift+Enter para pular linha)"
+        placeholder="Escreva sua dúvida... (Shift+Enter para pular linha)"
         rows="1"
-        maxlength="1000"
+        maxlength="2000"
       ></textarea>
-      <button class="mic-btn" id="micBtn" title="Gravar Áudio">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
+
+      <!-- Botão de Microfone -->
+      <button class="btn-icon btn-mic" id="micBtn" title="Gravar mensagem de voz">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
           <line x1="12" y1="19" x2="12" y2="23"></line>
           <line x1="8" y1="23" x2="16" y2="23"></line>
         </svg>
       </button>
-      <button class="send-btn" id="sendBtn" title="Enviar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
+
+      <!-- Botão de Enviar -->
+      <button class="btn-icon btn-send" id="sendBtn" title="Enviar mensagem">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
       </button>
     </div>
+
   </div>
 
-  <!-- Modal de Zoom da Foto -->
+  <!-- Modal Lightbox da Foto -->
   <div id="imageModal" class="image-modal">
-    <img id="modalImg" src="" alt="Zoom da Foto">
+    <img id="modalImg" src="" alt="Crachá Oficial Duque IA">
   </div>
 
-  <!-- VLibras Widget (Governo Federal) -->
+  <!-- VLibras Widget Oficial -->
   <div vw class="enabled">
     <div vw-access-button class="active"></div>
     <div vw-plugin-wrapper>
@@ -546,62 +726,81 @@
     new window.VLibras.Widget('https://vlibras.gov.br/app');
   </script>
 
+  <!-- Script da Aplicação -->
   <script>
+    // ── Referências do DOM ──────────────────────────────────────────────────
     const messagesArea    = document.getElementById('messagesArea');
     const chatInput       = document.getElementById('chatInput');
     const sendBtn         = document.getElementById('sendBtn');
+    const micBtn          = document.getElementById('micBtn');
     const newChatBtn      = document.getElementById('newChatBtn');
+    const headerAvatar    = document.getElementById('headerAvatar');
+    const avatarTrigger   = document.getElementById('avatarTrigger');
+    const imageModal      = document.getElementById('imageModal');
+    const modalImg        = document.getElementById('modalImg');
     const librasToggleBtn = document.getElementById('librasToggleBtn');
     const librasStatusBar = document.getElementById('librasStatusBar');
 
+    // Catálogo de Avatares Dinâmicos
+    const AVATARS = {
+      acolhe:  'assets/atendente_caxias_headset_acolhe.png',
+      pensando:'assets/atendente_notebook_pensando.png',
+      joinha:  'assets/atendente_caxias_joinha.png',
+      tablet:  'assets/atendente_caxias_tablet.png'
+    };
+
     let sessionId = 'sess_' + Date.now();
-
-    // ── VLibras: Modo de acessibilidade ─────────────────────────────────────
     let librasMode = false;
+    let avatarTimer = null;
 
+    // Transição de avatar da atendente
+    function setAvatarState(state) {
+      if (!AVATARS[state]) return;
+      if (avatarTimer) clearTimeout(avatarTimer);
+
+      headerAvatar.style.opacity = '0.4';
+      setTimeout(() => {
+        headerAvatar.src = AVATARS[state];
+        headerAvatar.style.opacity = '1';
+      }, 150);
+
+      // Se for estado de confirmação (joinha), retorna para acolhe após 4 segundos
+      if (state === 'joinha') {
+        avatarTimer = setTimeout(() => {
+          setAvatarState('acolhe');
+        }, 4500);
+      }
+    }
+
+    // Modal de zoom
+    avatarTrigger.addEventListener('click', () => {
+      modalImg.src = headerAvatar.src;
+      imageModal.classList.add('active');
+    });
+    imageModal.addEventListener('click', () => {
+      imageModal.classList.remove('active');
+    });
+
+    // Toggle Libras
     librasToggleBtn.addEventListener('click', () => {
       librasMode = !librasMode;
-      librasToggleBtn.classList.toggle('active', librasMode);
       librasStatusBar.classList.toggle('visible', librasMode);
-      librasToggleBtn.title = librasMode
-        ? 'Desativar modo Libras'
-        : 'Ativar modo Libras — todas as respostas serão traduzidas para Libras';
-      // Ao ativar, abre o widget VLibras direto
       if (librasMode) {
         const accessBtn = document.querySelector('[vw-access-button]');
         if (accessBtn) setTimeout(() => accessBtn.click(), 200);
       }
     });
 
-    /**
-     * Traduz um texto para Libras via widget VLibras / portal vlibras.gov.br
-     */
     function translateToLibras(text) {
-      const plainText = text
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/\*(.*?)\*/g, '$1')
-        .replace(/#{1,6}\s/g, '')
-        .replace(/`/g, '')
-        .replace(/\[.*?\]\(.*?\)/g, '')
-        .replace(/[-*•]\s/g, '')
-        .trim();
-
-      if (!plainText) return;
-
-      // Tenta injetar no campo de texto do widget VLibras nativo
-      const inputField = document.querySelector('.vw-text-input, [vw-translate-field], input[placeholder*="Libras"], .vw-input');
+      const clean = text.replace(/[*#`_\[\]]/g, '').trim();
+      const inputField = document.querySelector('.vw-text-input, [vw-translate-field], input[placeholder*="Libras"]');
       if (inputField) {
-        inputField.value = plainText;
-        inputField.dispatchEvent(new Event('input',  { bubbles: true }));
-        inputField.dispatchEvent(new Event('change', { bubbles: true }));
-      } else {
-        // Fallback: abre no portal vlibras.gov.br
-        const encoded = encodeURIComponent(plainText.substring(0, 500));
-        window.open(`https://vlibras.gov.br/?text=${encoded}`, '_blank', 'width=900,height=650,noopener');
+        inputField.value = clean;
+        inputField.dispatchEvent(new Event('input', { bubbles: true }));
       }
     }
 
-    // ── Markdown simplificado ────────────────────────────────────────────────
+    // Formatação de Markdown institucional
     function formatMarkdown(text) {
       if (!text) return '';
       let html = text
@@ -609,45 +808,16 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-      // Imagens com validação de esquema seguro e escape de aspas duplas
-      html = html.replace(/!\[(.*?)\]\(((?:https?:\/\/|\/)[^\s"']+)\)/g, (match, alt, src) => {
-        const cleanAlt = alt.replace(/"/g, '&quot;');
-        return `<img src="${src}" alt="${cleanAlt}" loading="lazy" style="max-width:100%; border-radius:8px; margin: 8px 0; display:block;">`;
-      });
-      // Links com validação de esquema seguro (evita javascript: e data:)
-      html = html.replace(/\[(.*?)\]\(((?:https?:\/\/|mailto:|tel:|\/)[^\s"']+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      // Negrito e Itálico
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*(.*?)\*/g,     '<em>$1</em>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-      // Linkificação inteligente de texto puro (evitando tags HTML existentes)
-      const parts = html.split(/(<[^>]+>)/g);
-      for (let i = 0; i < parts.length; i++) {
-        if (parts[i] && !parts[i].startsWith('<')) {
-          let textSeg = parts[i];
-          
-          // 1. URLs (ex: https://...)
-          textSeg = textSeg.replace(/(https?:\/\/[^\s<,]+)/g, '<a href="$1" target="_blank">$1</a>');
-          
-          // 2. E-mails (ex: contato@...)
-          textSeg = textSeg.replace(/\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g, '<a href="mailto:$1" target="_blank">$1</a>');
-          
-          // 3. Telefones (ex: 0800 000 3627 ou (21) 2652-3835)
-          textSeg = textSeg.replace(/\b(0800\s*\d{3}\s*\d{4}|\(?\d{2}\)?\s*9?\d{4}[-\s]?\d{4})\b/g, '<a href="tel:$1">$1</a>');
-          
-          // 4. Endereços (ex: Praça Roberto Silveira, N° 31 - Jardim 25 de Agosto)
-          const addrRegex = /(Rua|Avenida|Av\.|Praça|Praca|Alameda|Rodovia|Rod\.)\s+([A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*(?:\s+(?:de|da|do|dos|das|e|o|a)\s+[A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*|\s+[A-ZÀ-Ÿ][a-zà-ÿ0-9\.]*)*)(?:,?\s*(?:[Nn]?[°º\s]*\d+|s\/n|S\/N))?/g;
-          textSeg = textSeg.replace(addrRegex, (match) => {
-            const cleanQuery = encodeURIComponent(match.replace(/[\n\r]+/g, ' ').trim() + ', Duque de Caxias - RJ');
-            return `<a href="https://www.google.com/maps/search/?api=1&query=${cleanQuery}" target="_blank">${match}</a>`;
-          });
-          
-          parts[i] = textSeg;
-        }
-      }
-      html = parts.join('');
+      // Telefones municipais destacados (ex: 2652-3835)
+      html = html.replace(/\b(\(?21\)?\s*9?\d{4}[-\s]?\d{4})\b/g, '<a href="tel:$1"><strong>$1</strong></a>');
 
+      // Parágrafos e listas
       const paragraphs = html.split('\n\n');
-      html = paragraphs.map(p => {
+      return paragraphs.map(p => {
         const trimmed = p.trim();
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
           const items = trimmed.split(/\n[-*•]\s+/);
@@ -656,107 +826,106 @@
         }
         return `<p>${p.replace(/\n/g, '<br>')}</p>`;
       }).join('');
-
-      return html;
     }
 
-    // ── Hora atual ───────────────────────────────────────────────────────────
     function nowTime() {
       return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // ── Adiciona mensagem ────────────────────────────────────────────────────
+    // Renderização de Mensagens
     function appendMessage(sender, text, data = null) {
-      const wrapper = document.createElement('div');
-      wrapper.className = `message ${sender}`;
+      const row = document.createElement('div');
+      row.className = `message-row ${sender}`;
+
+      if (sender === 'bot') {
+        const thumb = document.createElement('img');
+        thumb.className = 'bot-thumb';
+        thumb.src = AVATARS.acolhe;
+        thumb.alt = 'Duque IA';
+        row.appendChild(thumb);
+      }
+
+      const bubbleWrap = document.createElement('div');
+      bubbleWrap.className = 'bubble-wrapper';
 
       const bubble = document.createElement('div');
       bubble.className = 'message-bubble';
-      bubble.innerHTML  = formatMarkdown(text);
-      wrapper.appendChild(bubble);
+      bubble.innerHTML = formatMarkdown(text);
+      bubbleWrap.appendChild(bubble);
 
-      // Renderiza áudio do usuário se disponível
-      if (sender === 'user' && data?.local_audio_url) {
-        const audioContainer = document.createElement('div');
-        audioContainer.style.marginTop = '8px';
-        audioContainer.innerHTML = `
-          <audio controls src="${data.local_audio_url}" style="width: 100%; max-width: 250px; height: 32px; filter: brightness(0.9); display: block; outline: none;"></audio>
-        `;
-        bubble.appendChild(audioContainer);
-      }
-
-      // Renderiza áudio de resposta do bot se disponível
+      // Reprodutor de áudio (se houver áudio sintetizado pelo TTS)
       if (sender === 'bot' && data?.response_audio_url) {
-        const audioContainer = document.createElement('div');
-        audioContainer.style.marginTop = '8px';
-        const botAudioUrl = (data.response_audio_url || '').replace(/^\/+/, '');
-        audioContainer.innerHTML = `
-          <audio controls src="${botAudioUrl}" style="width: 100%; max-width: 250px; height: 32px; display: block; outline: none;"></audio>
+        const audioBox = document.createElement('div');
+        audioBox.className = 'audio-player-box';
+        const cleanUrl = data.response_audio_url.replace(/^\/+/, '');
+        audioBox.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003f99" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <audio controls src="${cleanUrl}"></audio>
         `;
-        bubble.appendChild(audioContainer);
+        bubbleWrap.appendChild(audioBox);
       }
 
-      // Se modo Libras estiver ativo, traduz automaticamente a resposta
-      if (sender === 'bot' && text && librasMode) {
-        setTimeout(() => translateToLibras(text), 600);
-      }
+      // Metadados
+      const meta = document.createElement('div');
+      meta.className = 'meta-info';
 
-      const metaDiv = document.createElement('div');
-      metaDiv.className = 'meta-info';
+      const time = document.createElement('span');
+      time.className = 'tag-time';
+      time.textContent = nowTime();
+      meta.appendChild(time);
 
-      if (sender === 'user') {
-        metaDiv.innerHTML = `<span class="metrics-tag">${nowTime()}</span>`;
-      } else {
-        // Hora
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'metrics-tag';
-        timeSpan.textContent = nowTime();
-        metaDiv.appendChild(timeSpan);
-
-        // Latência
+      if (sender === 'bot') {
         if (data?.metrics?.total_time_ms) {
-          const t = document.createElement('span');
-          t.className   = 'xai-tag';
-          t.textContent = `${Math.round(data.metrics.total_time_ms)}ms`;
-          metaDiv.appendChild(t);
+          const lat = document.createElement('span');
+          lat.className = 'tag-meta';
+          lat.textContent = `⏱️ ${(data.metrics.total_time_ms / 1000).toFixed(1)}s`;
+          meta.appendChild(lat);
         }
-
-        // Intenção
         if (data?.intent_detected) {
-          const i = document.createElement('span');
-          i.className   = 'xai-tag';
-          i.textContent = data.intent_detected.replace(/_/g, ' ').toUpperCase();
-          metaDiv.appendChild(i);
-        }
-
-        // Fontes
-        if (data?.sources?.length) {
-          const s = document.createElement('span');
-          s.className   = 'xai-tag';
-          s.textContent = `Fonte: ${data.sources.join(', ')}`;
-          metaDiv.appendChild(s);
+          const intTag = document.createElement('span');
+          intTag.className = 'tag-meta';
+          intTag.textContent = `🎯 ${data.intent_detected.replace(/_/g, ' ')}`;
+          meta.appendChild(intTag);
         }
       }
 
-      wrapper.appendChild(metaDiv);
-      messagesArea.appendChild(wrapper);
+      bubbleWrap.appendChild(meta);
+      row.appendChild(bubbleWrap);
+      messagesArea.appendChild(row);
       messagesArea.scrollTop = messagesArea.scrollHeight;
+
+      if (sender === 'bot' && librasMode && text) {
+        translateToLibras(text);
+      }
     }
 
-    // ── Typing indicator ─────────────────────────────────────────────────────
+    // Indicador de Consulta RAG
     function showTyping() {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'message bot';
-      wrapper.id        = 'typingIndicator';
-      wrapper.innerHTML = `
-        <div class="message-bubble">
-          <div class="typing-indicator">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-        </div>`;
-      messagesArea.appendChild(wrapper);
+      setAvatarState('pensando');
+      const box = document.createElement('div');
+      box.className = 'message-row bot';
+      box.id = 'typingIndicator';
+
+      const thumb = document.createElement('img');
+      thumb.className = 'bot-thumb';
+      thumb.src = AVATARS.pensando;
+      box.appendChild(thumb);
+
+      const bubble = document.createElement('div');
+      bubble.className = 'typing-box';
+      bubble.innerHTML = `
+        <span class="typing-text">Pesquisando nas fontes oficiais de Duque de Caxias...</span>
+        <div class="dots-wave">
+          <div class="dot-w"></div>
+          <div class="dot-w"></div>
+          <div class="dot-w"></div>
+        </div>
+      `;
+      box.appendChild(bubble);
+      messagesArea.appendChild(box);
       messagesArea.scrollTop = messagesArea.scrollHeight;
     }
 
@@ -764,230 +933,138 @@
       document.getElementById('typingIndicator')?.remove();
     }
 
-    // ── Enviar mensagem ───────────────────────────────────────────────────────
-    async function handleSend() {
-      const text = chatInput.value.trim();
+    // Envio de Mensagem
+    async function handleSend(customText = null) {
+      const text = (customText || chatInput.value).trim();
       if (!text || sendBtn.disabled) return;
 
-      chatInput.value   = '';
+      chatInput.value = '';
       chatInput.style.height = 'auto';
-      sendBtn.disabled  = true;
+      sendBtn.disabled = true;
+
       appendMessage('user', text);
       showTyping();
+
       try {
-        const res  = await fetch('api/chat', {
-          method:  'POST',
+        const res = await fetch('api/chat', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ message: text, sessionId })
+          body: JSON.stringify({ message: text, sessionId })
         });
 
         const data = await res.json();
         removeTyping();
 
         if (data.error) {
-          appendMessage('bot', `Ocorreu um erro: ${data.error}`);
+          setAvatarState('acolhe');
+          appendMessage('bot', `Desculpe, ocorreu uma instabilidade temporária: ${data.error}`);
         } else {
+          setAvatarState('joinha');
           appendMessage('bot', data.answer, data);
         }
       } catch (err) {
         removeTyping();
-        appendMessage('bot', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
-        console.error(err);
+        setAvatarState('acolhe');
+        appendMessage('bot', 'Erro de conexão com o servidor municipal. Por favor, tente novamente em instantes.');
       } finally {
         sendBtn.disabled = false;
         chatInput.focus();
       }
     }
 
-    // ── Eventos ──────────────────────────────────────────────────────────────
-    sendBtn.addEventListener('click', handleSend);
+    function sendQuickPrompt(promptText) {
+      handleSend(promptText);
+    }
+
+    // Eventos de Input
+    sendBtn.addEventListener('click', () => handleSend());
     chatInput.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         handleSend();
       }
     });
+
     chatInput.addEventListener('input', () => {
       chatInput.style.height = 'auto';
-      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
     });
 
     newChatBtn.addEventListener('click', () => {
       sessionId = 'sess_' + Date.now();
-      messagesArea.innerHTML = '<div class="date-separator">Nova conversa</div>';
-      appendMessage('bot',
-        'Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n' +
-        'Como posso ajudar você hoje? Pergunte sobre secretarias, serviços municipais, endereços ou ouvidoria.'
-      );
-      chatInput.focus();
+      setAvatarState('acolhe');
+      messagesArea.innerHTML = '';
+      appendMessage('bot', 'Olá! Iniciei uma nova sessão de atendimento para você. Como posso te ajudar agora?');
     });
 
-    // ── Mensagem inicial ─────────────────────────────────────────────────────
-    appendMessage('bot',
-      'Olá! Sou o **DUQUE IA**, assistente virtual da Prefeitura de Duque de Caxias.\n\n' +
-      'Como posso ajudar você hoje? Pergunte sobre secretarias, serviços municipais, endereços ou ouvidoria.'
-    );
-    // ── Zoom da Foto de Perfil (Lightbox) ────────────────────────────────────
-    const avatarImg = document.querySelector('.avatar');
-    const imageModal = document.getElementById('imageModal');
-    const modalImg = document.getElementById('modalImg');
-
-    avatarImg.addEventListener('click', () => {
-      modalImg.src = avatarImg.src;
-      imageModal.classList.add('active');
-    });
-
-    imageModal.addEventListener('click', () => {
-      imageModal.classList.remove('active');
-    });
-
-    // ── Gravação de Áudio (MediaRecorder) ────────────────────────────────────
+    // ── Gravação de Áudio do Munícipe (MediaRecorder) ────────────────────────
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
 
-    const micBtn = document.getElementById('micBtn');
-
     micBtn.addEventListener('click', async () => {
-      if (!isRecording) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
-          audioChunks = [];
+      if (isRecording) {
+        mediaRecorder.stop();
+        return;
+      }
 
-          mediaRecorder.addEventListener('dataavailable', event => {
-            audioChunks.push(event.data);
-          });
+      if (!navigator.mediaDevices?.getUserMedia) {
+        alert('Seu navegador não possui suporte para gravação de áudio.');
+        return;
+      }
 
-          mediaRecorder.addEventListener('stop', async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const localAudioUrl = URL.createObjectURL(audioBlob);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
 
-            showTyping();
-            micBtn.disabled = true;
-            sendBtn.disabled = true;
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
 
-            // Mostra áudio local no histórico de conversas imediatamente
-            appendMessage('user', '🎙️ *Mensagem de áudio enviada*', { local_audio_url: localAudioUrl });
-
-            try {
-              // Converte o WebM gravado pelo navegador para WAV PCM 16-bit linear no client-side.
-              // Isso garante 100% de compatibilidade e velocidade de processamento na File API do Gemini.
-              const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-              const arrayBuffer = await audioBlob.arrayBuffer();
-              const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-              const wavBlob = bufferToWav(audioBuffer);
-
-              const reader = new FileReader();
-              reader.readAsDataURL(wavBlob);
-              reader.onloadend = async () => {
-                const base64Audio = reader.result;
-
-                try {
-                  const res = await fetch('api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ audio: base64Audio, sessionId })
-                  });
-
-                  const data = await res.json();
-                  removeTyping();
-
-                  if (data.error) {
-                    appendMessage('bot', `Ocorreu um erro: ${data.error}`);
-                  } else {
-                    appendMessage('bot', data.answer, data);
-                  }
-                } catch (err) {
-                  removeTyping();
-                  appendMessage('bot', 'Erro ao conectar com o servidor. Verifique se o backend está rodando.');
-                  console.error(err);
-                } finally {
-                  micBtn.disabled = false;
-                  sendBtn.disabled = false;
-                }
-              };
-            } catch (convErr) {
-              removeTyping();
-              appendMessage('bot', 'Erro ao processar e converter o áudio no navegador.');
-              console.error(convErr);
-              micBtn.disabled = false;
-              sendBtn.disabled = false;
-            }
-          });
-
-          mediaRecorder.start();
+        mediaRecorder.onstart = () => {
           isRecording = true;
           micBtn.classList.add('recording');
-          micBtn.title = "Parar Gravação";
-        } catch (err) {
-          alert('Não foi possível acessar o microfone. Verifique as permissões de gravação de áudio do seu navegador.');
-          console.error(err);
-        }
-      } else {
-        mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
-        isRecording = false;
-        micBtn.classList.remove('recording');
-        micBtn.title = "Gravar Áudio";
+          micBtn.title = 'Clique para encerrar e enviar o áudio';
+        };
+
+        mediaRecorder.onstop = async () => {
+          isRecording = false;
+          micBtn.classList.remove('recording');
+          micBtn.title = 'Gravar mensagem de voz';
+          stream.getTracks().forEach(track => track.stop());
+
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = async () => {
+            const base64Audio = reader.result;
+            showTyping();
+            appendMessage('user', '🎙️ [Mensagem de Áudio enviada]');
+
+            try {
+              const res = await fetch('api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ audio: base64Audio, sessionId })
+              });
+              const data = await res.json();
+              removeTyping();
+              setAvatarState('joinha');
+              appendMessage('bot', data.answer, data);
+            } catch (err) {
+              removeTyping();
+              setAvatarState('acolhe');
+              appendMessage('bot', 'Erro ao processar mensagem de voz.');
+            }
+          };
+        };
+
+        mediaRecorder.start();
+      } catch (err) {
+        alert('Permissão de microfone negada ou indisponível.');
       }
     });
-
-    // ── Helper: Converte AudioBuffer para arquivo WAV 16-bit PCM Linear ─────────
-    function bufferToWav(buffer) {
-      const numOfChan = buffer.numberOfChannels;
-      const length = buffer.length * numOfChan * 2 + 44;
-      const bufferArr = new ArrayBuffer(length);
-      const view = new DataView(bufferArr);
-      const channels = [];
-      let offset = 0;
-      let pos = 0;
-
-      function setUint16(data) {
-        view.setUint16(pos, data, true);
-        pos += 2;
-      }
-
-      function setUint32(data) {
-        view.setUint32(pos, data, true);
-        pos += 4;
-      }
-
-      // RIFF header
-      setUint32(0x46464952); // "RIFF"
-      setUint32(length - 8); // file length - 8
-      setUint32(0x45564157); // "WAVE"
-
-      // fmt chunk
-      setUint32(0x20746d66); // "fmt "
-      setUint32(16);         // chunk size
-      setUint16(1);          // uncompressed linear PCM
-      setUint16(numOfChan);
-      setUint32(buffer.sampleRate);
-      setUint32(buffer.sampleRate * numOfChan * 2); // byte rate
-      setUint16(numOfChan * 2); // block align
-      setUint16(16); // bits per sample
-
-      // data chunk
-      setUint32(0x61746164); // "data"
-      setUint32(length - pos - 4); // chunk size
-
-      for (let i = 0; i < numOfChan; i++) {
-        channels.push(buffer.getChannelData(i));
-      }
-
-      while (pos < length) {
-        for (let i = 0; i < numOfChan; i++) {
-          let sample = Math.max(-1, Math.min(1, channels[i][offset]));
-          sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-          view.setInt16(pos, sample, true);
-          pos += 2;
-        }
-        offset++;
-      }
-
-      return new Blob([bufferArr], { type: 'audio/wav' });
-    }
   </script>
 </body>
 </html>

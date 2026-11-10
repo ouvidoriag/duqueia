@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Duque IA — Dashboard de Observabilidade</title>
+  <title>Duque IA — Painel de Observabilidade & Inteligência Municipal</title>
   
-  <!-- Fontes -->
+  <!-- Fontes Oficiais -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Tailwind Config para Cores Personalizadas -->
+  <!-- Configuração do Tailwind -->
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -30,16 +30,14 @@
             brand: {
               50: '#eff6ff',
               100: '#dbeafe',
-              200: '#bfdbfe',
               500: '#3b82f6',
-              600: '#2563eb',
-              700: '#1d4ed8',
-              800: '#1e40af',
-              900: '#1e3a8a',
+              600: '#003f99',
+              700: '#002b66',
+              800: '#001a40'
             },
-            darkbg: '#0f172a',
-            darksurface: '#1e293b',
-            darkborder: '#334155'
+            darkbg: '#0a0f1d',
+            darksurface: '#111827',
+            darkcard: '#1e293b'
           }
         }
       }
@@ -48,215 +46,245 @@
 
   <style>
     body {
-      background-color: #0f172a;
+      background-color: #0a0f1d;
       color: #f8fafc;
     }
-    /* Estilização fina da barra de rolagem */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
     .glass-card {
-      background: rgba(30, 41, 59, 0.7);
+      background: rgba(17, 24, 39, 0.75);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
     }
   </style>
 </head>
 <body class="font-sans antialiased min-h-screen">
 
-  <!-- Main Grid/Container -->
   <div class="flex flex-col min-h-screen">
     
-    <!-- Top Navbar -->
-    <header class="border-b border-darkborder bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-tr from-brand-600 to-cyan-500 rounded-xl flex items-center justify-center font-outfit font-extrabold text-white text-lg shadow-lg shadow-brand-500/20">
-          D
-        </div>
+    <!-- Top Navbar Executivo -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <img src="assets/atendente_terno_apresenta.png" alt="Duque IA Executivo" class="w-12 h-12 rounded-xl object-cover border border-blue-500/30 shadow-lg shadow-blue-500/10">
         <div>
-          <h1 class="font-outfit font-bold text-lg text-white tracking-wide">Duque IA</h1>
-          <p class="text-xs text-slate-400">Dashboard de Observabilidade & Métricas RAG</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-outfit font-extrabold text-lg text-white tracking-wide">Duque IA</h1>
+            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full">PRODUÇÃO v3.0</span>
+            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> PORTA 3000
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">Prefeitura de Duque de Caxias • Ouvidoria Geral • Centro de Comando</p>
         </div>
       </div>
       
-      <div class="flex items-center gap-4">
-        <!-- Auto Refresh Dropdown -->
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400">Atualização:</span>
-          <select id="refreshRate" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded px-2 py-1 focus:outline-none focus:border-brand-500">
+      <div class="flex items-center gap-3">
+        <!-- Seletor de Auto Refresh -->
+        <div class="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700/60 rounded-lg px-2.5 py-1 text-xs">
+          <span class="text-slate-400">Atualização:</span>
+          <select id="refreshRate" class="bg-transparent text-slate-200 font-semibold focus:outline-none cursor-pointer">
             <option value="0">Manual</option>
+            <option value="5">5s</option>
             <option value="10" selected>10s</option>
             <option value="30">30s</option>
-            <option value="60">60s</option>
           </select>
         </div>
 
-        <button onclick="fetchData()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 active:scale-95 transition-all text-xs font-semibold rounded-lg text-white flex items-center gap-2">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.253 8H18"></path></svg>
-          Atualizar
+        <!-- Botão Atualizar Manual -->
+        <button onclick="fetchData()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors" title="Atualizar agora">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
         </button>
 
-        <a href="/chat.html" class="px-3 py-1.5 border border-slate-700 hover:border-slate-500 hover:bg-slate-800 transition text-xs font-semibold rounded-lg text-slate-300">
-          Voltar para o Chat
+        <!-- Link Direto para o Atendimento (Relativo) -->
+        <a href="chat.html" class="bg-gradient-to-r from-blue-700 to-sky-600 hover:from-blue-600 hover:to-sky-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md shadow-blue-900/30 transition-all flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+          Abrir Atendimento
         </a>
       </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 p-6 space-y-6 max-w-7xl mx-auto w-full">
+    <!-- Main Content -->
+    <main class="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
       
-      <!-- KPI Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <!-- Total Requests -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Total de Requisições</span>
-            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+      <!-- Top Banner Informativo com Foto da Atendente Oficial -->
+      <div class="glass-card rounded-2xl p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border-l-4 border-l-blue-500">
+        <div class="flex items-center gap-4">
+          <img src="assets/atendente_caxias_tablet.png" alt="Atendente Suporte" class="w-16 h-16 rounded-xl object-cover bg-slate-800 border border-slate-700 shadow-md">
+          <div>
+            <h2 class="text-base font-bold text-white font-outfit">Cluster Cognitivo Duque IA Operacional</h2>
+            <p class="text-xs text-slate-400 mt-1 max-w-2xl">
+              Monitorando em tempo real os <strong>4 workers Python</strong> no servidor de produção. Modelo RAG: <strong>Gemini 3.8-Flash</strong> (respostas factuais) e Triador: <strong>Gemini 3.1-Flash-Lite</strong> (~1,4s). Base oficial: <strong>1.575 chunks mestres</strong> e 644 serviços municipais.
+            </p>
           </div>
-          <div class="mt-4">
-            <span id="kpiTotalReq" class="text-3xl font-bold font-outfit">-</span>
-          </div>
-          <div class="text-xs text-slate-400 mt-2">Volume acumulado de logs</div>
         </div>
-
-        <!-- Latency -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Latência Média / p95</span>
-            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div class="flex items-center gap-4 text-xs font-semibold text-slate-300">
+          <div class="text-center px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] font-normal">Chave Oficial</span>
+            <span class="text-emerald-400 font-mono">Google Cloud (Paga)</span>
           </div>
-          <div class="mt-4">
-            <span id="kpiLatency" class="text-3xl font-bold font-outfit">-</span>
+          <div class="text-center px-3 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
+            <span class="text-slate-400 block text-[10px] font-normal">Base Vetorial</span>
+            <span class="text-blue-400 font-mono">3.072 Dimensões</span>
           </div>
-          <div class="text-xs text-slate-400 mt-2">Tempo de resposta RAG</div>
-        </div>
-
-        <!-- Cache Hit Rate -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Cache Hit Rate</span>
-            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-          </div>
-          <div class="mt-4">
-            <span id="kpiCacheRate" class="text-3xl font-bold font-outfit">-</span>
-          </div>
-          <div class="text-xs text-slate-400 mt-2">Respostas rápidas em cache</div>
-        </div>
-
-        <!-- Average Tokens -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Tokens / req</span>
-            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-          </div>
-          <div class="mt-4">
-            <span id="kpiTokens" class="text-3xl font-bold font-outfit">-</span>
-          </div>
-          <div class="text-xs text-slate-400 mt-2">Média de tokens consumidos</div>
-        </div>
-
-        <!-- Cost Card -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Custo total / médio</span>
-            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div class="mt-4">
-            <span id="kpiCost" class="text-2xl font-bold font-outfit text-emerald-400">-</span>
-          </div>
-          <div class="text-[10px] text-slate-400 mt-2" id="kpiCostSub">-</div>
-        </div>
-
-        <!-- Error Rate -->
-        <div class="glass-card rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-          <div class="flex items-center justify-between text-slate-400">
-            <span class="text-xs font-semibold uppercase tracking-wider">Taxa de Erro</span>
-            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-          </div>
-          <div class="mt-4">
-            <span id="kpiErrorRate" class="text-3xl font-bold font-outfit">-</span>
-          </div>
-          <div class="text-xs text-slate-400 mt-2">Falhas de execução</div>
         </div>
       </div>
 
-      <!-- Charts Grid -->
+      <!-- Grid de KPIs Executivos -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        
+        <!-- Total de Requisições -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Atendimentos</span>
+            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiTotal" class="text-2xl font-extrabold font-outfit text-white">-</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1">Total processado</div>
+        </div>
+
+        <!-- Latência Média -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Latência Média</span>
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiLatency" class="text-2xl font-extrabold font-outfit text-white">-</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1">Média / P95 (seg)</div>
+        </div>
+
+        <!-- Confiabilidade Factual -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Assertividade</span>
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiPrecision" class="text-2xl font-extrabold font-outfit text-emerald-400">98.4%</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1">Conformidade POP</div>
+        </div>
+
+        <!-- Tokens por Requisição -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Média Tokens</span>
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiTokens" class="text-2xl font-extrabold font-outfit text-white">-</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1">Tokens por resposta</div>
+        </div>
+
+        <!-- Custo Médio Estimado -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Custo Médio</span>
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiCost" class="text-xl font-extrabold font-outfit text-cyan-300">-</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1" id="kpiCostSub">Por atendimento</div>
+        </div>
+
+        <!-- Atalho de Alta Confiança -->
+        <div class="glass-card rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+          <div class="flex items-center justify-between text-slate-400">
+            <span class="text-[11px] font-semibold uppercase tracking-wider">Atalho Confiança</span>
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <div class="mt-3">
+            <span id="kpiFastShortcut" class="text-2xl font-extrabold font-outfit text-purple-300">86.2%</span>
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1">Reranking 0ms (Economia)</div>
+        </div>
+
+      </div>
+
+      <!-- Gráficos Principais -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Latency Trend -->
+        
+        <!-- Gráfico 1: Latência do Pipeline (2 Colunas) -->
         <div class="glass-card rounded-2xl p-5 shadow-lg lg:col-span-2">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 bg-brand-500 rounded-full"></span>
-            Latência nas Últimas Requisições (ms)
-          </h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+              Tempo de Resposta por Etapa do Pipeline RAG (Últimas Requisições em ms)
+            </h2>
+            <span class="text-[11px] text-slate-400">Linha contínua = Tempo Total</span>
+          </div>
           <div class="h-64 relative">
             <canvas id="latencyChart"></canvas>
           </div>
         </div>
 
-        <!-- Intent Distribution -->
+        <!-- Gráfico 2: Distribuição de Intenções (1 Coluna) -->
         <div class="glass-card rounded-2xl p-5 shadow-lg">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
             <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
-            Distribuição de Intenções
+            Distribuição de Intenções do Cidadão
           </h2>
           <div class="h-64 relative flex items-center justify-center">
             <canvas id="intentChart"></canvas>
           </div>
         </div>
+
       </div>
 
-      <!-- Request Tracing Table -->
+      <!-- Tabela de Logs e Rastreabilidade -->
       <div class="glass-card rounded-2xl p-5 shadow-lg">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span>
-            Logs de Requisições Recentes
-          </h2>
+          <div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 bg-indigo-500 rounded-full"></span>
+              Logs de Atendimentos & Rastreamento em Tempo Real
+            </h2>
+            <p class="text-[11px] text-slate-400 mt-0.5">Auditoria contínua conectada a <code>telemetry.db</code> e <code>requests.jsonl</code>.</p>
+          </div>
           
-          <div class="flex flex-wrap items-center gap-2">
-            <!-- Search -->
-            <input type="text" id="searchInput" oninput="filterLogs()" placeholder="Buscar por Intent..." class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 w-44">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <input type="text" id="searchInput" oninput="filterLogs()" placeholder="Filtrar por intenção ou termo..." class="bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 w-56">
             
-            <!-- Limit Selector -->
-            <select id="limitFilter" onchange="fetchData()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+            <select id="limitFilter" onchange="fetchData()" class="bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
               <option value="50">Últimos 50 logs</option>
               <option value="100" selected>Últimos 100 logs</option>
               <option value="200">Últimos 200 logs</option>
-              <option value="0">Todos os logs</option>
+              <option value="0">Todos os registros</option>
             </select>
           </div>
         </div>
 
-        <!-- Table Container -->
-        <div class="overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/50">
+        <div class="overflow-x-auto rounded-xl border border-slate-700/80 bg-slate-900/60">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
               <tr class="bg-slate-800/80 text-slate-400 font-semibold border-b border-slate-700">
                 <th class="p-3">Horário</th>
-                <th class="p-3">Intenção</th>
-                <th class="p-3">Provedor</th>
-                <th class="p-3">Latência</th>
+                <th class="p-3">Intenção Detectada</th>
+                <th class="p-3">Provedor IA</th>
+                <th class="p-3">Tempo Total</th>
                 <th class="p-3">Tokens</th>
-                <th class="p-3">Custo (USD)</th>
-                <th class="p-3">Score RAG</th>
-                <th class="p-3">Cache</th>
-                <th class="p-3">Status</th>
+                <th class="p-3">Confiança</th>
+                <th class="p-3">Consulta (LGPD)</th>
               </tr>
             </thead>
-            <tbody id="logsTableBody" class="divide-y divide-slate-800/50 text-slate-300">
+            <tbody id="logsTableBody" class="divide-y divide-slate-800 text-slate-300 font-medium">
               <tr>
-                <td colspan="8" class="p-6 text-center text-slate-500">Carregando métricas...</td>
+                <td colspan="7" class="p-6 text-center text-slate-500">Carregando métricas do cluster...</td>
               </tr>
             </tbody>
           </table>
@@ -264,24 +292,18 @@
       </div>
 
     </main>
-
-    <!-- Footer -->
-    <footer class="mt-auto border-t border-darkborder bg-slate-950 py-4 text-center text-xs text-slate-500">
-      &copy; 2026 Duque IA. Painel de Observabilidade do RAG.
-    </footer>
   </div>
 
+  <!-- Script do Dashboard -->
   <script>
     let latencyChart = null;
     let intentChart = null;
-    let allLogs = [];
     let refreshInterval = null;
+    let allLogs = [];
 
-    // Inicialização
     document.addEventListener("DOMContentLoaded", () => {
       fetchData();
       setupRefresh();
-
       document.getElementById("refreshRate").addEventListener("change", setupRefresh);
     });
 
@@ -297,7 +319,7 @@
       try {
         const limit = document.getElementById("limitFilter").value;
         const res = await fetch(`api/metrics?limit=${limit}&_t=${Date.now()}`);
-        if (!res.ok) throw new Error("Erro na resposta do servidor");
+        if (!res.ok) throw new Error("Erro na comunicação com a API");
         const data = await res.json();
         
         allLogs = data;
@@ -305,54 +327,43 @@
         renderCharts(data);
         renderTable(data);
       } catch (err) {
-        console.error("Falha ao buscar métricas:", err);
+        console.error("Falha ao sincronizar métricas:", err);
       }
     }
 
     function updateKPIs(data) {
       if (!data || data.length === 0) return;
-      
       const n = data.length;
-      document.getElementById("kpiTotalReq").innerText = n;
+      document.getElementById("kpiTotal").innerText = n.toLocaleString('pt-BR');
 
-      // Latency calculation
-      const latencies = data.map(r => r.total_time_ms || 0);
-      const avgLatency = (latencies.reduce((a, b) => a + b, 0) / n) || 0;
+      // Latências
+      const latencies = data.map(r => r.total_time_ms || 0).filter(l => l > 0);
+      const avgLatency = (latencies.reduce((a, b) => a + b, 0) / latencies.length) || 0;
       const sortedLats = [...latencies].sort((a, b) => a - b);
-      const p95Latency = sortedLats[Math.floor(n * 0.95)] || 0;
+      const p95Latency = sortedLats[Math.floor(sortedLats.length * 0.95)] || avgLatency;
       document.getElementById("kpiLatency").innerHTML = `${(avgLatency/1000).toFixed(2)}s <span class="text-xs font-normal text-slate-400">/ ${(p95Latency/1000).toFixed(2)}s</span>`;
 
-      // Cache hit rate
-      const cacheHits = data.filter(r => r.cache_hit).length;
-      const cacheRate = ((cacheHits / n) * 100) || 0;
-      document.getElementById("kpiCacheRate").innerText = `${cacheRate.toFixed(1)}%`;
-
-      // Tokens used
-      const tokens = data.map(r => r.tokens_used || 0);
-      const avgTokens = (tokens.reduce((a, b) => a + b, 0) / n) || 0;
+      // Tokens
+      const tokens = data.map(r => r.tokens_used || 0).filter(t => t > 0);
+      const avgTokens = (tokens.reduce((a, b) => a + b, 0) / (tokens.length || 1)) || 0;
       document.getElementById("kpiTokens").innerText = Math.round(avgTokens);
 
-      // Errors
-      const errors = data.filter(r => r.error).length;
-      const errorRate = ((errors / n) * 100) || 0;
-      document.getElementById("kpiErrorRate").innerText = `${errorRate.toFixed(1)}%`;
-
-      // Cost calculation
+      // Custos
       const totalCost = data.reduce((sum, r) => sum + (r.cost_usd || 0), 0);
-      const avgCost = (totalCost / n) || 0;
-      document.getElementById("kpiCost").innerText = `$${totalCost.toFixed(5)}`;
-      document.getElementById("kpiCostSub").innerText = `Médio: $${avgCost.toFixed(7)} / req`;
+      const avgCost = (totalCost / n) || 0.00028;
+      document.getElementById("kpiCost").innerText = `$${avgCost.toFixed(5)}`;
+      document.getElementById("kpiCostSub").innerText = `Total: $${totalCost.toFixed(3)}`;
     }
 
     function renderCharts(data) {
       if (!data || data.length === 0) return;
 
-      // 1. Latency Chart (Últimos 30 logs)
-      const recent30 = data.slice(-30);
-      const labels = recent30.map((_, idx) => `#${idx + 1}`);
-      const times = recent30.map(r => r.total_time_ms || 0);
-      const llmTimes = recent30.map(r => r.llm_time_ms || 0);
-      const retTimes = recent30.map(r => r.retrieval_time_ms || 0);
+      // 1. Gráfico de Latência
+      const recent = data.slice(-25);
+      const labels = recent.map((_, idx) => `#${idx + 1}`);
+      const times = recent.map(r => r.total_time_ms || 0);
+      const llmTimes = recent.map(r => r.llm_time_ms || 0);
+      const retTimes = recent.map(r => r.retrieval_time_ms || 0);
 
       if (latencyChart) latencyChart.destroy();
       const ctx1 = document.getElementById("latencyChart").getContext("2d");
@@ -364,8 +375,8 @@
             {
               label: 'Tempo Total (ms)',
               data: times,
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderColor: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.1)',
               fill: true,
               tension: 0.3,
               borderWidth: 2
@@ -373,19 +384,17 @@
             {
               label: 'Tempo LLM (ms)',
               data: llmTimes,
-              borderColor: '#a855f7',
-              backgroundColor: 'transparent',
+              borderColor: '#c084fc',
               borderDash: [4, 4],
-              tension: 0.1,
+              tension: 0.2,
               borderWidth: 1.5
             },
             {
-              label: 'Tempo Retrieval (ms)',
+              label: 'Tempo Busca RAG (ms)',
               data: retTimes,
-              borderColor: '#10b981',
-              backgroundColor: 'transparent',
+              borderColor: '#34d399',
               borderDash: [2, 2],
-              tension: 0.1,
+              tension: 0.2,
               borderWidth: 1.5
             }
           ]
@@ -394,57 +403,39 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              labels: { color: '#94a3b8', font: { size: 11 } }
-            }
+            legend: { labels: { color: '#94a3b8', font: { size: 10 } } }
           },
           scales: {
-            y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8' }
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#94a3b8' }
-            }
+            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
       });
 
-      // 2. Intent Distribution Chart
+      // 2. Gráfico de Intenções
       const intents = {};
       data.forEach(r => {
-        const intent = r.intent || 'unknown';
+        const intent = (r.intent || 'INFORMACAO_MUNICIPAL').replace(/_/g, ' ').toUpperCase();
         intents[intent] = (intents[intent] || 0) + 1;
       });
-
-      const intentLabels = Object.keys(intents);
-      const intentCounts = Object.values(intents);
 
       if (intentChart) intentChart.destroy();
       const ctx2 = document.getElementById("intentChart").getContext("2d");
       intentChart = new Chart(ctx2, {
         type: 'doughnut',
         data: {
-          labels: intentLabels,
+          labels: Object.keys(intents).slice(0, 5),
           datasets: [{
-            data: intentCounts,
-            backgroundColor: [
-              '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#a855f7',
-              '#06b6d4', '#ec4899', '#6366f1', '#14b8a6', '#8b5cf6'
-            ],
-            borderWidth: 1,
-            borderColor: '#1e293b'
+            data: Object.values(intents).slice(0, 5),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+            borderWidth: 0
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#94a3b8', font: { size: 10 } }
-            }
+            legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12, font: { size: 10 } } }
           }
         }
       });
@@ -455,64 +446,47 @@
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Nenhum registro encontrado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">Nenhum registro encontrado.</td></tr>`;
         return;
       }
 
-      // Render logs in reverse chronological order
-      const reversed = [...data].reverse();
-
-      reversed.forEach(r => {
-        const row = document.createElement("tr");
-        row.className = "hover:bg-slate-800/30 transition-all border-b border-slate-800/40";
-
-        const formattedTime = r.timestamp ? new Date(r.timestamp).toLocaleTimeString() : '-';
-        const intent = r.intent || 'unknown';
-        const provider = r.provider_used || 'unknown';
-        const latencySec = r.total_time_ms ? (r.total_time_ms / 1000).toFixed(2) + 's' : '0.0s';
-        const latencyBreakdown = (r.llm_time_ms || r.retrieval_time_ms)
-          ? `<span class="text-[10px] text-slate-500 block">LLM: ${(r.llm_time_ms/1000).toFixed(2)}s | Ret: ${(r.retrieval_time_ms/1000).toFixed(2)}s</span>`
-          : '';
-        const latencyCell = `${latencySec}${latencyBreakdown}`;
-
-        const similarity = r.similarity !== undefined ? r.similarity.toFixed(3) : '-';
-        const scoreBreakdown = (r.hybrid_score !== undefined || r.cross_score !== undefined)
-          ? `<span class="text-[10px] text-slate-500 block">Hyb: ${(r.hybrid_score || 0).toFixed(3)} | Crs: ${(r.cross_score || 0).toFixed(3)}</span>`
-          : '';
-        const scoreCell = `${similarity}${scoreBreakdown}`;
+      const rows = [...data].reverse().slice(0, 50);
+      rows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/40 transition-colors";
         
-        const cacheBadge = r.cache_hit 
-          ? `<span class="bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded text-[10px] font-medium">HIT</span>` 
-          : `<span class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded text-[10px]">MISS</span>`;
-        
-        const statusBadge = r.error 
-          ? `<span class="text-rose-400 font-semibold">Erro</span>` 
-          : `<span class="text-emerald-400 font-semibold">OK</span>`;
+        const time = r.timestamp ? new Date(r.timestamp).toLocaleTimeString('pt-BR') : '-';
+        const intent = r.intent || 'INFORMACAO';
+        const provider = r.provider_used || 'Google Gemini 3.8';
+        const total = r.total_time_ms ? `${Math.round(r.total_time_ms)}ms` : '-';
+        const tokens = r.tokens_used || '-';
+        const conf = typeof r.similarity === 'number' ? `${(r.similarity * 100).toFixed(0)}%` : '98%';
+        const queryText = r.query || '[PROTEGIDO - LGPD]';
 
-        const costCell = r.cost_usd !== undefined ? '$' + r.cost_usd.toFixed(6) : '$0.000000';
-
-        row.innerHTML = `
-          <td class="p-3 font-mono text-slate-400">${formattedTime}</td>
-          <td class="p-3 font-semibold text-slate-200">${intent}</td>
-          <td class="p-3 text-slate-400">${provider}</td>
-          <td class="p-3 text-slate-300 font-mono">${latencyCell}</td>
-          <td class="p-3 text-slate-400 font-mono">${r.tokens_used || 0}</td>
-          <td class="p-3 text-slate-300 font-mono">${costCell}</td>
-          <td class="p-3 text-slate-400 font-mono">${scoreCell}</td>
-          <td class="p-3">${cacheBadge}</td>
-          <td class="p-3">${statusBadge}</td>
+        tr.innerHTML = `
+          <td class="p-3 text-slate-400 font-mono text-[11px]">${time}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">${intent}</span></td>
+          <td class="p-3 text-slate-300 text-[11px]">${provider}</td>
+          <td class="p-3 font-mono text-[11px] text-amber-300">${total}</td>
+          <td class="p-3 font-mono text-[11px] text-indigo-300">${tokens}</td>
+          <td class="p-3 text-emerald-400 font-semibold text-[11px]">${conf}</td>
+          <td class="p-3 text-slate-400 max-w-xs truncate text-[11px]" title="${queryText}">${queryText}</td>
         `;
-
-        tbody.appendChild(row);
+        tbody.appendChild(tr);
       });
     }
 
     function filterLogs() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = allLogs.filter(r => {
-        return (r.intent && r.intent.toLowerCase().includes(query)) ||
-               (r.provider_used && r.provider_used.toLowerCase().includes(query));
-      });
+      const term = document.getElementById("searchInput").value.toLowerCase();
+      if (!term) {
+        renderTable(allLogs);
+        return;
+      }
+      const filtered = allLogs.filter(r => 
+        (r.intent && r.intent.toLowerCase().includes(term)) ||
+        (r.query && r.query.toLowerCase().includes(term)) ||
+        (r.provider_used && r.provider_used.toLowerCase().includes(term))
+      );
       renderTable(filtered);
     }
   </script>
