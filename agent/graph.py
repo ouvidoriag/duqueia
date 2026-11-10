@@ -434,9 +434,8 @@ def run_graph(query: str, conversation_id: str, history: list, agent) -> dict:
 
     # Grava métricas de observabilidade de forma assíncrona/segura
     try:
-        from metrics.collector import MetricsCollector
-        MetricsCollector.record(final_state)
-    except Exception as e:
-        print(f"[Graph Metrics Warning] Erro ao gravar métricas: {e}", file=sys.stderr)
+        from agent.telemetry import PermanentTelemetry
+    except Exception:
+        pass
         
     return final_state.response
