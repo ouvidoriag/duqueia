@@ -591,8 +591,8 @@
     <!-- Header Oficial PMDC -->
     <header class="chat-header">
       <div class="header-left">
-        <div class="avatar-wrapper" id="avatarTrigger" title="Clique para ampliar o crachá oficial">
-          <img class="avatar-img" id="headerAvatar" src="assets/atendente_caxias_headset_acolhe.png" alt="Atendente Oficial Duque IA">
+        <div class="avatar-wrapper" id="avatarTrigger" title="Clique para ampliar o avatar oficial">
+          <img class="avatar-img" id="headerAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Atendente Oficial Duque IA">
         </div>
         <div class="header-info">
           <h1>
@@ -643,11 +643,11 @@
       
       <!-- Card de Apresentação e Boas-Vindas -->
       <div class="welcome-card" id="welcomeCard">
-        <img class="welcome-avatar" src="assets/atendente_caxias_headset_acolhe.png" alt="Atendente Oficial">
+        <img class="welcome-avatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque IA Oficial">
         <div class="welcome-text">
           <h2>Olá! Seja muito bem-vindo ao Duque IA.</h2>
           <p>
-            Sou a atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>. Estou pronta para tirar suas dúvidas sobre serviços, prazos, secretarias, unidades de saúde e registrar solicitações da Ouvidoria Geral.
+            Sou o atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>. Estou pronto para tirar suas dúvidas sobre serviços, prazos, secretarias, unidades de saúde e registrar solicitações da Ouvidoria Geral.
           </p>
           
           <div class="chips-section">
@@ -741,19 +741,27 @@
     const librasToggleBtn = document.getElementById('librasToggleBtn');
     const librasStatusBar = document.getElementById('librasStatusBar');
 
-    // Catálogo de Avatares Dinâmicos
+    // Catálogo dos Novos Personagens Oficiais do Duque IA
     const AVATARS = {
-      acolhe:  'assets/atendente_caxias_headset_acolhe.png',
-      pensando:'assets/atendente_notebook_pensando.png',
-      joinha:  'assets/atendente_caxias_joinha.png',
-      tablet:  'assets/atendente_caxias_tablet.png'
+      acolhe:      'assets/personagens/duque_boas_vindas_bracos_abertos.png',
+      pensando:    'assets/personagens/duque_desenvolvedor_notebook.png',
+      joinha:      'assets/personagens/duque_joinha_aprovado.png',
+      tablet:      'assets/personagens/duque_consultando_tablet.png',
+      saude:       'assets/personagens/duque_saude_jaleco.png',
+      telefone:    'assets/personagens/duque_atendimento_telefone.png',
+      executivo:   'assets/personagens/duque_executivo_analisando.png',
+      gestao:      'assets/personagens/duque_gestao_foco_caneca.png',
+      gamer:       'assets/personagens/duque_gamer_headset.png',
+      jovem:       'assets/personagens/duque_jovem_mochila_paz.png',
+      polo:        'assets/personagens/duque_polo_apresenta.png',
+      confiante:   'assets/personagens/duque_confiante_bracos_cruzados.png'
     };
 
     let sessionId = 'sess_' + Date.now();
     let librasMode = false;
     let avatarTimer = null;
 
-    // Transição de avatar da atendente
+    // Transição de avatar do Duque IA
     function setAvatarState(state) {
       if (!AVATARS[state]) return;
       if (avatarTimer) clearTimeout(avatarTimer);
@@ -764,11 +772,11 @@
         headerAvatar.style.opacity = '1';
       }, 150);
 
-      // Se for estado de confirmação (joinha), retorna para acolhe após 4 segundos
-      if (state === 'joinha') {
+      // Retorna para o estado padrão de acolhimento após 5 segundos
+      if (state !== 'acolhe' && state !== 'pensando') {
         avatarTimer = setTimeout(() => {
           setAvatarState('acolhe');
-        }, 4500);
+        }, 5000);
       }
     }
 
@@ -959,7 +967,19 @@
           setAvatarState('acolhe');
           appendMessage('bot', `Desculpe, ocorreu uma instabilidade temporária: ${data.error}`);
         } else {
-          setAvatarState('joinha');
+          // Seleção dinâmica do personagem conforme a temática da resposta
+          const ansLower = (data.answer || '').toLowerCase();
+          if (ansLower.includes('uph') || ansLower.includes('hospital') || ansLower.includes('saúde') || ansLower.includes('posto de saúde') || ansLower.includes('vacina') || ansLower.includes('médico')) {
+            setAvatarState('saude');
+          } else if (ansLower.includes('telefone') || ansLower.includes('ouvidoria') || ansLower.includes('(21)') || ansLower.includes('whatsapp')) {
+            setAvatarState('telefone');
+          } else if (ansLower.includes('passo a passo') || ansLower.includes('colab') || ansLower.includes('documentos') || ansLower.includes('protocolo')) {
+            setAvatarState('tablet');
+          } else if (ansLower.includes('cultura') || ansLower.includes('turismo') || ansLower.includes('teatro') || ansLower.includes('esporte') || ansLower.includes('vila olímpica') || ansLower.includes('fundec')) {
+            setAvatarState('jovem');
+          } else {
+            setAvatarState('joinha');
+          }
           appendMessage('bot', data.answer, data);
         }
       } catch (err) {

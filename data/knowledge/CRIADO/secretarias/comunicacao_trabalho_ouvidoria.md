@@ -39,3 +39,4 @@ A **Ouvidoria Geral de Duque de Caxias** é o canal oficial de segunda instânci
 ## Diretrizes no Atendimento RAG e Agentes
 - Quando o munícipe buscar contatos de reclamações, ouvidoria, elogios ou status de protocolos de serviços públicos, direcionar prioritariamente para os canais da **Ouvidoria Geral (SMCSRPTER)** via telefone **(21) 2652-3835**, WhatsApp **(21) 99824-5903** ou aplicativo **Colab**.
 - Consultas sobre vagas de emprego, primeiro emprego e SINE devem ser direcionadas ao setor de Trabalho e Renda da pasta.
+

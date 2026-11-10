@@ -143,19 +143,24 @@ O sistema opera com bancos locais segregados, configurados em **WAL (Write-Ahead
 
 ---
 
-## 6. Catálogo de Imagens e Personas para o Frontend (`public/assets/`)
+## 6. Catálogo dos 12 Personagens Oficiais do Duque IA (`public/assets/personagens/`)
 
-O repositório possui uma coleção de avatares fotográficos e ilustrações oficiais para humanizar o chat e o dashboard:
+O repositório conta com a suíte de avatares 3D do **Duque**, o atendente oficial humanizado de Duque de Caxias, segmentados individualmente com fundo transparente em `public/assets/personagens/`:
 
-| Arquivo de Imagem | Expressão / Estado do Atendente | Cenário de Uso na Interface |
+| Arquivo de Imagem | Expressão / Pose | Papel / Contexto no Sistema |
 | :--- | :--- | :--- |
-| `atendente_caxias_headset_acolhe.png` | Atendente feminina com headset, sorriso acolhedor e crachá PMDC | **Estado Inicial / Boas-vindas** no chat. |
-| `atendente_notebook_pensando.png` | Atendente feminina ao notebook, expressão atenta de raciocínio | **Indicador de Digitando / Consultando** (ativo durante o processamento do RAG). |
-| `atendente_caxias_joinha.png` | Atendente feminina fazendo sinal de positivo | **Confirmação / Resposta Concluída** com sucesso. |
-| `atendente_caxias_tablet.png` | Atendente feminina segurando tablet de serviços | **Exibição de Listas de Serviços e Locais**. |
-| `atendente_terno_apresenta.png` | Atendente masculino de terno apresentando painel | **Apresentação de Relatórios e Dashboard**. |
-| `atendente_terno_headset_joinha.png` | Atendente masculino corporativo com headset | **Alternativa masculina para suporte formal**. |
-| `fotoperfil.png` | Ícone oficial de perfil redondo do Duque IA | **Avatar de mensagem no feed de conversa**. |
+| `duque_boas_vindas_bracos_abertos.png` | Braços abertos, sorriso receptivo caloroso | **Boas-vindas e Acolhimento Inicial** no chat. |
+| `duque_desenvolvedor_notebook.png` | Moletom `</>`, digitando/analisando notebook | **Estado de Processamento e Busca RAG** (Digitando). |
+| `duque_joinha_aprovado.png` | Camisa polo branca com joinha/positivo | **Sucesso na Resposta / Confirmação de Protocolo**. |
+| `duque_saude_jaleco.png` | Jaleco médico branco com crachá municipal | **Temas de Saúde, Vacinas, UPHs 24h e Hospitais**. |
+| `duque_atendimento_telefone.png` | Falando ao telefone celular | **Canais da Ouvidoria Geral, Telefones e Contatos**. |
+| `duque_consultando_tablet.png` | Segurando e apontando para a tela do tablet | **Passo a passo, Formulários e Plataforma Colab**. |
+| `duque_executivo_analisando.png` | Blazer bege, ajustando óculos com perspicácia | **Topo do Painel Executivo e Análise de Dados**. |
+| `duque_gestao_foco_caneca.png` | Camisa verde, caneca "FOCO PLANO RESULTADO" | **Planejamento Estratégico, Governo e Metas**. |
+| `duque_jovem_mochila_paz.png` | Casaco azul, mochila, sinal de paz e amor (V) | **Cultura, Turismo, Esporte, Lazer e Juventude**. |
+| `duque_gamer_headset.png` | Cadeira ergonômica, headset gamer e punho firme | **Suporte Ágil e Operações em Tempo Real**. |
+| `duque_confiante_bracos_cruzados.png` | Camiseta preta, braços cruzados e relógio | **Institucional, Segurança e Ordem Pública**. |
+| `duque_polo_apresenta.png` | Camisa polo preta clássica apresentando | **Comunicação Social e Relações Públicas**. |
 
 ---
 

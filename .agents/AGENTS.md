@@ -239,7 +239,7 @@ A mensagem do munícipe percorre:
 5. `output_guardrail`: Blindagem de dados sensíveis (LGPD) e validação factual.
 
 ### 5. Diretrizes para Frontend e Apresentação
-* **`public/chat.html`:** Interface de atendimento humanizada com o atendente virtual do DUQUE IA. Deve utilizar os avatares disponíveis em `public/assets/` (`atendente_caxias_headset_acolhe.png`, `atendente_notebook_pensando.png`, `atendente_caxias_joinha.png`, etc.) alternando dinamicamente de acordo com o estado da conversa (acolhendo, pensando/pesquisando, respondendo).
+* **`public/chat.html`:** Interface de atendimento humanizada com o atendente virtual do DUQUE IA. Deve utilizar a suíte de avatares 3D disponíveis em `public/assets/personagens/` (`duque_boas_vindas_bracos_abertos.png`, `duque_desenvolvedor_notebook.png`, `duque_joinha_aprovado.png`, `duque_saude_jaleco.png`, `duque_atendimento_telefone.png`, `duque_consultando_tablet.png`, etc.) alternando dinamicamente de acordo com o estado e temática da conversa (acolhendo, pensando/pesquisando, saúde, contatos, confirmando).
 * **`public/dashboard.html`:** Painel de observabilidade executivo que consome `telemetry.db` através do endpoint `api/metrics`. Deve exibir métricas de latência, volume de atendimentos por secretaria, conformidade de respostas, economia de tokens e mapa de calor de demandas.
 
 ### 6. Estrutura Canônica de Secretarias e Pastas Municipais
