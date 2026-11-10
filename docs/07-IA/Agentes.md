@@ -7,4 +7,4 @@ A arquitetura do Duque IA implementa múltiplos Handlers inteligentes que agem c
 3. **Agente RAG Handler (`RagHandler`)**: Realiza busca híbrida local e consolida dados de secretarias ou canais de atendimento.
 
 ---
-[Avançar: Deploy](../08-Deploy/Produção.md) | [Voltar: Fluxos](Fluxos.md)
+[Avançar: Deploy](../08-Deploy/Producao.md) | [Voltar: Fluxos](Fluxos.md)

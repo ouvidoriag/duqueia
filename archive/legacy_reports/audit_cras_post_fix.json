@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-07-23T09:57:15.899200",
+  "question": "Qual endereço do CRAS Jardim Primavera?",
+  "triage": {
+    "intent": "RAG_GERAL",
+    "handler": "RAG_HANDLER",
+    "source": "SQLITE_CACHE",
+    "rag_executed": true,
+    "needs_clarification": false,
+    "confidence": 1.0
+  },
+  "query_rewriting": {
+    "original": "Qual endereço do CRAS Jardim Primavera?",
+    "rewritten": "Qual endereço do CRAS Jardim Primavera?",
+    "entities_original": [
+      "Jardim Primavera",
+      "CRAS"
+    ],
+    "entities_rewritten": [
+      "Jardim Primavera",
+      "CRAS"
+    ],
+    "entity_loss": [],
+    "entity_substitution": []
+  },
+  "planner": {
+    "intent": "service_location",
+    "queries": [
+      "CRAS Jardim Primavera endereço",
+      "CRAS Duque de Caxias",
+      "Secretaria de Assistência Social e Direitos Humanos"
+    ],
+    "focus": [
+      "address",
+      "contact"
+    ],
+    "tools_selected": [
+      "faq_chunks",
+      "geo_units"
+    ]
+  },
+  "retrieval": {
+    "structured_comparison": {
+      "structured_found": false,
+      "vector_found": true,
+      "structured_count": 0,
+      "vector_count": 821
+    },
+    "retrieval_executed": true,
+    "retrieval_returned_results": true,
+    "max_similarity_score": 1.0,
+    "effective_threshold": 0.5,
+    "boosts_applied": [
+      "bairro_locality_boost"
+    ]
+  },
+  "context_chunks_sent_to_llm": [
+    {
+      "rank": 1,
+      "source": "unidades (CRAS: CRAS Jardim Primavera)",
+      "title": "CRAS Jardim Primavera",
+      "category": "unidades",
+      "score": 1.0,
+      "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Jardim Primavera\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos ..."
+    },
+    {
+      "rank": 2,
+      "source": "unidades (CRAS: CRAS Imbariê)",
+      "title": "CRAS Imbariê",
+      "category": "unidades",
+      "score": 1.0,
+      "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Imbariê\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos Humanos\nE..."
+    },
+    {
+      "rank": 3,
+      "source": "unidades (CRAS: CRAS Xerém)",
+      "title": "CRAS Xerém",
+      "category": "unidades",
+      "score": 1.0,
+      "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Xerém\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos Humanos\nEnd..."
+    }
+  ],
+  "reranking": {
+    "candidates_before": [
+      {
+        "source": "unidades (CRAS: CRAS Jardim Primavera)",
+        "title": "CRAS Jardim Primavera",
+        "score": 0.99
+      },
+      {
+        "source": "unidades (CRAS: CRAS Imbariê)",
+        "title": "CRAS Imbariê",
+        "score": 0.99
+      },
+      {
+        "source": "unidades (CRAS: CRAS Xerém)",
+        "title": "CRAS Xerém",
+        "score": 0.99
+      }
+    ],
+    "candidates_after": [
+      {
+        "source": "unidades (CRAS: CRAS Jardim Primavera)",
+        "title": "CRAS Jardim Primavera",
+        "score": 1.0
+      },
+      {
+        "source": "unidades (CRAS: CRAS Imbariê)",
+        "title": "CRAS Imbariê",
+        "score": 1.0
+      },
+      {
+        "source": "unidades (CRAS: CRAS Xerém)",
+        "title": "CRAS Xerém",
+        "score": 1.0
+      }
+    ],
+    "position_deltas": {
+      "CRAS Jardim Primavera": 0,
+      "CRAS Imbariê": 0,
+      "CRAS Xerém": 0
+    }
+  },
+  "generation": {
+    "prompt_length": 1382,
+    "response_before_guardrail": "O endereço do CRAS Jardim Primavera é **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**. Ele fica anexo à Sede da Prefeitura.\n\nSe precisar de mais alguma informação, como telefone ou horário de funcionamento, é só me dizer!",
+    "guardrail_passed": true,
+    "response_after_guardrail": "O endereço do CRAS Jardim Primavera é **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**. Ele fica anexo à Sede da Prefeitura.\n\nSe precisar de mais alguma informação, como telefone ou horário de funcionamento, é só me dizer!",
+    "answer_supported_by_context": true,
+    "support_score": 0.63
+  },
+  "root_cause_diagnosis": {
+    "code": "NO_FAILURE_DETECTED",
+    "details": "RAG executado e auditado sem falhas."
+  },
+  "total_execution_ms": 34939.18
+}

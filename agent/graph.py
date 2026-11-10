@@ -159,7 +159,7 @@ def node_fast_gate(state: AgentState, ctx: GraphContext) -> AgentState:
     """Camada 0: verifica regras de segurança locais sem LLM."""
     from agent.triage import check_fast_gate, _add_routing_metadata
 
-    result = check_fast_gate(state.query)
+    result = check_fast_gate(state.query, history=state.history)
     if result:
         triage = _add_routing_metadata(result)
         next_node = triage.get("next_agent", "RAG_HANDLER")
@@ -253,6 +253,63 @@ def _run_handler(state: AgentState, ctx: GraphContext, handler_key: str) -> Agen
         start_time=state.start_time,
         history=state.history
     )
+
+    # ── Detector de Loops de Redirecionamento Cíclico e Persistência de Slots ──
+    agent_cls = ctx.agent.__class__
+    if state.conversation_id and hasattr(agent_cls, "_session_state"):
+        sess = agent_cls._session_state.setdefault(state.conversation_id, {
+            "redirect_count": 0,
+            "last_channel": None,
+            "slots": {}
+        })
+
+        # Persiste slots estabelecidos da conversa (não são perdidos no FIFO)
+        if state.triage_info:
+            if state.triage_info.get("sub_intent"):
+                sess["slots"]["sub_intent"] = state.triage_info.get("sub_intent")
+            if state.triage_info.get("intent"):
+                sess["slots"]["intent"] = state.triage_info.get("intent")
+            if state.triage_info.get("rewritten_query"):
+                sess["slots"]["last_rewritten_query"] = state.triage_info.get("rewritten_query")
+
+        ans_text = (result.get("answer") or "").lower()
+        user_query_lower = state.query.lower()
+        is_colab_redirect = ("colab" in ans_text and any(w in ans_text for w in ["categoria", "duquedecaxias.colab.re", "tema", "aplicativo colab"]))
+        has_colab_friction = any(w in user_query_lower for w in [
+            "não consigo", "nao consigo", "não sei usar", "nao sei usar", "não sei mexer",
+            "nao sei mexer", "dando erro", "deu erro", "não tenho", "nao tenho", "prefiro telefone",
+            "prefiro ligar", "não quero aplicativo", "não quero app", "me ajuda"
+        ]) and ("colab" in user_query_lower or sess.get("last_channel") == "colab")
+
+        if is_colab_redirect or has_colab_friction:
+            if sess.get("last_channel") == "colab":
+                sess["redirect_count"] = sess.get("redirect_count", 0) + 1
+            else:
+                sess["last_channel"] = "colab"
+                sess["redirect_count"] = 1
+
+            if sess["redirect_count"] >= 2 or has_colab_friction:
+                # Quebra de loop: redireciona para atendimento humanizado direto da Ouvidoria
+                from config.settings import OUVIDORIA_CONTACTS
+                result["answer"] = (
+                    "Percebi que você está com dificuldades para utilizar o aplicativo Colab ou precisa de um atendimento mais direto. "
+                    "Para que você não precise ficar repetindo o preenchimento e para resolver isso com total comodidade, "
+                    "fale diretamente com a nossa equipe da **Ouvidoria Geral de Duque de Caxias**:\n\n"
+                    f"• **Telefone:** **{OUVIDORIA_CONTACTS['telefone']}**\n"
+                    f"• **WhatsApp Oficial:** **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+                    f"• **E-mail:** **{OUVIDORIA_CONTACTS['email']}**\n"
+                    f"• **Atendimento Presencial:** Alameda Esmeralda, 206 - Jardim Primavera (Segunda a sexta, das 9h às 17h).\n\n"
+                    "Um atendente oficial registrará sua manifestação diretamente no sistema municipal!"
+                )
+                result["intent_detected"] = "ouvidoria_loop_prevented"
+                sess["redirect_count"] = 0
+                sess["last_channel"] = "ouvidoria_direta"
+        else:
+            # Apenas zera se o usuário claramente mudou de assunto
+            if state.triage_info.get("intent") not in ["OUVIDORIA_MANIFESTACAO", "AMBIGUO_BARULHO"]:
+                sess["redirect_count"] = 0
+                sess["last_channel"] = None
+
     # Injeta metadados do grafo na resposta
     result["_graph"] = {
         "nodes_executed": state.nodes_executed,

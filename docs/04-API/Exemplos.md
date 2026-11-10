@@ -3,7 +3,7 @@
 Você pode testar a API do Duque IA localmente usando a ferramenta `curl` em sua linha de comando:
 
 ```bash
-curl -X POST http://localhost:3000/api/chat \
+curl -X POST http://localhost:3001/api/chat \
      -H "Content-Type: application/json" \
      -d '{"message": "Olá", "sessionId": "test_session_1"}'
 ```

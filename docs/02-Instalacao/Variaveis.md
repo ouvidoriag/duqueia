@@ -2,10 +2,13 @@
 
 | Variável | Tipo | Valor Padrão | Descrição |
 |---|---|---|---|
-| `GEMINI_API_KEY` | string | `None` | Chave de acesso à API do Google Gemini (obrigatória em produção). |
-| `USE_TRIAGE_LAYER` | boolean | `true` | Se `true`, ativa o roteador de intenções baseado em LLM antes da busca RAG. |
-| `SQLITE_DB_PATH` | string | `agent/duque_ia.db` | Caminho físico para o arquivo de banco de dados do SQLite. |
-| `PORT` | integer | `3000` | Porta onde o servidor Node.js será executado. |
+| `GEMINI_API_KEY` / `GEMINI_API_KEYS` | string | `None` | Chave(s) de acesso à API do Google Gemini com suporte a rotação automática. |
+| `USE_TRIAGE_LAYER` | boolean | `true` | Se `true`, ativa a triagem de intenções antes do pipeline RAG. |
+| `DATABASE_MAIN` | string | `data/db/main.db` | Caminho para o banco relacional de serviços municipais e ontologia. |
+| `DATABASE_VECTOR` | string | `data/db/vector.db` | Caminho para o banco vetorial de chunks e FTS5. |
+| `DATABASE_CACHE` | string | `data/db/cache.db` | Caminho para o banco de cache semântico de triagem. |
+| `DATABASE_TELEMETRY` | string | `data/db/telemetry.db` | Caminho para o banco de telemetria e auditoria de consultas. |
+| `PORT` | integer | `3001` | Porta onde o servidor Node.js será executado. |
 
 ---
 [Avançar: Dependências](Dependencias.md) | [Voltar: Ambiente](Ambiente.md)

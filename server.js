@@ -7,16 +7,6 @@ const zlib = require('zlib');
 // Cache para arquivos estáticos: Map<filePath, { raw: Buffer, gzipped: Buffer, contentType: string, ext: string, isCacheable: boolean }>
 const staticCache = new Map();
 
-
-// ── Configuração ─────────────────────────────────────────────────────────────
-const PYTHON_PATH = process.platform === 'win32' ? 'python' : 'python3';
-const PORT = process.env.PORT || 3000;
-const AGENT_PATH = path.join(__dirname, 'agent', 'main.py');
-const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos de inatividade
-
-// Cache de agentes instanciados por sessão: Map<sessionId, sessionObj>
-const activeSessions = new Map();
-
 // ── Mimetypes de arquivos estáticos ──────────────────────────────────────────
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -25,97 +15,146 @@ const MIME_TYPES = {
   '.json': 'application/json; charset=utf-8',
   '.ico':  'image/x-icon',
   '.png':  'image/png',
+  '.jpg':  'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.svg':  'image/svg+xml',
   '.mp3':  'audio/mpeg',
   '.webm': 'audio/webm',
   '.wav':  'audio/wav',
+  '.ogg':  'audio/ogg',
 };
 
-// ── Gerenciamento de sessões ──────────────────────────────────────────────────
 
-/**
- * Cria ou retorna uma instância persistente do processo Python para a sessão.
- */
-function getOrCreateAgentInstance(sessionId) {
-  if (activeSessions.has(sessionId)) {
-    const existing = activeSessions.get(sessionId);
-    // Reinicia sessão se o processo morreu
-    if (existing.process.exitCode !== null) {
-      console.warn(`[Server] Processo da sessão ${sessionId} havia morrido. Reiniciando...`);
-      activeSessions.delete(sessionId);
-    } else {
-      // Renova o timer de timeout ao receber nova mensagem
-      clearTimeout(existing.timeoutId);
-      existing.timeoutId = setTimeout(() => destroySession(sessionId), SESSION_TIMEOUT_MS);
-      return existing;
+// ── Configuração ─────────────────────────────────────────────────────────────
+const PYTHON_PATH = process.platform === 'win32' ? 'python' : 'python3';
+const PORT = process.env.PORT || 3001;
+const AGENT_PATH = path.join(__dirname, 'agent', 'main.py');
+const MAX_WORKERS = Math.max(1, parseInt(process.env.MAX_WORKERS || '4', 10));
+
+// ── Rate Limiter em Memória por IP ───────────────────────────────────────────
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minuto
+const MAX_REQUESTS_PER_WINDOW = 30;     // 30 requisições / minuto por IP
+const ipRateLimitMap = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  let timestamps = ipRateLimitMap.get(ip) || [];
+  timestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  if (timestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+    ipRateLimitMap.set(ip, timestamps);
+    return true;
+  }
+  timestamps.push(now);
+  ipRateLimitMap.set(ip, timestamps);
+  return false;
+}
+
+// ── Governança e Limpeza Periódica de Arquivos Temporários de Áudio ───────────
+const AUDIO_CLEANUP_INTERVAL_MS = 15 * 60 * 1000; // a cada 15 minutos
+const MAX_AUDIO_AGE_MS = 60 * 60 * 1000;          // expurgo de áudios com mais de 1 hora
+
+function cleanupOldAudioFiles() {
+  const targetDirs = [
+    path.join(__dirname, 'public', 'uploads'),
+    path.join(__dirname, 'public', 'audio')
+  ];
+
+  const now = Date.now();
+  let deletedCount = 0;
+
+  for (const dir of targetDirs) {
+    if (!fs.existsSync(dir)) continue;
+    try {
+      const files = fs.readdirSync(dir);
+      for (const file of files) {
+        if (!/\.(wav|webm|mp3|ogg|opus)$/i.test(file)) continue;
+        const filePath = path.join(dir, file);
+        try {
+          const stats = fs.statSync(filePath);
+          if (now - stats.mtimeMs > MAX_AUDIO_AGE_MS) {
+            fs.unlinkSync(filePath);
+            deletedCount++;
+          }
+        } catch (_) {}
+      }
+    } catch (err) {
+      console.error(`[Audio Cleanup Error] Falha ao verificar diretório ${dir}:`, err.message);
     }
   }
 
-  console.log(`[Server] Criando nova instância do agente para a sessão: ${sessionId}`);
+  if (deletedCount > 0) {
+    console.log(`[Audio Cleanup] ${deletedCount} arquivo(s) temporário(s) de áudio expurgado(s) com sucesso.`);
+  }
+}
 
+// Executa limpeza inicial e agenda verificação periódica
+cleanupOldAudioFiles();
+setInterval(cleanupOldAudioFiles, AUDIO_CLEANUP_INTERVAL_MS);
+
+// ── Pool Gerenciado de Workers Python ────────────────────────────────────────
+const workerPool = [];
+const requestQueue = [];
+const sessionWorkerMap = new Map(); // sessionId -> workerId
+
+/**
+ * Cria uma nova instância de Worker Python dentro do Pool gerenciado.
+ */
+function createWorker(workerId) {
+  console.log(`[WorkerPool] Iniciando worker Python #${workerId}...`);
   const pyProcess = spawn(PYTHON_PATH, ['-u', AGENT_PATH], {
     cwd: __dirname,
     env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' }
   });
 
-  const sessionObj = {
+  const worker = {
+    id: workerId,
     process: pyProcess,
-    currentResolve: null,
-    currentReject: null,
+    busy: false,
+    activeRequestId: null,
+    pendingRequests: new Map(), // requestId -> { resolve, reject, turnTimeout, startTime }
     buffer: '',
-    initialized: false,
-    timeoutId: null,
+    lastActive: Date.now()
   };
 
-  // ── Stdout: bufferiza e extrai respostas JSON ───────────────────────────
   pyProcess.stdout.on('data', (data) => {
-    const chunk = data.toString('utf-8');
-    sessionObj.buffer += chunk;
-    processBuffer(sessionObj);
+    worker.buffer += data.toString('utf-8');
+    processWorkerBuffer(worker);
   });
 
-  // ── Stderr: apenas log (não afeta o fluxo) ─────────────────────────────
   pyProcess.stderr.on('data', (data) => {
-    console.error(`[Python stderr - ${sessionId}]: ${data.toString('utf-8').trim()}`);
+    console.error(`[Worker #${workerId} stderr]: ${data.toString('utf-8').trim()}`);
   });
 
-  // ── Close: limpa sessão e rejeita qualquer promise pendente ───────────
   pyProcess.on('close', (code) => {
-    console.log(`[Server] Processo da sessão ${sessionId} encerrou com código ${code}`);
-    if (sessionObj.currentReject) {
-      sessionObj.currentReject(new Error(`Processo do agente encerrou inesperadamente (código ${code}).`));
-      sessionObj.currentResolve = null;
-      sessionObj.currentReject = null;
+    console.warn(`[WorkerPool] Worker #${workerId} encerrou com código ${code}`);
+    for (const [reqId, pending] of worker.pendingRequests) {
+      clearTimeout(pending.turnTimeout);
+      pending.reject(new Error(`Worker Python #${workerId} encerrou inesperadamente (código ${code}).`));
     }
-    clearTimeout(sessionObj.timeoutId);
-    activeSessions.delete(sessionId);
+    worker.pendingRequests.clear();
+    worker.busy = false;
+
+    // Remove do pool e restabelece a capacidade
+    const idx = workerPool.indexOf(worker);
+    if (idx !== -1) workerPool.splice(idx, 1);
+    setTimeout(() => {
+      const newWorker = createWorker(workerId);
+      workerPool.push(newWorker);
+      processQueue();
+    }, 1000);
   });
 
-  // ── Timeout de inatividade ──────────────────────────────────────────────
-  sessionObj.timeoutId = setTimeout(() => destroySession(sessionId), SESSION_TIMEOUT_MS);
-
-  activeSessions.set(sessionId, sessionObj);
-  return sessionObj;
+  return worker;
 }
 
-/**
- * Destrói graciosamente uma sessão após inatividade.
- */
-function destroySession(sessionId) {
-  const session = activeSessions.get(sessionId);
-  if (!session) return;
-  console.log(`[Server] Encerrando sessão inativa: ${sessionId}`);
-  try { session.process.kill('SIGTERM'); } catch (_) {}
-  activeSessions.delete(sessionId);
+// Inicializa o Pool de Workers
+for (let i = 1; i <= MAX_WORKERS; i++) {
+  workerPool.push(createWorker(i));
 }
 
-// ── Processamento de Buffer ───────────────────────────────────────────────────
-
-/**
- * Extrai e resolve blocos de JSON completos do stream de saída do Python.
- */
-function processBuffer(session) {
-  const text = session.buffer;
+// ── Processamento de Buffer com Sincronização por request_id ──────────────────
+function processWorkerBuffer(worker) {
+  const text = worker.buffer;
   let startIdx = text.indexOf('{');
   if (startIdx === -1) return;
 
@@ -126,26 +165,12 @@ function processBuffer(session) {
 
   for (let i = startIdx; i < text.length; i++) {
     const char = text[i];
-
-    if (escapeNext) {
-      escapeNext = false;
-      continue;
-    }
-
-    if (char === '\\') {
-      escapeNext = true;
-      continue;
-    }
-
-    if (char === '"') {
-      inString = !inString;
-      continue;
-    }
-
+    if (escapeNext) { escapeNext = false; continue; }
+    if (char === '\\') { escapeNext = true; continue; }
+    if (char === '"') { inString = !inString; continue; }
     if (!inString) {
-      if (char === '{') {
-        braceCount++;
-      } else if (char === '}') {
+      if (char === '{') braceCount++;
+      else if (char === '}') {
         braceCount--;
         if (braceCount === 0) {
           endIdx = i;
@@ -158,48 +183,109 @@ function processBuffer(session) {
   if (endIdx === -1) return; // JSON ainda incompleto no buffer
 
   const jsonCandidate = text.substring(startIdx, endIdx + 1);
-  session.buffer = text.substring(endIdx + 1);
+  worker.buffer = text.substring(endIdx + 1);
 
   try {
     const parsed = JSON.parse(jsonCandidate);
-    if (session.currentResolve) {
-      session.currentResolve(parsed);
-      session.currentResolve = null;
-      session.currentReject = null;
-    }
+    handleWorkerResponse(worker, parsed);
   } catch (err) {
-    console.error('[Server JSON Parse Warning]:', err.message);
-    session.buffer = text.substring(startIdx + 1);
-    processBuffer(session);
+    console.error('[WorkerPool JSON Parse Error]:', err.message);
+    worker.buffer = text.substring(startIdx + 1);
+    processWorkerBuffer(worker);
   }
 }
 
-// ── Comunicação com o Agente ──────────────────────────────────────────────────
+function handleWorkerResponse(worker, data) {
+  const reqId = data.request_id || worker.activeRequestId;
+  worker.busy = false;
+  worker.activeRequestId = null;
+  worker.lastActive = Date.now();
+
+  if (reqId && worker.pendingRequests.has(reqId)) {
+    const pending = worker.pendingRequests.get(reqId);
+    clearTimeout(pending.turnTimeout);
+    worker.pendingRequests.delete(reqId);
+    pending.resolve(data);
+  } else {
+    console.warn(`[WorkerPool] Descartando resposta tardia de requisição já cancelada/expirada: ${reqId}`);
+  }
+
+  processQueue();
+}
+
+// ── Fila de Requisições e Despacho ao Pool ────────────────────────────────────
+function processQueue() {
+  if (requestQueue.length === 0) return;
+
+  // Busca worker livre (preferência por afinidade de sessão)
+  const nextTask = requestQueue[0];
+  let targetWorker = null;
+
+  if (sessionWorkerMap.has(nextTask.sessionId)) {
+    const preferredId = sessionWorkerMap.get(nextTask.sessionId);
+    const candidate = workerPool.find(w => w.id === preferredId && !w.busy && w.process.exitCode === null);
+    if (candidate) targetWorker = candidate;
+  }
+
+  if (!targetWorker) {
+    targetWorker = workerPool.find(w => !w.busy && w.process.exitCode === null);
+  }
+
+  if (!targetWorker) {
+    // Todos os workers estão ocupados no momento; tarefa permanece no início da fila
+    return;
+  }
+
+  requestQueue.shift();
+  sessionWorkerMap.set(nextTask.sessionId, targetWorker.id);
+
+  targetWorker.busy = true;
+  targetWorker.activeRequestId = nextTask.requestId;
+  targetWorker.lastActive = Date.now();
+
+  const turnTimeout = setTimeout(() => {
+    if (targetWorker.pendingRequests.has(nextTask.requestId)) {
+      targetWorker.pendingRequests.delete(nextTask.requestId);
+      targetWorker.busy = false;
+      targetWorker.activeRequestId = null;
+      nextTask.reject(new Error('Tempo de resposta do agente excedido (90s).'));
+      processQueue();
+    }
+  }, 90_000);
+
+  targetWorker.pendingRequests.set(nextTask.requestId, {
+    resolve: nextTask.resolve,
+    reject: nextTask.reject,
+    turnTimeout,
+    startTime: Date.now()
+  });
+
+  const payload = JSON.stringify({
+    request_id: nextTask.requestId,
+    query: nextTask.message,
+    conversation_id: nextTask.sessionId
+  }) + '\n';
+
+  targetWorker.process.stdin.write(Buffer.from(payload, 'utf-8'));
+}
 
 /**
- * Envia mensagem ao processo Python e retorna uma Promise com a resposta JSON.
+ * Envia mensagem ao Pool gerenciado de workers Python com isolamento por request_id.
  */
 function sendMessageToAgent(sessionId, message) {
   return new Promise((resolve, reject) => {
-    // Timeout de 90s por turno para evitar travamentos
-    const turnTimeout = setTimeout(() => {
-      reject(new Error('Tempo de resposta do agente excedido (90s).'));
-      const session = activeSessions.get(sessionId);
-      if (session) { session.currentResolve = null; session.currentReject = null; }
-    }, 90_000);
+    const requestId = 'req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+    const task = {
+      requestId,
+      sessionId,
+      message,
+      resolve,
+      reject,
+      createdAt: Date.now()
+    };
 
-    const session = getOrCreateAgentInstance(sessionId);
-
-    if (session.currentResolve) {
-      clearTimeout(turnTimeout);
-      return reject(new Error('Requisição pendente para esta sessão. Aguarde.'));
-    }
-
-    session.currentResolve = (data) => { clearTimeout(turnTimeout); resolve(data); };
-    session.currentReject  = (err)  => { clearTimeout(turnTimeout); reject(err); };
-
-    const line = `${message}\n`;
-    session.process.stdin.write(Buffer.from(line, 'utf-8'));
+    requestQueue.push(task);
+    processQueue();
   });
 }
 
@@ -220,12 +306,42 @@ const server = http.createServer((req, res) => {
   // ── Health Check ────────────────────────────────────────────────────────
   if ((req.url === '/health' || req.url.endsWith('/health')) && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok', sessions: activeSessions.size }));
+    res.end(JSON.stringify({
+      status: 'ok',
+      workers: workerPool.length,
+      busyWorkers: workerPool.filter(w => w.busy).length,
+      queueLength: requestQueue.length
+    }));
+    return;
+  }
+
+  // ── Reload Workers (Hot-Reload de Código Python) ───────────────────────────
+  if ((req.url === '/api/admin/reload-workers' || req.url.endsWith('/api/admin/reload-workers')) && (req.method === 'POST' || req.method === 'GET')) {
+    console.log('[WorkerPool] Reiniciando todos os workers Python para recarregar código...');
+    const currentCount = workerPool.length;
+    for (const w of workerPool) {
+      try {
+        w.process.kill('SIGTERM');
+      } catch (e) {
+        try { w.process.kill('SIGKILL'); } catch (_) {}
+      }
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      status: 'ok',
+      message: `Sinal de recarga enviado para ${currentCount} workers Python. Novos processos com o código atualizado serão gerados automaticamente.`
+    }));
     return;
   }
 
   // ── API de Chat ─────────────────────────────────────────────────────────
   if ((req.url === '/api/chat' || req.url.endsWith('/api/chat')) && req.method === 'POST') {
+    const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+    if (isRateLimited(clientIp)) {
+      res.writeHead(429, { 'Content-Type': 'application/json; charset=utf-8', 'Retry-After': '60' });
+      res.end(JSON.stringify({ error: 'Muitas requisições. Por favor, aguarde um momento antes de enviar outra mensagem.' }));
+      return;
+    }
     let body = '';
     req.on('data', chunk => { body += chunk.toString('utf-8'); });
     req.on('end', async () => {
@@ -277,7 +393,7 @@ const server = http.createServer((req, res) => {
   if ((req.url.includes('/api/metrics')) && req.method === 'GET') {
     const jsonlPath = path.join(__dirname, 'metrics', 'requests.jsonl');
     const csvPath = path.join(__dirname, 'metrics', 'retrieval_performance.csv');
-    
+
     fs.readFile(jsonlPath, 'utf8', (err, jsonlData) => {
       let records = [];
       if (!err && jsonlData) {
@@ -286,11 +402,11 @@ const server = http.createServer((req, res) => {
           if (line.trim()) {
             try {
               records.push(JSON.parse(line));
-            } catch (_) {}
+            } catch (_) { }
           }
         }
       }
-      
+
       fs.readFile(csvPath, 'utf8', (csvErr, csvData) => {
         if (!csvErr && csvData) {
           const lines = csvData.split('\n');
@@ -307,7 +423,7 @@ const server = http.createServer((req, res) => {
                 const similarity = parseFloat(parts[5]) || 0;
                 const tokens_used = parseInt(parts[6]) || 0;
                 const cost_usd = parseFloat(parts[7]) || 0;
-                
+
                 records.push({
                   timestamp,
                   intent: 'RAG_REQUISICAO',
@@ -326,12 +442,12 @@ const server = http.createServer((req, res) => {
             }
           }
         }
-        
+
         // Remove duplicados por chave (timestamp, tempo e tokens)
         const seen = new Set();
         const uniqueRecords = [];
         records.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        
+
         for (const r of records) {
           const key = `${r.timestamp}_${r.total_time_ms}_${r.tokens_used}`;
           if (!seen.has(key)) {
@@ -339,11 +455,11 @@ const server = http.createServer((req, res) => {
             uniqueRecords.push(r);
           }
         }
-        
+
         const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
         const limit = parseInt(parsedUrl.searchParams.get('limit')) || 200;
         const responseRecords = limit > 0 ? uniqueRecords.slice(-limit) : uniqueRecords;
-        
+
         res.writeHead(200, {
           'Content-Type': 'application/json; charset=utf-8',
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -384,7 +500,7 @@ const server = http.createServer((req, res) => {
     } else {
       const gzipped = zlib.gzipSync(content);
       const isCacheable = ['.html', '.css', '.js', '.json', '.png', '.ico', '.svg'].includes(ext);
-      
+
       const cacheEntry = {
         raw: content,
         gzipped: gzipped,
@@ -392,11 +508,11 @@ const server = http.createServer((req, res) => {
         ext: ext,
         isCacheable: isCacheable
       };
-      
+
       if (isCacheable) {
         staticCache.set(filePath, cacheEntry);
       }
-      
+
       serveStaticContent(req, res, cacheEntry);
     }
   });
@@ -461,21 +577,23 @@ function serveStaticContent(req, res, fileEntry) {
 
 // ── Graceful Shutdown ─────────────────────────────────────────────────────────
 function shutdown(signal) {
-  console.log(`\n[Server] ${signal} recebido. Encerrando sessões ativas...`);
-  for (const [id, session] of activeSessions) {
-    try { session.process.kill('SIGTERM'); } catch (_) {}
-    clearTimeout(session.timeoutId);
-    console.log(`  → Sessão encerrada: ${id}`);
+  console.log(`\n[Server] ${signal} recebido. Encerrando worker pool do Python...`);
+  for (const worker of workerPool) {
+    try {
+      worker.process.stdin.end();
+      worker.process.kill('SIGTERM');
+    } catch (_) { }
+    console.log(`  → Worker #${worker.id} encerrado.`);
   }
   server.close(() => {
-    console.log('[Server] Servidor encerrado com sucesso.');
+    console.log('[Server] Servidor HTTP encerrado com sucesso.');
     process.exit(0);
   });
   setTimeout(() => process.exit(1), 5000); // Força saída após 5s se travar
 }
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT',  () => shutdown('SIGINT'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 // ── Inicialização ─────────────────────────────────────────────────────────────
 server.listen(PORT, () => {

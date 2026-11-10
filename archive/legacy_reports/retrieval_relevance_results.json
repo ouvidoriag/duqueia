@@ -1,0 +1,316 @@
+[
+  {
+    "query": "Quem é o Prefeito de Duque de Caxias?",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "intent_pass": true,
+    "expected_category": "general",
+    "expected_source": "prefeito.md",
+    "retrieved_source": "prefeito.md",
+    "score": 0.786,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 7533.895492553711,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual a história e origem do município de Duque de Caxias?",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "intent_pass": true,
+    "expected_category": "general",
+    "expected_source": "a_cidade.md",
+    "retrieved_source": "a_cidade.md",
+    "score": 0.712,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 7112.768173217773,
+    "status": "PASS"
+  },
+  {
+    "query": "Quais são os principais limites territoriais da cidade de Caxias?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "general",
+    "expected_source": "a_cidade.md",
+    "retrieved_source": "a_cidade.md",
+    "score": 0.6552,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 6123.023748397827,
+    "status": "PASS"
+  },
+  {
+    "query": "Quem é o secretário responsável pela pasta de saúde?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "saude",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "meio_ambiente.md",
+    "score": 0.5792,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 4174.211025238037,
+    "status": "PASS"
+  },
+  {
+    "query": "Quem é o Secretário Municipal de Fazenda?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "fazenda",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1822)",
+    "score": 0.8415,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 4025.554418563843,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual secretaria cuida do Webmap e tecnologia geográfica?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "urbanismo",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1538)",
+    "score": 0.8075,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2586.8966579437256,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual a missão da Secretaria Municipal de Transportes?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "transportes",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "transportes.md",
+    "score": 0.7006,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2332.183599472046,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde fica a Secretaria Municipal de Meio Ambiente?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "meio_ambiente",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1558)",
+    "score": 0.8415,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2302.494525909424,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde é oferecido o curso de Língua Brasileira de Sinais - Libras?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "carta_servicos",
+    "expected_source": [
+      "CARTA_DE_SERVICO",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1658)",
+    "score": 0.8415,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2370.5081939697266,
+    "status": "PASS"
+  },
+  {
+    "query": "Como me inscrever para o curso de Cavaquinho pela FUNDEC?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "carta_servicos",
+    "expected_source": [
+      "CARTA_DE_SERVICO",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1712)",
+    "score": 0.8415,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2388.671875,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde conseguir atendimento de Nutrição pela prefeitura?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "carta_servicos",
+    "expected_source": [
+      "CARTA_DE_SERVICO",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1628)",
+    "score": 0.8075,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2432.9066276550293,
+    "status": "PASS"
+  },
+  {
+    "query": "Como funciona o serviço de saúde do homem em Duque de Caxias?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "saude",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "saude.md",
+    "score": 0.6551,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 4335.070848464966,
+    "status": "PASS"
+  },
+  {
+    "query": "Como solicitar o serviço de Tapa Buraco na rua?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "carta_servicos",
+    "expected_source": [
+      "CARTA_DE_SERVICO",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1748)",
+    "score": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2479.759454727173,
+    "status": "PASS"
+  },
+  {
+    "query": "Como faço para solicitar capina ou limpeza urbana?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "carta_servicos",
+    "expected_source": [
+      "CARTA_DE_SERVICO",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1476)",
+    "score": 0.8415,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2345.790386199951,
+    "status": "PASS"
+  },
+  {
+    "query": "O que é o IPMDC e qual sua função?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "ipmdc",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1462)",
+    "score": 0.8075,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2558.957815170288,
+    "status": "PASS"
+  },
+  {
+    "query": "Jardim Primavera fica em qual distrito?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "general",
+    "expected_source": [
+      "a_cidade",
+      "unidades"
+    ],
+    "retrieved_source": "unidades (CRAS: CRAS Jardim Primavera)",
+    "score": 0.9405,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 11289.872407913208,
+    "status": "PASS"
+  },
+  {
+    "query": "Como emitir IPTU?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "fazenda",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1810)",
+    "score": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 4948.158740997314,
+    "status": "PASS"
+  },
+  {
+    "query": "Explique assistência social",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "intent_pass": true,
+    "expected_category": "secretarias",
+    "expected_source": [
+      "assistencia_social",
+      "vw_ia_servicos"
+    ],
+    "retrieved_source": "vw_ia_servicos (ID: 1537)",
+    "score": 0.95,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 2199.8953819274902,
+    "status": "PASS"
+  },
+  {
+    "query": "CRAS Jardim Primavera",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "intent_pass": true,
+    "expected_category": "unidades",
+    "expected_source": [
+      "unidades",
+      "cras"
+    ],
+    "retrieved_source": "unidades (CRAS: CRAS Jardim Primavera)",
+    "score": 0.9405,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 7468.51372718811,
+    "status": "PASS"
+  }
+]

@@ -1,14 +1,15 @@
 # Políticas de Backup — Duque IA
 
-Como o Duque IA armazena todas as informações em banco local SQLite (`agent/duque_ia.db`), o backup torna-se extremamente simples.
+Como o Duque IA armazena todas as informações em bancos locais SQLite em `data/db/` (`main.db`, `vector.db`, `cache.db`, `telemetry.db`), o backup torna-se extremamente simples e seguro.
 
-## Backup Físico Semanal
-Recomenda-se realizar uma cópia fria do arquivo `agent/duque_ia.db` semanalmente e salvar em um local seguro (cloud storage externo ou servidor de backup).
+## Backup Físico
+Recomenda-se realizar uma cópia fria do diretório `data/db/` periodicamente e salvar em local seguro (cloud storage externo ou servidor de backup).
 
 ## Backup Lógico (SQL Dump)
-Você pode exportar a estrutura e os dados relacionais do banco em formato SQL legível:
+Você pode exportar a estrutura e os dados relacionais do banco principal em formato SQL legível:
 ```bash
-sqlite3 agent/duque_ia.db .dump > backup_duque_ia.sql
+sqlite3 data/db/main.db .dump > backup_main.sql
+sqlite3 data/db/vector.db .dump > backup_vector.sql
 ```
 
 ---

@@ -1,0 +1,34 @@
+{
+  "total_queries": 30,
+  "completed_queries": 30,
+  "total_tokens_sent_approx": 12606,
+  "total_tokens_received_approx": 3695,
+  "total_tokens": 16301,
+  "total_cost_usd": 0.0018763700000000003,
+  "total_latency_ms": 33855.0,
+  "llm_calls": 23,
+  "blocked_calls": 7,
+  "by_intent": {
+    "saudacao": 1,
+    "identidade_assistente": 1,
+    "ajuda": 1,
+    "institutional": 7,
+    "list": 5,
+    "gis": 3,
+    "ouvidoria_redirection": 1,
+    "general": 7,
+    "blocked_privacy": 2,
+    "out_of_competency": 1,
+    "blocked_legal": 1
+  },
+  "avg_latency_ms": 1128.5,
+  "total_execution_time_s": 1.458648443222046,
+  "projection_500_conversations_day": {
+    "queries_per_day": 2000,
+    "daily_cost_usd": 0.12509133333333336,
+    "monthly_cost_usd": 3.7527400000000006,
+    "daily_tokens_sent": 840400.0,
+    "daily_tokens_received": 246333.33333333334,
+    "avg_cost_per_conversation_usd": 0.0002501826666666667
+  }
+}

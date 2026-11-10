@@ -24,7 +24,8 @@ Crie o arquivo de ambiente `.env` e configure sua `GEMINI_API_KEY`:
 ```env
 GEMINI_API_KEY=sua_chave_aqui
 USE_TRIAGE_LAYER=true
-SQLITE_DB_PATH=agent/duque_ia.db
+DATABASE_MAIN=data/db/main.db
+DATABASE_VECTOR=data/db/vector.db
 ```
 
 ## 3. Instalação e Ambiente Virtual (.venv)
@@ -70,7 +71,7 @@ pm2 startup
 ```
 
 ## 5. Configuração do Reverse Proxy (Nginx)
-Recomenda-se usar o Nginx como proxy reverso para apontar o tráfego da porta 80/443 para a porta 3000 do Node:
+Recomenda-se usar o Nginx como proxy reverso para apontar o tráfego da porta 80/443 para a porta 3001 do Node:
 
 ```bash
 sudo apt install nginx -y
@@ -84,7 +85,7 @@ server {
     server_name seu_dominio.com;
 
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

@@ -76,7 +76,8 @@ Crie um arquivo `.env` contendo:
 ```env
 GEMINI_API_KEY=sua_chave_aqui
 USE_TRIAGE_LAYER=true
-SQLITE_DB_PATH=agent/duque_ia.db
+DATABASE_MAIN=data/db/main.db
+DATABASE_VECTOR=data/db/vector.db
 ```
 Mais informações sobre variáveis avançadas estão na [Documentação de Variáveis](docs/02-Instalacao/Variaveis.md).
 
@@ -91,16 +92,21 @@ Acesse as subpastas da pasta [/docs](docs/README.md) para documentações comple
 - 📂 **[05-Frontend - Telas e Estilização](docs/05-Frontend/Estrutura.md)**
 - 📂 **[06-Backend - Servidor Node.js](docs/06-Backend/Controllers.md)**
 - 📂 **[07-IA - Engenharia de Prompts e Agentes](docs/07-IA/Prompts.md)**
-- 📂 **[08-Deploy - Docker, Render e VPS](docs/08-Deploy/Produção.md)**
+- 📂 **[08-Deploy - Docker, Render e VPS](docs/08-Deploy/Producao.md)**
 - 📂 **[09-Testes - Execução e Casos de Teste](docs/09-Testes/Testes.md)**
 - 📂 **[10-Manutenção - Backup e Checklist](docs/10-Manutencao/Checklist.md)**
 
 ---
 
 ## 🧪 Como Rodar Testes
-O projeto conta com 47 testes integrados e unitários:
+O projeto conta com uma suíte de 22 baterias integradas e unitárias (incluindo regressão multi-turno e ontologia):
 ```bash
 python scripts/run_all_tests.py
+```
+Diagnóstico de infraestrutura e integridade física dos bancos:
+```bash
+python setup_and_run.py --health
+python scripts/check_db.py
 ```
 Veja os casos de testes documentados em [Casos de Teste](docs/09-Testes/Casos.md).
 
@@ -108,7 +114,7 @@ Veja os casos de testes documentados em [Casos de Teste](docs/09-Testes/Casos.md
 
 ## 🛠️ Solução de Problemas (Troubleshooting)
 - **Erro `Invalid API Key`**: Verifique se o arquivo `.env` está na raiz do projeto e se a chave `GEMINI_API_KEY` foi configurada sem aspas ou espaços extras.
-- **Erro de SQLite Lock**: Certifique-se de que nenhum outro processo está mantendo o arquivo `agent/duque_ia.db` aberto para escrita.
+- **Erro de SQLite Lock**: Certifique-se de que nenhum outro processo está mantendo arquivos em `data/db/` abertos em modo exclusivo. Os bancos utilizam WAL para permitir múltiplas leituras e escritas concorrentes.
 - **Saudações Duplicadas**: O sistema implementa blindagem via histórico. Certifique-se de passar o `sessionId` idêntico nas chamadas subsequentes para manter a sessão ativa.
 
 ---

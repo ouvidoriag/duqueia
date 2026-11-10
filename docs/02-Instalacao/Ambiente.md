@@ -8,7 +8,8 @@ Crie um arquivo `.env` na raiz do projeto contendo as seguintes definições bá
 ```env
 # Configurações do Agente
 USE_TRIAGE_LAYER=true
-SQLITE_DB_PATH=agent/duque_ia.db
+DATABASE_MAIN=data/db/main.db
+DATABASE_VECTOR=data/db/vector.db
 
 # Chaves de API das LLMs
 GEMINI_API_KEY=sua_chave_do_gemini_aqui

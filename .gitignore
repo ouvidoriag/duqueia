@@ -32,15 +32,26 @@ scratch/
 *.db
 *.db-journal
 *.db-wal
+*.bak
 !data/db/main.db
 !data/db/vector.db
 !data/db/cache.db
+!data/db/telemetry.db
+archive/database_backups/
 
 
 # Logs e Métricas Locais
 logs/
 metrics/
 *.log
+
+# Arquivos de Áudio e Uploads de Usuários (Chat de Voz)
+public/audio/*.wav
+public/audio/*.mp3
+!public/audio/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep
+
 
 # Arquivos Temporários de Sistema e Editores
 .DS_Store

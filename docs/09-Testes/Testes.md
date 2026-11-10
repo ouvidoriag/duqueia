@@ -1,6 +1,6 @@
 # Manual da Suíte de Testes — Duque IA
 
-O projeto possui uma suíte completa de testes automatizados localizados na pasta `tests/` e executores em `scripts/`.
+O projeto possui uma suíte completa de testes automatizados localizados na pasta `scripts/tests/` orquestrados por `scripts/run_all_tests.py`.
 
 ## Executar todos os testes
 Para iniciar toda a bateria de testes automatizados (unitários e integrados):

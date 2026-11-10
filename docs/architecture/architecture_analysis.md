@@ -7,7 +7,7 @@
 
 `DUQUEIA/
 │
-├── server.js                     # Gateway HTTP Node.js (porta 3000) — gerencia sessões por sessionId
+├── server.js                     # Gateway HTTP Node.js (porta 3001) — gerencia sessões por sessionId
 ├── requirements.txt              # Declaração de dependências Python para o Render
 ├── package.json                  # Scripts npm e build command de dependências
 │

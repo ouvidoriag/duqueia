@@ -62,14 +62,19 @@ for pat in LEGAL_TRIGGERS:
     FAST_SECURITY_PATTERNS.append((pat, "JURIDICO", "Solicitação jurídica bloqueada localmente."))
 
 
-# Detecta queries de barulho/som onde o cidadão NÃO especifica se a origem é pública ou privada.
+# Detecta queries de barulho/som onde o cidadão NÃO especifica se a origem é pública/comercial ou privada.
 # Deve ficar ABAIXO dos padrões de segurança (LGPD/ESCALONAMENTO) que têm prioridade.
 # Dispara AMBIGUO_BARULHO com needs_clarification=True para acionar o Agente Coletor.
 AMBIGUITY_FAST_PATTERNS = [
-    # Frases ambíguas de barulho sem menção explícita de vizinho/residência privada OU local público
+    # Frases de som alto/música/barulho onde é necessário esclarecer se vem de residência particular (190) ou comércio/espaço público (Prefeitura/Colab)
+    (
+        r"\b(?:som\s+alto|música\s+alta|musica\s+alta|barulho\s+(?:de\s+)?som|vizinho\s+(?:com\s+|tá\s+com\s+|ta\s+com\s+|está\s+com\s+)?som\s+alto)\b",
+        "AMBIGUO_BARULHO",
+        "Reclamação de som alto/barulho necessitando esclarecimento de origem (residência particular ou estabelecimento/espaço público)."
+    ),
+    # Frases ambíguas de barulho sem menção explícita de local público ou privado
     (
         r"(?:tem|tá|ta|tem|há|ha)\s+(?:um|uma|muito|um)\s+(?:barulho|som|algazarra|zoeira|bagunça|bagunceira)\b"
-        r"(?!.*(?:vizinho|vizinha|apartamento|casa\s+(?:do|da|ao\s+lado)|residência|andar))"
         r"(?!.*(?:rua|praça|largo|parque|show|evento|bar\b|boate))",
         "AMBIGUO_BARULHO",
         "Reclamação de barulho sem origem explícita detectada — aguardando esclarecimento."
@@ -77,7 +82,6 @@ AMBIGUITY_FAST_PATTERNS = [
     # 'barulho insuportavel / excessivo / muito alto' sem local claro
     (
         r"barulho\s+(?:insuportáve[l]?|insuportave[l]?|excess[i]?vo|muito\s+alto|absurdo|horríve[l]?|horrivel)"
-        r"(?!.*(?:vizinho|vizinha|apartamento|casa\s+(?:do|da|ao\s+lado)|residência|andar))"
         r"(?!.*(?:rua|praça|largo|parque|show|evento|bar\b|boate))",
         "AMBIGUO_BARULHO",
         "Reclamação de barulho intenso sem origem explícita — aguardando esclarecimento."
@@ -100,7 +104,7 @@ SEGURANCA_PUBLICA_FAST_PATTERNS = [
 
 POSSIVEL_DENUNCIA_FAST_PATTERNS = [
     (r"\b(?:me\s+(?:\w+\s+)?xingou|me\s+(?:\w+\s+)?xingaram|xingou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de ofensa ou xingamento sofrido."),
-    (r"\b(?:me\s+(?:\w+\s+)?tratou\s+(?:\w+\s+)?mal|me\s+(?:\w+\s+)?trataram\s+(?:\w+\s+)?mal|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratado|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratada)\b", "POSSIVEL_DENUNCIA", "Relato de mau tratamento sofrido."),
+    (r"\b(?:me\s+(?:\w+\s+)?tratou\s+(?:\w+\s+)?mal|me\s+(?:\w+\s+)?trataram\s+(?:\w+\s+)?mal|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratado|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?tratada|fui\s+(?:\w+\s+)?maltratad[ao]|me\s+(?:\w+\s+)?maltrat(?:ou|aram))\b", "POSSIVEL_DENUNCIA", "Relato de mau tratamento sofrido."),
     (r"\b(?:foi\s+(?:\w+\s+)?grosseiro|foi\s+(?:\w+\s+)?grosseira|foram\s+(?:\w+\s+)?grosseiros)\b", "POSSIVEL_DENUNCIA", "Relato de grosseria sofrida."),
     (r"\b(?:me\s+(?:\w+\s+)?ofendeu|me\s+(?:\w+\s+)?ofenderam|ofendeu\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de ofensa sofrida."),
     (r"\b(?:foi\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educado|foi\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educada|foram\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?educados)\b", "POSSIVEL_DENUNCIA", "Relato de atitude mal educada."),
@@ -109,7 +113,9 @@ POSSIVEL_DENUNCIA_FAST_PATTERNS = [
     (r"\b(?:me\s+(?:\w+\s+)?destratou|me\s+(?:\w+\s+)?destrataram|destratou\s+me)\b", "POSSIVEL_DENUNCIA", "Relato de desrespeito sofrido."),
     (r"\b(?:fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?atendido|fui\s+(?:\w+\s+)?mal\s+(?:\w+\s+)?atendida|mau\s+(?:\w+\s+)?atendimento|atendimento\s+(?:\w+\s+)?ruim)\b", "POSSIVEL_DENUNCIA", "Relato de atendimento inadequado."),
     (r"\b(?:fui\s+(?:\w+\s+)?vítima|fui\s+(?:\w+\s+)?vitima)\b", "POSSIVEL_DENUNCIA", "Relato de ter sido vítima de algo."),
-    (r"\b(?:aconteceu\s+(?:\w+\s+)?comigo)\b", "POSSIVEL_DENUNCIA", "Relato pessoal de ocorrido.")
+    (r"\b(?:aconteceu\s+(?:\w+\s+)?comigo)\b", "POSSIVEL_DENUNCIA", "Relato pessoal de ocorrido."),
+    (r"\b(?:pediu\s+dinheiro|pediram\s+dinheiro|cobrou\s+propina|pediu\s+propina|cobrando\s+propina|suborno|concussão|concussao)\b", "POSSIVEL_DENUNCIA", "Relato de cobrança indevida ou corrupção de agente público."),
+    (r"\b(?:praticou\s+(?:uma\s+)?irregularidade|cometeu\s+(?:uma\s+)?irregularidade|desvio\s+de\s+conduta)\b", "POSSIVEL_DENUNCIA", "Relato de conduta irregular ou infração disciplinar de agente.")
 ]
 
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
@@ -139,7 +145,31 @@ RAG_GERAL_FAST_PATTERNS = [
     (r"\b(?:ouvidoria|colab|telefone|endereço|endereco|contato|horário|horario|secretaria|prefeitura)\b", "RAG_GERAL", "Consulta informativa de canais/secretarias detectada localmente.")
 ]
 
-def check_fast_gate(query: str) -> dict | None:
+# Palavras-chave de mudança de assunto e tópicos independentes para blindagem do Fast Gate
+INTENT_CHANGE_SIGNALS = [
+    "esquece", "esqueça", "cancela", "deixa pra lá", "deixa para la",
+    "mudei de ideia", "outro assunto", "outra coisa", "na verdade, não",
+    "não quero mais", "mudando de assunto", "na verdade"
+]
+
+INDEPENDENT_TOPIC_KEYWORDS = [
+    "horário", "horario", "ambulante", "higiene", "alvará", "alvara",
+    "abrir empresa", "abrir um", "abrir uma", "endereço", "endereco",
+    "onde fica", "onde tem", "trabalho", "iptu", "segunda via", "2ª via",
+    "iluminação", "iluminacao", "lixo", "buraco", "asfalto", "bueiro",
+    "vacina", "matrícula", "matricula", "remédio", "remedio", "hospital",
+    "upa", "creche", "escola"
+]
+
+INDEPENDENT_QUESTION_PREFIXES = [
+    "quero saber", "gostaria de saber", "como faço para", "como faco para",
+    "como posso", "onde posso", "preciso saber", "preciso do", "qual o horário",
+    "qual o horario", "tenho uma reclamação sobre o comércio ambulante",
+    "reclamação sobre o comércio ambulante", "quero denunciar um comércio funcionando irregularmente",
+    "o estabelecimento onde trabalho", "quero abrir uma reclamação contra um estabelecimento por falta de higiene"
+]
+
+def check_fast_gate(query: str, history: list = None) -> dict | None:
     """Valida a query usando regras locais de baixíssima latência (0ms)."""
     query_lower = query.lower().strip()
     
@@ -160,6 +190,125 @@ def check_fast_gate(query: str) -> dict | None:
             "reason": "Query extremamente curta tratada como saudação padrão.",
             "source": "FAST_GATE"
         }
+
+    # Desambiguação instantânea multi-turno (0ms) baseada no histórico recente
+    if history:
+        # Se o usuário estiver explicitamente mudando de assunto ou fazendo uma pergunta independente completa,
+        # NÃO interceptar no Fast Gate de desambiguação multi-turno. Deixe fluir para triagem/resolução de entidade.
+        is_intent_change = any(sig in query_lower for sig in INTENT_CHANGE_SIGNALS)
+        is_independent_query = (
+            any(k in query_lower for k in INDEPENDENT_TOPIC_KEYWORDS) or
+            any(query_lower.startswith(p) for p in INDEPENDENT_QUESTION_PREFIXES)
+        )
+
+        if not is_intent_change and not is_independent_query:
+            # Avaliamos o último turno do assistente para garantir que o contexto imediato pede esclarecimento
+            last_assistant_turn = ""
+            for turn in reversed(history):
+                if "DUQUE IA:" in turn or "DUQUE" in turn or "assistente:" in turn.lower():
+                    last_assistant_turn = turn.lower()
+                    break
+            if not last_assistant_turn and len(history) > 0:
+                last_assistant_turn = history[-1].lower()
+
+            # Desambiguação de Barulho / Som Alto
+            is_noise_context = any(w in last_assistant_turn for w in [
+                "origem do ruído", "origem do barulho", "som alto", "ruído", "ruido",
+                "residência particular", "residencia particular", "190", "comércio, obra",
+                "estabelecimento comercial", "ambiguo_barulho", "poluição sonora",
+                "barulho vem de", "barulho vem", "ruído vem", "som vem", "barulho",
+                "residência ou de um comércio", "residencia ou de um comercio",
+                "residência ou comércio", "residencia ou comercio"
+            ])
+
+            if is_noise_context:
+                # Caso A: Residencial (Polícia Militar 190)
+                is_residential = (
+                    any(w in query_lower for w in [
+                        "casa", "residencia", "residência", "apartamento", "vizinho", "vizinha",
+                        "particular", "residencial", "casa ao lado", "na casa do vizinho",
+                        "casa de vizinho", "família", "familia", "meu vizinho"
+                    ]) or
+                    query_lower in ["não", "nao", "não é comércio", "nao é comercio", "não, é na minha casa", "não, é casa", "não, casa"]
+                )
+
+                # Caso B: Comércio / Estabelecimento (Colab / Ouvidoria - Ordem Pública)
+                is_commercial = (
+                    any(w in query_lower for w in [
+                        "comercial", "comércio", "comercio", "comérciu", "comerciu", "estabelecimento",
+                        "bar", "loja", "restaurante", "boate", "mercado", "supermercado", "salão", "salao",
+                        "casa de festa", "casa de festas", "lanchonete", "padaria", "quiosque", "boteco",
+                        "oficina", "igreja", "templo", "empresa", "barulho do bar", "som alto do bar",
+                        "bar tá com som", "bar ta com som", "bar da esquina", "comercio ta com",
+                        "vizinho é um bar", "vizinho e um bar"
+                    ]) or
+                    query_lower in ["sim", "sim, é um bar", "sim é um bar", "sim, comercial", "sim comercial", "é comercial", "e comercial"]
+                )
+
+                # Caso C: Via Pública / Veículos / Paredão / Eventos (Colab / Ordem Pública)
+                is_public_or_vehicle = any(w in query_lower for w in [
+                    "rua", "na rua", "praça", "praca", "calçada", "calcada", "via pública", "via publica",
+                    "carro", "carro de som", "carro com som", "veículo", "veiculo", "automotivo",
+                    "som automotivo", "paredão", "paredao", "evento", "show", "evento na rua"
+                ])
+
+                if is_residential and not is_commercial:
+                    return {
+                        "intent": "RESIDENCIAL",
+                        "confidence": 1.0,
+                        "needs_clarification": False,
+                        "reason": "Desambiguação rápida de som alto: origem confirmada em residência particular (Polícia 190).",
+                        "rewritten_query": f"Perturbação do sossego por som alto em residência particular ({query}).",
+                        "source": "FAST_GATE"
+                    }
+                elif is_commercial:
+                    return {
+                        "intent": "OUVIDORIA_MANIFESTACAO",
+                        "tipo_manifestacao": "reclamacao",
+                        "sub_intent": "poluicao_sonora_comercial",
+                        "confidence": 1.0,
+                        "needs_clarification": False,
+                        "reason": "Desambiguação rápida de som alto: origem confirmada em estabelecimento comercial (Colab Ordem Pública).",
+                        "rewritten_query": f"Reclamação de poluição sonora e ruído em estabelecimento comercial ou bar ({query}).",
+                        "source": "FAST_GATE"
+                    }
+                elif is_public_or_vehicle:
+                    subtype = "veiculo" if any(w in query_lower for w in ["carro", "veículo", "veiculo", "paredão", "paredao", "automotivo"]) else "via_publica"
+                    return {
+                        "intent": "OUVIDORIA_MANIFESTACAO",
+                        "tipo_manifestacao": "reclamacao",
+                        "sub_intent": f"poluicao_sonora_{subtype}",
+                        "confidence": 1.0,
+                        "needs_clarification": False,
+                        "reason": f"Desambiguação rápida de som alto: origem em {subtype.replace('_', ' ')} (Colab Ordem Pública).",
+                        "rewritten_query": f"Reclamação de poluição sonora em via pública / som automotivo ({query}).",
+                        "source": "FAST_GATE"
+                    }
+
+            # Desambiguação de Iluminação Pública vs Residencial
+            is_light_context = any(w in last_assistant_turn for w in [
+                "falta de energia elétrica dentro da sua residência", "iluminação pública (como um poste",
+                "poste ou lâmpada", "ambiguo_luz", "poste apagado", "lâmpada queimada"
+            ])
+            if is_light_context:
+                if any(w in query_lower for w in ["poste", "rua", "fora", "apagado", "apagada", "quebrada", "pública", "publica", "na rua"]):
+                    return {
+                        "intent": "RAG_GERAL",
+                        "confidence": 1.0,
+                        "needs_clarification": False,
+                        "reason": "Desambiguação rápida de iluminação: poste de iluminação pública na rua.",
+                        "rewritten_query": f"Solicitação de troca ou manutenção de lâmpada em poste de rua ({query}).",
+                        "source": "FAST_GATE"
+                    }
+                elif any(w in query_lower for w in ["casa", "minha casa", "dentro", "light", "relógio", "relogio", "residência", "residencia"]):
+                    return {
+                        "intent": "RESIDENCIAL",
+                        "confidence": 1.0,
+                        "needs_clarification": False,
+                        "reason": "Desambiguação rápida de iluminação: falta de energia dentro de casa (Light).",
+                        "rewritten_query": f"Falta de luz dentro de residência particular ({query}).",
+                        "source": "FAST_GATE"
+                    }
         
     # 1º: Matcher de políticas de segurança / escopo (máxima prioridade)
     for regex, intent, reason in FAST_SECURITY_PATTERNS:
@@ -194,16 +343,28 @@ def check_fast_gate(query: str) -> dict | None:
                 "source": "FAST_GATE"
             }
 
-    # 1º B: Relatos de ofensas/xingamentos/mau atendimento (alta prioridade, antes de conversa casual)
-    for regex, intent, reason in POSSIVEL_DENUNCIA_FAST_PATTERNS:
-        if re.search(regex, query_lower):
-            return {
-                "intent": intent,
-                "confidence": 1.0,
-                "needs_clarification": False,
-                "reason": reason,
-                "source": "FAST_GATE"
-            }
+    # 1º B: Relatos de ofensas/xingamentos/mau atendimento por agente/servidor (alta prioridade, antes de conversa casual)
+    is_private_or_commercial = any(w in query_lower for w in [
+        "comércio", "comercio", "loja", "bar", "restaurante", "lanchonete", "padaria",
+        "mercado", "supermercado", "banco", "empresa", "vizinho", "vizinha", "motorista de ônibus",
+        "motorista de van", "estabelecimento"
+    ])
+    has_municipal_agent = any(w in query_lower for w in [
+        "servidor", "funcionário", "funcionario", "atendente da prefeitura", "prefeitura",
+        "guarda municipal", "guarda", "fiscal", "secretaria", "posto de saúde", "posto de saude",
+        "upa", "hospital municipal", "escola municipal", "creche municipal"
+    ])
+    # Se mencionar entidade comercial privada sem menção de servidor municipal, não é POSSIVEL_DENUNCIA funcional
+    if not (is_private_or_commercial and not has_municipal_agent):
+        for regex, intent, reason in POSSIVEL_DENUNCIA_FAST_PATTERNS:
+            if re.search(regex, query_lower):
+                return {
+                    "intent": intent,
+                    "confidence": 1.0,
+                    "needs_clarification": False,
+                    "reason": reason,
+                    "source": "FAST_GATE"
+                }
 
     # 1º C: Perguntas de autoridades (alta prioridade, antes de conversa casual)
     for regex, intent, reason in AUTORIDADE_PUBLICA_FAST_PATTERNS:
@@ -320,7 +481,29 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "Intenções permitidas:\n"
         "SAUDACAO, IDENTIDADE, LGPD, JURIDICO, FORA_COMPETENCIA, AMBIGUO_LUZ, AMBIGUO_LAMPADA, AMBIGUO_BARULHO, "
         "RESIDENCIAL, OUVIDORIA_MANIFESTACAO, ESCALONAMENTO_HUMANO, POSSIVEL_DENUNCIA, AUTORIDADE_PUBLICA, PROGRAMACAO, CONVERSA, RAG_GERAL.\n\n"
-        "Regras Rápidas:\n"
+        "Regras Rápidas e Desambiguação Multi-Turno:\n"
+        "## REGRA CRÍTICA — PRESERVAÇÃO DA INTENÇÃO CONVERSACIONAL:\n"
+        "Quando o usuário já tiver declarado uma intenção (como reclamação, solicitação, informação, denúncia, elogio, sugestão, pedido de serviço) e posteriormente fornecer informações para esclarecer ou detalhar essa intenção, NÃO altere a intenção original automaticamente.\n"
+        "As novas mensagens devem ser interpretadas primeiro como possíveis complementos do contexto existente.\n"
+        "Exemplo obrigatório:\n"
+        "- Usuário: \"Quero abrir uma reclamação.\" -> intent = OUVIDORIA_MANIFESTACAO (tipo_manifestacao = reclamacao)\n"
+        "- Usuário: \"Meu vizinho está com som alto.\" -> topic = SOM ALTO\n"
+        "- Usuário: \"Estabelecimento comercial.\" -> intent = OUVIDORIA_MANIFESTACAO, topic = SOM ALTO, location_type = ESTABELECIMENTO COMERCIAL.\n"
+        "A mensagem \"estabelecimento comercial\" NÃO deve ser classificada isoladamente como uma nova intenção!\n\n"
+        "PROIBIDO:\n"
+        "- Não transformar automaticamente: RECLAMAÇÃO -> DENÚNCIA\n"
+        "- Não transformar automaticamente: ESTABELECIMENTO COMERCIAL -> ÓRGÃO/SERVIDOR DA PREFEITURA sem que o usuário tenha fornecido informação que justifique explicitamente essa mudança.\n\n"
+        "MUDANÇA DE INTENÇÃO:\n"
+        "A intenção somente deve ser substituída quando:\n"
+        "1. o usuário declarar explicitamente que mudou de assunto (Ex: \"Esqueça a reclamação do barulho. Quero saber como emitir meu IPTU.\"); ou\n"
+        "2. houver evidência inequívoca de que a nova mensagem representa uma nova demanda independente.\n\n"
+        "REGRA DE DECISÃO ANTES DE REDIRECT:\n"
+        "Antes de executar qualquer redirect ou alterar intenção, verifique obrigatoriamente:\n"
+        "1. Qual é a intenção original? 2. Qual é o assunto atual? 3. A última mensagem apenas esclarece o assunto? 4. O usuário realmente mudou de intenção? 5. Existe evidência explícita para o redirect? 6. O redirect é compatível com TODA a conversa, e não apenas com a última mensagem?\n"
+        "Se a última mensagem apenas esclarecer a intenção existente: PRESERVAR INTENÇÃO.\n"
+        "Se houver mudança explícita: ATUALIZAR INTENÇÃO.\n"
+        "Nunca faça classificação ou redirect considerando somente a última mensagem quando houver contexto conversacional disponível.\n\n"
+        "- POSSIVEL_DENUNCIA = Usar ESTRITAMENTE para relatos de ofensas, xingamentos, ameaças, humilhações ou grosseria cometida por SERVIDORES PÚBLICOS MUNICIPAIS ou durante atendimento em postos/órgãos da Prefeitura. Reclamações de barulho, comércio, lixo, obras ou serviços urbanos NÃO são POSSIVEL_DENUNCIA.\n"
         "- FORA_COMPETENCIA = Usar APENAS para órgãos Estaduais (Metrô, Trem/Supervia, DETRAN), Federais (INSS, IRPF/Receita Federal) ou Prefeituras de OUTROS municípios. Perguntas sobre bairros de Caxias (Jardim Primavera, Xerém, 25 de Agosto, etc.), comércio local, restaurantes, passeios, história ou locais do município NÃO são FORA_COMPETENCIA -> use RAG_GERAL.\n"
         "- Zeladoria urbana (buraco, lixo, lâmpada pública) primeira vez sem protocolo = RAG_GERAL (needs_clarification=false).\n"
         "- Se o histórico contém uma dúvida sobre luz/iluminação (AMBIGUO_LUZ) e o usuário desambigua para postes ou lâmpadas da rua = RAG_GERAL (needs_clarification=false).\n"
@@ -388,7 +571,7 @@ def get_triage_fallback(reason: str) -> dict:
 def perform_triage(db_path: str, query: str, gemini_client, history: list = None) -> dict:
     """Orquestra as camadas de triagem (Fast Gate, Cache e LLM)."""
     # 1. Camada 0: Fast Gate (Regras Locais)
-    fast_res = check_fast_gate(query)
+    fast_res = check_fast_gate(query, history=history)
     if fast_res:
         return _add_routing_metadata(fast_res)
         

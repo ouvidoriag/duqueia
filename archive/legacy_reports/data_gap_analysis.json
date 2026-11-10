@@ -1,0 +1,74 @@
+[
+  {
+    "id": "P01",
+    "pergunta": "Como solicitar a poda de árvore na calçada da minha rua?",
+    "erro": "FALSE_NEGATIVE_GUARDRAIL",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P04",
+    "pergunta": "Quais documentos preciso para matricular meu filho na creche municipal?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P05",
+    "pergunta": "Como emitir o carnê do IPTU em Duque de Caxias?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P07",
+    "pergunta": "Como solicitar limpeza de lote baldio ou terreno abandonado?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P11",
+    "pergunta": "Quais são os bairros do segundo distrito de Duque de Caxias?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P12",
+    "pergunta": "Qual a população estimada do município de Duque de Caxias?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P15",
+    "pergunta": "Quero registrar uma denúncia sobre irregularidade em obra pública.",
+    "erro": "TRIAGE_BYPASS",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P20",
+    "pergunta": "A FUNDEC oferece cursos gratuitos? Quais?",
+    "erro": "LLM_HALLUCINATION",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  },
+  {
+    "id": "P28",
+    "pergunta": "Qual é a capital da França?",
+    "erro": "TRIAGE_BYPASS",
+    "tem_resposta_no_banco": false,
+    "main_db_matches": [],
+    "vector_db_matches": []
+  }
+]

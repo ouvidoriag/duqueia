@@ -1,0 +1,600 @@
+{
+  "total": 5,
+  "success": 3,
+  "failures": 2,
+  "success_rate_pct": 60.0,
+  "breakdown": {
+    "NO_FAILURE_DETECTED": 2,
+    "TRIAGE_BYPASS": 0,
+    "TRIAGE_ROUTING_ERROR": 0,
+    "ENTITY_LOSS_IN_REWRITE": 0,
+    "ENTITY_SUBSTITUTION": 0,
+    "VECTOR_INDEX_OUTDATED": 0,
+    "STRUCTURED_NOT_INDEXED": 0,
+    "RERANKER_DEGRADATION": 0,
+    "LOW_CONFIDENCE_THRESHOLD": 0,
+    "FALSE_NEGATIVE_GUARDRAIL": 0,
+    "LLM_HALLUCINATION": 2,
+    "SECURITY_PRIVACY_BLOCKED": 1
+  },
+  "results": [
+    {
+      "timestamp": "2026-07-23T10:52:53.658408",
+      "question": "Como solicitar a poda de árvore na calçada da minha rua?",
+      "triage": {
+        "intent": "RAG_GERAL",
+        "handler": "RAG_HANDLER",
+        "source": "SQLITE_CACHE",
+        "rag_executed": true,
+        "needs_clarification": false,
+        "confidence": 1.0
+      },
+      "query_rewriting": {
+        "original": "Como solicitar a poda de árvore na calçada da minha rua?",
+        "rewritten": "Como solicitar a poda de árvore na calçada da minha rua?",
+        "entities_original": [],
+        "entities_rewritten": [],
+        "entity_loss": [],
+        "entity_substitution": []
+      },
+      "planner": {
+        "intent": "service_request",
+        "queries": [
+          "como solicitar poda de árvore na calçada",
+          "Secretaria Municipal de Meio Ambiente Duque de Caxias",
+          "serviço de poda de árvore prefeitura"
+        ],
+        "focus": [
+          "steps",
+          "department",
+          "requirements"
+        ],
+        "tools_selected": [
+          "faq_chunks"
+        ]
+      },
+      "retrieval": {
+        "structured_comparison": {
+          "structured_found": true,
+          "vector_found": true,
+          "structured_count": 2,
+          "vector_count": 821
+        },
+        "retrieval_executed": true,
+        "retrieval_returned_results": true,
+        "max_similarity_score": 0.6067,
+        "effective_threshold": 0.5,
+        "boosts_applied": [],
+        "golden_document_tracking": {
+          "golden_document_found": false,
+          "golden_document_title": "N/A",
+          "golden_document_rank_before": null,
+          "golden_document_rank_after": null,
+          "golden_document_used_in_prompt": false
+        }
+      },
+      "context_chunks_sent_to_llm": [
+        {
+          "rank": 1,
+          "source": "assunto_secretaria_secretaria_municipal_de_transportes_e_serviços_públicos.md",
+          "title": "Demandas Colab: Secretaria Municipal de Transportes e Serviços Públicos",
+          "category": "secretarias",
+          "score": 0.6067,
+          "text_preview": "# Assuntos e Demandas do Aplicativo Colab: Secretaria Municipal de Transportes e Serviços Públicos\\n\\nA **Secretaria Municipal de Transportes e Serviços Públicos** é o órgão responsável por responder, fiscalizar e solucionar as seguintes solicitações..."
+        },
+        {
+          "rank": 2,
+          "source": "assunto_secretaria_secretaria_municipal_de_obras_e_agricultura.md",
+          "title": "Demandas Colab: Secretaria Municipal de Obras e Agricultura",
+          "category": "secretarias",
+          "score": 0.6045,
+          "text_preview": " de via pública (móveis e fixas)**\\n- **Planos de contingência e evacuação**\\n- **Poluição por indústrias**\\n- **Desobstrução de redes de esgoto.**\\n- **lixo com muito ao lado do campo, a prefeitura limpa , a população não**\\n\\nPara reclamações de de..."
+        },
+        {
+          "rank": 3,
+          "source": "assunto_secretaria_secretaria_municipal_de_proteção_animal.md",
+          "title": "Demandas Colab: Secretaria Municipal de Proteção Animal",
+          "category": "secretarias",
+          "score": 0.6023,
+          "text_preview": "# Assuntos e Demandas do Aplicativo Colab: Secretaria Municipal de Proteção Animal\\n\\nA **Secretaria Municipal de Proteção Animal** é o órgão responsável por responder, fiscalizar e solucionar as seguintes solicitações, reclamações e demandas abertas..."
+        }
+      ],
+      "reranking": {
+        "candidates_before": [
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_transportes_e_serviços_públicos.md",
+            "title": "Demandas Colab: Secretaria Municipal de Transportes e Serviços Públicos",
+            "score": 0.7137168081045812
+          },
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_obras_e_agricultura.md",
+            "title": "Demandas Colab: Secretaria Municipal de Obras e Agricultura",
+            "score": 0.711134346713552
+          },
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_proteção_animal.md",
+            "title": "Demandas Colab: Secretaria Municipal de Proteção Animal",
+            "score": 0.7086454490616747
+          }
+        ],
+        "candidates_after": [
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_transportes_e_serviços_públicos.md",
+            "title": "Demandas Colab: Secretaria Municipal de Transportes e Serviços Públicos",
+            "score": 0.6067
+          },
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_obras_e_agricultura.md",
+            "title": "Demandas Colab: Secretaria Municipal de Obras e Agricultura",
+            "score": 0.6045
+          },
+          {
+            "source": "assunto_secretaria_secretaria_municipal_de_proteção_animal.md",
+            "title": "Demandas Colab: Secretaria Municipal de Proteção Animal",
+            "score": 0.6023
+          }
+        ],
+        "position_deltas": {
+          "Demandas Colab: Secretaria Municipal de ": 0
+        }
+      },
+      "generation": {
+        "prompt_length": 4119,
+        "response_before_guardrail": "Que bom que você está buscando cuidar da arborização da nossa cidade! Para solicitar a poda de uma árvore na calçada da sua rua, que é um logradouro público, você precisa comparecer à Secretaria Municipal de Meio Ambiente (SMMA). Lá, preencherá um formulário com o endereço completo e pontos de referência, e será muito útil levar fotos da árvore para auxiliar na análise. Este serviço é gratuito e a equipe da SMMA estará pronta para te acolher e ajudar.\n\n**Informações adicionais sobre \"Solicitar poda ou corte em logradouros públicos\":**\n\n👣 **Passo a Passo:**\nPasso 1: Comparecer à Secretaria Municipal de Meio Ambiente para abertura da solicitação.",
+        "guardrail_passed": true,
+        "response_after_guardrail": "Que bom que você está buscando cuidar da arborização da nossa cidade! Para solicitar a poda de uma árvore na calçada da sua rua, que é um logradouro público, você precisa comparecer à Secretaria Municipal de Meio Ambiente (SMMA). Lá, preencherá um formulário com o endereço completo e pontos de referência, e será muito útil levar fotos da árvore para auxiliar na análise. Este serviço é gratuito e a equipe da SMMA estará pronta para te acolher e ajudar.\n\n**Informações adicionais sobre \"Solicitar poda ou corte em logradouros públicos\":**\n\n👣 **Passo a Passo:**\nPasso 1: Comparecer à Secretaria Municipal de Meio Ambiente para abertura da solicitação.",
+        "answer_supported_by_context": false,
+        "support_score": 0.17
+      },
+      "root_cause_diagnosis": {
+        "code": "LLM_HALLUCINATION",
+        "details": "A resposta gerada possui fatos/dados não suportados pelos chunks de contexto (Score de Suporte: 0.17)."
+      },
+      "total_execution_ms": 43521.49
+    },
+    {
+      "timestamp": "2026-07-23T10:53:37.680058",
+      "question": "Onde fica a Secretaria Municipal de Saúde de Duque de Caxias?",
+      "triage": {
+        "intent": "RAG_GERAL",
+        "handler": "RAG_HANDLER",
+        "source": "SQLITE_CACHE",
+        "rag_executed": true,
+        "needs_clarification": false,
+        "confidence": 1.0
+      },
+      "query_rewriting": {
+        "original": "Onde fica a Secretaria Municipal de Saúde de Duque de Caxias?",
+        "rewritten": "Onde fica a Secretaria Municipal de Saúde de Duque de Caxias?",
+        "entities_original": [
+          "SAUDE"
+        ],
+        "entities_rewritten": [
+          "SAUDE"
+        ],
+        "entity_loss": [],
+        "entity_substitution": []
+      },
+      "planner": {
+        "intent": "service_location",
+        "queries": [
+          "Secretaria Municipal de Saúde de Duque de Caxias",
+          "Endereço da Secretaria de Saúde de Duque de Caxias",
+          "Secretaria Municipal de Saúde contato"
+        ],
+        "focus": [
+          "address",
+          "phone"
+        ],
+        "tools_selected": [
+          "faq_chunks"
+        ]
+      },
+      "retrieval": {
+        "structured_comparison": {
+          "structured_found": true,
+          "vector_found": true,
+          "structured_count": 188,
+          "vector_count": 821
+        },
+        "retrieval_executed": true,
+        "retrieval_returned_results": true,
+        "max_similarity_score": 1.0,
+        "effective_threshold": 0.5,
+        "boosts_applied": [],
+        "golden_document_tracking": {
+          "golden_document_found": true,
+          "golden_document_title": "Secretaria Municipal de Saúde - Duque de Caxias",
+          "golden_document_rank_before": 1,
+          "golden_document_rank_after": 1,
+          "golden_document_used_in_prompt": true
+        }
+      },
+      "context_chunks_sent_to_llm": [
+        {
+          "rank": 1,
+          "source": "saude.md",
+          "title": "Secretaria Municipal de Saúde - Duque de Caxias",
+          "category": "secretarias",
+          "score": 1.0,
+          "text_preview": "e\n- **Endereço:** Alameda James Franco, 03 – Jardim Primavera, Duque de Caxias - RJ.\n- **Telefone Administrativo:** (21) 2773-6312.\n- **Ouvidoria Geral da Saúde:** (21) 3194-9531 / 3194-9533.\n- **E-mails:** smsdc@duquedecaxias.rj.gov.br / ouvidoriasm..."
+        },
+        {
+          "rank": 2,
+          "source": "comunicacao.md",
+          "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+          "category": "secretarias",
+          "score": 1.0,
+          "text_preview": " **Endereço:** Alameda Esmeralda, 206 – Jardim Primavera, Duque de Caxias - RJ.\n- **E-mail de Imprensa:** imprensa@duquedecaxias.rj.gov.br\n- **Horário:** Segunda a sexta-feira, das 9h às 17h.\n"
+        },
+        {
+          "rank": 3,
+          "source": "direitos_crianca_adolescente_idoso.md",
+          "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+          "category": "secretarias",
+          "score": 1.0,
+          "text_preview": "utiva, focada na construção de uma rede sólida de suporte social que assegure a dignidade e os direitos dos cidadãos caxienses em todas as fases da vida.\n\n## Contato e Localização\n- **Endereço:** Alameda Esmeralda, 206 – Jardim Primavera, Duque de Ca..."
+        }
+      ],
+      "reranking": {
+        "candidates_before": [
+          {
+            "source": "saude.md",
+            "title": "Secretaria Municipal de Saúde - Duque de Caxias",
+            "score": 0.7744312266825979
+          },
+          {
+            "source": "comunicacao.md",
+            "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+            "score": 0.7640460852317758
+          },
+          {
+            "source": "direitos_crianca_adolescente_idoso.md",
+            "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+            "score": 0.7420917265328525
+          }
+        ],
+        "candidates_after": [
+          {
+            "source": "saude.md",
+            "title": "Secretaria Municipal de Saúde - Duque de Caxias",
+            "score": 1.0
+          },
+          {
+            "source": "comunicacao.md",
+            "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+            "score": 1.0
+          },
+          {
+            "source": "direitos_crianca_adolescente_idoso.md",
+            "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+            "score": 1.0
+          }
+        ],
+        "position_deltas": {
+          "Secretaria Municipal de Saúde - Duque de": 0,
+          "Secretaria Municipal de Comunicação - Du": 0,
+          "Secretaria Municipal de Direitos da Cria": 0
+        }
+      },
+      "generation": {
+        "prompt_length": 873,
+        "response_before_guardrail": "A Secretaria Municipal de Saúde de Duque de Caxias fica na **Alameda James Franco, 03 – Jardim Primavera, Duque de Caxias - RJ**.\n\nSe precisar de mais alguma informação, como telefone ou horário de funcionamento, é só me dizer!",
+        "guardrail_passed": true,
+        "response_after_guardrail": "A Secretaria Municipal de Saúde de Duque de Caxias fica na **Alameda James Franco, 03 – Jardim Primavera, Duque de Caxias - RJ**.\n\nSe precisar de mais alguma informação, como telefone ou horário de funcionamento, é só me dizer!",
+        "answer_supported_by_context": true,
+        "support_score": 0.53
+      },
+      "root_cause_diagnosis": {
+        "code": "NO_FAILURE_DETECTED",
+        "details": "RAG executado e auditado sem falhas."
+      },
+      "total_execution_ms": 38989.35
+    },
+    {
+      "timestamp": "2026-07-23T10:54:17.169928",
+      "question": "Como emitir o carnê do IPTU em Duque de Caxias?",
+      "triage": {
+        "intent": "RAG_GERAL",
+        "handler": "RAG_HANDLER",
+        "source": "SQLITE_CACHE",
+        "rag_executed": true,
+        "needs_clarification": false,
+        "confidence": 1.0
+      },
+      "query_rewriting": {
+        "original": "Como emitir o carnê do IPTU em Duque de Caxias?",
+        "rewritten": "Como emitir o carnê do IPTU em Duque de Caxias?",
+        "entities_original": [
+          "IPTU"
+        ],
+        "entities_rewritten": [
+          "IPTU"
+        ],
+        "entity_loss": [],
+        "entity_substitution": []
+      },
+      "planner": {
+        "intent": "service_request",
+        "queries": [
+          "como emitir 2ª via carnê IPTU Duque de Caxias",
+          "Secretaria Municipal de Fazenda e Planejamento",
+          "serviços online IPTU Duque de Caxias"
+        ],
+        "focus": [
+          "steps",
+          "url",
+          "department"
+        ],
+        "tools_selected": [
+          "faq_chunks"
+        ]
+      },
+      "retrieval": {
+        "structured_comparison": {
+          "structured_found": true,
+          "vector_found": true,
+          "structured_count": 5,
+          "vector_count": 821
+        },
+        "retrieval_executed": true,
+        "retrieval_returned_results": true,
+        "max_similarity_score": 0.6328,
+        "effective_threshold": 0.5,
+        "boosts_applied": [],
+        "golden_document_tracking": {
+          "golden_document_found": false,
+          "golden_document_title": "N/A",
+          "golden_document_rank_before": null,
+          "golden_document_rank_after": null,
+          "golden_document_used_in_prompt": false
+        }
+      },
+      "context_chunks_sent_to_llm": [
+        {
+          "rank": 1,
+          "source": "home.md",
+          "title": "Prefeitura Municipal de Duque de Caxias - Home",
+          "category": "general",
+          "score": 0.6328,
+          "text_preview": "# Prefeitura Municipal de Duque de Caxias - Home\n\n## Informações Gerais\n- **Site Oficial:** https://duquedecaxias.rj.gov.br/\n- **Endereço:** Alameda Esmeralda 206, Jd. Primavera, Duque de Caxias / RJ\n- **CEP:** 25215-260\n- **Telefone:** (21) 3900-135..."
+        },
+        {
+          "rank": 2,
+          "source": "CARTA_DE_SERVICO_23.05.26.xlsx",
+          "title": "Emissão de 2° Via de Guias de Recolhimento e Emissão de Extrato de Débitos",
+          "category": "carta_servicos",
+          "score": 0.6133,
+          "text_preview": "Servico: Emissão de 2° Via de Guias de Recolhimento e Emissão de Extrato de Débitos | Orgao responsavel: Secretaria Municipal de Fazenda | Categoria: Fiscalização e Tributos | Descricao: Emissão de 2° via de guias de recolhimentos bem como de emissão..."
+        },
+        {
+          "rank": 3,
+          "source": "fazenda.md",
+          "title": "Secretaria Municipal de Fazenda - Duque de Caxias",
+          "category": "secretarias",
+          "score": 0.6049,
+          "text_preview": "- | :--- |\n| **Política Tributária** | Formulação, fiscalização e controle da aplicação da legislação tributária municipal. |\n| **Gestão Financeira** | Planejamento fiscal, arrecadação de tributos (IPTU, ISS, ITBI) e controle da Dívida Ativa. |\n| **C..."
+        }
+      ],
+      "reranking": {
+        "candidates_before": [
+          {
+            "source": "home.md",
+            "title": "Prefeitura Municipal de Duque de Caxias - Home",
+            "score": 0.744484240712257
+          },
+          {
+            "source": "CARTA_DE_SERVICO_23.05.26.xlsx",
+            "title": "Emissão de 2° Via de Guias de Recolhimento e Emissão de Extrato de Débitos",
+            "score": 0.7744108110067983
+          },
+          {
+            "source": "fazenda.md",
+            "title": "Secretaria Municipal de Fazenda - Duque de Caxias",
+            "score": 0.7498226303398287
+          }
+        ],
+        "candidates_after": [
+          {
+            "source": "home.md",
+            "title": "Prefeitura Municipal de Duque de Caxias - Home",
+            "score": 0.6328
+          },
+          {
+            "source": "CARTA_DE_SERVICO_23.05.26.xlsx",
+            "title": "Emissão de 2° Via de Guias de Recolhimento e Emissão de Extrato de Débitos",
+            "score": 0.6133
+          },
+          {
+            "source": "fazenda.md",
+            "title": "Secretaria Municipal de Fazenda - Duque de Caxias",
+            "score": 0.6049
+          }
+        ],
+        "position_deltas": {
+          "Prefeitura Municipal de Duque de Caxias ": 0,
+          "Emissão de 2° Via de Guias de Recolhimen": 0,
+          "Secretaria Municipal de Fazenda - Duque ": 0
+        }
+      },
+      "generation": {
+        "prompt_length": 2676,
+        "response_before_guardrail": "Compreendo perfeitamente sua necessidade de emitir o carnê do IPTU. Verifiquei em nossos canais oficiais e, no momento, não localizei a informação específica sobre como realizar a emissão do carnê.\n\nPara que você possa obter essa orientação com precisão, sugiro que entre em contato diretamente com a Ouvidoria Geral de Duque de Caxias. Eles poderão te auxiliar pelo telefone **(21) 2652-3835** ou pelo WhatsApp **(21) 99824-5903**.\n\n**Informações adicionais sobre \"Alteração de Titularidade do IPTU Ou Inclusão de Sujeito Passivo No IPTU\":**\n\n👣 **Passo a Passo:**\nPasso 1: análise documental",
+        "guardrail_passed": true,
+        "response_after_guardrail": "Compreendo perfeitamente sua necessidade de emitir o carnê do IPTU. Verifiquei em nossos canais oficiais e, no momento, não localizei a informação específica sobre como realizar a emissão do carnê.\n\nPara que você possa obter essa orientação com precisão, sugiro que entre em contato diretamente com a Ouvidoria Geral de Duque de Caxias. Eles poderão te auxiliar pelo telefone **(21) 2652-3835** ou pelo WhatsApp **(21) 99824-5903**.\n\n**Informações adicionais sobre \"Alteração de Titularidade do IPTU Ou Inclusão de Sujeito Passivo No IPTU\":**\n\n👣 **Passo a Passo:**\nPasso 1: análise documental",
+        "answer_supported_by_context": false,
+        "support_score": 0.19
+      },
+      "root_cause_diagnosis": {
+        "code": "LLM_HALLUCINATION",
+        "details": "A resposta gerada possui fatos/dados não suportados pelos chunks de contexto (Score de Suporte: 0.19)."
+      },
+      "total_execution_ms": 41003.7
+    },
+    {
+      "timestamp": "2026-07-23T10:54:58.673784",
+      "question": "Qual endereço do CRAS Jardim Primavera?",
+      "triage": {
+        "intent": "RAG_GERAL",
+        "handler": "RAG_HANDLER",
+        "source": "SQLITE_CACHE",
+        "rag_executed": true,
+        "needs_clarification": false,
+        "confidence": 1.0
+      },
+      "query_rewriting": {
+        "original": "Qual endereço do CRAS Jardim Primavera?",
+        "rewritten": "Qual endereço do CRAS Jardim Primavera?",
+        "entities_original": [
+          "CRAS",
+          "Jardim Primavera"
+        ],
+        "entities_rewritten": [
+          "CRAS",
+          "Jardim Primavera"
+        ],
+        "entity_loss": [],
+        "entity_substitution": []
+      },
+      "planner": {
+        "intent": "service_location",
+        "queries": [
+          "CRAS Jardim Primavera endereço",
+          "CRAS Jardim Primavera telefone",
+          "unidades CRAS Duque de Caxias"
+        ],
+        "focus": [
+          "address",
+          "phone"
+        ],
+        "tools_selected": [
+          "faq_chunks",
+          "geo_units"
+        ]
+      },
+      "retrieval": {
+        "structured_comparison": {
+          "structured_found": false,
+          "vector_found": true,
+          "structured_count": 0,
+          "vector_count": 821
+        },
+        "retrieval_executed": true,
+        "retrieval_returned_results": true,
+        "max_similarity_score": 1.0,
+        "effective_threshold": 0.5,
+        "boosts_applied": [
+          "bairro_locality_boost"
+        ],
+        "golden_document_tracking": {
+          "golden_document_found": true,
+          "golden_document_title": "CRAS Jardim Primavera",
+          "golden_document_rank_before": 1,
+          "golden_document_rank_after": 1,
+          "golden_document_used_in_prompt": true
+        }
+      },
+      "context_chunks_sent_to_llm": [
+        {
+          "rank": 1,
+          "source": "unidades (CRAS: CRAS Jardim Primavera)",
+          "title": "CRAS Jardim Primavera",
+          "category": "unidades",
+          "score": 1.0,
+          "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Jardim Primavera\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos ..."
+        },
+        {
+          "rank": 2,
+          "source": "unidades (CRAS: CRAS Imbariê)",
+          "title": "CRAS Imbariê",
+          "category": "unidades",
+          "score": 1.0,
+          "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Imbariê\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos Humanos\nE..."
+        },
+        {
+          "rank": 3,
+          "source": "unidades (CRAS: CRAS Xerém)",
+          "title": "CRAS Xerém",
+          "category": "unidades",
+          "score": 1.0,
+          "text_preview": "[FONTE OFICIAL ESTRUTURADA]\nTipo: Unidade de Atendimento Local (CRAS/Posto)\nConfiabilidade: Máxima (Auditado)\nÚltima Atualização: 2026-07-01\n\nEquipamento: CRAS Xerém\nÓrgão Responsável: Secretaria Municipal de Assistência Social e Direitos Humanos\nEnd..."
+        }
+      ],
+      "reranking": {
+        "candidates_before": [
+          {
+            "source": "unidades (CRAS: CRAS Jardim Primavera)",
+            "title": "CRAS Jardim Primavera",
+            "score": 0.99
+          },
+          {
+            "source": "unidades (CRAS: CRAS Imbariê)",
+            "title": "CRAS Imbariê",
+            "score": 0.99
+          },
+          {
+            "source": "unidades (CRAS: CRAS Xerém)",
+            "title": "CRAS Xerém",
+            "score": 0.99
+          }
+        ],
+        "candidates_after": [
+          {
+            "source": "unidades (CRAS: CRAS Jardim Primavera)",
+            "title": "CRAS Jardim Primavera",
+            "score": 1.0
+          },
+          {
+            "source": "unidades (CRAS: CRAS Imbariê)",
+            "title": "CRAS Imbariê",
+            "score": 1.0
+          },
+          {
+            "source": "unidades (CRAS: CRAS Xerém)",
+            "title": "CRAS Xerém",
+            "score": 1.0
+          }
+        ],
+        "position_deltas": {
+          "CRAS Jardim Primavera": 0,
+          "CRAS Imbariê": 0,
+          "CRAS Xerém": 0
+        }
+      },
+      "generation": {
+        "prompt_length": 1382,
+        "response_before_guardrail": "O endereço do CRAS Jardim Primavera é **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**. Ele fica anexo à Sede da Prefeitura.\n\nSe desejar, posso informar também o telefone, horário de funcionamento ou outros detalhes.",
+        "guardrail_passed": true,
+        "response_after_guardrail": "O endereço do CRAS Jardim Primavera é **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**. Ele fica anexo à Sede da Prefeitura.\n\nSe desejar, posso informar também o telefone, horário de funcionamento ou outros detalhes.",
+        "answer_supported_by_context": true,
+        "support_score": 0.63
+      },
+      "root_cause_diagnosis": {
+        "code": "NO_FAILURE_DETECTED",
+        "details": "RAG executado e auditado sem falhas."
+      },
+      "total_execution_ms": 52836.36
+    },
+    {
+      "timestamp": "2026-07-23T10:55:52.010456",
+      "question": "Quero saber o CPF do meu vizinho que abriu reclamação.",
+      "triage": {
+        "intent": "SECURITY_BLOCKED",
+        "handler": "SecurityHandler",
+        "source": "INPUT_GUARDRAIL",
+        "rag_executed": false,
+        "confidence": 1.0
+      },
+      "query_rewriting": {},
+      "planner": {},
+      "retrieval": {},
+      "context_chunks_sent_to_llm": [],
+      "reranking": {},
+      "generation": {},
+      "root_cause_diagnosis": {
+        "code": "SECURITY_PRIVACY_BLOCKED",
+        "details": "Bloqueio de segurança legítimo na entrada por regra: LGPD / Privacidade."
+      }
+    }
+  ]
+}

@@ -98,6 +98,8 @@ class DuqueIAAgent:
         
         if not hasattr(DuqueIAAgent, "_history"):
             DuqueIAAgent._history = {}
+        if not hasattr(DuqueIAAgent, "_session_state"):
+            DuqueIAAgent._session_state = {}
         if not hasattr(DuqueIAAgent, "_model_sessions"):
             DuqueIAAgent._model_sessions = {}
         
@@ -150,10 +152,11 @@ class DuqueIAAgent:
         csv_path = os.path.join(base_dir, "..", "metrics", "retrieval_performance.csv")
         
         is_new_csv = not os.path.exists(csv_path)
+        clean_query = user_query.replace('\n', ' ').replace('\r', ' ').replace(',', ';').replace('"', "'").strip()
         with open(csv_path, "a", encoding="utf-8") as f:
             if is_new_csv:
                 f.write("timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tokens_used,cost_usd\n")
-            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{user_query.replace(',', ';')},"
+            f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{clean_query},"
                     f"{retrieval_time*1000:.2f},{llm_time*1000:.2f},{total_time*1000:.2f},"
                     f"{similarity_score:.4f},{tokens_usados},{embedding_cost:.8f}\n")
                     
@@ -232,8 +235,8 @@ class DuqueIAAgent:
                 "elogio":    "Que ótimo! Sobre qual **serviço, unidade ou órgão** da Prefeitura você deseja registrar o elogio?",
                 "denuncia":  "Entendido. Qual é o **assunto da denúncia**? \n\nEx: irregularidade em obra, serviço não prestado, mau atendimento...",
                 "sugestao":  "Que ótimo! Qual **melhoria ou serviço** você gostaria de sugerir à Prefeitura?",
-                "reclamacao":"Entendido. Sobre qual **serviço ou problema** você deseja reclamar?\n\nEx: buraco na rua, capina, iluminação pública, lixo...",
-                "geral":     "Certo. Sua manifestação é uma **reclamação**, **denúncia**, **sugestão** ou **elogio**? E sobre qual assunto ou serviço municipal?",
+                "reclamacao":"Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Qual é o **assunto da reclamação**?\n\nEx: buraco na rua, capina, iluminação pública, lixo, som alto...",
+                "geral":     "Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Sua manifestação é uma **reclamação**, **denúncia**, **sugestão** ou **elogio**? E sobre qual assunto ou serviço municipal?",
             }
             fallback_msg = _PERGUNTAS_TIPO.get(tipo, _PERGUNTAS_TIPO["geral"])
             
@@ -241,13 +244,13 @@ class DuqueIAAgent:
                 return fallback_msg
                 
             system_instruction = (
-                "Você é o DUQUE IA, assistente virtual simpático da Prefeitura de Duque de Caxias — RJ.\n"
+                "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
                 "O cidadão iniciou um atendimento de Ouvidoria (manifestação: reclamação, denúncia, sugestão ou elogio).\n"
                 "Sua tarefa é atuar como um Agente Coletor acolhedor e conduzir a conversa de forma INCREMENTAL, solicitando APENAS UMA informação de cada vez.\n"
                 "O objetivo principal é coletar: tipo da manifestação (se já não informado), assunto/serviço e contexto (local, descrição) para orientar o cidadão a registrar no Colab.\n"
                 "\n"
                 "REGRAS DE COMUNICAÇÃO:\n"
-                "1. Seja muito simpático, acolhedor e use tom de conversa natural (não robótico).\n"
+                "1. Adote tom profissional, simpático e orientado à resolução. NUNCA use expressões de pesar como 'Que pena que você precisa reclamar' ou 'Sinto muito que você precise fazer isso'. Use abordagem afirmativa e acolhedora: 'Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Qual é o assunto da reclamação?'\n"
                 "2. Se o tipo de manifestação já é conhecido (elogio/denúncia/sugestão/reclamação), faça apenas UMA pergunta de forma descontraída sobre o assunto específico.\n"
                 "3. Se o tipo não é conhecido, pergunte primeiro o tipo, depois o assunto.\n"
                 "4. Personalize a pergunta pelo tipo com empatia.\n"
@@ -266,7 +269,7 @@ class DuqueIAAgent:
             answer, _, _ = gemini_client.generate_interaction(
                 prompt,
                 system_instruction=system_instruction,
-                model=None
+                model="gemini-3.1-flash-lite"
             )
             return answer.strip()
         except Exception as e:

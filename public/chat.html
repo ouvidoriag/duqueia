@@ -606,8 +606,13 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-      html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" loading="lazy" style="max-width:100%; border-radius:8px; margin: 8px 0; display:block;">');
-      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+      // Imagens com validação de esquema seguro e escape de aspas duplas
+      html = html.replace(/!\[(.*?)\]\(((?:https?:\/\/|\/)[^\s"']+)\)/g, (match, alt, src) => {
+        const cleanAlt = alt.replace(/"/g, '&quot;');
+        return `<img src="${src}" alt="${cleanAlt}" loading="lazy" style="max-width:100%; border-radius:8px; margin: 8px 0; display:block;">`;
+      });
+      // Links com validação de esquema seguro (evita javascript: e data:)
+      html = html.replace(/\[(.*?)\]\(((?:https?:\/\/|mailto:|tel:|\/)[^\s"']+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       html = html.replace(/\*(.*?)\*/g,     '<em>$1</em>');
 
@@ -765,7 +770,7 @@
       appendMessage('user', text);
       showTyping();
       try {
-        const res  = await fetch('api/chat', {
+        const res  = await fetch('/api/chat', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ message: text, sessionId })
@@ -865,7 +870,7 @@
                 const base64Audio = reader.result;
 
                 try {
-                  const res = await fetch('api/chat', {
+                  const res = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ audio: base64Audio, sessionId })

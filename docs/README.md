@@ -46,8 +46,8 @@ Navegue pelos módulos usando os links abaixo:
 - [Fluxos de IA](07-IA/Fluxos.md) — Triagem e Roteamento de intenções.
 - [Agentes Autónomos](07-IA/Agentes.md) — Agente Coletor e RAG Handler.
 
-### 8. [Módulo 08 - Deploy](08-Deploy/Produção.md)
-- [Manual de Produção](08-Deploy/Produção.md) — Passos de deploy.
+### 8. [Módulo 08 - Deploy](08-Deploy/Producao.md)
+- [Manual de Produção](08-Deploy/Producao.md) — Passos de deploy.
 - [Configuração Docker](08-Deploy/Docker.md) — Orquestração de containers.
 - [Hospedagem no Render/VPS](08-Deploy/Render.md) — Passos recomendados.
 

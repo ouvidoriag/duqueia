@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-07-23T09:46:21.353009",
+  "question": "Qual endereço do CRAS Jardim Primavera?",
+  "triage": {
+    "intent": "RAG_GERAL",
+    "handler": "RAG_HANDLER",
+    "source": "SQLITE_CACHE",
+    "rag_executed": true,
+    "needs_clarification": false,
+    "confidence": 1.0
+  },
+  "query_rewriting": {
+    "original": "Qual endereço do CRAS Jardim Primavera?",
+    "rewritten": "Qual endereço do CRAS Jardim Primavera?",
+    "entities_original": [
+      "Jardim Primavera",
+      "CRAS"
+    ],
+    "entities_rewritten": [
+      "Jardim Primavera",
+      "CRAS"
+    ],
+    "entity_loss": [],
+    "entity_substitution": []
+  },
+  "planner": {
+    "intent": "service_location",
+    "queries": [
+      "CRAS Jardim Primavera endereço",
+      "CRAS Duque de Caxias",
+      "Secretaria Municipal de Assistência Social e Direitos Humanos"
+    ],
+    "focus": [
+      "address",
+      "contact"
+    ],
+    "tools_selected": [
+      "faq_chunks",
+      "geo_units"
+    ]
+  },
+  "retrieval": {
+    "structured_comparison": {
+      "structured_found": false,
+      "vector_found": true,
+      "structured_count": 0,
+      "vector_count": 814
+    },
+    "retrieval_executed": true,
+    "retrieval_returned_results": true,
+    "max_similarity_score": 1.4137,
+    "effective_threshold": 0.5,
+    "boosts_applied": [
+      "bairro_locality_boost"
+    ]
+  },
+  "context_chunks_sent_to_llm": [
+    {
+      "rank": 1,
+      "source": "direitos_crianca_adolescente_idoso.md",
+      "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+      "category": "secretarias",
+      "score": 1.4137,
+      "text_preview": "utiva, focada na construção de uma rede sólida de suporte social que assegure a dignidade e os direitos dos cidadãos caxienses em todas as fases da vida.\n\n## Contato e Localização\n- **Endereço:** Alameda Esmeralda, 206 – Jardim Primavera, Duque de Ca..."
+    },
+    {
+      "rank": 2,
+      "source": "comunicacao.md",
+      "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+      "category": "secretarias",
+      "score": 0.8391,
+      "text_preview": " **Endereço:** Alameda Esmeralda, 206 – Jardim Primavera, Duque de Caxias - RJ.\n- **E-mail de Imprensa:** imprensa@duquedecaxias.rj.gov.br\n- **Horário:** Segunda a sexta-feira, das 9h às 17h.\n"
+    },
+    {
+      "rank": 3,
+      "source": "habitacao.md",
+      "title": "Secretaria Municipal de Habitação - Duque de Caxias",
+      "category": "secretarias",
+      "score": 0.8352,
+      "text_preview": "nto\n- **Endereço:** Alameda Bartolomeu Gusmão, 85 – Jardim Primavera, Duque de Caxias - RJ.\n- **Telefone:** (21) 96557-7062.\n- **E-mail:** smh@duquedecaxias.rj.gov.br\n- **Horário:** Segunda a sexta-feira, das 9h às 17h.\n"
+    }
+  ],
+  "reranking": {
+    "candidates_before": [
+      {
+        "source": "direitos_crianca_adolescente_idoso.md",
+        "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+        "score": 0.7755430791641855
+      },
+      {
+        "source": "comunicacao.md",
+        "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+        "score": 0.7621181754034217
+      },
+      {
+        "source": "habitacao.md",
+        "title": "Secretaria Municipal de Habitação - Duque de Caxias",
+        "score": 0.7504779115389869
+      }
+    ],
+    "candidates_after": [
+      {
+        "source": "direitos_crianca_adolescente_idoso.md",
+        "title": "Secretaria Municipal de Direitos da Criança, Adolescente e Idoso - Duque de Caxias",
+        "score": 1.4137
+      },
+      {
+        "source": "comunicacao.md",
+        "title": "Secretaria Municipal de Comunicação - Duque de Caxias",
+        "score": 0.8391
+      },
+      {
+        "source": "habitacao.md",
+        "title": "Secretaria Municipal de Habitação - Duque de Caxias",
+        "score": 0.8352
+      }
+    ],
+    "position_deltas": {
+      "Secretaria Municipal de Direitos da Cria": 0,
+      "Secretaria Municipal de Comunicação - Du": 0,
+      "Secretaria Municipal de Habitação - Duqu": 0
+    }
+  },
+  "generation": {
+    "prompt_length": 4498,
+    "response_before_guardrail": "Compreendo sua busca pelo endereço do CRAS Jardim Primavera. Verifiquei cuidadosamente nossos registros oficiais, mas não localizei essa informação específica em nossos canais.\n\nPara obter o endereço exato e outras informações sobre o CRAS Jardim Primavera, por favor, entre em contato com a Ouvidoria Geral de Duque de Caxias pelo telefone **(21) 2652-3835** ou pelo WhatsApp **(21) 99824-5903**. Eles terão o maior prazer em ajudar você!",
+    "guardrail_passed": true,
+    "response_after_guardrail": "Compreendo sua busca pelo endereço do CRAS Jardim Primavera. Verifiquei cuidadosamente nossos registros oficiais, mas não localizei essa informação específica em nossos canais.\n\nPara obter o endereço exato e outras informações sobre o CRAS Jardim Primavera, por favor, entre em contato com a Ouvidoria Geral de Duque de Caxias pelo telefone **(21) 2652-3835** ou pelo WhatsApp **(21) 99824-5903**. Eles terão o maior prazer em ajudar você!",
+    "answer_supported_by_context": false,
+    "support_score": 0.18
+  },
+  "root_cause_diagnosis": {
+    "code": "LLM_HALLUCINATION",
+    "details": "A resposta gerada possui fatos/dados não suportados pelos chunks de contexto (Score de Suporte: 0.18)."
+  },
+  "total_execution_ms": 41575.57
+}

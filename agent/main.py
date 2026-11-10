@@ -65,13 +65,29 @@ def main():
         try:
             if _is_tty:
                 query = input("Munícipe: ")
+                req_id = None
             else:
                 line = sys.stdin.readline()
                 if not line:
-                    import time
-                    time.sleep(0.05)
+                    # EOF detectado (pipe fechado pelo servidor pai) -> encerra limpo
+                    break
+                raw_input = line.strip()
+                if not raw_input:
                     continue
-                query = line.strip()
+
+                # Suporte a protocolo estruturado com request_id para correlação atômica
+                req_id = None
+                if raw_input.startswith("{") and raw_input.endswith("}"):
+                    try:
+                        parsed_in = json.loads(raw_input)
+                        query = parsed_in.get("query", raw_input)
+                        req_id = parsed_in.get("request_id")
+                        if parsed_in.get("conversation_id"):
+                            conversation_id = parsed_in["conversation_id"]
+                    except Exception:
+                        query = raw_input
+                else:
+                    query = raw_input
 
             if not query.strip():
                 continue
@@ -97,6 +113,9 @@ def main():
             try:
                 data = json.loads(raw)
                 conversation_id = data.get("conversation_id", conversation_id)
+                if req_id is not None:
+                    data["request_id"] = req_id
+                raw = json.dumps(data, ensure_ascii=False)
 
                 if show_json:
                     # Em modo pipe: saída limpa para facilitar parsing pelo servidor
@@ -119,11 +138,7 @@ def main():
         except (KeyboardInterrupt, EOFError):
             if _is_tty:
                 print("\nEncerrando o DUQUE IA. Até logo!")
-                break
-            else:
-                import time
-                time.sleep(0.05)
-                continue
+            break
 
 if __name__ == "__main__":
     main()

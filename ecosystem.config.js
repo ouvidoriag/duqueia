@@ -24,7 +24,7 @@ module.exports = {
       interpreter: resolvePythonInterpreter(),
       env: {
         NODE_ENV: "production",
-        PORT: 3000
+        PORT: 3001
       },
       max_memory_restart: "1G",
       autorestart: true,

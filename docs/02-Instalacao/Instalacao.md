@@ -33,7 +33,7 @@ Siga os passos abaixo para configurar e executar a plataforma Duque IA localment
    ```bash
    npm start
    ```
-   O servidor estará disponível em `http://localhost:3000`.
+   O servidor estará disponível em `http://localhost:3001`.
 
 ---
 [Avançar: Ambiente](Ambiente.md) | [Voltar ao Sumário](../README.md)

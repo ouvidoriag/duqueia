@@ -33,9 +33,9 @@ COPY . .
 RUN mkdir -p data/db logs metrics
 
 # Expõe a porta padrão do servidor web Node.js
-EXPOSE 3000
+EXPOSE 3001
 
-ENV PORT=3000
+ENV PORT=3001
 ENV NODE_ENV=production
 
 # Comando padrão que executa o setup e inicia o servidor

@@ -1,0 +1,406 @@
+[
+  {
+    "id": "P01",
+    "category": "Serviços Municipais",
+    "question": "Como solicitar a poda de árvore na calçada da minha rua?",
+    "answer": "Para solicitar a poda de árvore na calçada da sua rua, que é considerada área pública, você tem duas opções principais:\n\n**1. Através do",
+    "sources": [
+      "lacunas_dados_resolvidas.md",
+      "CARTA_DE_SERVICO_23.05.26.xlsx"
+    ],
+    "confidence": 0.95,
+    "latency_ms": 12672.7,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P02",
+    "category": "Serviços Municipais",
+    "question": "Onde fica a Secretaria Municipal de Saúde de Duque de Caxias?",
+    "answer": "A Secretaria Municipal de Saúde de Duque de Caxias está localizada na **Alameda James Franco, 03 – Jardim Primavera, Duque de Caxias - RJ**.",
+    "sources": [
+      "desenvolvimento_economico.md",
+      "comunicacao.md",
+      "saude.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 12538.3,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P03",
+    "category": "Serviços Municipais",
+    "question": "Como registrar uma reclamação de buraco na rua?",
+    "answer": "Para registrar uma reclamação de buraco na rua e solicitar o serviço de Tapa Buraco, siga as orientações abaixo:\n\n*   **Órgão Responsável**: Secretaria Municipal de Obras e Agricultura (SMO)\n*   **Como Solicitar / Passo a Passo**:\n    1.  Abertura de solicitação.\n    2.  A equipe identifica o problema.\n    3.  O serviço é realizado.\n*   **Prazo Máximo**: 30 dias corridos\n*   **Custo**: Gratuito\n*   **Canais de Atendimento**:\n    *   E-mail: **obraspmdc@gmail.com**",
+    "sources": [
+      "vw_ia_servicos (ID: 1166)",
+      "vw_ia_servicos (ID: 1268)",
+      "vw_ia_servicos (ID: 1198)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 19441.3,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P04",
+    "category": "Serviços Municipais",
+    "question": "Quais documentos preciso para matricular meu filho na creche municipal?",
+    "answer": "Para matricular seu filho em uma creche municipal de Duque de Caxias, você precisará dos seguintes documentos:\n\n**Órgão",
+    "sources": [
+      "lacunas_dados_resolvidas.md",
+      "educacao.md",
+      "vw_ia_servicos (ID: 1267)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 11491.1,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P05",
+    "category": "Serviços Municipais",
+    "question": "Como emitir o carnê do IPTU em Duque de Caxias?",
+    "answer": "Para emitir o carnê do IPTU em Duque de Caxias, você pode acessar o **Portal do Contribuinte** da Prefeitura, que é",
+    "sources": [
+      "vw_ia_servicos (ID: 1090)",
+      "vw_ia_servicos (ID: 1092)",
+      "vw_ia_servicos (ID: 1093)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 12224.9,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P06",
+    "category": "Serviços Municipais",
+    "question": "Qual é o telefone da Ouvidoria Municipal?",
+    "answer": "O telefone da Ouvidoria Geral de Duque de Caxias é **(21) 2652-3835**.",
+    "sources": [
+      "assunto_secretaria_defesa_civil.md",
+      "ouvidoria_geral_info.md",
+      "assunto_secretaria_secretaria_municipal_de_esporte_e_lazer.md"
+    ],
+    "confidence": 0.9,
+    "latency_ms": 6360.9,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P07",
+    "category": "Serviços Municipais",
+    "question": "Como solicitar limpeza de lote baldio ou terreno abandonado?",
+    "answer": "Olá! Para solicitar a limpeza de um lote baldio ou terreno abandonado, a forma de atendimento pode variar dependendo se o terreno é particular ou",
+    "sources": [
+      "vw_ia_servicos (ID: 1126)",
+      "vw_ia_servicos (ID: 1170)",
+      "vw_ia_servicos (ID: 1093)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 11682.6,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P08",
+    "category": "Serviços Municipais",
+    "question": "Onde fica o CRAS mais próximo ao Jardim Primavera?",
+    "answer": "O CRAS mais próximo ao Jardim Primavera é o próprio **CRAS Jardim Primavera**, localizado na **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**.\n\nVocê pode entrar em contato pelo telefone **(21) 2773-1066**. O funcionamento é de segunda a sexta-feira, das 9h às 17h. O órgão responsável é a Secretaria Municipal de Assistência Social e Direitos Humanos.",
+    "sources": [
+      "unidades (CRAS: CRAS Centenário)",
+      "unidades (CRAS: CRAS Jardim Primavera)",
+      "unidades (CRAS: CRAS Imbariê)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 17765.3,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P09",
+    "category": "Serviços Municipais",
+    "question": "Como solicitar o serviço de tapa-buraco na Prefeitura?",
+    "answer": "Para solicitar o serviço de tapa-buraco na Prefeitura de Duque de Caxias, você tem duas opções principais, dependendo da localização e do",
+    "sources": [
+      "vw_ia_servicos (ID: 1166)",
+      "CARTA_DE_SERVICO_23.05.26.xlsx",
+      "vw_ia_servicos (ID: 1441)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 8575.3,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P10",
+    "category": "Informações da Cidade",
+    "question": "Quem é o prefeito de Duque de Caxias?",
+    "answer": "O Prefeito de Duque de Caxias de Duque de Caxias é **Jonathas Monteiro Porto Neto (Netinho Reis)**.\n\nEssa informação consta na estrutura oficial da Prefeitura (Fonte: **prefeito.md** / Versão do Catálogo: **2026-07-13**).\n\nCaso deseje, posso informar também:\n• Quem é a **Vice-Prefeita** de Duque de Caxias\n• Quais são as **Secretarias Municipais** da Prefeitura\n• Qual o endereço da **Prefeitura Municipal**",
+    "sources": [
+      "prefeito.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 38.5,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P11",
+    "category": "Informações da Cidade",
+    "question": "Quais são os bairros do segundo distrito de Duque de Caxias?",
+    "answer": "Os bairros que compõem o **2º Distrito de Duque de Caxias** são:\n\n*   **Jardim Primavera**\n*   **Campos Elíseos**\n*   **Pilar**\n*   **Parque Paulista**\n*   **Saracuruna**\n*   **Nova Campinas**\n*   **São Bento**\n*   **Chácaras Rio-Petrópolis**\n*   **Amapá**\n*   **Figueira**\n*   **Caxias**",
+    "sources": [
+      "lacunas_dados_resolvidas.md",
+      "a_cidade.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 14433.2,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P12",
+    "category": "Informações da Cidade",
+    "question": "Qual a população estimada do município de Duque de Caxias?",
+    "answer": "A população estimada do município de Duque de Caxias, segundo o IBGE, é de aproximadamente **808.161 a 910.000 habitantes**. É o terceiro município mais populoso do Estado do Rio de Janeiro e o maior da Baixada Fluminense.",
+    "sources": [
+      "https://duquedecaxias.rj.gov.br/",
+      "lacunas_dados_resolvidas.md",
+      "a_cidade.md"
+    ],
+    "confidence": 0.95,
+    "latency_ms": 11897.5,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P13",
+    "category": "Serviços Municipais",
+    "question": "Tem serviço de coleta de entulho pela Prefeitura?",
+    "answer": "Sim, a Prefeitura de Duque de Caxias oferece o serviço de **Retirada de Entulho** em áreas públicas.\n\nAqui estão os detalhes:\n\n*   **Órgão Responsável**: Secretaria Municipal de Obras e Agricultura (SMO)\n*   **Descrição**: Remoção de entulho em áreas públicas.\n*   **Quem pode solicitar**: Pessoas físicas e jurídicas.\n*   **Como Solicitar / Passo a Passo**:\n    1.  Abertura de solicitação.\n    2.  O problema é identificado.\n    3.  A demanda é resolvida.\n*   **Prazo Máximo**: 48 horas\n*   **Custo**: Gratuito\n*   **Canais de Atendimento**:\n    *   E-mail: **obraspmdc@gmail.com**\n    *   Canais Digitais: **https://duquedecaxias.colab.re/**",
+    "sources": [
+      "vw_ia_servicos (ID: 1134)",
+      "vw_ia_servicos (ID: 1174)",
+      "vw_ia_servicos (ID: 1142)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 11547.4,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P14",
+    "category": "Iluminação Pública",
+    "question": "O poste da minha rua está apagado há uma semana. O que eu faço?",
+    "answer": "Entendo sua preocupação com o poste apagado em sua rua. A iluminação pública é essencial para a segurança e bem-estar de todos.\n\nComo a informação específica sobre o serviço de manutenção de iluminação pública não consta nos dados oficiais disponíveis no momento, sugiro que entre em contato com a **Ouvidoria Geral de Duque de Caxias** para registrar sua solicitação. Eles poderão direcionar seu pedido ao setor responsável.\n\nVocê pode contatá-los pelos seguintes canais:\n*   Telefone: **(21) 2652-3835**\n*   WhatsApp: **(21) 99824-5903**",
+    "sources": [
+      "vw_ia_servicos (ID: 1095)",
+      "vw_ia_servicos (ID: 1098)",
+      "vw_ia_servicos (ID: 1093)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 6429.4,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P15",
+    "category": "Iluminação Pública",
+    "question": "Qual é o WhatsApp ou canal direto para iluminação pública?",
+    "answer": "Para demandas relacionadas à iluminação pública, como lâmpadas piscando ou queimadas, o canal direto para registro é o **aplicativo Colab** ou o **portal do cidadão de Duque de Caxias**.\n\nAo registrar sua demanda, você precisará informar:\n*   O número da casa ou um ponto de referência em frente ao poste, com a descrição da fachada.\n*   Seu telefone com DDD.",
+    "sources": [
+      "lampada_piscando.md",
+      "vw_ia_servicos (ID: 1179)",
+      "troca_de_lampada_queimada.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 14790.4,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P16",
+    "category": "Saúde",
+    "question": "Onde fica o Hospital Municipal Doutor Moacyr Rodrigues do Carmo?",
+    "answer": "Não encontrei a informação sobre a localização do Hospital Municipal Doutor Moacyr Rodrigues do Carmo nos dados oficiais que possuo.\n\nPara obter essa informação, por favor, entre em contato com a **Ouvidoria Geral de Duque de Caxias** pelos seguintes canais:\n*   Telefone: **(21) 2652-3835**\n*   WhatsApp: **(21) 99824-5903**",
+    "sources": [
+      "vw_ia_servicos (ID: 1151)",
+      "vw_ia_servicos (ID: 1131)",
+      "vw_ia_servicos (ID: 1147)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 7739.5,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P17",
+    "category": "Saúde",
+    "question": "Como funciona o atendimento na UPA de Sarapuí?",
+    "answer": "A UPA de Sarapuí, referida no contexto como **UPA Walter Garcia**, tem como foco o atendimento de **Emergência Pediátrica",
+    "sources": [
+      "vw_ia_servicos (ID: 1445)",
+      "vw_ia_servicos (ID: 1372)",
+      "saude.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 10047.4,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P18",
+    "category": "Saúde",
+    "question": "Quais documentos preciso para tirar o Cartão do SUS no município?",
+    "answer": "Para solicitar a emissão do Cartão do SUS em Duque de Caxias, o serviço é de responsabilidade da **Secretaria Municipal de",
+    "sources": [
+      "lacunas_dados_resolvidas.md",
+      "CARTA_DE_SERVICO_23.05.26.xlsx",
+      "servicos.md"
+    ],
+    "confidence": 0.68,
+    "latency_ms": 16373.3,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P19",
+    "category": "Educação & Cursos",
+    "question": "A FUNDEC oferece cursos gratuitos? Como se inscrever?",
+    "answer": "Sim, a Prefeitura de Duque de Caxias, por meio da Secretaria Municipal de Assistência Social e Direitos Humanos (SMASDH), oferece vagas em cursos profissionalizantes gratuitos em parceria com a FUNDEC.\n\nEste serviço é destinado especificamente ao encaminhamento de **mulheres em situação de violência de gênero**, visando qualificação profissional, geração de oportunidades, autonomia financeira e fortalecimento da independência.\n\nPara se inscrever, siga o passo a passo:\n\n*   **Órgão Responsável**: Secretaria Municipal de Assistência Social e Direitos Humanos (SMASDH)\n*   **Quem pode solicitar**: Mulheres vítimas e/ou em situação de violência de gênero.\n*   **Custo**: Gratuito\n*   **Documentação Necessária**:\n    *   Apresentar documento de identidade (RG)\n    *   CPF\n*   **Como Solicitar / Passo a Passo**:\n    1.  Procurar o CEAM (Centro Especializado de Atendimento à",
+    "sources": [
+      "vw_ia_servicos (ID: 1183)",
+      "vw_ia_servicos (ID: 1209)",
+      "vw_ia_servicos (ID: 1202)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 10362.8,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P20",
+    "category": "Educação & Cursos",
+    "question": "Quais são os documentos necessários para transferência escolar?",
+    "answer": "Para realizar a matrícula ou inscrição, que inclui casos de transferência, na Rede Municipal de Ensino de Duque de Caxias, você precisará dos seguintes",
+    "sources": [
+      "https://duquedecaxias.rj.gov.br/",
+      "lacunas_dados_resolvidas.md",
+      "CARTA_DE_SERVICO_23.05.26.xlsx"
+    ],
+    "confidence": 0.95,
+    "latency_ms": 13555.7,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P21",
+    "category": "Impostos & Finanças",
+    "question": "Posso parcelar a dívida ativa do IPTU?",
+    "answer": "No momento, as informações específicas sobre o parcelamento da dívida ativa do IPTU não constam em nossos registros oficiais disponíveis.\n\nPara obter orientações detalhadas sobre como parcelar a dívida ativa do IPTU, por favor, entre em contato com a **Ouvidoria Geral de Duque de Caxias** pelos seguintes canais:\n\n*   Telefone: **(21) 2652-3835**\n*   WhatsApp: **(21) 99824-5903**\n\nEles poderão direcioná-lo à secretaria ou setor responsável para esclarecer suas dúvidas e informar sobre os procedimentos necessários.",
+    "sources": [
+      "vw_ia_servicos (ID: 1090)",
+      "vw_ia_servicos (ID: 1092)",
+      "vw_ia_servicos (ID: 1093)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 10786.4,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P22",
+    "category": "Impostos & Finanças",
+    "question": "Como funciona a isenção de IPTU para aposentados em Duque de Caxias?",
+    "answer": "No momento, não possuo informações específicas sobre o processo de isenção de IPTU para aposentados em Duque de Caxias em nossa base de dados oficial.\n\nPara obter detalhes sobre os requisitos, procedimentos e documentação necessária para a isenção de IPTU para aposentados, por favor, entre em contato com a **Ouvidoria Geral de Duque de Caxias**. Eles poderão fornecer as orientações precisas sobre este serviço.\n\nCanais de Atendimento da Ouvidoria Geral:\n*   Telefone: **(21) 2652-3835**\n*   WhatsApp: **(21) 99824-5903**",
+    "sources": [
+      "vw_ia_servicos (ID: 1090)",
+      "vw_ia_servicos (ID: 1092)",
+      "vw_ia_servicos (ID: 1093)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 18281.9,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P23",
+    "category": "Transporte & Trânsito",
+    "question": "Como solicitar cartão de estacionamento para idoso ou PWD?",
+    "answer": "A informação sobre como solicitar o cartão de estacionamento para idoso ou PWD (Pessoa com Deficiência) não consta no contexto oficial disponível.\n\nPara obter essa informação, por favor, entre em contato com a **Ouvidoria Geral de Duque de Caxias** pelos seguintes canais:\n*   Telefone: **(21) 2652-3835**\n*   WhatsApp: **(21) 99824-5903**",
+    "sources": [
+      "vw_ia_servicos (ID: 1358)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 10226.0,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P24",
+    "category": "Transporte & Trânsito",
+    "question": "Onde recorrer de uma multa de trânsito municipal?",
+    "answer": "Como assistente virtual informativo, não realizo pareceres jurídicos, defesas, recursos ou interpretações de leis, nem formulo argumentos contra a administração pública. Para suporte legal, favor contatar a Procuradoria Geral do Município ou os órgãos competentes.",
+    "sources": [],
+    "confidence": 0.0,
+    "latency_ms": 7581.4,
+    "status": "⏳ Ajuste RAG (Fallback)"
+  },
+  {
+    "id": "P25",
+    "category": "Meio Ambiente & Zoonoses",
+    "question": "Como solicitar castração gratuita de cães e gatos em Caxias?",
+    "answer": "A Prefeitura de Duque de Caxias oferece atendimento gratuito para animais de estimação da população através do **Hospital Municipal Veterinário**, que realiza consultas, exames",
+    "sources": [
+      "meio_ambiente.md",
+      "CARTA_DE_SERVICO_23.05.26.xlsx",
+      "https://duquedecaxias.rj.gov.br/noticia/prefeitura-de-duque-de-caxias-inaugura-nova-unidade-de-saude/4312"
+    ],
+    "confidence": 0.95,
+    "latency_ms": 19718.9,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P26",
+    "category": "Meio Ambiente & Zoonoses",
+    "question": "Onde denunciar maus-tratos a animais no município?",
+    "answer": "Sinto muito que você esteja passando por essa situação, pois o bem-estar dos animais é uma prioridade para nossa cidade. Para denunciar maus-tratos, você deve entrar em contato com a Secretaria Municipal de Meio Ambiente ou registrar o caso na Delegacia de Proteção ao Meio Ambiente. Poderia me informar em qual bairro ocorreu o fato para que eu possa te orientar sobre o canal de atendimento mais próximo?",
+    "sources": [],
+    "confidence": 1.0,
+    "latency_ms": 4132.2,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P27",
+    "category": "Segurança & Defesa Civil",
+    "question": "Qual é o telefone da Defesa Civil de Duque de Caxias para emergências de chuva?",
+    "answer": "Para emergências relacionadas a chuvas e outras ocorrências, você pode entrar em contato com a Defesa Civil de Duque de Caxias pelos seguintes telefones: **199**, **0800 0230 199** ou **(21) 99463-7387**.",
+    "sources": [
+      "vw_ia_servicos (ID: 1194)",
+      "vw_ia_servicos (ID: 1189)",
+      "vw_ia_servicos (ID: 1163)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 10927.8,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P28",
+    "category": "Segurança & Defesa Civil",
+    "question": "Onde fica a sede da Guarda Municipal?",
+    "answer": "O endereço da sede da Guarda Municipal de Duque de Caxias é **Rua Silva Fernandes, 275 – Parque Duque, Duque de Caxias - RJ**.",
+    "sources": [
+      "cultura_turismo.md",
+      "seguranca_publica.md",
+      "comunicacao.md"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 13022.1,
+    "status": "✔ Aprovado"
+  },
+  {
+    "id": "P29",
+    "category": "Assistência Social",
+    "question": "Como se cadastrar no Cadastro Único (CadÚnico) em Duque de Caxias?",
+    "answer": "Para se cadastrar no Cadastro Único (CadÚnico) em Duque de Caxias, siga as orientações abaixo:\n\n**Órgão Respons",
+    "sources": [
+      "vw_ia_servicos (ID: 1391)",
+      "vw_ia_servicos (ID: 1181)",
+      "vw_ia_servicos (ID: 1103)"
+    ],
+    "confidence": 1.0,
+    "latency_ms": 20008.9,
+    "status": "✔ Aprovado (Golden Source)"
+  },
+  {
+    "id": "P30",
+    "category": "Assistência Social",
+    "question": "Quais são os serviços oferecidos pelo Centro de Referência da Mulher (CEAM)?",
+    "answer": "Os Centros Especializados de Atendimento à Mulher (CEAMs) em Duque de Caxias oferecem atendimentos individuais com uma equipe multidisciplinar, visando a prevenção e o enfrentamento à violência contra a mulher.\n\nOs serviços incluem:\n*   **Atendimento interdisciplinar**: Psicológico, Social, Jurídico, de orientação e informação.\n\n**Órgão Responsável**: Secretaria Municipal de Assistência Social e Direitos Humanos\n\n**Como Solicitar / Passo a Passo**: O acesso aos serviços é feito de forma presencial.\n\n**Canais de Atendimento**:\nVocê pode procurar um dos seguintes endereços:\n*   **CEAM Vera Lúcia**: Rua Professor José de Souza Herdy, n°878, Jardim Vinte Cinco de Agosto, Duque de Caxias (ao lado da academia Femme).\n*   **CEAM Idacilde do Prado Lameu**: Alameda Rui Barbosa, Lote 08, Quadra 17, Jardim Primavera – Duque de Caxias – RJ, CEP 25.215-209.",
+    "sources": [
+      "CARTA_DE_SERVICO_23.05.26.xlsx"
+    ],
+    "confidence": 0.9,
+    "latency_ms": 30642.8,
+    "status": "✔ Aprovado"
+  }
+]
