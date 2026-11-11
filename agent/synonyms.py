@@ -65,3 +65,4 @@ def expand_query_with_synonyms(query: str) -> str:
     if additions:
         return f"{query} ({', '.join(additions)})"
     return query
+

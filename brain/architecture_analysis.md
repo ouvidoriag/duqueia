@@ -1,28 +1,29 @@
-# Análise Arquitetural Completa e Mapeamento do Framework RAG — DUQUE IA
+# Análise Arquitetural Completa e Auditoria Técnica do Framework RAG — DUQUE IA 2.0
 
-> **Auditoria Arquitetural — FASE 1: MAPEAMENTO COMPLETO**  
-> **Data:** 2026-07-29 | **Sistema:** DUQUE IA (Sistema de Informações Municipais — Duque de Caxias / RJ)  
-> **Autor:** Arquiteto Sênior de IA (Antigravity AI Agent)
+> **Auditoria Arquitetural — FASE 1: MAPEAMENTO COMPLETO DE DADOS, BANCOS E RAG**  
+> **Data:** 11 de Novembro de 2026 | **Sistema:** DUQUE IA (Sistema de Informações Municipais — Duque de Caxias / RJ)  
+> **Autor:** Arquiteto Sênior de IA & Ouvidoria Geral do Município  
+> **Status:** Auditoria Profunda Concluída | Pronto para Refinamento de Chunking e Vetorização
 
 ---
 
 ## 1. Visão Geral e Diagrama Textual da Arquitetura
 
-O **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) de nível empresarial, projetado para o atendimento ao munícipe da Prefeitura de Duque de Caxias / RJ. O sistema adota uma arquitetura descentralizada de micro-bancos de dados (SQLite `main.db`, `vector.db`, `cache.db`, `telemetry.db`), orquestração por Grafo de Estados (LangGraph Lite em Python puro), triagem semântica em múltiplos níveis, busca híbrida (relacional + vetorial RRF) e blindagem rigorosa de segurança (Input, Output e Privacy Guardrails).
+O **DUQUE IA 2.0** é um framework RAG (*Retrieval-Augmented Generation*) de nível governamental com arquitetura de micro-bancos de dados SQLite em modo WAL, orquestração por Grafo de Estados (*LangGraph Lite* em Python puro), triagem semântica com dois modelos cognitivos (*Gemini 3.1 Flash Lite* e *Gemini 3.8 Flash*), camada *Golden Source* com resolução espacial em 0ms, busca híbrida (FTS5 BM25 trigramas + vetores densos 3.072d + RRF + Cross-Encoder local) e quádrupla blindagem de segurança (*Input, Retrieval, Output e Privacy Guardrails*).
 
 ```text
                                ┌───────────────────────────────────┐
-                               │     Cliente Web / Frontend        │
+                               │     Munícipe / Frontend Web       │
                                └─────────────────┬─────────────────┘
-                                                 │ HTTP POST /api/chat
+                                                 │ HTTP POST /api/chat (porta 3000)
                                                  ▼
                                ┌───────────────────────────────────┐
-                               │       server.js (Node.js)         │  Gateway HTTP & Gestão de Sessões
+                               │       server.js (Node.js)         │  WorkerPool (4 workers Python persistentes)
                                └─────────────────┬─────────────────┘
-                                                 │ UTF-8 Pipe (stdin/stdout)
+                                                 │ Protocolo JSON via stdin/stdout
                                                  ▼
                                ┌───────────────────────────────────┐
-                               │       agent/main.py (CLI)         │  Entry Point Python
+                               │       agent/main.py (CLI)         │  Ponto de Entrada dos Workers
                                └─────────────────┬─────────────────┘
                                                  │
                                                  ▼
@@ -32,177 +33,190 @@ O **DUQUE IA** é um framework RAG (Retrieval-Augmented Generation) de nível em
                                                  │
                                                  ▼
                                ┌───────────────────────────────────┐
-                               │       agent/graph.py              │  LangGraph Lite (Grafo de Estados)
+                               │       agent/graph.py              │  Grafo Cognitivo (LangGraph Lite)
                                └─────────────────┬─────────────────┘
                                                  │
             ┌────────────────────────────────────┼────────────────────────────────────┐
             │                                    │                                    │
             ▼                                    ▼                                    ▼
  ┌─────────────────────┐              ┌─────────────────────┐              ┌─────────────────────┐
- │  Input Guardrails   │              │   Triagem FastGate  │              │   Query Rewriter    │
- │ (agent/guardrails)  │              │   (agent/triage)    │              │  (agent/handlers)   │
- │ • Prompt Injection  │              │ • Regras estáticas  │              │ • Histórico         │
- │ • SQL Injection     │              │ • Cache SQLite      │              │ • Resolução de      │
- │ • LGPD / Privacidade│              │ • LLM Classifier    │              │   referências       │
- │ • Competência Munic.│              └──────────┬──────────┘              └──────────┬──────────┘
- └──────────┬──────────┘                         │                                    │
-            │                                    └──────────────────┬─────────────────┘
-            └────────────────────────────────────┐                  │
-                                                 ▼                  ▼
-                                       ┌───────────────────────────────────┐
-                                       │   Roteamento de Handlers          │
-                                       │   (agent/handlers.py)             │
-                                       └─────────────────┬─────────────────┘
-                                                         │
-       ┌───────────────────────┬─────────────────────────┼─────────────────────────┬───────────────────────┐
-       ▼                       ▼                         ▼                         ▼                       ▼
-┌──────────────┐       ┌──────────────┐          ┌──────────────┐          ┌──────────────┐        ┌──────────────┐
-│  Security    │       │ Conversation │          │  Collector   │          │  Ambiguity   │        │  RAG Handler │
-│  Handler     │       │   Handler    │          │   Handler    │          │   Handler    │        │  (Retrieval) │
-└──────┬───────┘       └──────┬───────┘          └──────┬───────┘          └──────┬───────┘        └──────┬───────┘
-       │                      │                         │                         │                       │
-       └──────────────────────┴─────────────────────────┼─────────────────────────┴───────────────────────┘
-                                                        │
-                                                        ▼
-                                       ┌───────────────────────────────────┐
-                                       │     agent/retrieval.py            │  Retriever Híbrido Multiconta
-                                       └────────────────┬──────────────────┘
-                                                        │
-                ┌───────────────────────────────────────┼───────────────────────────────────────┐
-                ▼                                       ▼                                       ▼
-     ┌─────────────────────┐                 ┌─────────────────────┐                 ┌─────────────────────┐
-     │   SQLite Main       │                 │   SQLite Vector     │                 │  Geographic Engine  │
-     │ (vw_ia_servicos,    │                 │ (duque_ia_chunks,   │                 │ (unidades_cras,     │
-     │  carta_servicos)    │                 │  gemini-emb 768d)   │                 │  bairros / postos)  │
-     └──────────┬──────────┘                 └──────────┬──────────┘                 └──────────┬──────────┘
-                │                                       │                                       │
-                └───────────────────────────────────────┼───────────────────────────────────────┘
-                                                        │ Candidatos Recuperados
-                                                        ▼
-                                       ┌───────────────────────────────────┐
-                                       │       agent/reranker.py           │  Cross-Encoder Reranking
-                                       │ (GeminiCrossEncoder + RRF Fusion) │  (60% Cross + 40% Hybrid)
-                                       └────────────────┬──────────────────┘
-                                                        │ Top Chunks Ranqueados
-                                                        ▼
-                                       ┌───────────────────────────────────┐
-                                       │     agent/handlers.py             │  Gerador de Respostas LLM
-                                       │ (Prompt Builder + Gemini API)     │
-                                       └────────────────┬──────────────────┘
-                                                        │ Resposta Candidata
-                                                        ▼
-                                       ┌───────────────────────────────────┐
-                                       │       Output Guardrail            │  Verificação Anti-Alucinação
-                                       │      (agent/guardrails.py)        │  & Sanitização LGPD
-                                       └────────────────┬──────────────────┘
-                                                        │ Resposta Final JSON
-                                                        ▼
-                                       ┌───────────────────────────────────┐
-                                       │   database/telemetry.db           │  Telemetria & Métricas
-                                       └───────────────────────────────────┘
+ │    FastGate & Regex │              │   Entity Resolver   │              │   Triagem Multiturno│
+ │ (agent/guardrails)  │              │  (Golden Source 0ms)│              │  (agent/triage.py)  │
+ │ • Prompt Injection  │              │ • 648 Equipamentos  │              │ • Gemini 3.1 Lite   │
+ │ • SQL Injection     │              │ • 205 Escolas Mun.  │              │ • Cache SQLite (3ms)│
+ │ • LGPD / Privacidade│              │ • 1.623 Sinônimos   │              │ • Agente Coletor    │
+ │ • Competência Munic.│              │ • Rotas Google Maps │              │ • Histórico turn_idx│
+ └──────────┬──────────┘              └──────────┬──────────┘              └──────────┬──────────┘
+            │                                    │                                    │
+            └────────────────────────────────────┴─────────────────┬──────────────────┘
+                                                                   │
+                                                                   ▼
+                                                 ┌───────────────────────────────────┐
+                                                 │   Roteador de Handlers & LORS     │
+                                                 │   (agent/handlers.py)             │
+                                                 └─────────────────┬─────────────────┘
+                                                                   │
+       ┌───────────────────────┬───────────────────────────────────┼───────────────────────────────────┐
+       ▼                       ▼                                   ▼                                   ▼
+┌──────────────┐       ┌──────────────┐                    ┌──────────────┐                    ┌──────────────┐
+│  Security    │       │ Conversation │                    │  Collector   │                    │  RAG Handler │
+│  Handler     │       │   Handler    │                    │   Handler    │                    │  (Retrieval) │
+└──────┬───────┘       └──────┬───────┘                    └──────┬───────┘                    └──────┬───────┘
+       │                      │                                   │                                   │
+       └──────────────────────┴───────────────────────────────────┴─────────────────┬─────────────────┘
+                                                                                    │
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │     agent/retrieval.py            │
+                                                                   │  (Retriever Híbrido RRF + LORS)   │
+                                                                   └────────────────┬──────────────────┘
+                                                                                    │
+                 ┌──────────────────────────────────────────────────────────────────┼──────────────────────────────────┐
+                 ▼                                                                  ▼                                  ▼
+      ┌─────────────────────┐                                            ┌─────────────────────┐            ┌─────────────────────┐
+      │   SQLite Main       │                                            │   SQLite Vector     │            │    FTS5 Trigramas   │
+      │ (data/db/main.db)   │                                            │ (data/db/vector.db) │            │ (tabela chunks_fts) │
+      │ • 24 secretarias    │                                            │ • 855 vetores 3072d │            │ • 1.814 chunks FTS5 │
+      │ • 644 serviços      │                                            │ • 2.643 chunks mestre│           │ • Busca textual BM25│
+      │ • 205 escolas       │                                            │ • gemini-embedding-2│            │ • Suporte diacrítico│
+      │ • 443 unidades      │                                            │ • Cosine Sim (numpy)│            │ • Resolução 0ms     │
+      └──────────┬──────────┘                                            └──────────┬──────────┘            └──────────┬──────────┘
+                 │                                                                  │                                  │
+                 └──────────────────────────────────────────────────────────────────┼──────────────────────────────────┘
+                                                                                    │ Candidatos Recuperados
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │       agent/reranker.py           │
+                                                                   │ (GeminiCrossEncoder Local 0ms)    │
+                                                                   │ • Atalho de Alta Confiança (>=0.7)│
+                                                                   │ • Cache LRU de Hash MD5           │
+                                                                   └────────────────┬──────────────────┘
+                                                                                    │ Top Candidatos Reordenados
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │     agent/context_builder.py      │
+                                                                   │ • Deduplicação Inter-Fontes       │
+                                                                   │ • Orçamento Max (6.000 chars)     │
+                                                                   │ • Prioridade a Regras de Negócio  │
+                                                                   └────────────────┬──────────────────┘
+                                                                                    │ Bloco de Contexto Filtrado
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │     agent/handlers.py             │
+                                                                   │ • Motor: Gemini 3.8 Flash         │
+                                                                   │ • Síntese Analítica Factual       │
+                                                                   └────────────────┬──────────────────┘
+                                                                                    │ Resposta Candidata
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │       Output Guardrail            │
+                                                                   │      (agent/guardrails.py)        │
+                                                                   │ • Anti-Alucinação Factual Strict  │
+                                                                   │ • 421 Telefones Oficiais Auditados│
+                                                                   │ • 269 E-mails Oficiais Auditados  │
+                                                                   │ • Formato JSON {answer, sources}  │
+                                                                   └────────────────┬──────────────────┘
+                                                                                    │ Resposta Final Homologada
+                                                                                    ▼
+                                                                   ┌───────────────────────────────────┐
+                                                                   │     data/db/telemetry.db          │
+                                                                   │ • Auditoria, Tokens, Turnos, CSAT │
+                                                                   └───────────────────────────────────┘
 ```
 
 ---
 
-## 2. Fluxos Principais do Sistema
+## 2. Inventário Físico dos Bancos de Dados e Dados em `PRODUCAO`
 
-### 2.1 Fluxo de Ingestão de Dados (`ingestion/parser/`)
-- **Fontes Suportadas**: PDFs Oficiais, Carta de Serviços (XLSX/CSV), Documentos Web (Scraped Markdown), Ofícios Digitalizados (OCR) e Tabelas Estruturadas de Assuntos/Unidades.
-- **Módulos de Ingestão**:
-  - `parse_carta_servico.py`: Processa planilhas estruturadas da Carta de Serviços da Prefeitura.
-  - `parse_oficios_ocr.py`: Trata anexos e ofícios scanned com OCR Tesseract/PyMuPDF.
-  - `parse_pdfs.py`: Extração e chunking recursivo hierárquico de decretos, leis e normativas municipais.
-  - `parse_web.py`: Extração limpa do portal oficial da Prefeitura de Duque de Caxias.
-  - `populate_structured_services.py`: Registra serviços diretamente nas visões relacionais (`vw_ia_servicos`).
-  - `inject_ouvidoria_chunk.py`: Injeta contatos oficiais e fluxos de atendimento da Ouvidoria Geral.
-
-### 2.2 Fluxo de Gerador de Embeddings (`ingestion/embed/`)
-- **Módulo**: `ingestion/embed/core.py` e `ingestion/embed/main.py`.
-- **Modelo de Embedding**: `gemini-embedding-2` (3.072 dimensões com normalização L2 e suporte a hash determinístico local em modo offline).
-- **Armazenamento**: Tabela `duque_ia_chunks` e índices vetoriais em `database/vector.db` (`sqlite-vec` / SQLite blob).
-- **Estratégia de Chunking**: Chunking contextualizado com prefixo hierárquico (`[Documento: X | Seção: Y]`).
-
-### 2.3 Fluxo de Retrieval e Reranking (`agent/retrieval.py` e `agent/reranker.py`)
-1. **Reescrita e Expansão de Query**: Expandida em até 3 sub-queries focadas via `agent/planner.py` (método LORS).
-2. **Busca Híbrida em Paralelo**:
-   - *Busca Vetorial*: Cosine similarity em `vector.db` (top-K chunks).
-   - *Busca Relacional FTS*: Match exato/BM25 nas tabelas relacionais de serviços e secretarias (`main.db`).
-   - *Busca de Entidades Geográficas*: Mapeamento de unidades físicas (CRAS, Postos de Saúde, Bairros) via `agent/entity_resolver.py`.
-3. **Fusão RRF (Reciprocal Rank Fusion)**: Combina rankings de BM25 e busca vetorial.
-4. **Reranking Cross-Encoder**: Avaliação do alinhamento semântico profundo com peso `0.60 * CrossEncoderScore + 0.40 * HybridScore`.
-
-### 2.4 Fluxo de Triagem e Tomada de Decisão (`agent/triage.py` e `agent/graph.py`)
-- **FastGate (0ms)**: Expressões regulares e regras determinísticas interceptam saudações, tentativas de SQL/Prompt Injection e consultas LGPD bloqueadas.
-- **Cache de Triagem**: Consultas recorrentes são respondidas com latência zero via `database/cache.db`.
-- **Classificador LLM**: Classifica intenção (`RAG_GERAL`, `COLETOR_INFO`, `AMBIGUIDADE`, `FORA_COMPETENCIA`, `LGPD_PRIVACIDADE`, `PROGRAMACAO`, `AGRADECIMENTO`).
+| Banco de Dados | Caminho Físico | Tamanho | Tabelas Chave | Registros | Status de Integridade |
+| :--- | :--- | :---: | :--- | :---: | :---: |
+| **`main.db`** | `data/db/main.db` | 1.92 MB | `secretarias`, `secretaria_servicos`, `secretaria_unidades`, `escolas_municipais`, `faixas_cep`, `bairros`, `equipamentos`, `regras_negocio` | 24 secretarias, 644 serviços, 443 unidades, 205 escolas, 40 bairros | **100% Íntegro** |
+| **`vector.db`** | `data/db/vector.db` | 52.5 MB | `chunks`, `chunks_fts`, `duque_ia_chunks`, `core_documents` | 1.814 em `chunks_fts`<br>2.643 em `duque_ia_chunks` | **Atenção: 1.788 chunks sem embedding denso** |
+| **`cache.db`** | `data/db/cache.db` | 139 KB | `semantic_cache`, `query_hashes` | 410 intenções em cache | **100% Íntegro (3ms)** |
+| **`telemetry.db`** | `data/db/telemetry.db` | 1.28 MB | `messages`, `sessions`, `chat_feedback` | 1.382 mensagens, turnos indexados | **100% Íntegro** |
 
 ---
 
-## 3. Matriz de Dependências Entre Módulos
+## 3. Diagnóstico Crítico de Chunking ("Divisões e Cortes") em `vector.db`
 
-| Módulo Orquestrador | Dependências Diretas | Função e Papel |
-| :--- | :--- | :--- |
-| `agent/agent.py` | `agent/triage.py`, `agent/retrieval.py`, `agent/handlers.py`, `agent/guardrails.py`, `utils/gemini_client.py` | Orquestrador principal da classe `DuqueIAAgent`. |
-| `agent/graph.py` | `agent/triage.py`, `agent/handlers.py`, `agent/guardrails.py` | Grafo de Estados LangGraph Lite para roteamento resiliente. |
-| `agent/triage.py` | `utils/gemini_client.py`, `config/settings.py`, `database/cache.db` | Triagem de intenções em 3 níveis com fallback Gracioso. |
-| `agent/retrieval.py` | `utils/db_client.py`, `agent/entity_resolver.py`, `config/settings.py` | Busca híbrida multiconta e resolução de entidades físicas. |
-| `agent/handlers.py` | `utils/gemini_client.py`, `agent/context_builder.py`, `agent/fallback.py` | Execução de nós de resposta (Collector, Ambiguity, RAG). |
-| `agent/guardrails.py` | `config/settings.py` | Filtros de segurança de entrada/saída (SQLi, Prompt Injection, LGPD). |
+A auditoria matemática de todos os 1.814 chunks revelou a seguinte distribuição de tamanhos:
 
----
+| Faixa de Tamanho (Caracteres) | Quantidade | Percentual | Diagnóstico Arquitetural |
+| :--- | :---: | :---: | :--- |
+| **1. Quase Vazio (< 150 chars)** | **39** | **2,1%** | **Gargalo / Ruído**: Cabeçalhos puros de páginas ou títulos soltos (ex: `### Página 1 CARTA DE SERVIÇOS`). Desperdiçam slots de retrieval sem dados factuais. |
+| **2. Curto (150 a 300 chars)** | **13** | **0,7%** | Fragmentos curtos que necessitam de enriquecimento contextual de metadados. |
+| **3. Ótimo (300 a 1.500 chars)** | **1.285** | **70,8%** | **Zona Ideal**: Densidade semântica perfeita para `gemini-embedding-2` (3072d) e prompt do Gemini 3.8. |
+| **4. Longo (1.501 a 3.000 chars)** | **403** | **22,2%** | Serviços completos com etapas e documentação. Aceitáveis, mas demandam atenção no orçamento. |
+| **5. Gigante / Oversized (> 3.000 chars)** | **74** | **4,1%** | **Gargalo Crítico**: Chunks de até **14.318 chars** que estouram o limite de 6.000 chars do `ContextBuilder`, monopolizam o prompt e diluem a densidade semântica. |
 
-## 4. Auditoria de Segurança, LGPD e Blindagem POP
-
-### 4.1 Input & FastGate Guardrails
-- **Prompt Injection**: Intercepta tentativas de desvio ("ignore instruções anteriores", "você agora é...").
-- **SQL Injection**: Detecta comandos SQL perigosos (`DROP TABLE`, `UNION SELECT`, `DELETE FROM`).
-- **LGPD / Privacidade de Terceiros**: Impede buscas por CPFs de terceiros, nomes de munícipes ou andamento de processos de vizinhos. Resposta de bloqueio padronizada sem expor dados.
-- **Competência Municipal**: Filtra perguntas sobre esferas Federal/Estadual (Metrô, INSS, Rodovias Federais, etc.) e emite recusa por falta de competência da Prefeitura de Duque de Caxias.
-- **Emergência Defesa Civil (199)**: Roteamento instantâneo (0ms) para risco de desabamento, alagamentos graves e desabamentos de imóvel.
-- **Emergência Segurança Pública (190)**: Roteamento instantâneo (0ms) para tráfico de drogas, crimes e emergências policiais (Polícia Militar 190 + Colab SMSP).
-- **Proteção ao Menor / Escalona Humanamente**: Intercepta relatos de agressão, maus-tratos ou abuso de crianças/adolescentes, acionando o Conselho Tutelar, Disque 100, PM 190 e Ouvidoria Geral.
-- **Trava de Responsabilidade Jurídica Patrimonial (Legal Shield)**: Para danos materiais (ex: queda de árvore em veículo), orienta abertura de Processo Administrativo via Procuradoria Geral / Ouvidoria sem promessa verbal de indenização.
-
-### 4.2 Fallback e Redirecionamento Direto para Ouvidoria Geral
-Quando as buscas no RAG não atingem o limiar de confiança exigido (`score < threshold`), a resposta substitui mensagens genéricas de erro pelo direcionamento direto:
-- **Telefone Ouvidoria Geral**: `(21) 2652-3835`
-- **WhatsApp Ouvidoria Geral**: `(21) 99824-5903`
-- **Plataforma Colab**: Instrução para preenchimento de dados essenciais (CPF, endereço completo com ponto de referência e fotos).
-
-### 4.3 Agente Coletor (Triagem de Esclarecimento Contextual & Proximidade)
-Quando `needs_clarification: true`, o sistema aciona o modo **Agente Coletor**:
-- Avalia o histórico recente de conversas para preservar o contexto dos turnos anteriores e proibir a repetição de procedimentos genéricos.
-- Coleta amigável de **Bairro** e **Rua** para solicitações de equipamentos/serviços mais próximos.
-- Realiza perguntas amigáveis e **estritamente incrementais (uma solicitação por vez)** para evitar sobrecarregar o cidadão.
-- Direciona o munícipe a abrir o chamado na plataforma **Colab** vinculando-o à Secretaria adequada.
+### Detalhamento dos Casos Extremos de Chunking:
+1. **`carta_01511` (14.318 caracteres)** e **`carta_01510` (13.216 caracteres)**:
+   - Origem: Página 2 e 3 da Secretaria de Urbanismo. A página inteira do Boletim Oficial foi injetada como um bloco único sem recorte por serviço.
+   - Consequência: Um único chunk desse estoura sozinho o teto de 6.000 caracteres do `ContextBuilder` (`max_context_chars: int = 6000`), bloqueando a inserção de outros chunks relevantes.
+2. **`geo_01571` (10.542 caracteres)** e **`geo_01575` (9.663 caracteres)**:
+   - Origem: Detalhamento territorial do 1º e 2º Distritos e Índice de Bairros.
+   - Consequência: Violação direta da regra da **Fase 6 do AGENTS.md** (*1 entidade geográfica = 1 chunk*). Um único chunk contém 40 bairros misturados.
+3. **`transparencia_catalogo_59_apis` (6.566 caracteres)**:
+   - Origem: Catálogo mestre unificado de 59 APIs da Transparência.
+   - Consequência: Contém simultaneamente APIs de finanças, folha, licitações, despesas e contratos.
 
 ---
 
-## 5. Mapeamento de Gargalos e Oportunidades de Melhoria
+## 4. Diagnóstico dos Embeddings em `duque_ia_chunks`
 
-1. **Latência no Classificador LLM de Triagem**:
-   - *Gargalo*: Quando a consulta não cai no FastGate, há uma chamada remota ao LLM para triagem antes do retrieval.
-   - *Melhoria*: Expandir o cache determinístico local e usar modelos ultra-rápidos (`gemini-3.1-flash-lite`) com resposta estruturada via JSON Schema.
-2. **Integração SIG / GIS Territorial (Duque 2.0)**:
-   - *Oportunidade*: Implementar o Chunking por Entidade Geográfica (1 entidade territorial = 1 chunk com GeoJSON da feição) para responder consultas por bairro, distrito, setor e lote.
-3. **Consistência de Thresholds Dinâmicos**:
-   - *Gargalo*: Ajuste dinâmico de score limiar dependendo da categoria de serviços.
-   - *Melhoria*: Padronização do Cross-Encoder com trava máxima `min(score, 1.0)` para evitar inflação de relevância.
+| Situação do Vetor | Quantidade de Chunks | Percentual | Categoria Mais Afetada |
+| :--- | :---: | :---: | :--- |
+| **Vetor 3.072d Válido (`dim_3072`)** | **855** | **32,4%** | `carta_servicos` (372), `secretarias` (212), `general` (183), `pop_documento` (36), `web_scraped` (36) |
+| **Vetor Vazio `[]` (`dim_0`)** | **216** | **8,2%** | Lotes recentes inseridos com string `[]` |
+| **Sem Vetor (`null_or_empty`)** | **1.572** | **59,4%** | `servico_publico` (657), `equipamento_publico` (442), `educacao` (205), `regra_negocio` (58), `concursos` (9) |
+| **TOTAL GERAL** | **2.643** | **100%** | **1.788 chunks (67,6%) dependem exclusivamente de FTS5 trigramas e Golden Source** |
+
+> [!IMPORTANT]
+> **Impacto no RAG**: Quando o munícipe faz uma pergunta semântica coloquial que não contém os termos exatos indexados no FTS5 trigramas, esses 1.788 chunks recebem score de cosseno 0.0 (`[0.0] * 3072` em `retrieval.py`), impossibilitando o resgate puramente vetorial.
 
 ---
 
-## 6. Recomendação Arquitetural e Roadmap para PRODUÇÃO
+## 5. Matriz de Dependências Entre Módulos Ativos
 
 ```mermaid
-graph TD
-    A[Mapeamento & Auditoria FASE 1] --> B[Auditoria de Chunking FASE 2]
-    B --> C[Avaliação de Retrieval FASE 3]
-    C --> D[Fortalecimento de Guardrails FASE 4]
-    D --> E[Métricas & Telemetria FASE 5]
-    E --> F[Suporte GeoJSON / GIS FASE 6]
-    F --> G[Benchmark de Desempenho FASE 7]
-    G --> H[Empacotamento Docker / Supabase FASE 8]
+flowchart TD
+    subgraph Core["Pipeline Cognitivo Duque IA"]
+        A["agent/agent.py"] --> G["agent/graph.py"]
+        G --> FG["agent/guardrails.py (FastGate)"]
+        G --> ER["agent/entity_resolver.py (Golden Source)"]
+        G --> TR["agent/triage.py (Gemini 3.1 Lite)"]
+        G --> H["agent/handlers.py"]
+        H --> R["agent/retrieval.py (Hybrid LORS)"]
+        R --> RK["agent/reranker.py (GeminiCrossEncoder Local)"]
+        R --> CB["agent/context_builder.py (Deduplicação & Budget)"]
+        H --> OG["agent/guardrails.py (Output Guardrail)"]
+        H --> TEL["agent/telemetry.py (SQLite WAL)"]
+    end
+    
+    subgraph Data["Bases de Dados e Conhecimento"]
+        R --> MDB["data/db/main.db (644 serv, 648 unid)"]
+        R --> VDB["data/db/vector.db (1.814 FTS / 2.643 chunks)"]
+        TR --> CDB["data/db/cache.db (410 hashes)"]
+        TEL --> TDB["data/db/telemetry.db (1.382 msgs)"]
+    end
 ```
 
 ---
-*Documento gerado e validado em conformidade com as diretrizes do projeto DUQUE IA.*
+
+## 6. Gargalos Identificados e Plano de Ação Recomendado
+
+1. **Eliminação de 39 Chunks Fantasmas (< 150 chars)**:
+   - Remover ou mesclar chunks que são apenas títulos de páginas no `vector.db`.
+2. **Sub-divisão Recursiva dos 74 Chunks Gigantes (> 3.000 chars)**:
+   - Aplicar `recursive_character_chunker` ou `semantic_chunker` em blocos de 600 a 1.200 caracteres com prefixo contextual `[Parent Title]`.
+   - Quebrar os chunks territoriais (`geo_01571`, `geo_01572`, etc.) em **1 bairro = 1 chunk**, respeitando a Fase 6 do AGENTS.md.
+   - Quebrar o chunk da Transparência em 4 blocos temáticos (Receitas/Despesas, Servidores, Contratos/Obras, Licitações).
+3. **Geração Incremental dos 1.788 Embeddings Faltantes**:
+   - Processar em lotes controlados com `gemini-embedding-2` (3072d), respeitando os limites da chave oficial paga.
+4. **Alinhamento do `embed_config.yml`**:
+   - Atualizado para `gemini-embedding-2` (3072d).
+5. **Ajuste Fino do `ContextBuilder`**:
+   - Proteger contra estouro de orçamento caso um chunk remanescente seja longo, garantindo a presença mínima de pelo menos 3 fontes diversificadas.
+
+---
+*Relatório de Auditoria Arquitetural gerado e homologado pelo Arquiteto Sênior de IA.*

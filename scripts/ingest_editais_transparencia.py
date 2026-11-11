@@ -139,3 +139,4 @@ def ingest_editais():
 
 if __name__ == "__main__":
     ingest_editais()
+

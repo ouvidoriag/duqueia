@@ -1,10 +1,11 @@
-# Configuração de Geração de Embeddings e Chunking para o DUQUE IA
+# Configuração Oficial de Geração de Embeddings e Chunking para o DUQUE IA
+# Prefeitura Municipal de Duque de Caxias — Ouvidoria Geral do Município
 
-# Configurações globais do modelo de embedding
-embedding_model: "text-embedding-3-small"
-dimensions: 1536
+# Modelo de Embedding Oficial de Produção (Google Cloud Gemini API Paga)
+embedding_model: "gemini-embedding-2"
+dimensions: 3072
 
-# Estratégias de Chunking disponíveis para Benchmark
+# Estratégias de Chunking disponíveis para Benchmark e Produção
 strategies:
   # Estratégia Clássica de Caracteres Recursivos (500/100)
   - name: "recursive_500_100"
