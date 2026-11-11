@@ -57,3 +57,4 @@ assert "turno 1" in ans3.lower(), f"FALHA: Não citou o Turno 1! Resposta: {ans3
 print("STATUS TURNO 3: ✅ APROVADO (Primeira pergunta recuperada literalmente do SQLite)")
 
 print("\n🎉 TODAS AS 3 CORREÇÕES VALIDADAS COM SUCESSO!")
+
