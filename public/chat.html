@@ -479,33 +479,81 @@
 
     /* Feedback de Resolução do Cidadão (CSAT / Qualidade Percebida) */
     .feedback-box {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      transition: all 0.25s ease;
+    }
+    .feedback-prompt {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-      padding: 2px 4px;
-      font-size: 0.76rem;
-      color: var(--text-soft);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .feedback-prompt span {
+      font-weight: 600;
+      color: #475569;
     }
     .feedback-box .feedback-btn {
-      background: #f8fafc;
+      background: #ffffff;
       border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 2px 8px;
+      border-radius: 8px;
+      padding: 3px 10px;
       font-size: 0.76rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
+      color: #334155;
     }
     .feedback-box .feedback-btn:hover {
-      background: #e2e8f0;
+      background: #f1f5f9;
       border-color: #94a3b8;
       transform: translateY(-1px);
     }
+    .feedback-comment-card {
+      margin-top: 8px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      animation: fadeIn 0.25s ease-out;
+    }
+    .feedback-comment-card textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.76rem;
+      color: #1e293b;
+      resize: vertical;
+      min-height: 52px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .feedback-comment-card textarea:focus {
+      border-color: #003f99;
+      box-shadow: 0 0 0 2px rgba(0, 63, 153, 0.12);
+    }
+    .feedback-comment-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
     .feedback-box .feedback-thanks {
-      color: #16a34a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-weight: 600;
       font-size: 0.78rem;
     }
@@ -1250,6 +1298,7 @@
     let sessionId = generateSecureSessionId();
     let librasMode = false;
     let avatarTimer = null;
+    let lastUserQuestion = '';
 
     // Detecção inteligente de secretaria responsável
     function detectSecretaria(text, data = null) {
@@ -1480,29 +1529,118 @@
 
       // Caixa de Feedback de Resolução do Atendimento (CSAT)
       if (sender === 'bot' && text && !text.includes('Como posso te ajudar hoje?') && text.length > 30) {
+        const currentTurnQuestion = lastUserQuestion || '';
+        const detectedSec = detectSecretaria(text, data);
+        const secSigla = detectedSec ? detectedSec.sigla : '';
+        const topicName = data?.intent_detected || (secSigla ? `SECRETARIA_${secSigla}` : 'GERAL');
+
         const fbBox = document.createElement('div');
         fbBox.className = 'feedback-box';
         fbBox.innerHTML = `
-          <span>Essa resposta foi útil?</span>
-          <button class="feedback-btn" data-type="positive" title="Sim, foi útil">👍 Sim</button>
-          <button class="feedback-btn" data-type="negative" title="Não ajudou ou faltou dados">👎 Não</button>
+          <div class="feedback-prompt">
+            <span>Essa resposta foi útil?</span>
+            <button class="feedback-btn" data-type="positive" title="Sim, foi útil">👍 Sim</button>
+            <button class="feedback-btn" data-type="negative" title="Não ajudou ou faltou dados">👎 Não</button>
+          </div>
         `;
-        const btns = fbBox.querySelectorAll('.feedback-btn');
-        btns.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const fType = btn.getAttribute('data-type');
+
+        const btnPos = fbBox.querySelector('.feedback-btn[data-type="positive"]');
+        const btnNeg = fbBox.querySelector('.feedback-btn[data-type="negative"]');
+
+        // Fluxo 1: Clicou em "SIM"
+        btnPos.addEventListener('click', () => {
+          fetch('api/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              session_id: sessionId,
+              feedback_type: 'positive',
+              question: currentTurnQuestion,
+              bot_response: text ? text.substring(0, 500) : '',
+              topic: topicName,
+              secretaria: secSigla
+            })
+          }).catch(() => {});
+
+          fbBox.innerHTML = `
+            <div class="feedback-thanks" style="color: #16a34a;">
+              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/></svg>
+              <span>Obrigado pelo seu feedback! Ficamos felizes em ajudar. 🙏</span>
+            </div>
+          `;
+        }, { once: true });
+
+        // Fluxo 2: Clicou em "NÃO" -> Abre caixinha para comentar sobre a resposta incorreta
+        btnNeg.addEventListener('click', () => {
+          fbBox.innerHTML = `
+            <div class="feedback-comment-card">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <span style="font-weight: 700; color: #334155; font-size: 0.76rem; display: flex; align-items: center; gap: 5px;">
+                  <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #f43f5e;"></span>
+                  Deseja comentar o que estava incorreto ou o que faltou?
+                </span>
+                <span style="font-size: 0.7rem; color: #94a3b8; font-weight: 500;">Ajude a Ouvidoria</span>
+              </div>
+              <textarea class="feedback-comment-textarea" placeholder="Ex: O horário mudou, o posto fica em outro endereço, faltou informar os documentos necessários..."></textarea>
+              <div class="feedback-comment-actions">
+                <button class="feedback-skip-btn" style="background: transparent; border: none; color: #64748b; font-size: 0.72rem; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 6px;">
+                  Apenas marcar Não
+                </button>
+                <button class="feedback-submit-btn" style="background: #003f99; color: #ffffff; border: none; font-size: 0.72rem; font-weight: 700; cursor: pointer; padding: 5px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,63,153,0.2);">
+                  <span>Enviar Comentário</span>
+                  <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+              </div>
+            </div>
+          `;
+
+          const textarea = fbBox.querySelector('.feedback-comment-textarea');
+          const submitBtn = fbBox.querySelector('.feedback-submit-btn');
+          const skipBtn = fbBox.querySelector('.feedback-skip-btn');
+
+          setTimeout(() => { textarea?.focus(); }, 100);
+
+          const sendNegativeFeedback = (commentText) => {
             fetch('api/feedback', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 session_id: sessionId,
-                feedback_type: fType,
-                topic: data?.intent_detected || 'geral'
+                feedback_type: 'negative',
+                comment: commentText,
+                question: currentTurnQuestion,
+                bot_response: text ? text.substring(0, 500) : '',
+                topic: topicName,
+                secretaria: secSigla
               })
             }).catch(() => {});
-            fbBox.innerHTML = '<span class="feedback-thanks">Obrigado pela sua avaliação! 🙏</span>';
+
+            if (commentText) {
+              fbBox.innerHTML = `
+                <div class="feedback-thanks" style="color: #003f99;">
+                  <svg class="w-4 h-4 text-pmdc-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Agradecemos pelo seu apontamento! Sua contribuição nos ajuda a corrigir as informações de Duque de Caxias. 🙏</span>
+                </div>
+              `;
+            } else {
+              fbBox.innerHTML = `
+                <div class="feedback-thanks" style="color: #64748b;">
+                  <span>Obrigado pelo retorno. Nossa equipe da Ouvidoria trabalhará para aprimorar essa resposta! 🙏</span>
+                </div>
+              `;
+            }
+          };
+
+          submitBtn.addEventListener('click', () => {
+            const comment = (textarea?.value || '').trim();
+            sendNegativeFeedback(comment);
           }, { once: true });
-        });
+
+          skipBtn.addEventListener('click', () => {
+            sendNegativeFeedback('');
+          }, { once: true });
+        }, { once: true });
+
         bubbleWrap.appendChild(fbBox);
       }
       row.appendChild(bubbleWrap);
@@ -1689,6 +1827,7 @@
       const text = (customText || chatInput.value).trim();
       if (!text || sendBtn.disabled) return;
 
+      lastUserQuestion = text;
       chatInput.value = '';
       chatInput.style.height = 'auto';
       sendBtn.disabled = true;

@@ -682,11 +682,18 @@ const server = http.createServer((req, res) => {
       try {
         const feedback = JSON.parse(body || '{}');
         const sessionId = String(feedback.session_id || feedback.conversation_id || '').trim();
-        const feedbackType = String(feedback.feedback_type || feedback.type || 'positive').trim();
+        const rawType = String(feedback.feedback_type || feedback.type || 'positive').trim().toLowerCase();
+        const isPositive = (rawType === 'positive' || rawType === 'upvote' || rawType === 'sim' || rawType === 'true');
+        const feedbackType = isPositive ? 'positive' : 'negative';
+        const dbType = isPositive ? 'upvote' : 'downvote';
         const comment = String(feedback.comment || '').trim();
         const topic = String(feedback.topic || '').trim();
+        const question = String(feedback.question || '').trim();
+        const botResponse = String(feedback.bot_response || '').trim();
+        const secretaria = String(feedback.secretaria || '').trim();
+        const nowIso = new Date().toISOString();
 
-        // Grava no arquivo de telemetria de feedback
+        // 1. Grava no arquivo de telemetria de feedback (metrics/feedback.jsonl)
         const metricsDir = path.join(__dirname, 'metrics');
         if (!fs.existsSync(metricsDir)) fs.mkdirSync(metricsDir, { recursive: true });
         const record = {
@@ -694,10 +701,34 @@ const server = http.createServer((req, res) => {
           feedback_type: feedbackType,
           comment: comment,
           topic: topic,
-          timestamp: new Date().toISOString()
+          question: question,
+          bot_response: botResponse,
+          secretaria: secretaria,
+          timestamp: nowIso
         };
         fs.appendFile(path.join(metricsDir, 'feedback.jsonl'), JSON.stringify(record) + '\n', () => {});
 
+        // 2. Grava na tabela chat_feedback em data/db/telemetry.db
+        try {
+          const { DatabaseSync } = require('node:sqlite');
+          const dbPath = path.join(__dirname, 'data', 'db', 'telemetry.db');
+          if (fs.existsSync(dbPath)) {
+            const db = new DatabaseSync(dbPath);
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN question TEXT;'); } catch (_) {}
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN bot_response TEXT;'); } catch (_) {}
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN secretaria TEXT;'); } catch (_) {}
+
+            const stmt = db.prepare(`
+              INSERT INTO chat_feedback (session_id, feedback_type, comment, topic, question, bot_response, secretaria, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+            `);
+            stmt.run(sessionId, dbType, comment || null, topic || null, question || null, botResponse || null, secretaria || null);
+          }
+        } catch (dbErr) {
+          console.warn('[Feedback DB Insert Warning]:', dbErr.message);
+        }
+
+        console.log(`[Feedback] Registrado: tipo=${feedbackType}, sec=${secretaria || topic}, com=${comment ? 'Sim' : 'Não'}`);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ status: 'ok', message: 'Feedback registrado com sucesso.' }));
       } catch (err) {
@@ -705,6 +736,138 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ error: 'JSON inválido.' }));
       }
     });
+    return;
+  }
+
+  // ── API de Consulta de Feedbacks e Métricas CSAT ───────────────────────────
+  if ((req.url.startsWith('/api/feedback') || req.url.startsWith('/api/feedbacks')) && req.method === 'GET') {
+    const isAdmin = isAuthorizedAdmin(req);
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const limit = parseInt(parsedUrl.searchParams.get('limit')) || 100;
+    const filterType = parsedUrl.searchParams.get('type') || ''; // 'positive', 'negative', 'commented'
+
+    try {
+      const { DatabaseSync } = require('node:sqlite');
+      const dbPath = path.join(__dirname, 'data', 'db', 'telemetry.db');
+      let feedbacks = [];
+      let stats = {
+        total: 0,
+        positive: 0,
+        negative: 0,
+        with_comments: 0,
+        satisfaction_rate: 100.0,
+        by_secretaria: {}
+      };
+
+      if (fs.existsSync(dbPath)) {
+        const db = new DatabaseSync(dbPath, { readOnly: true });
+        const rows = db.prepare('SELECT id, session_id, feedback_type, comment, topic, question, bot_response, secretaria, created_at FROM chat_feedback ORDER BY id DESC').all();
+
+        stats.total = rows.length;
+        rows.forEach(r => {
+          const isPos = (r.feedback_type === 'upvote' || r.feedback_type === 'positive');
+          if (isPos) stats.positive++;
+          else stats.negative++;
+
+          if (r.comment && r.comment.trim().length > 0) {
+            stats.with_comments++;
+          }
+
+          const sec = (r.secretaria || r.topic || 'GERAL').toUpperCase();
+          if (!stats.by_secretaria[sec]) {
+            stats.by_secretaria[sec] = { positive: 0, negative: 0, total: 0 };
+          }
+          stats.by_secretaria[sec].total++;
+          if (isPos) stats.by_secretaria[sec].positive++;
+          else stats.by_secretaria[sec].negative++;
+        });
+
+        if (stats.total > 0) {
+          stats.satisfaction_rate = parseFloat(((stats.positive / stats.total) * 100).toFixed(1));
+        }
+
+        let filteredRows = rows;
+        if (filterType === 'negative') {
+          filteredRows = filteredRows.filter(r => r.feedback_type === 'downvote' || r.feedback_type === 'negative');
+        } else if (filterType === 'positive') {
+          filteredRows = filteredRows.filter(r => r.feedback_type === 'upvote' || r.feedback_type === 'positive');
+        } else if (filterType === 'commented') {
+          filteredRows = filteredRows.filter(r => r.comment && r.comment.trim().length > 0);
+        }
+
+        feedbacks = (limit > 0 ? filteredRows.slice(0, limit) : filteredRows).map(r => {
+          return {
+            id: r.id,
+            session_id: r.session_id,
+            feedback_type: (r.feedback_type === 'upvote' || r.feedback_type === 'positive') ? 'positive' : 'negative',
+            comment: isAdmin ? (r.comment || null) : (r.comment ? '[Comentário Registrado]' : null),
+            question: isAdmin ? (r.question || null) : '[PROTEGIDO - LGPD]',
+            bot_response: r.bot_response,
+            topic: r.topic,
+            secretaria: r.secretaria,
+            created_at: r.created_at
+          };
+        });
+      }
+
+      // Se telemetry.db estiver vazio, tenta ler metrics/feedback.jsonl como fallback
+      if (feedbacks.length === 0) {
+        const jsonlPath = path.join(__dirname, 'metrics', 'feedback.jsonl');
+        if (fs.existsSync(jsonlPath)) {
+          const lines = fs.readFileSync(jsonlPath, 'utf8').split('\n');
+          const fileRecords = [];
+          for (const line of lines) {
+            if (line.trim()) {
+              try { fileRecords.push(JSON.parse(line)); } catch (_) {}
+            }
+          }
+          stats.total = fileRecords.length;
+          fileRecords.reverse().forEach((r, idx) => {
+            const isPos = (r.feedback_type === 'positive' || r.feedback_type === 'upvote');
+            if (isPos) stats.positive++;
+            else stats.negative++;
+            if (r.comment && r.comment.trim().length > 0) stats.with_comments++;
+
+            const sec = (r.secretaria || r.topic || 'GERAL').toUpperCase();
+            if (!stats.by_secretaria[sec]) {
+              stats.by_secretaria[sec] = { positive: 0, negative: 0, total: 0 };
+            }
+            stats.by_secretaria[sec].total++;
+            if (isPos) stats.by_secretaria[sec].positive++;
+            else stats.by_secretaria[sec].negative++;
+
+            feedbacks.push({
+              id: idx + 1,
+              session_id: r.session_id,
+              feedback_type: isPos ? 'positive' : 'negative',
+              comment: isAdmin ? (r.comment || null) : (r.comment ? '[Comentário Registrado]' : null),
+              question: isAdmin ? (r.question || null) : '[PROTEGIDO - LGPD]',
+              bot_response: r.bot_response,
+              topic: r.topic,
+              secretaria: r.secretaria,
+              created_at: r.timestamp
+            });
+          });
+          if (stats.total > 0) {
+            stats.satisfaction_rate = parseFloat(((stats.positive / stats.total) * 100).toFixed(1));
+          }
+        }
+      }
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache'
+      });
+      res.end(JSON.stringify({
+        stats,
+        feedbacks
+      }));
+    } catch (err) {
+      console.error('[Feedback GET API Error]:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: 'Erro ao consultar feedbacks.', details: err.message }));
+    }
     return;
   }
 
