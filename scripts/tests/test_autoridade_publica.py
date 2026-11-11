@@ -29,8 +29,8 @@ def run_autoridade_publica_tests():
         },
         {
             "id": "AP02",
-            "query": "Quem é o vice-prefeito de Duque de Caxias?",
-            "expected_name": "Aline da Silva Santos (Aline do Mestre Lulinha)"
+            "query": "Quem é a vice-prefeita de Duque de Caxias?",
+            "expected_name": "Aline Ferreira Batista Ribeiro (Aline do Aureo)"
         },
         {
             "id": "AP03",

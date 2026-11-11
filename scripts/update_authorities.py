@@ -118,12 +118,12 @@ def update_catalog():
 
     # Adiciona vice-prefeito se não encontrado
     if "vice-prefeito" not in authorities:
-        source_documents.add("a_cidade.md")
+        source_documents.add("vice_prefeita.md")
         vice_entry = {
-            "cargo": "Vice-Prefeito de Duque de Caxias",
-            "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-            "fonte": "a_cidade.md",
-            "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+            "cargo": "Vice-Prefeita de Duque de Caxias",
+            "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+            "fonte": "vice_prefeita.md",
+            "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
             "documento": "Estrutura Administrativa Oficial"
         }
         unique_authorities.add(vice_entry["nome"])
@@ -133,6 +133,10 @@ def update_catalog():
         authorities["vice prefeita"] = vice_entry
         authorities["quem é o vice-prefeito"] = vice_entry
         authorities["quem é o vice prefeito"] = vice_entry
+        authorities["quem é a vice-prefeita"] = vice_entry
+        authorities["quem é a vice prefeita"] = vice_entry
+        authorities["aline do aureo"] = vice_entry
+        authorities["aline ferreira batista ribeiro"] = vice_entry
 
     generated_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     catalog_version = datetime.datetime.now().strftime("%Y-%m-%d")

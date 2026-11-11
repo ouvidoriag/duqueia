@@ -2216,45 +2216,73 @@ AUTHORITIES = {
         "documento": "Estrutura Administrativa Oficial"
     },
     "vice-prefeito": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "vice prefeito": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "vice-prefeita": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "vice prefeita": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "quem é o vice-prefeito": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
+        "documento": "Estrutura Administrativa Oficial"
+    },
+    "quem é a vice-prefeita": {
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
+        "documento": "Estrutura Administrativa Oficial"
+    },
+    "quem é a vice prefeita": {
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "quem é o vice prefeito": {
-        "cargo": "Vice-Prefeito de Duque de Caxias",
-        "nome": "Aline da Silva Santos (Aline do Mestre Lulinha)",
-        "fonte": "a_cidade.md",
-        "detalhes": "Aline do Mestre Lulinha é a Vice-Prefeita de Duque de Caxias.",
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
+        "documento": "Estrutura Administrativa Oficial"
+    },
+    "aline do aureo": {
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
+        "documento": "Estrutura Administrativa Oficial"
+    },
+    "aline ferreira batista ribeiro": {
+        "cargo": "Vice-Prefeita de Duque de Caxias",
+        "nome": "Aline Ferreira Batista Ribeiro (Aline do Aureo)",
+        "fonte": "vice_prefeita.md",
+        "detalhes": "Aline Ferreira Batista Ribeiro, conhecida publicamente como Aline do Aureo, é a Vice-Prefeita de Duque de Caxias (mandato 2025–2028), eleita ao lado do prefeito Netinho Reis. Formada em Serviço Social pela Unigranrio com pós-graduação em Gestão Pública pela PUC, atuou como subsecretária e titular da Secretaria Municipal de Assistência Social e Direitos Humanos a partir de 2017.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "ouvidor geral": {

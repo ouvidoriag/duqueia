@@ -1466,7 +1466,13 @@ class AuthorityHandler(BaseHandler):
             cargo_lower = cargo.lower()
             sugestoes = []
             
-            if "prefeito" in cargo_lower:
+            if "vice" in cargo_lower:
+                sugestoes = [
+                    "• Quem é o **Prefeito** de Duque de Caxias",
+                    "• Qual o contato e localização do **Gabinete da Vice-Prefeita**",
+                    "• Quais são as **Secretarias Municipais** da Prefeitura"
+                ]
+            elif "prefeito" in cargo_lower:
                 sugestoes = [
                     "• Quem é a **Vice-Prefeita** de Duque de Caxias",
                     "• Quais são as **Secretarias Municipais** da Prefeitura",
@@ -1509,16 +1515,20 @@ class AuthorityHandler(BaseHandler):
 
             detalhes_str = f"\n\n{auth.get('detalhes', '')}" if auth.get('detalhes') else ""
             cargo_title = cargo if "duque de caxias" in cargo.lower() else f"{cargo} de Duque de Caxias"
+            is_feminine = any(fem in cargo_title.lower() for fem in ["vice-prefeita", "prefeita", "secretária", "ouvidora", "controladora"])
+            artigo = "A" if is_feminine else "O"
+            verbo_cargo = "é a" if is_feminine else "é o"
+
             if matched_by_name:
                 answer = (
-                    f"**{nome}** é o **{cargo_title}**.{detalhes_str}\n\n"
+                    f"**{nome}** {verbo_cargo} **{cargo_title}**.{detalhes_str}\n\n"
                     f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
                     f"Caso deseje, posso informar também:\n"
                     f"{sugestoes_str}"
                 )
             else:
                 answer = (
-                    f"O **{cargo_title}** é **{nome}**.{detalhes_str}\n\n"
+                    f"{artigo} **{cargo_title}** é **{nome}**.{detalhes_str}\n\n"
                     f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
                     f"Caso deseje, posso informar também:\n"
                     f"{sugestoes_str}"
