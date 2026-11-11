@@ -1841,3 +1841,4 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-11 15:05:10,eu queria levar meu cachorro na emergencia e agora,9821.89,4365.17,14499.06,1.0000,2662,0.00027620
 2026-11-11 15:06:52,eu queria levar meu cachorro na emergencia e agora,6277.66,5306.43,11705.93,1.0000,2728,0.00029600
 2026-11-11 15:06:57,Como solicitar o conserto de lâmpada de poste apagada?,505.73,4644.48,5153.37,1.0000,1651,0.00021570
+2026-11-11 15:59:30,Minha avó é idosa; possui dificuldade de locomoção e depende de medicamentos fornecidos pela rede municipal. Entretanto; há dois meses estamos enfrentando dificuldades para conseguir os medicamentos na unidade de saúde. Quando perguntamos aos funcionários; cada um fornece uma informação diferente. Como podemos formalizar essa situação e solicitar uma solução sem precisar nos deslocar diversas vezes?,9600.44,7120.69,18580.22,1.0000,3391,0.00038680

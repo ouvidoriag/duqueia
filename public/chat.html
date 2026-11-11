@@ -551,11 +551,22 @@
       margin-top: 8px;
     }
     .feedback-box .feedback-thanks {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       font-weight: 600;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
+      padding: 2px 0;
+    }
+    .feedback-box .feedback-thanks svg {
+      width: 14px !important;
+      height: 14px !important;
+      min-width: 14px !important;
+      min-height: 14px !important;
+      max-width: 14px !important;
+      max-height: 14px !important;
+      flex-shrink: 0;
+      display: inline-block;
     }
 
     /* Reprodutor de Áudio Nativo */
@@ -1563,9 +1574,9 @@
           }).catch(() => {});
 
           fbBox.innerHTML = `
-            <div class="feedback-thanks" style="color: #16a34a;">
-              <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/></svg>
-              <span>Obrigado pelo seu feedback! Ficamos felizes em ajudar. 🙏</span>
+            <div class="feedback-thanks" style="color: #16a34a; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 5px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; min-width: 15px; min-height: 15px; border-radius: 50%; background: #dcfce7; color: #16a34a; font-size: 10px; font-weight: 800; line-height: 1;">✓</span>
+              <span>Obrigado pelo seu feedback! 🙏</span>
             </div>
           `;
         }, { once: true });
@@ -1617,15 +1628,15 @@
 
             if (commentText) {
               fbBox.innerHTML = `
-                <div class="feedback-thanks" style="color: #003f99;">
-                  <svg class="w-4 h-4 text-pmdc-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/></svg>
-                  <span>Agradecemos pelo seu apontamento! Sua contribuição nos ajuda a corrigir as informações de Duque de Caxias. 🙏</span>
+                <div class="feedback-thanks" style="color: #003f99; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 5px;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; min-width: 15px; min-height: 15px; border-radius: 50%; background: #dbeafe; color: #003f99; font-size: 10px; font-weight: 800; line-height: 1;">✓</span>
+                  <span>Apontamento registrado! Obrigado por ajudar a Ouvidoria. 🙏</span>
                 </div>
               `;
             } else {
               fbBox.innerHTML = `
-                <div class="feedback-thanks" style="color: #64748b;">
-                  <span>Obrigado pelo retorno. Nossa equipe da Ouvidoria trabalhará para aprimorar essa resposta! 🙏</span>
+                <div class="feedback-thanks" style="color: #64748b; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 5px;">
+                  <span>Obrigado pelo retorno. Vamos aprimorar essa resposta! 🙏</span>
                 </div>
               `;
             }
