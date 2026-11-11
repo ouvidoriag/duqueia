@@ -145,3 +145,4 @@ if __name__ == "__main__":
         print(f"Título: {c['titulo']}")
         print(f"Len: {len(c['conteudo'])} chars")
         print(f"Conteúdo:\n{c['conteudo']}")
+

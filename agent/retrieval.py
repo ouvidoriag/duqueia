@@ -775,9 +775,16 @@ def compute_rrf_fusion(rankings: list, k: int = 60) -> dict:
 
 _VECTOR_INDEX_CACHE = None
 
-def _get_vector_index_cache():
+def invalidate_vector_cache():
+    """Invalida o cache vetorial em memória para forçar recarregamento dinâmico na próxima consulta."""
+    global _VECTOR_INDEX_CACHE
+    _VECTOR_INDEX_CACHE = None
+
+def _get_vector_index_cache(force_reload: bool = False):
     """Mantém em memória os vetores normalizados e metadados para busca vetorial instantânea (sub-milissegundo)."""
     global _VECTOR_INDEX_CACHE
+    if force_reload:
+        _VECTOR_INDEX_CACHE = None
     if _VECTOR_INDEX_CACHE is not None:
         return _VECTOR_INDEX_CACHE
 

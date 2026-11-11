@@ -67,3 +67,4 @@ def clean_empty_dividers():
 
 if __name__ == "__main__":
     clean_empty_dividers()
+
