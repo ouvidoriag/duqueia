@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Duque IA | Painel de Gestão & Inteligência Municipal</title>
+  
+  <!-- Tipografia Oficial: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            pmdc: {
+              50:  '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              500: '#0284c7',
+              600: '#003f99',
+              700: '#002b66',
+              800: '#001a40',
+              900: '#001129'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #001a40 0%, #002b66 50%, #0284c7 100%);
+      min-height: 100vh;
+    }
+    .card-glass {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 50px rgba(0, 17, 41, 0.35);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased text-slate-900 flex items-center justify-center p-4 min-h-screen">
+
+  <div class="w-full max-w-md">
+    
+    <!-- Header com Brasão e Título Institucional -->
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center p-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 mb-3 shadow-lg">
+        <img src="assets/personagens/duque_executivo_analisando.png" alt="Duque IA Executivo" class="w-16 h-16 object-contain">
+      </div>
+      <h1 class="font-outfit font-extrabold text-2xl text-white tracking-tight drop-shadow-sm">
+        Duque IA — Painel de Gestão
+      </h1>
+      <p class="text-xs text-blue-200 font-medium mt-1">
+        Prefeitura Municipal de Duque de Caxias • Ouvidoria Geral
+      </p>
+    </div>
+
+    <!-- Card de Login -->
+    <div class="card-glass rounded-3xl p-8 transition-all">
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="font-outfit font-bold text-lg text-pmdc-800">Autenticação de Acesso</h2>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-pmdc-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
+            Área Restrita
+          </span>
+        </div>
+        <p class="text-xs text-slate-500">
+          Acesso exclusivo para gestores e ouvidores municipais com auditoria total de conversas.
+        </p>
+      </div>
+
+      <!-- Alerta de Erro -->
+      <div id="errorAlert" class="hidden mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5">
+        <svg class="w-4 h-4 shrink-0 text-rose-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span id="errorMessage" class="leading-relaxed">Credenciais inválidas.</span>
+      </div>
+
+      <!-- Formulário -->
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        
+        <!-- Campo Usuário -->
+        <div>
+          <label for="username" class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            Usuário / Matrícula
+          </label>
+          <input 
+            type="text" 
+            id="username" 
+            required 
+            autocomplete="username"
+            placeholder="admin ou matrícula do gestor"
+            class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-pmdc-600 focus:bg-white focus:ring-2 focus:ring-pmdc-500/20 transition-all font-medium"
+          >
+        </div>
+
+        <!-- Campo Senha -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="password" class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              Senha de Acesso
+            </label>
+          </div>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="password" 
+              required 
+              autocomplete="current-password"
+              placeholder="••••••••••••"
+              class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-pmdc-600 focus:bg-white focus:ring-2 focus:ring-pmdc-500/20 transition-all font-medium pr-10"
+            >
+            <button 
+              type="button" 
+              onclick="togglePasswordVisibility()" 
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+              title="Mostrar/ocultar senha"
+            >
+              <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botão de Acesso -->
+        <div class="pt-2">
+          <button 
+            type="submit" 
+            id="submitBtn"
+            class="w-full bg-pmdc-600 hover:bg-pmdc-700 active:bg-pmdc-800 text-white font-outfit font-bold text-sm py-2.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+          >
+            <span id="btnText">Entrar no Painel Executivo</span>
+            <svg id="btnSpinner" class="hidden w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Rodapé do Card -->
+      <div class="mt-6 pt-5 border-t border-slate-200/80 text-center">
+        <div class="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+          <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Acesso Seguro com Visualização Total de Conversas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link para o Chat Público -->
+    <div class="text-center mt-5">
+      <a href="chat.html" class="inline-flex items-center gap-1.5 text-xs text-blue-200 hover:text-white transition-colors font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Voltar para o Atendimento ao Munícipe (Chat)
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    // Se já estiver logado, redireciona diretamente ao dashboard
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("duque_admin_token");
+      if (token) {
+        try {
+          const res = await fetch("api/auth/status", {
+            headers: { "Authorization": "Bearer " + token }
+          });
+          if (res.ok) {
+            window.location.replace("dashboard.html");
+          }
+        } catch (_) {}
+      }
+    });
+
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById("password");
+      if (pwd.type === "password") {
+        pwd.type = "text";
+      } else {
+        pwd.type = "password";
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorAlert = document.getElementById("errorAlert");
+      const errorMessage = document.getElementById("errorMessage");
+      const btnText = document.getElementById("btnText");
+      const btnSpinner = document.getElementById("btnSpinner");
+      const submitBtn = document.getElementById("submitBtn");
+
+      errorAlert.classList.add("hidden");
+      btnText.textContent = "Autenticando...";
+      btnSpinner.classList.remove("hidden");
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch("api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success && data.token) {
+          localStorage.setItem("duque_admin_token", data.token);
+          if (data.user) {
+            localStorage.setItem("duque_admin_user", JSON.stringify(data.user));
+          }
+          // Redireciona com sucesso ao painel executivo
+          window.location.replace("dashboard.html");
+        } else {
+          errorMessage.textContent = data.error || "Credenciais incorretas. Verifique seu usuário e senha.";
+          errorAlert.classList.remove("hidden");
+        }
+      } catch (err) {
+        errorMessage.textContent = "Falha de conexão com o servidor. Verifique se o backend está ativo.";
+        errorAlert.classList.remove("hidden");
+      } finally {
+        btnText.textContent = "Entrar no Painel Executivo";
+        btnSpinner.classList.add("hidden");
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

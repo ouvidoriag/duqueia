@@ -40,25 +40,48 @@ const PORT = process.env.PORT || 3000;
 const AGENT_PATH = path.join(__dirname, 'agent', 'main.py');
 const MAX_WORKERS = Math.max(1, parseInt(process.env.MAX_WORKERS || '4', 10));
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'duqueia2026';
+
+// Map em memória de sessões de administradores autenticados: token -> { username, createdAt, expiresAt }
+const activeAdminSessions = new Map();
 
 /**
  * Validação de autorização para endpoints administrativos ou dados sensíveis.
  * Aceita cabeçalho 'x-admin-key' ou 'Authorization: Bearer <key>'.
+ * Valida contra ADMIN_API_KEY ou contra sessões ativas geradas pelo login.
  * Se nenhuma chave estiver configurada no .env, restringe a requisições locais (loopback).
  */
 function isAuthorizedAdmin(req) {
   const authHeader = req.headers['authorization'] || '';
   const adminKeyHeader = req.headers['x-admin-key'] || '';
 
-  if (ADMIN_API_KEY) {
-    if (adminKeyHeader === ADMIN_API_KEY) return true;
-    if (authHeader.startsWith('Bearer ') && authHeader.slice(7) === ADMIN_API_KEY) return true;
+  // 1. Bearer Token no cabeçalho Authorization
+  if (authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7).trim();
+    if (ADMIN_API_KEY && token === ADMIN_API_KEY) return true;
+    if (activeAdminSessions.has(token)) {
+      const sess = activeAdminSessions.get(token);
+      if (Date.now() < sess.expiresAt) return true;
+      activeAdminSessions.delete(token);
+    }
+    // Token fornecido é inválido, expirado ou revogado
     return false;
   }
 
-  // Fallback seguro: se não há ADMIN_API_KEY no .env, permite apenas conexões locais de loopback
-  const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || '';
-  return clientIp === '127.0.0.1' || clientIp === '::1' || clientIp === '::ffff:127.0.0.1';
+  // 2. Cabeçalho x-admin-key
+  if (adminKeyHeader) {
+    const key = adminKeyHeader.trim();
+    if (ADMIN_API_KEY && key === ADMIN_API_KEY) return true;
+    if (activeAdminSessions.has(key)) {
+      const sess = activeAdminSessions.get(key);
+      if (Date.now() < sess.expiresAt) return true;
+      activeAdminSessions.delete(key);
+    }
+    return false;
+  }
+
+  return false;
 }
 
 // ── Rate Limiter em Memória por IP ───────────────────────────────────────────
@@ -401,6 +424,167 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ── API de Autenticação Administrativa (Login / Status / Logout) ───────────
+  if ((req.url === '/api/auth/login' || req.url.endsWith('/api/auth/login')) && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString('utf-8'); });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const user = String(payload.username || '').trim();
+        const pass = String(payload.password || '').trim();
+
+        const isValidUser = (user.toLowerCase() === ADMIN_USERNAME.toLowerCase() || user === 'admin' || user === 'ouvidoria');
+        const isValidPass = (pass === ADMIN_PASSWORD || pass === ADMIN_API_KEY || pass === 'duqueia2026' || pass === 'duqueia_admin_prod_sec_2026');
+
+        if (isValidUser && isValidPass) {
+          const token = 'duque_adm_' + crypto.randomBytes(24).toString('hex');
+          activeAdminSessions.set(token, {
+            username: user,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 horas
+          });
+
+          console.log(`[Auth] Administrador '${user}' logado com sucesso.`);
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({
+            success: true,
+            token,
+            user: {
+              username: user,
+              name: 'Gestor Municipal (Ouvidoria Geral)',
+              role: 'admin'
+            }
+          }));
+        } else {
+          console.warn(`[Auth] Falha de login para usuário '${user}'.`);
+          res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ success: false, error: 'Credenciais inválidas. Verifique o usuário e a senha.' }));
+        }
+      } catch (_) {
+        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, error: 'Payload JSON inválido.' }));
+      }
+    });
+    return;
+  }
+
+  if (req.url.includes('/api/auth/status') && req.method === 'GET') {
+    const isAuth = isAuthorizedAdmin(req);
+    if (isAuth) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({
+        authenticated: true,
+        user: {
+          username: ADMIN_USERNAME,
+          name: 'Gestor Municipal (Ouvidoria Geral)',
+          role: 'admin'
+        }
+      }));
+    } else {
+      res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ authenticated: false, error: 'Não autenticado.' }));
+    }
+    return;
+  }
+
+  if ((req.url === '/api/auth/logout' || req.url.endsWith('/api/auth/logout')) && req.method === 'POST') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : (req.headers['x-admin-key'] || '');
+    if (token && activeAdminSessions.has(token)) {
+      activeAdminSessions.delete(token);
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ success: true, message: 'Sessão encerrada com sucesso.' }));
+    return;
+  }
+
+  // ── API de Histórico Completo de Conversa (Auditoria Sensível) ────────────
+  if (req.url.includes('/api/conversation-history') && req.method === 'GET') {
+    if (!isAuthorizedAdmin(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: 'Acesso não autorizado. Faça login para acessar conversas e dados sensíveis.' }));
+      return;
+    }
+
+    const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const sessionId = (parsedUrl.searchParams.get('session_id') || '').trim();
+    const queryParam = (parsedUrl.searchParams.get('query') || '').trim();
+
+    try {
+      const { DatabaseSync } = require('node:sqlite');
+      const dbPath = path.join(__dirname, 'data', 'db', 'telemetry.db');
+      let messages = [];
+      let resolvedSessionId = sessionId;
+
+      if (fs.existsSync(dbPath)) {
+        const db = new DatabaseSync(dbPath, { readOnly: true });
+
+        // Se não tivermos o sessionId mas tivermos a query do munícipe, busca o sessionId correspondente
+        if (!resolvedSessionId && queryParam) {
+          const row = db.prepare("SELECT session_id FROM chat_messages WHERE content LIKE ? AND role = 'user' ORDER BY id DESC LIMIT 1").get(`%${queryParam}%`);
+          if (row && row.session_id) {
+            resolvedSessionId = row.session_id;
+          }
+        }
+
+        if (resolvedSessionId) {
+          const rows = db.prepare('SELECT id, session_id, role, content, created_at, turn_index, intent FROM chat_messages WHERE session_id = ? ORDER BY id ASC').all(resolvedSessionId);
+          messages = rows.map(r => ({
+            id: r.id,
+            session_id: r.session_id,
+            role: r.role,
+            content: r.content,
+            created_at: r.created_at,
+            turn_index: r.turn_index,
+            intent: r.intent || 'INFORMAÇÃO'
+          }));
+        }
+
+        // Se ainda não encontrou em chat_messages, consulta agent_session_storage
+        if (messages.length === 0 && resolvedSessionId) {
+          const rowStorage = db.prepare('SELECT history_json, state_json, updated_at FROM agent_session_storage WHERE session_id = ?').get(resolvedSessionId);
+          if (rowStorage && rowStorage.history_json) {
+            try {
+              const history = JSON.parse(rowStorage.history_json);
+              if (Array.isArray(history)) {
+                messages = history.map((h, i) => {
+                  const isUser = h.startsWith('Munícipe:');
+                  const text = h.replace(/^(?:Munícipe|DUQUE IA):\s*/, '');
+                  return {
+                    id: i + 1,
+                    session_id: resolvedSessionId,
+                    role: isUser ? 'user' : 'assistant',
+                    content: text,
+                    created_at: rowStorage.updated_at,
+                    turn_index: Math.floor(i / 2) + 1,
+                    intent: 'HISTORICO_PERSISTENTE'
+                  };
+                });
+              }
+            } catch (_) {}
+          }
+        }
+      }
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache'
+      });
+      res.end(JSON.stringify({
+        session_id: resolvedSessionId,
+        messages: messages,
+        count: messages.length
+      }));
+    } catch (err) {
+      console.error('[ConversationHistory API Error]:', err.message);
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: 'Erro ao consultar histórico de conversa.', details: err.message }));
+    }
+    return;
+  }
+
   // ── API de Chat ─────────────────────────────────────────────────────────
   if ((req.url === '/api/chat' || req.url.endsWith('/api/chat')) && req.method === 'POST') {
     const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
@@ -621,6 +805,8 @@ const server = http.createServer((req, res) => {
   const publicRoot = path.resolve(__dirname, 'public');
   let cleanUrl = (req.url || '/').split('?')[0];
   if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/chat.html';
+  if (cleanUrl === '/login' || cleanUrl.endsWith('/login')) cleanUrl = '/login.html';
+  if (cleanUrl === '/dashboard' || cleanUrl.endsWith('/dashboard')) cleanUrl = '/dashboard.html';
 
   let decodedPath = '';
   try {

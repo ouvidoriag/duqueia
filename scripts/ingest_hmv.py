@@ -259,3 +259,4 @@ if __name__ == "__main__":
     update_vector_db()
     update_ontology_json()
     print("\n>>> INGESTÃO DO HMV CONCLUÍDA COM SUCESSO TOTAL!")
+
