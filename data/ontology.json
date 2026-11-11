@@ -593,5 +593,38 @@
       "calcamento"
     ],
     "active": 1
+  },
+  {
+    "entity_id": "HOSPITAL_MUNICIPAL_VETERINARIO",
+    "entity_type": "saude_animal",
+    "canonical_name": "Hospital Municipal Veterinário de Duque de Caxias (HMV)",
+    "secretaria": "Secretaria Municipal de Saúde (SMS) / Secretaria Municipal de Meio Ambiente e Proteção Animal (SMMA)",
+    "aliases": [
+      "hospital veterinario",
+      "hospital veterinario de caxias",
+      "hospital de cachorro",
+      "emergencia veterinaria",
+      "pronto socorro veterinario",
+      "hmv",
+      "veterinario publico",
+      "veterinario gratuito",
+      "upa veterinaria",
+      "posto veterinario"
+    ],
+    "keywords": [
+      "cachorro",
+      "gato",
+      "pet",
+      "veterinario",
+      "veterinaria",
+      "emergencia",
+      "socorro",
+      "animal",
+      "jardim primavera",
+      "hmv",
+      "consulta animal",
+      "castracao"
+    ],
+    "active": 1
   }
 ]

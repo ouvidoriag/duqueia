@@ -53,7 +53,7 @@ EQUIPMENT_PATTERNS = {
     "defesa_civil": r"\bdefesa\s+civil\b",
     "subprefeitura": r"\bsubprefeituras?\b",
     "guarda_municipal": r"\bguarda\s+municipal\b",
-    "veterinario": r"\bveterinarios?\b|\bcastramove(?:l|is)\b|\bprotecao\s+aos\s+animais\b",
+    "veterinario": r"\bveterinarios?\b|\bveterinaria\b|\bcastramove(?:l|is)\b|\bprotecao\s+aos\s+animais\b|\bcachorros?\b|\bcaes\b|\bcao\b|\bgatos?\b|\bpets?\b|\banima(?:l|is)\b|\bzoonoses?\b|\bsocorro\s+animal\b|\bhospital\s+veterinario\b|\bhmv\b",
     "secretaria": r"\bsecretarias?\b|\bsemuh\b|\bsmo\b|\bsmu\b|\bsms\b|\bsme\b|\bsmf\b|\bseasdh\b|\bsmasdh\b|\bsemagro\b",
     "ipmdc": r"\bipmdc\b",
     "ouvidoria": r"\bouvidoria\b|\bouvidoria\s+geral\b",
@@ -207,6 +207,7 @@ class GoldenSourceResolver:
             if nl.startswith("creas ") or " creas " in nl: return "creas"
             if nl.startswith("upa ") or " upa " in nl: return "upa"
             if nl.startswith("uph ") or " uph " in nl: return "uph"
+            if "veterinario" in nl or "veterinaria" in nl: return "veterinario"
             if "hospital" in nl or "maternidade" in nl or "hmapn" in nl: return "hospital"
             if "fundec" in nl: return "fundec"
             if "conselho tutelar" in nl: return "conselho_tutelar"
@@ -300,7 +301,8 @@ class GoldenSourceResolver:
         is_emergency_clinical = any(w in q_norm for w in [
             "quebrei", "quebrado", "fratura", "trauma", "ortopedia", "desmaiado", "desmaio", "socorro"
         ])
-        if is_emergency_clinical:
+        is_animal_query = any(w in q_norm for w in ["cachorro", "cachorros", "cao", "caes", "gato", "gatos", "pet", "pets", "animal", "animais", "veterinario", "veterinaria"])
+        if is_emergency_clinical and not is_animal_query:
             return None
 
         if is_procedural and not is_asking_place:
@@ -402,6 +404,10 @@ class GoldenSourceResolver:
                         type_matches = True
                         score += 50
                         break
+                    elif deq == "veterinario" and u_type == "veterinario":
+                        type_matches = True
+                        score += 60
+                        break
                     elif deq == "escola" and u_type == "escola":
                         type_matches = True
                         score += 40
@@ -447,6 +453,7 @@ class GoldenSourceResolver:
                     "upa": "Unidades de Pronto Atendimento (UPAs e UPHs 24h)",
                     "conselho_tutelar": "Conselhos Tutelares",
                     "caps": "Centros de Atenção Psicossocial (CAPS)",
+                    "veterinario": "Hospitais e Unidades Veterinárias Municipais",
                     "defesa_civil": "Bases da Defesa Civil"
                 }
                 label = type_labels.get(target_eq, target_eq.upper())
@@ -498,6 +505,15 @@ class GoldenSourceResolver:
             if any(w in q_norm for w in ["cadastr", "matricul", "inscrever", "cuidar da minha saude"]):
                 if best_u["unit_type"] in ("ubs", "usf", "uph", "hospital"):
                     ans += "\n📋 **Para se cadastrar na unidade de saúde:** Compareça de segunda a sexta-feira portando seu **Cartão do SUS**, **documento oficial com foto (RG/CPF)** e **comprovante de residência** no município.\n"
+
+            # Orientação específica para atendimento veterinário
+            if best_u["unit_type"] == "veterinario":
+                ans += (
+                    "\n🐾 **Orientações para Atendimento Veterinário (HMV):**\n"
+                    "• O atendimento de urgência/emergência e consultas é **100% gratuito** para cães e gatos de moradores de Duque de Caxias.\n"
+                    "• **Documentos Obrigatórios do Tutor:** Documento de identidade com foto (**RG/CNH**), **CPF** e **comprovante de residência atualizado** no município de Duque de Caxias em nome do tutor do animal.\n"
+                    "• **Serviços:** Emergência clínica, cirurgias gerais, castração gratuita, exames de sangue, raio-X e ultrassonografia.\n"
+                )
 
             ans += "\nSe precisar de mais alguma informação ou serviços deste equipamento, é só perguntar! 😊"
 

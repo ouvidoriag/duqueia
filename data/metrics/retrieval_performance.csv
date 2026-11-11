@@ -1836,3 +1836,8 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-11 14:35:24,Quais programas de assistência social a Prefeitura oferece para famílias carentes?,517.88,8781.14,9302.44,1.0000,3305,0.00043680
 2026-11-11 14:35:31,A FUNDEC oferece cursos gratuitos? Quais?,451.44,6355.20,6808.73,1.0000,3445,0.00035780
 2026-11-11 14:35:47,Me ajude a montar um recurso jurídico contra a Prefeitura por falta de serviço.,628.98,8648.04,9280.22,1.0000,4306,0.00047360
+2026-11-11 14:57:15,eu queria levar meu cachorro na emergencia e agora,10530.80,7929.14,20357.72,1.0000,2337,0.00020450
+2026-11-11 14:58:46,Como solicitar o conserto de lâmpada de poste apagada?,8471.27,4756.85,13651.71,1.0000,1628,0.00020880
+2026-11-11 15:05:10,eu queria levar meu cachorro na emergencia e agora,9821.89,4365.17,14499.06,1.0000,2662,0.00027620
+2026-11-11 15:06:52,eu queria levar meu cachorro na emergencia e agora,6277.66,5306.43,11705.93,1.0000,2728,0.00029600
+2026-11-11 15:06:57,Como solicitar o conserto de lâmpada de poste apagada?,505.73,4644.48,5153.37,1.0000,1651,0.00021570

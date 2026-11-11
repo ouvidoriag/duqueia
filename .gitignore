@@ -41,6 +41,7 @@ scratch/
 !data/db/telemetry.db
 data/backups/
 archive/database_backups/
+backup-local-*/
 
 # Logs e Métricas Locais
 logs/

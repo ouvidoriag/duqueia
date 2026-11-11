@@ -895,8 +895,8 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         if struct_regras:
             structured_candidates.extend(struct_regras)
 
-        # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos) na tabela secretaria_unidades
-        if run_geo and any(ind in q_sub_norm for ind in ["cras", "creas", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro", "hospital", "upa", "ceam", "restaurante", "ciep", "escola", "clinica"]):
+        # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos/Hospitais) na tabela secretaria_unidades
+        if (run_geo or any(k in q_sub_norm for k in ["veterinario", "cachorro", "gato", "pet", "animal"])) and any(ind in q_sub_norm for ind in ["cras", "creas", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro", "hospital", "upa", "ceam", "restaurante", "ciep", "escola", "clinica", "veterinario", "veterinaria", "cachorro", "gato", "pet", "animal", "zoonose"]):
             try:
                 main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
                 rows_unidades = query_db(main_db, """
@@ -907,7 +907,7 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                 for name, addr, phone, hours, sec_name in rows_unidades:
                     structured_text = (
                         "[FONTE OFICIAL ESTRUTURADA]\n"
-                        "Tipo: Unidade de Atendimento Local (CRAS/Posto)\n"
+                        "Tipo: Unidade de Atendimento Local (Equipamento Público Municipal)\n"
                         "Confiabilidade: Máxima (Auditado)\n"
                         "Última Atualização: 2026-07-01\n\n"
                         f"Equipamento: {name}\n"
@@ -916,10 +916,10 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
                         f"Telefone: {phone or 'Não disponível'}\n"
                         f"Funcionamento: {hours or 'Segunda a sexta-feira, das 9h às 17h'}"
                     )
-                    # Verifica se o CRAS se relaciona com as palavras da busca (sem o bug do w in q_sub.lower())
+                    # Verifica se o equipamento se relaciona com as palavras da busca
                     if any(w in name.lower() or w in addr.lower() for w in q_keywords if len(w) >= 3):
                         structured_candidates.append({
-                            "source": f"unidades (CRAS: {name})",
+                            "source": f"unidades ({name})",
                             "category": "unidades",
                             "content": structured_text,
                             "title": name,

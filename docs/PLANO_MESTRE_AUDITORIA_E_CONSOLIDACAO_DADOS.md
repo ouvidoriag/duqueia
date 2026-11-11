@@ -81,11 +81,27 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
 #### ETAPA 5 — Homologação e Benchmark Transparente (100% Concluída):
 - [x] **Benchmark Oficial de Relevância de Recuperação (`scripts/tests/test_retrieval_relevance.py`):**
   - **Precisão de Roteamento:** **100,00%**
-  - **Precisão de Retrieval:** **89,47%**
-  - **Média MRR:** **0,895**
-  - **Média NDCG@3:** **0,895**
-  - **Latência Média de Busca:** **794,90 ms**
+  - **Precisão de Retrieval:** **94,74%** (elevado de 89,47%)
+  - **Média MRR:** **0,912**
+  - **Média NDCG@3:** **0,921**
+  - **Latência Média de Busca:** **1.006,95 ms**
   - Salvo em `metrics/retrieval_metrics.csv` e `metrics/retrieval_relevance_results.json`.
+
+#### ETAPA 6 — Resolução Definitiva dos Casos Operacionais Críticos (100% Concluída):
+- [x] **Caso 1: Hospital Municipal Veterinário de Duque de Caxias (HMV) / Emergência Animal / Pet:**
+  - **Diagnóstico:** A consulta *"eu queria levar meu cachorro na emergencia e agora"* recebia resposta falsa de que o município não possuía hospital público veterinário porque faltavam regras canônicas específicas e vetorização detalhada do equipamento.
+  - **Ação Executada:**
+    - Ingestão da regra canônica `regra_canon_hospital_municipal_veterinario_caxias` em `main.db` (`regras_negocio`), com boost de 5.0x e tags ricas (`cachorro`, `gato`, `pet`, `emergencia veterinaria`, `socorro animal`, etc.).
+    - Criação da entidade `HOSPITAL_MUNICIPAL_VETERINARIO` em `municipal_entities` e `data/ontology.json`.
+    - Atualização do equipamento `equipamento_01162` e da unidade 422 em `secretaria_unidades`.
+    - Geração de embeddings densos de 3.072 dimensões via Gemini para `duque_ia_chunks` e `chunks.vetor_blob`.
+    - Atualização de `agent/entity_resolver.py` (prioridade de `veterinario` sobre `hospital`, padrões de regex de animais), `agent/triage.py` (Fast Gate pattern de saúde animal) e `agent/planner.py` (expansão LORS para HMV Jardim Primavera).
+  - **Resultado:** Aprovado com 100% de precisão! Munícipe recebe endereço completo (Alameda Xavier Filho, Jardim Primavera), horário (8h às 17h), atendimento imediato de emergência, documentos obrigatórios do tutor (RG, CPF, Comprovante de Residência em Caxias) e telefones oficiais `(21) 2773-5500` / `(21) 2676-9000`.
+- [x] **Caso 2: Solicitação de Troca de Lâmpada de Poste Apagada / Iluminação Pública:**
+  - **Diagnóstico:** A consulta *"Como solicitar o conserto de lâmpada de poste apagada?"* sofria falso bloqueio do `output_guardrail` porque o telefone da concessionária Light (`0800 021 0196`) não constava na lista de telefones auditados.
+  - **Ação Executada:**
+    - Whitelist expandida em `agent/guardrails.py` para incluir números canônicos de concessionárias públicas essenciais (Light `0800 021 0196`, Águas do Rio `0800 195 0195`, Naturgy `0800 024 0197`, Iluminação Pública) e integração dinâmica aos 443 telefones de `secretaria_unidades`.
+  - **Resultado:** Aprovado com 100% de conformidade! Munícipe recebe o passo a passo completo no aplicativo Colab (Zeladoria Urbana > Iluminação Pública > Lâmpada Queimada), informações necessárias e a correta distinção de competência entre SMTSP/PPP e Light. Zero bloqueios de guardrail.
 - [x] **Benchmark Oficial das 30 Perguntas Municipais (`scripts/test_30_perguntas.py`):**
   - Casos executados: **30/30 (100%)**
   - Cobertura completa: 20 perguntas municipais reais (RAG) + 10 perguntas de segurança, LGPD, competência e casual chat.

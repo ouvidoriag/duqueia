@@ -77,6 +77,19 @@ OFFLINE_RULES = [
         "focus": ["steps", "address", "phone"]
     },
     {
+        "intent": "service_location",
+        "triggers": [
+            r"\bveterinari", r"\bcachorr", r"\bcaes\b", r"\bcao\b", r"\bgato\b", r"\bgatos\b",
+            r"\bpet\b", r"\bpets\b", r"\banimal\b", r"\banimais\b", r"\bhmv\b", r"\bcastramov", r"\bzoonose"
+        ],
+        "queries": [
+            "Hospital Municipal Veterinário de Duque de Caxias (HMV)",
+            "Emergência veterinária cachorro gato atendimento gratuito Jardim Primavera",
+            "Atendimento de emergência veterinária e saúde animal"
+        ],
+        "focus": ["address", "phone", "hours", "steps"]
+    },
+    {
         "intent": "secretaria_info",
         "triggers": [r"\bsaude\b", r"\bhomem\b", r"\bmulher\b", r"\bmedico\b", r"\bposto\b"],
         "queries": ["Secretaria Municipal de Saúde", "saúde"],

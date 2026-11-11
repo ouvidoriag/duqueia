@@ -1,5 +1,5 @@
 strategy,precision,recall,retrieval_score,mrr,ndcg,latency,cost
-pipeline_routing_hybrid,0.89,0.86,0.895,0.895,0.895,794.9ms,0.00008
+pipeline_routing_hybrid,0.95,0.91,0.947,0.912,0.921,1007.0ms,0.00008
 hierarchical_sibling_expansion,0.99,0.98,0.988,0.985,0.980,0.85ms,0.00016
 entity_geo_strategy,0.98,0.97,0.975,0.970,0.965,0.04ms,0.00005
 semantic_strategy,0.95,0.93,0.940,0.935,0.920,60ms,0.00025

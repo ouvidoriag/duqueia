@@ -158,6 +158,7 @@ RAG_GERAL_FAST_PATTERNS = [
     # Transportes, Mobilidade e Canais da Prefeitura
     (r"\b(?:ônibus|onibus|transporte|tarifa\s+zero|passe\s+livre|estacionamento|sinal|semáforo|semaforo)\b", "RAG_GERAL", "Serviço de transportes e mobilidade detectado localmente."),
     (r"\b(?:multas?|recorrer\s+de\s+multa|recurso\s+de\s+multa|jari|defesa\s+prévia|defesa\s+previa|autuação|autuacao|processo\s+de\s+multa)\b", "RAG_GERAL", "Consulta sobre multas e recursos de trânsito detectada localmente."),
+    (r"\b(?:veterin[aá]ri[ao]s?|castram[oó]ve[li]s?|cachorros?|cães|cao|gatos?|pets?|animais|animal|zoonoses?|socorro\s+animal|hmv)\b", "RAG_GERAL", "Serviço de saúde animal e hospital veterinário detectado localmente."),
     (r"\b(?:ouvidoria|colab|telefone|endereço|endereco|contato|horário|horario|secretaria|prefeitura)\b", "RAG_GERAL", "Consulta informativa de canais/secretarias detectada localmente.")
 ]
 
@@ -174,6 +175,7 @@ INDEPENDENT_TOPIC_KEYWORDS = [
     "onde fica", "onde tem", "trabalho", "iptu", "segunda via", "2ª via",
     "iluminação", "iluminacao", "lixo", "buraco", "asfalto", "bueiro",
     "vacina", "matrícula", "matricula", "remédio", "remedio", "hospital",
+    "veterinário", "veterinario", "cachorro", "gato", "pet", "animal", "hmv",
     "upa", "creche", "escola"
 ]
 

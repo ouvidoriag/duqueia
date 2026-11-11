@@ -7,7 +7,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 4879.879474639893,
+    "latency_ms": 6975.686550140381,
     "status": "PASS"
   },
   {
@@ -16,10 +16,10 @@
     "detected_intent": "general",
     "retrieved_count": 3,
     "top_similarity": 1.0,
-    "mrr": 0.0,
-    "ndcg": 0.0,
-    "latency_ms": 568.6197280883789,
-    "status": "FAIL"
+    "mrr": 0.3333333333333333,
+    "ndcg": 0.5,
+    "latency_ms": 611.9673252105713,
+    "status": "PASS"
   },
   {
     "query": "Quais são os principais limites territoriais da cidade de Caxias?",
@@ -29,7 +29,7 @@
     "top_similarity": 1.0,
     "mrr": 0.0,
     "ndcg": 0.0,
-    "latency_ms": 640.446662902832,
+    "latency_ms": 566.110372543335,
     "status": "FAIL"
   },
   {
@@ -40,7 +40,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 537.8339290618896,
+    "latency_ms": 606.7092418670654,
     "status": "PASS"
   },
   {
@@ -51,7 +51,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 536.2977981567383,
+    "latency_ms": 565.887451171875,
     "status": "PASS"
   },
   {
@@ -62,7 +62,7 @@
     "top_similarity": 0.9405,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 511.0204219818115,
+    "latency_ms": 607.0559024810791,
     "status": "PASS"
   },
   {
@@ -73,7 +73,7 @@
     "top_similarity": 0.97,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 518.7129974365234,
+    "latency_ms": 621.4890480041504,
     "status": "PASS"
   },
   {
@@ -84,7 +84,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 734.1341972351074,
+    "latency_ms": 707.6005935668945,
     "status": "PASS"
   },
   {
@@ -95,7 +95,7 @@
     "top_similarity": 0.9267,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 530.2495956420898,
+    "latency_ms": 711.8222713470459,
     "status": "PASS"
   },
   {
@@ -106,7 +106,7 @@
     "top_similarity": 0.99,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 496.76990509033203,
+    "latency_ms": 677.532434463501,
     "status": "PASS"
   },
   {
@@ -117,7 +117,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 513.6451721191406,
+    "latency_ms": 500.8206367492676,
     "status": "PASS"
   },
   {
@@ -128,7 +128,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 630.5458545684814,
+    "latency_ms": 545.9907054901123,
     "status": "PASS"
   },
   {
@@ -139,7 +139,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 514.8708820343018,
+    "latency_ms": 512.3119354248047,
     "status": "PASS"
   },
   {
@@ -150,7 +150,7 @@
     "top_similarity": 0.98,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 473.7534523010254,
+    "latency_ms": 1087.524652481079,
     "status": "PASS"
   },
   {
@@ -161,7 +161,7 @@
     "top_similarity": 0.98,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 551.6695976257324,
+    "latency_ms": 864.4404411315918,
     "status": "PASS"
   },
   {
@@ -172,7 +172,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 650.5706310272217,
+    "latency_ms": 1054.9302101135254,
     "status": "PASS"
   },
   {
@@ -183,7 +183,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 724.1556644439697,
+    "latency_ms": 508.3615779876709,
     "status": "PASS"
   },
   {
@@ -194,7 +194,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 534.8315238952637,
+    "latency_ms": 668.4434413909912,
     "status": "PASS"
   },
   {
@@ -205,7 +205,7 @@
     "top_similarity": 1.0,
     "mrr": 1.0,
     "ndcg": 1.0,
-    "latency_ms": 555.0172328948975,
+    "latency_ms": 737.4238967895508,
     "status": "PASS"
   }
 ]
