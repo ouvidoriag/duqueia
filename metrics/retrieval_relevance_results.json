@@ -1,0 +1,211 @@
+[
+  {
+    "query": "Quem é o Prefeito de Duque de Caxias?",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 4879.879474639893,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual a história e origem do município de Duque de Caxias?",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 0.0,
+    "ndcg": 0.0,
+    "latency_ms": 568.6197280883789,
+    "status": "FAIL"
+  },
+  {
+    "query": "Quais são os principais limites territoriais da cidade de Caxias?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 0.0,
+    "ndcg": 0.0,
+    "latency_ms": 640.446662902832,
+    "status": "FAIL"
+  },
+  {
+    "query": "Quem é o secretário responsável pela pasta de saúde?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 537.8339290618896,
+    "status": "PASS"
+  },
+  {
+    "query": "Quem é o Secretário Municipal de Fazenda?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 536.2977981567383,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual secretaria cuida do Webmap e tecnologia geográfica?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 0.9405,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 511.0204219818115,
+    "status": "PASS"
+  },
+  {
+    "query": "Qual a missão da Secretaria Municipal de Transportes?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 0.97,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 518.7129974365234,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde fica a Secretaria Municipal de Meio Ambiente?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 734.1341972351074,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde é oferecido o curso de Língua Brasileira de Sinais - Libras?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 0.9267,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 530.2495956420898,
+    "status": "PASS"
+  },
+  {
+    "query": "Como me inscrever para o curso de Cavaquinho pela FUNDEC?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 0.99,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 496.76990509033203,
+    "status": "PASS"
+  },
+  {
+    "query": "Onde conseguir atendimento de Nutrição pela prefeitura?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 513.6451721191406,
+    "status": "PASS"
+  },
+  {
+    "query": "Como funciona o serviço de saúde do homem em Duque de Caxias?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 630.5458545684814,
+    "status": "PASS"
+  },
+  {
+    "query": "Como solicitar o serviço de Tapa Buraco na rua?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 514.8708820343018,
+    "status": "PASS"
+  },
+  {
+    "query": "Como faço para solicitar capina ou limpeza urbana?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 0.98,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 473.7534523010254,
+    "status": "PASS"
+  },
+  {
+    "query": "O que é o IPMDC e qual sua função?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 0.98,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 551.6695976257324,
+    "status": "PASS"
+  },
+  {
+    "query": "Jardim Primavera fica em qual distrito?",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 650.5706310272217,
+    "status": "PASS"
+  },
+  {
+    "query": "Como emitir IPTU?",
+    "expected_intent": "institutional",
+    "detected_intent": "institutional",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 724.1556644439697,
+    "status": "PASS"
+  },
+  {
+    "query": "Explique assistência social",
+    "expected_intent": "general",
+    "detected_intent": "general",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 534.8315238952637,
+    "status": "PASS"
+  },
+  {
+    "query": "CRAS Jardim Primavera",
+    "expected_intent": "gis",
+    "detected_intent": "gis",
+    "retrieved_count": 3,
+    "top_similarity": 1.0,
+    "mrr": 1.0,
+    "ndcg": 1.0,
+    "latency_ms": 555.0172328948975,
+    "status": "PASS"
+  }
+]

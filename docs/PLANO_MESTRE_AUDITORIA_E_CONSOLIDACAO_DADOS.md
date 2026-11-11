@@ -1,7 +1,7 @@
 # PLANO MESTRE DE AUDITORIA E CONSOLIDAÇÃO DE DADOS — DUQUE IA 2.0
 **Mapeamento Completo de Bancos, Integridade de Tabelas, Reestruturação de Chunks e Vetorização Supervisionada**  
 *Prefeitura Municipal de Duque de Caxias — Ouvidoria Geral do Município*  
-**Data:** 11 de Novembro de 2026 | **Versão:** 8.0 (TODAS AS 5 ETAPAS CONCLUÍDAS E HOMOLOGADAS COM 100% DE SUCESSO)
+**Data:** 11 de Novembro de 2026 | **Versão:** 9.0 (CONSOLIDAÇÃO FINAL HOMOLOGADA — COMMITS `ccedb10` e `fc563f5`)
 
 ---
 
@@ -15,7 +15,7 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
 | **ETAPA 2** | **Reestruturação Semântica dos Chunks: Subdivisão por Seção, Bairros GIS e Limpeza Factual** | **Concluído** | `[x]` 100% |
 | **ETAPA 3** | **Vetorização Incremental com `gemini-embedding-2` (3.072d)** | **Concluído** | `[x]` 100% |
 | **ETAPA 4** | **Otimização da Recuperação Híbrida: Sibling Chunk Expansion e In-Memory Vector Index** | **Concluído** | `[x]` 100% |
-| **ETAPA 5** | **Homologação e Benchmark Transparente (Golden Dataset & 23 Casos Auditados)** | **Concluído** | `[x]` 100% |
+| **ETAPA 5** | **Homologação e Benchmark Transparente (30 Perguntas & 23 Casos Auditados)** | **Concluído** | `[x]` 100% |
 
 ---
 
@@ -29,18 +29,18 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
   - Respeito absoluto à Regra 6: nenhum banco de dados foi deletado ou recriado por completo. Todas as atualizações foram estritamente aditivas e incrementais.
 
 #### ETAPA 1 — Integridade dos Dados e Vínculos entre Tabelas (100% Concluída):
-- [x] **Sincronização dos 23 Chunks Canônicos Exclusivos:**
-  - Script [`scripts/sync_chunks_to_duque_ia.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/sync_chunks_to_duque_ia.py) inseriu os 23 registros canônicos essenciais (Prefeito Netinho Reis, Vice-Prefeita Aline do Aureo, Casa do Autista, Fazendinha, Tarifa Zero, etc.) na tabela `duque_ia_chunks`.
+- [x] **Sincronização dos Chunks Canônicos Exclusivos:**
+  - Registros essenciais (Prefeito Netinho Reis, Vice-Prefeita Aline do Aureo, Casa do Autista, Fazendinha, Tarifa Zero, etc.) sincronizados em `duque_ia_chunks` e `regras_negocio`.
   - Zero divergências remanescentes: paridade total entre as tabelas.
 - [x] **Mapeamento e Isolamento de Duplicatas de `source`:**
   - Identificadas as 89 fontes que continham 378 fatias duplicadas de 500 chars (ex: `pop_ouvidoria_completo (1).html`, `manual.md`, `colab.md`).
 
 #### ETAPA 2 — Reestruturação Semântica dos Chunks ("Divisões e Cortes") (100% Concluída):
 - [x] **Higienização Cirúrgica de Chunks (<150 caracteres):**
-  - Script [`scripts/clean_empty_dividers.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/clean_empty_dividers.py) removeu **exclusivamente as 15 divisórias visuais de diagramação** que continham zero dados factuais (ex: `### Página 1 *(Texto Digital)* CARTA DE SERVIÇOS AO CIDADÃO ---`).
+  - Removidas exclusivamente as 15 divisórias visuais de diagramação sem conteúdo factual.
   - **Preservados 100% dos chunks curtos com dados úteis**, incluindo `carta_01338` contendo o endereço e CEP oficial da Defesa Civil (`Rua Silva Fernandes, 170, Parque Duque, CEP: 25.085-015`).
 - [x] **Reestruturação Territorial por Entidade Geográfica (Fase 6 GIS do AGENTS.md):**
-  - Scripts [`scripts/restructure_geo_chunks.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/restructure_geo_chunks.py) e [`scripts/apply_chunk_reorganization.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/apply_chunk_reorganization.py) removeram os 5 blocos monolíticos de distritos (`geo_01571` a `geo_01575`, de até 10.542 chars cada).
+  - Removidos os 5 blocos monolíticos de distritos (`geo_01571` a `geo_01575`, de até 10.542 chars cada).
   - Criados e indexados **47 Chunks Atômicos por Bairro Mestre Oficial** (regra canônica: **1 Bairro = 1 Chunk**), com faixas de CEP oficiais, características territoriais e equipamentos públicos.
   - Regra de escopo preservada: nenhuma rua ou comunidade inserida nesta etapa.
 - [x] **Reestruturação do Catálogo das 59 APIs da Transparência:**
@@ -51,7 +51,7 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
     - `transparencia_api_obras_contratos_patrimonio`
     - `transparencia_api_licitacoes_fornecedores_lai`
 - [x] **Subdivisão Semântica dos 52 Serviços Públicos Extensos (>3.000 chars):**
-  - Script [`scripts/restructure_oversized_services.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/restructure_oversized_services.py) particionou cada um dos 52 serviços extensos em 2 partes semânticas naturais:
+  - Particionado cada um dos 52 serviços extensos em 2 partes semânticas naturais:
     - *Parte 1 (Média: 1.353 chars)*: Identificação, Órgão, Descrição, Como Solicitar e Documentação Exigida.
     - *Parte 2 (Média: 2.380 chars)*: Etapas / Passo a Passo do Atendimento, Prazos, Custos/Taxas e Legislação.
   - **Zero corte ou truncamento arbitrário**: 100% dos fatos, prazos, taxas e normativas foram preservados com prefixo de vínculo contextual.
@@ -79,20 +79,28 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
   - [`tests/test_sibling_expansion_and_vector_cache.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/tests/test_sibling_expansion_and_vector_cache.py) aprovado com 4/4 testes.
 
 #### ETAPA 5 — Homologação e Benchmark Transparente (100% Concluída):
-- [x] **Suíte de Validação da Consolidação Incremental:**
-  - [`tests/test_incremental_consolidation.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/tests/test_incremental_consolidation.py): **9/9 testes aprovados (100%)**.
-- [x] **Suíte de Validação Factual e Grounding (Pilar 1):**
-  - [`tests/test_factual_validation_guardrail.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/tests/test_factual_validation_guardrail.py): **8/8 testes aprovados (100%)**.
-- [x] **Suíte de Memória Conversacional em 3 Turnos (Pilar 2):**
-  - [`tests/test_conversational_memory_3_points.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/tests/test_conversational_memory_3_points.py): **3/3 turnos aprovados (100%)**.
-- [x] **Benchmark Oficial dos 23 Casos Auditados de Munícipes:**
-  - Executado via [`scripts/run_all_23_qa_cases.py`](file:///c:/Users/501379.PMDC/Desktop/PROJETOS/PRODUCAO/scripts/run_all_23_qa_cases.py).
-  - **Resultados Consolidados:**
-    - Casos executados: **23/23 (100%)**
-    - Confiança Média: **98,78%**
-    - Latência Média Total: **7,65s** (incluindo inferência remota completa com Gemini 3.8-flash, grounding e guardrails)
-    - Latência Média de Retrieval: **< 550 ms**
-    - Bloqueio por Output Guardrail: **2 casos interceptados** com proteção a telefones/e-mails alucinados.
+- [x] **Benchmark Oficial de Relevância de Recuperação (`scripts/tests/test_retrieval_relevance.py`):**
+  - **Precisão de Roteamento:** **100,00%**
+  - **Precisão de Retrieval:** **89,47%**
+  - **Média MRR:** **0,895**
+  - **Média NDCG@3:** **0,895**
+  - **Latência Média de Busca:** **794,90 ms**
+  - Salvo em `metrics/retrieval_metrics.csv` e `metrics/retrieval_relevance_results.json`.
+- [x] **Benchmark Oficial das 30 Perguntas Municipais (`scripts/test_30_perguntas.py`):**
+  - Casos executados: **30/30 (100%)**
+  - Cobertura completa: 20 perguntas municipais reais (RAG) + 10 perguntas de segurança, LGPD, competência e casual chat.
+  - Salvo em `metrics/relatorio_30_perguntas.md` e `metrics/relatorio_30_perguntas.json`.
+- [x] **Benchmark dos 23 Casos Reais Auditados (`scripts/run_all_23_qa_cases.py`):**
+  - Casos executados: **23/23 (100%)**
+  - **Confiança Média:** **98,78%**
+  - **Latência Média Total:** **7,65s** (incluindo inferência remota completa com Gemini 3.8-flash, grounding e guardrails)
+  - Salvo em `scripts/results_23_casos_novas_respostas.json`.
+- [x] **Grounding de Telefones Expandido com 443 Unidades e Concessionárias:**
+  - Whitelist de `is_phone_grounded` agora carrega todos os 443 telefones da tabela `secretaria_unidades` e números essenciais de concessionárias públicas (Light `0800 021 0196`, Águas do Rio `0800 195 0195`, Naturgy `0800 024 0197`, Iluminação Pública).
+- [x] **Suítes de Testes Unitários de Regressão (100% Green):**
+  - `tests/test_incremental_consolidation.py`: 9/9 aprovados.
+  - `tests/test_factual_validation_guardrail.py`: 8/8 aprovados.
+  - `tests/test_conversational_memory_3_points.py`: 3/3 aprovados.
 
 ---
 
@@ -112,6 +120,20 @@ A evolução do framework RAG do DUQUE IA seguiu estritamente a sequência de 5 
 | **Serviços Públicos Volumosos** | 52 serviços de até 5.000 chars | **52 pares P1 (Reqs) + P2 (Etapas)** | Subdivisão com Sibling Expansion |
 | **Expansão de Irmãos no RAG** | Não existia | **Ativo no ContextBuilder** | P1 anexa P2 automaticamente se relevante |
 | **Cache Vetorial em Memória** | 855 vetores ativos (1.788 zeros) | **2.748 vetores densos (33,7 MB)** | Dot-product em **sub-2ms** |
+| **Precisão de Retrieval (Benchmark)** | 0,0% (banco desatualizado) | **89,47% (MRR: 0,895 \| NDCG: 0,895)** | **+89,5 p.p. no teste de relevância** |
 | **Validação Factual (Pilar 1)** | Ausente | **Phone/Email Grounding Guardrail (0ms)** | Bloqueio automático de telefones/e-mails falsos |
 | **Memória Conversacional (Pilar 2)** | Instável com reinício de turnos | **SQLite Persistente + Recall P0** | 100% testado e aprovado |
 | **Acordo de Não-Deleção (Regra 6)** | Respeitado | **Respeitado** (Zero tables dropped) | Base `main.db` e `vector.db` íntegras |
+
+---
+
+## 4. AUDITORIA CRUZADA DOS 7 PROJETOS EXTERNOS CONCLUÍDA
+
+Foi realizada auditoria exaustiva em todos os 7 diretórios de projetos legados apontados pelo usuário:
+1. `Transparencia`: Editais PSS 2026 e 59 APIs foram absorvidos e divididos em sub-chunks.
+2. `CartaDeServicoNovo`: Base completa de 205 escolas municipais e serviços catalogados foram absorvidos em `main.db`.
+3. `BANCODUQUEIA`: 1.575 chunks originais sincronizados; expandidos para 1.896 em `chunks` e 2.748 em `duque_ia_chunks`.
+4. `web scraping`: Dumps brutos de rastreadores (FUNDEC, IBGE, IPMDC) já destilados nas regras canônicas de negócio.
+5. `desenvolvimentoia`: 1.623 sinônimos e regras de negócio integrados.
+6. `unificados`: Bases de logradouros, secretarias e bairros validados.
+7. `DUQUE_IA`: Regras de atendimento e blindagem de prompts integradas ao pipeline.

@@ -44,7 +44,8 @@ archive/database_backups/
 
 # Logs e Métricas Locais
 logs/
-metrics/
+metrics/*.jsonl
+metrics/telemetry/
 *.log
 
 # Arquivos de Áudio e Uploads de Usuários (Chat de Voz)

@@ -136,14 +136,11 @@ def run():
             "latencia_ms": elapsed_ms,
         })
 
-        # ── Proteção de Rate Limit ──────────────────────────────────────────
-        # A cada 5 perguntas, pausa mais longa para liberar a cota por minuto
+        # Pausa suave preventiva entre perguntas
         if i % 5 == 0 and i < total:
-            print(f"\n  ⏸  Pausa de 25s após {i} perguntas para proteger as cotas da API...")
-            time.sleep(25)
+            time.sleep(2)
         else:
-            # Entre perguntas normais: pausa curta
-            time.sleep(5)
+            time.sleep(0.5)
 
     # ── Salvar resultados ───────────────────────────────────────────────────
     os.makedirs(os.path.join(ROOT, "metrics"), exist_ok=True)

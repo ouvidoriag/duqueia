@@ -7,15 +7,21 @@ from config.settings import GEMINI_FAST_MODEL, OUVIDORIA_CONTACTS, DATABASE_MAIN
 # Telefones de emergência e serviços essenciais padronizados nacionalmente
 OFFICIAL_SHORT_PHONES = {"190", "192", "193", "199", "100", "180", "181", "153", "141"}
 
-# Telefones oficiais centrais da Prefeitura de Duque de Caxias
+# Telefones oficiais centrais da Prefeitura de Duque de Caxias e concessionárias de utilidade pública
 OFFICIAL_CANONICAL_PHONES = {
-    "26523835",   # Ouvidoria Geral
-    "998245903",  # WhatsApp Ouvidoria Geral
-    "26764444",   # Defesa Civil Caxias
-    "26732203",   # Defesa Civil Caxias
-    "27734550",   # IPMDC Caxias
-    "22531177",   # Disque Denúncia RJ
-    "36566697",   # Obras / Serviços
+    "26523835",     # Ouvidoria Geral
+    "998245903",    # WhatsApp Ouvidoria Geral
+    "26764444",     # Defesa Civil Caxias
+    "26732203",     # Defesa Civil Caxias
+    "27734550",     # IPMDC Caxias
+    "22531177",     # Disque Denúncia RJ
+    "36566697",     # Obras / Serviços
+    # Concessionárias essenciais atuantes no território municipal de Duque de Caxias
+    "08000210196",  # Light (Emergência e Alta Tensão)
+    "08001950195",  # Águas do Rio (Saneamento e Esgoto)
+    "08000240197",  # Naturgy (Gás Canalizado)
+    "08000000755",  # Iluminação Pública
+    "08007787272",  # Iluminação Pública
 }
 
 _CACHED_DB_PHONES: Optional[Set[str]] = None
@@ -42,6 +48,15 @@ def _get_db_phones() -> Set[str]:
                     phones.add(clean)
                     if len(clean) in (10, 11) and clean.startswith("21"):
                         phones.add(clean[2:])
+            try:
+                for row in cur.execute("SELECT phone FROM secretaria_unidades WHERE phone IS NOT NULL AND phone != ''").fetchall():
+                    clean = re.sub(r'\D', '', row[0])
+                    if clean:
+                        phones.add(clean)
+                        if len(clean) in (10, 11) and clean.startswith("21"):
+                            phones.add(clean[2:])
+            except Exception:
+                pass
             try:
                 for row in cur.execute("SELECT telefone FROM escolas_municipais WHERE telefone IS NOT NULL AND telefone != ''").fetchall():
                     clean = re.sub(r'\D', '', row[0])

@@ -1,0 +1,1 @@
+timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tokens_used,cost_usd
