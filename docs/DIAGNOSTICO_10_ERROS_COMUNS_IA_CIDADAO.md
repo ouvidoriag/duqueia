@@ -214,3 +214,4 @@ O ecossistema do **DUQUE IA** alcançou um nível de maturidade em que os **10 e
 1. **Monitoramento do Painel de Métricas (`dashboard.html`):** Acompanhar em tempo real os índices de confiança, tempo de resposta e intenções mais frequentes.
 2. **Ciclo de Atualização de Conhecimento:** Manter o versionamento modular dos arquivos Markdown em `data/knowledge/` para que qualquer alteração de secretarias ou leis municipais seja ingerida de forma incremental sem downtime.
 3. **Preservação da Memória Hierárquica:** Manter a política de limpeza semanal de telemetria (`cleanup_expired_sessions`), garantindo conformidade com a LGPD e agilidade operacional contínua no SQLite WAL.
+

@@ -32,7 +32,9 @@ scratch/
 *.db
 *.db-journal
 *.db-wal
+*.db-shm
 *.bak
+*.zip
 !data/db/main.db
 !data/db/vector.db
 !data/db/cache.db
