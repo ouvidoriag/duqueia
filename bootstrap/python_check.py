@@ -54,7 +54,11 @@ def check_requirements():
 
     missing_packages = []
     for mod_name, pkg_name in required_modules:
-        if importlib.util.find_spec(mod_name) is None:
+        try:
+            spec = importlib.util.find_spec(mod_name)
+            if spec is None:
+                missing_packages.append(pkg_name)
+        except (ModuleNotFoundError, ValueError, AttributeError):
             missing_packages.append(pkg_name)
 
     if missing_packages:
@@ -62,5 +66,6 @@ def check_requirements():
         for pkg in missing_packages:
             log(f"   - {pkg}")
         log("\nInstale-as executando: pip install -r requirements.txt\n")
+        raise SystemExit(1)
     else:
         log("✅ Todas as dependências essenciais do Python foram verificadas com sucesso!")
