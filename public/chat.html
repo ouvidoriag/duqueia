@@ -477,6 +477,39 @@
       color: var(--text-soft);
     }
 
+    /* Feedback de Resolução do Cidadão (CSAT / Qualidade Percebida) */
+    .feedback-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 2px 4px;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+    .feedback-box .feedback-btn {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .feedback-box .feedback-btn:hover {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+    .feedback-box .feedback-thanks {
+      color: #16a34a;
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+
     /* Reprodutor de Áudio Nativo */
     .audio-player-box {
       margin-top: 0.6rem;
@@ -1444,6 +1477,34 @@
       }
 
       bubbleWrap.appendChild(meta);
+
+      // Caixa de Feedback de Resolução do Atendimento (CSAT)
+      if (sender === 'bot' && text && !text.includes('Como posso te ajudar hoje?') && text.length > 30) {
+        const fbBox = document.createElement('div');
+        fbBox.className = 'feedback-box';
+        fbBox.innerHTML = `
+          <span>Essa resposta foi útil?</span>
+          <button class="feedback-btn" data-type="positive" title="Sim, foi útil">👍 Sim</button>
+          <button class="feedback-btn" data-type="negative" title="Não ajudou ou faltou dados">👎 Não</button>
+        `;
+        const btns = fbBox.querySelectorAll('.feedback-btn');
+        btns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const fType = btn.getAttribute('data-type');
+            fetch('api/feedback', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                session_id: sessionId,
+                feedback_type: fType,
+                topic: data?.intent_detected || 'geral'
+              })
+            }).catch(() => {});
+            fbBox.innerHTML = '<span class="feedback-thanks">Obrigado pela sua avaliação! 🙏</span>';
+          }, { once: true });
+        });
+        bubbleWrap.appendChild(fbBox);
+      }
       row.appendChild(bubbleWrap);
       messagesArea.appendChild(row);
       messagesArea.scrollTop = messagesArea.scrollHeight;

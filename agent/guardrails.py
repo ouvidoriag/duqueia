@@ -1,5 +1,119 @@
+import sys
 import re
-from config.settings import GEMINI_FAST_MODEL
+import sqlite3
+from typing import Optional, Set
+from config.settings import GEMINI_FAST_MODEL, OUVIDORIA_CONTACTS, DATABASE_MAIN
+
+# Telefones de emergência e serviços essenciais padronizados nacionalmente
+OFFICIAL_SHORT_PHONES = {"190", "192", "193", "199", "100", "180", "181", "153", "141"}
+
+# Telefones oficiais centrais da Prefeitura de Duque de Caxias
+OFFICIAL_CANONICAL_PHONES = {
+    "26523835",   # Ouvidoria Geral
+    "998245903",  # WhatsApp Ouvidoria Geral
+    "26764444",   # Defesa Civil Caxias
+    "26732203",   # Defesa Civil Caxias
+    "27734550",   # IPMDC Caxias
+    "22531177",   # Disque Denúncia RJ
+    "36566697",   # Obras / Serviços
+}
+
+_CACHED_DB_PHONES: Optional[Set[str]] = None
+_CACHED_DB_EMAILS: Optional[Set[str]] = None
+
+def _get_db_phones() -> Set[str]:
+    """Carrega sob demanda e armazena em cache todos os telefones oficiais cadastrados no main.db."""
+    global _CACHED_DB_PHONES
+    if _CACHED_DB_PHONES is not None:
+        return _CACHED_DB_PHONES
+    phones: Set[str] = set()
+    try:
+        with sqlite3.connect(DATABASE_MAIN, timeout=5.0) as conn:
+            cur = conn.cursor()
+            for row in cur.execute("SELECT phone FROM secretarias WHERE phone IS NOT NULL AND phone != ''").fetchall():
+                clean = re.sub(r'\D', '', row[0])
+                if clean:
+                    phones.add(clean)
+                    if len(clean) in (10, 11) and clean.startswith("21"):
+                        phones.add(clean[2:])
+            for row in cur.execute("SELECT phone FROM service_phones WHERE phone IS NOT NULL AND phone != ''").fetchall():
+                clean = re.sub(r'\D', '', row[0])
+                if clean:
+                    phones.add(clean)
+                    if len(clean) in (10, 11) and clean.startswith("21"):
+                        phones.add(clean[2:])
+    except Exception:
+        pass
+    _CACHED_DB_PHONES = phones
+    return _CACHED_DB_PHONES
+
+def _get_db_emails() -> Set[str]:
+    """Carrega sob demanda e armazena em cache todos os e-mails oficiais cadastrados no main.db."""
+    global _CACHED_DB_EMAILS
+    if _CACHED_DB_EMAILS is not None:
+        return _CACHED_DB_EMAILS
+    emails: Set[str] = set()
+    try:
+        with sqlite3.connect(DATABASE_MAIN, timeout=5.0) as conn:
+            cur = conn.cursor()
+            for row in cur.execute("SELECT email FROM secretarias WHERE email IS NOT NULL AND email != ''").fetchall():
+                e = row[0].strip().lower()
+                if "@" in e:
+                    emails.add(e)
+            for row in cur.execute("SELECT email FROM service_emails WHERE email IS NOT NULL AND email != ''").fetchall():
+                e = row[0].strip().lower()
+                if "@" in e:
+                    emails.add(e)
+    except Exception:
+        pass
+    _CACHED_DB_EMAILS = emails
+    return _CACHED_DB_EMAILS
+
+def extract_candidate_phones(text: str) -> list[str]:
+    """
+    Extrai números de telefone (fixos, celulares, 0800 e códigos de emergência),
+    filtrando intervalos de anos e mandatos (ex: 2025-2028 ou 1990-1994).
+    """
+    phone_pattern = r'(?:\b0800[-.\s]?\d{3}[-.\s]?\d{4}\b)|(?:(?:\(?\d{2}\)?\s*)?(?:[23]\d{3}|9\d{4})[-.\s]?\d{4})'
+    raw_matches = re.findall(phone_pattern, text)
+    valid_phones = []
+    for m in raw_matches:
+        clean = re.sub(r'\D', '', m)
+        # Exclui intervalos de anos (ex: 2025-2028, 1990-1994)
+        if len(clean) == 8 and (clean.startswith('19') or clean.startswith('20')) and (clean[4:6] in ('19', '20')):
+            continue
+        valid_phones.append(m)
+    return valid_phones
+
+def is_phone_grounded(phone: str, context: Optional[str]) -> bool:
+    """Verifica se um telefone é fundamentado no contexto ou no catálogo oficial municipal."""
+    clean = re.sub(r'\D', '', phone)
+    if not clean:
+        return True
+
+    # 1. Códigos de emergência de 3 dígitos
+    if clean in OFFICIAL_SHORT_PHONES:
+        return True
+
+    # 2. Telefones canônicos centrais (Ouvidoria, Defesa Civil, etc.)
+    local_digits = clean[2:] if len(clean) in (10, 11) and clean.startswith("21") else clean
+    if clean in OFFICIAL_CANONICAL_PHONES or local_digits in OFFICIAL_CANONICAL_PHONES:
+        return True
+
+    # 3. Presente no contexto recuperado
+    if context:
+        if phone in context or local_digits in context:
+            return True
+        clean_ctx = re.sub(r'\D', '', context)
+        if clean in clean_ctx or local_digits in clean_ctx:
+            return True
+
+    # 4. Presente no catálogo de secretarias e serviços do main.db
+    db_phones = _get_db_phones()
+    if clean in db_phones or local_digits in db_phones:
+        return True
+
+    return False
 
 DANGEROUS_PATTERNS = [
     # SQL Injection explícito
@@ -89,40 +203,52 @@ def check_legal_guardrail(query: str) -> bool:
 
 def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None, history: list = None, triage_info: dict = None) -> bool:
     """
-    Valida a resposta gerada pela IA contra alucinações, vazamento de PII (LGPD) ou ofensas.
-    Aplica validação determinística de ultra-alta velocidade (0ms) local via RegEx.
-    Elimina chamadas desnecessárias à API do Gemini no guardrail de saída.
+    Valida a resposta gerada pela IA contra alucinações, vazamento de PII (LGPD), ofensas e contatos falsos.
+    Aplica validação determinística de ultra-alta velocidade (0ms) local com grounding estrito de telefones e e-mails.
+    Elimina falsos bypasses e assegura integridade factual dos dados municipais.
     """
     if not answer or not answer.strip():
         return True
 
     ans_lower = answer.lower()
 
-    # 1. Validação de Vazamento de CPF de Terceiros (RegEx LGPD)
-    cpf_pattern = r'\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b'
-    if re.search(cpf_pattern, answer):
-        print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Padrão de CPF detectado na resposta.", file=sys.stderr)
-        return False
-
-    # 2. Validação determinística de e-mails não suportados pelo contexto
-    if context:
-        ctx_norm = context.lower()
-        found_emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', answer)
-        for email in found_emails:
-            e_low = email.lower()
-            if e_low not in ctx_norm and "ouvidoria@duquedecaxias.rj.gov.br" not in e_low and "colab.re" not in e_low:
-                print(f"[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): E-mail '{email}' não presente no contexto oficial.", file=sys.stderr)
-                return False
-
-    # 3. Bypass rápido: Respostas oficiais da Ouvidoria/Colab ou orientações padrão
-    if any(term in ans_lower for term in ["2652-3835", "ouvidoria@duquedecaxias.rj.gov.br", "colab", "190", "prefeitura"]):
-        return True
-
-    # 4. Checagem rápida de conteúdo ofensivo/inapropriado
+    # 1. Checagem prioritária de conteúdo ofensivo/inapropriado (Zero Tolerância)
     forbidden_words = ["filho da puta", "desgraça", "vagabundo", "burro", "idiota"]
     if any(word in ans_lower for word in forbidden_words):
         print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Palavra proibida detectada.", file=sys.stderr)
         return False
 
-    # Se passou nas validações determinísticas locais, aprova instantaneamente (0ms, 0 chamadas LLM)
+    # 2. Validação de Vazamento de CPF de Terceiros (RegEx LGPD)
+    cpf_pattern = r'\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b'
+    if re.search(cpf_pattern, answer):
+        print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Padrão de CPF detectado na resposta.", file=sys.stderr)
+        return False
+
+    # 3. Validação determinística de e-mails (Anti-Alucinação Factual)
+    found_emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', answer)
+    if found_emails:
+        db_emails = _get_db_emails()
+        ctx_norm = context.lower() if context else ""
+        for email in found_emails:
+            e_low = email.lower()
+            if (
+                e_low in ctx_norm
+                or e_low in db_emails
+                or "ouvidoria@duquedecaxias.rj.gov.br" in e_low
+                or "colab.re" in e_low
+                or e_low.endswith("@duquedecaxias.rj.gov.br")
+            ):
+                continue
+            print(f"[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): E-mail '{email}' não fundamentado no contexto ou catálogo oficial.", file=sys.stderr)
+            return False
+
+    # 4. Validação determinística de telefones (Anti-Alucinação Factual)
+    candidate_phones = extract_candidate_phones(answer)
+    if candidate_phones:
+        for phone in candidate_phones:
+            if not is_phone_grounded(phone, context):
+                print(f"[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Telefone '{phone}' alucinado / não fundamentado no contexto oficial.", file=sys.stderr)
+                return False
+
+    # Se passou em todas as validações determinísticas de segurança e grounding, aprova instantaneamente (0ms, 0 chamadas LLM)
     return True

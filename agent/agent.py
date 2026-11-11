@@ -110,6 +110,25 @@ class DuqueIAAgent:
                 if "intent" not in msg_cols:
                     conn.execute("ALTER TABLE chat_messages ADD COLUMN intent TEXT;")
                 conn.execute("CREATE INDEX IF NOT EXISTS idx_chat_messages_session_turn ON chat_messages(session_id, turn_index);")
+
+                # Migração defensiva chat_feedback: garante session_id e topic para CSAT e observabilidade
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS chat_feedback (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        session_id TEXT,
+                        message_id INTEGER,
+                        feedback_type TEXT,
+                        comment TEXT,
+                        topic TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                """)
+                fb_cols = [c[1] for c in conn.execute("PRAGMA table_info(chat_feedback)").fetchall()]
+                if "session_id" not in fb_cols:
+                    conn.execute("ALTER TABLE chat_feedback ADD COLUMN session_id TEXT;")
+                if "topic" not in fb_cols:
+                    conn.execute("ALTER TABLE chat_feedback ADD COLUMN topic TEXT;")
+
                 conn.commit()
         except Exception:
             pass

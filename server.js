@@ -482,6 +482,48 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ── API de Feedback do Munícipe (CSAT / Qualidade Real) ────────────────────
+  if ((req.url === '/api/feedback' || req.url.endsWith('/api/feedback')) && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 50000) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload muito grande.' }));
+        req.destroy();
+      }
+    });
+
+    req.on('end', () => {
+      try {
+        const feedback = JSON.parse(body || '{}');
+        const sessionId = String(feedback.session_id || feedback.conversation_id || '').trim();
+        const feedbackType = String(feedback.feedback_type || feedback.type || 'positive').trim();
+        const comment = String(feedback.comment || '').trim();
+        const topic = String(feedback.topic || '').trim();
+
+        // Grava no arquivo de telemetria de feedback
+        const metricsDir = path.join(__dirname, 'metrics');
+        if (!fs.existsSync(metricsDir)) fs.mkdirSync(metricsDir, { recursive: true });
+        const record = {
+          session_id: sessionId,
+          feedback_type: feedbackType,
+          comment: comment,
+          topic: topic,
+          timestamp: new Date().toISOString()
+        };
+        fs.appendFile(path.join(metricsDir, 'feedback.jsonl'), JSON.stringify(record) + '\n', () => {});
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ status: 'ok', message: 'Feedback registrado com sucesso.' }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'JSON inválido.' }));
+      }
+    });
+    return;
+  }
+
   // ── API de Métricas ─────────────────────────────────────────────────────
   if ((req.url.includes('/api/metrics')) && req.method === 'GET') {
     const jsonlPath = path.join(__dirname, 'metrics', 'requests.jsonl');

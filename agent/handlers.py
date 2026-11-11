@@ -1549,6 +1549,8 @@ class AuthorityHandler(BaseHandler):
                     f"{sugestoes_str}"
                 )
             
+            if agent:
+                agent._last_context = f"{nome} - {cargo} - {detalhes_limpo}"
             agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
             return {
                 "answer": answer,
