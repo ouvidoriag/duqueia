@@ -45,7 +45,9 @@ from agent.handlers import (
     PrivateResponsibilityHandler,
     ProgramacaoHandler,
     RagHandler,
-    AuthorityHandler
+    AuthorityHandler,
+    MemoryRecallHandler,
+    ClarificationHandler
 )
 
 
@@ -89,9 +91,139 @@ class DuqueIAAgent:
                 if "created_at" not in cols:
                     conn.execute("ALTER TABLE agent_session_storage ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
                 conn.execute("CREATE INDEX IF NOT EXISTS idx_session_updated ON agent_session_storage(updated_at);")
+
+                # Migração defensiva chat_messages: garante turn_index e intent para histórico estruturado
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS chat_messages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        session_id TEXT,
+                        role TEXT CHECK(role IN ('user', 'assistant')),
+                        content TEXT NOT NULL,
+                        turn_index INTEGER DEFAULT 1,
+                        intent TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                """)
+                msg_cols = [c[1] for c in conn.execute("PRAGMA table_info(chat_messages)").fetchall()]
+                if "turn_index" not in msg_cols:
+                    conn.execute("ALTER TABLE chat_messages ADD COLUMN turn_index INTEGER DEFAULT 1;")
+                if "intent" not in msg_cols:
+                    conn.execute("ALTER TABLE chat_messages ADD COLUMN intent TEXT;")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_chat_messages_session_turn ON chat_messages(session_id, turn_index);")
                 conn.commit()
         except Exception:
             pass
+
+    @classmethod
+    def get_session_turn(cls, session_id: str, turn_index: int) -> Optional[Dict[str, Any]]:
+        """Recupera um turno específico da conversa a partir do banco de mensagens persistente."""
+        if not session_id:
+            return None
+        cls._init_session_db()
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=10000;")
+                cur = conn.cursor()
+                rows = cur.execute(
+                    "SELECT role, content, intent, created_at FROM chat_messages WHERE session_id = ? AND turn_index = ? ORDER BY id ASC",
+                    (session_id, turn_index)
+                ).fetchall()
+                if not rows:
+                    return None
+                turn_data = {"turn_index": turn_index, "user": None, "assistant": None, "intent": None, "created_at": None}
+                for r in rows:
+                    role, content, intent, created_at = r
+                    if role == "user":
+                        turn_data["user"] = content
+                        turn_data["intent"] = intent
+                        turn_data["created_at"] = created_at
+                    elif role == "assistant":
+                        turn_data["assistant"] = content
+                return turn_data
+        except Exception:
+            return None
+
+    @classmethod
+    def get_first_user_question(cls, session_id: str) -> Optional[Dict[str, Any]]:
+        """Recupera literalmente a primeira pergunta feita pelo usuário na sessão."""
+        if not session_id:
+            return None
+        cls._init_session_db()
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=10000;")
+                cur = conn.cursor()
+                row = cur.execute(
+                    "SELECT content, turn_index, created_at FROM chat_messages WHERE session_id = ? AND role = 'user' ORDER BY turn_index ASC, id ASC LIMIT 1",
+                    (session_id,)
+                ).fetchone()
+                if row:
+                    return {"question": row[0], "turn_index": row[1], "created_at": row[2]}
+                return None
+        except Exception:
+            return None
+
+    @classmethod
+    def get_last_turn_pair(cls, session_id: str) -> Optional[Dict[str, Any]]:
+        """Recupera o último par de pergunta e resposta antes do turno atual."""
+        if not session_id:
+            return None
+        cls._init_session_db()
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=10000;")
+                cur = conn.cursor()
+                max_turn_row = cur.execute(
+                    "SELECT MAX(turn_index) FROM chat_messages WHERE session_id = ?",
+                    (session_id,)
+                ).fetchone()
+                if not max_turn_row or not max_turn_row[0]:
+                    return None
+                last_turn = max_turn_row[0]
+                rows = cur.execute(
+                    "SELECT role, content FROM chat_messages WHERE session_id = ? AND turn_index = ? ORDER BY id ASC",
+                    (session_id, last_turn)
+                ).fetchall()
+                pair = {"turn_index": last_turn, "user": None, "assistant": None}
+                for role, content in rows:
+                    if role == "user":
+                        pair["user"] = content
+                    elif role == "assistant":
+                        pair["assistant"] = content
+                return pair
+        except Exception:
+            return None
+
+    @classmethod
+    def get_session_all_turns(cls, session_id: str) -> List[Dict[str, Any]]:
+        """Recupera todos os turnos completos da conversa para resumo e contagem."""
+        if not session_id:
+            return []
+        cls._init_session_db()
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA busy_timeout=10000;")
+                cur = conn.cursor()
+                rows = cur.execute(
+                    "SELECT turn_index, role, content, intent, created_at FROM chat_messages WHERE session_id = ? ORDER BY turn_index ASC, id ASC",
+                    (session_id,)
+                ).fetchall()
+                turns_map = {}
+                for turn_idx, role, content, intent, created_at in rows:
+                    if turn_idx not in turns_map:
+                        turns_map[turn_idx] = {"turn_index": turn_idx, "user": None, "assistant": None, "intent": None, "created_at": created_at}
+                    if role == "user":
+                        turns_map[turn_idx]["user"] = content
+                        turns_map[turn_idx]["intent"] = intent
+                    elif role == "assistant":
+                        turns_map[turn_idx]["assistant"] = content
+                return [turns_map[k] for k in sorted(turns_map.keys())]
+        except Exception:
+            return []
 
     @classmethod
     def get_session_history(cls, conversation_id: str) -> List[str]:
@@ -256,7 +388,9 @@ class DuqueIAAgent:
             "PRIVATE_RESPONSIBILITY_HANDLER": PrivateResponsibilityHandler(),
             "PROGRAMACAO_HANDLER": ProgramacaoHandler(),
             "RAG_HANDLER": RagHandler(),
-            "AUTHORITY_HANDLER": AuthorityHandler()
+            "AUTHORITY_HANDLER": AuthorityHandler(),
+            "MEMORY_RECALL_HANDLER": MemoryRecallHandler(),
+            "CLARIFICATION_HANDLER": ClarificationHandler()
         }
         
         os.makedirs(os.path.join(os.path.dirname(self.db_path), "..", "logs"), exist_ok=True)
@@ -540,14 +674,23 @@ class DuqueIAAgent:
                         prev + [f"Munícipe: {user_query}", f"DUQUE IA: {ans_text}"]
                     )[-6:]
                     DuqueIAAgent.save_session_to_db(conversation_id)
-                    # Registra a mensagem na tabela de telemetria chat_messages
+                    # Registra a mensagem na tabela de telemetria chat_messages com turn_index sequencial
                     try:
-                        with sqlite3.connect(DATABASE_TELEMETRY, timeout=5.0) as conn:
+                        with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
                             conn.execute("PRAGMA journal_mode=WAL;")
-                            conn.execute("PRAGMA busy_timeout=5000;")
-                            conn.execute(
-                                "INSERT INTO chat_messages (session_id, role, content, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP), (?, ?, ?, CURRENT_TIMESTAMP)",
-                                (conversation_id, "user", user_query, conversation_id, "assistant", ans_text)
+                            conn.execute("PRAGMA busy_timeout=10000;")
+                            cur = conn.cursor()
+                            row_t = cur.execute(
+                                "SELECT COALESCE(MAX(turn_index), 0) FROM chat_messages WHERE session_id = ?",
+                                (conversation_id,)
+                            ).fetchone()
+                            next_turn = (row_t[0] if row_t else 0) + 1
+                            detected_intent = result_dict.get("intent_detected") or (result_dict.get("triage_info") or {}).get("intent") or "GERAL"
+                            cur.execute(
+                                "INSERT INTO chat_messages (session_id, role, content, turn_index, intent, created_at) VALUES "
+                                "(?, 'user', ?, ?, ?, CURRENT_TIMESTAMP), (?, 'assistant', ?, ?, ?, CURRENT_TIMESTAMP)",
+                                (conversation_id, user_query, next_turn, detected_intent,
+                                 conversation_id, ans_text, next_turn, detected_intent)
                             )
                             conn.commit()
                     except Exception:

@@ -14,21 +14,21 @@ AUTHORITIES = {
         "cargo": "Prefeito de Duque de Caxias",
         "nome": "Jonathas Monteiro Porto Neto (Netinho Reis)",
         "fonte": "prefeito.md",
-        "detalhes": "Netinho Reis é o Prefeito de Duque de Caxias.",
+        "detalhes": "Empresário do setor de sustentabilidade eleito para a gestão 2025–2028, assumiu a liderança do Poder Executivo municipal com foco em modernização, tecnologia, inclusão social e fortalecimento dos serviços públicos.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "prefeito de duque de caxias": {
         "cargo": "Prefeito de Duque de Caxias",
         "nome": "Jonathas Monteiro Porto Neto (Netinho Reis)",
         "fonte": "prefeito.md",
-        "detalhes": "Netinho Reis é o Prefeito de Duque de Caxias.",
+        "detalhes": "Empresário do setor de sustentabilidade eleito para a gestão 2025–2028, assumiu a liderança do Poder Executivo municipal com foco em modernização, tecnologia, inclusão social e fortalecimento dos serviços públicos.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "prefeito municipal": {
         "cargo": "Prefeito de Duque de Caxias",
         "nome": "Jonathas Monteiro Porto Neto (Netinho Reis)",
         "fonte": "prefeito.md",
-        "detalhes": "Netinho Reis é o Prefeito de Duque de Caxias.",
+        "detalhes": "Empresário do setor de sustentabilidade eleito para a gestão 2025–2028, assumiu a liderança do Poder Executivo municipal com foco em modernização, tecnologia, inclusão social e fortalecimento dos serviços públicos.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "secretário de administração, planejamento e orçamento": {

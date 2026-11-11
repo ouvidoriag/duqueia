@@ -26,3 +26,4 @@ for q in queries:
     print("STATUS: ✅ APROVADO")
 
 print("\nTodos os testes da Vice-Prefeita passaram com sucesso!")
+

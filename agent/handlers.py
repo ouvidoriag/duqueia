@@ -225,7 +225,10 @@ class ConversationHandler(BaseHandler):
                         "NUNCA use saudações redundantes ou inicie a resposta com 'Olá!' ou 'Oi!' se o diálogo já começou.\n"
                         "Lembre-o com leveza que sua especialidade é Duque de Caxias (serviços, secretarias, endereços)."
                     )
-                ans = agent.gemini_client.generate_response(query, system_instruction=sys_instruct, model="gemini-3.1-flash-lite").strip()
+                hist_text = "\n".join(history[-4:]) if history else ""
+                hist_ctx = f"Contexto recente da conversa:\n{hist_text}\n\n" if hist_text else ""
+                full_prompt = f"{hist_ctx}Mensagem do munícipe: \"{query}\""
+                ans = agent.gemini_client.generate_response(full_prompt, system_instruction=sys_instruct, model="gemini-3.1-flash-lite").strip()
             except Exception:
                 pass
         
@@ -1513,7 +1516,19 @@ class AuthorityHandler(BaseHandler):
 
             sugestoes_str = "\n".join(sugestoes)
 
-            detalhes_str = f"\n\n{auth.get('detalhes', '')}" if auth.get('detalhes') else ""
+            detalhes_raw = (auth.get('detalhes') or "").strip()
+            detalhes_limpo = detalhes_raw
+            if detalhes_raw:
+                # Deduplica se detalhes apenas repetir literalmente nome e cargo
+                d_lower = detalhes_raw.lower()
+                n_lower = nome.lower()
+                c_lower = cargo.lower()
+                if n_lower in d_lower and c_lower in d_lower:
+                    partes = [p.strip() for p in detalhes_raw.split(".") if p.strip()]
+                    partes_uteis = [p for p in partes if not (any(tok in p.lower() for tok in ["netinho reis é o prefeito", "é o prefeito de duque", "é o secretário de", "é a secretária de", "é o vice-prefeito", "é a vice-prefeita"]))]
+                    detalhes_limpo = ". ".join(partes_uteis) + ("." if partes_uteis else "")
+
+            detalhes_str = f"\n\n{detalhes_limpo}" if detalhes_limpo.strip() else ""
             cargo_title = cargo if "duque de caxias" in cargo.lower() else f"{cargo} de Duque de Caxias"
             is_feminine = any(fem in cargo_title.lower() for fem in ["vice-prefeita", "prefeita", "secretária", "ouvidora", "controladora"])
             artigo = "A" if is_feminine else "O"
@@ -1576,6 +1591,185 @@ class AuthorityHandler(BaseHandler):
             "metrics": {
                 "retrieval_time_ms": 0,
                 "llm_time_ms": 0,
+                "total_time_ms": round(elapsed * 1000, 2),
+                "tokens_used": 0,
+                "keywords": extract_query_keywords(query)
+            }
+        }
+
+
+class MemoryRecallHandler(BaseHandler):
+    """Recupera informações exatas e literais do histórico da conversa a partir do SQLite persistente."""
+    def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
+        elapsed = time.time() - start_time
+        q_lower = query.lower().strip()
+        agent_cls = agent.__class__
+        
+        # 1. Pergunta sobre a primeira pergunta ("qual foi minha primeira pergunta", etc.)
+        is_asking_first = any(p in q_lower for p in ["primeira pergunta", "1ª pergunta", "1a pergunta", "primeira dúvida", "primeira duvida", "perguntei primeiro", "primeiro perguntei", "comecei perguntando", "qual foi a primeira"])
+        
+        # 2. Pergunta sobre o que respondeu antes / última resposta
+        is_asking_last = any(p in q_lower for p in ["respondeu antes", "última resposta", "ultima resposta", "turno anterior", "resposta anterior"])
+        
+        # 3. Pergunta sobre resumo dos assuntos ("sobre o que estávamos conversando", etc.)
+        is_asking_summary = any(p in q_lower for p in ["estávamos conversando", "estavamos conversando", "estamos conversando", "quais assuntos", "quais perguntas"])
+        
+        # 4. Pergunta sobre um turno numérico específico (ex: "segunda pergunta", "terceira resposta", etc.)
+        ordinal_map = {
+            "segunda": 2, "2ª": 2, "2a": 2,
+            "terceira": 3, "3ª": 3, "3a": 3,
+            "quarta": 4, "4ª": 4, "4a": 4,
+            "quinta": 5, "5ª": 5, "5a": 5
+        }
+        specific_turn = None
+        for word, t_num in ordinal_map.items():
+            if word in q_lower:
+                specific_turn = t_num
+                break
+
+        ans = ""
+        if is_asking_first:
+            first_q = agent_cls.get_first_user_question(conversation_id)
+            if first_q and first_q.get("question"):
+                q_text = first_q["question"]
+                t_idx = first_q.get("turn_index", 1)
+                ans = (
+                    f"Sua primeira pergunta nesta conversa foi:\n\n"
+                    f'> **"{q_text}"**\n\n'
+                    f"(Registrada no **Turno {t_idx}** desta sessão). "
+                    f"Como posso ajudar você a continuar?"
+                )
+            else:
+                ans = "Esta é a sua primeira pergunta nesta conversa! Como posso ajudar você hoje?"
+        elif specific_turn:
+            turn_data = agent_cls.get_session_turn(conversation_id, specific_turn)
+            if turn_data and (turn_data.get("user") or turn_data.get("assistant")):
+                u_msg = turn_data.get("user") or ""
+                a_msg = turn_data.get("assistant") or ""
+                ans = (
+                    f"No **Turno {specific_turn}** desta conversa:\n\n"
+                    f"• **Sua pergunta foi:** *\"{u_msg}\"*\n"
+                    f"• **Minha resposta foi:** {a_msg}\n\n"
+                    f"Posso ajudar com mais algum esclarecimento sobre esse tema?"
+                )
+            else:
+                total_turns = len(agent_cls.get_session_all_turns(conversation_id))
+                ans = f"Não encontrei o Turno {specific_turn} nesta sessão (até agora temos {total_turns} turnos registrados)."
+        elif is_asking_last:
+            last_pair = agent_cls.get_last_turn_pair(conversation_id)
+            if last_pair and last_pair.get("assistant"):
+                ans = (
+                    f"Na resposta anterior (Turno {last_pair.get('turn_index')}), quando você perguntou sobre *\"{last_pair.get('user')}\"*, eu informei:\n\n"
+                    f"{last_pair.get('assistant')}\n\n"
+                    f"Ficou alguma dúvida ou gostaria que eu aprofundasse?"
+                )
+            else:
+                ans = "Ainda não temos interações anteriores registradas nesta sessão."
+        elif is_asking_summary:
+            all_turns = agent_cls.get_session_all_turns(conversation_id)
+            if all_turns:
+                linhas = []
+                for t in all_turns:
+                    u_preview = (t.get("user") or "").strip()
+                    if u_preview:
+                        if len(u_preview) > 80:
+                            u_preview = u_preview[:77] + "..."
+                        linhas.append(f"• **Turno {t['turn_index']}:** \"{u_preview}\"")
+                ans = (
+                    f"Nesta conversa, já tratamos dos seguintes tópicos ({len(all_turns)} turnos):\n\n"
+                    + "\n".join(linhas) + "\n\n"
+                    f"Sobre qual desses assuntos você gostaria de falar ou deseja iniciar um novo tema?"
+                )
+            else:
+                ans = "Esta sessão ainda não possui tópicos anteriores."
+        else:
+            first_q = agent_cls.get_first_user_question(conversation_id)
+            if first_q:
+                ans = f"Sua primeira pergunta nesta conversa foi: **\"{first_q['question']}\"**."
+            else:
+                ans = "Não localizei mensagens anteriores registradas nesta conversa."
+
+        return {
+            "answer": ans,
+            "sources": ["telemetry.db/chat_messages"],
+            "confidence": 1.0,
+            "intent_detected": "MEMORIA_CONVERSACIONAL",
+            "triage_info": triage_info,
+            "metrics": {
+                "retrieval_time_ms": round(elapsed * 1000, 2),
+                "llm_time_ms": 0,
+                "total_time_ms": round(elapsed * 1000, 2),
+                "tokens_used": 0,
+                "keywords": extract_query_keywords(query)
+            }
+        }
+
+
+class ClarificationHandler(BaseHandler):
+    """Trata pedidos de explicação didática, simplificação ou frustração do cidadão com a resposta anterior."""
+    def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
+        elapsed = time.time() - start_time
+        agent_cls = agent.__class__
+        last_pair = agent_cls.get_last_turn_pair(conversation_id)
+        q_lower = query.lower()
+
+        if not last_pair or not last_pair.get("assistant"):
+            ans = (
+                "Peço desculpas se a minha comunicação não ficou clara! Estou aqui pronto para ajudar você. "
+                "Poderia me dizer, de forma simples, qual serviço ou informação de Duque de Caxias você precisa?"
+            )
+        else:
+            prev_user = last_pair.get("user") or ""
+            prev_assistant = last_pair.get("assistant") or ""
+
+            if agent.using_real and agent.gemini_client:
+                try:
+                    sys_instruct = (
+                        "Você é o Duque IA, assistente virtual oficial da Prefeitura de Duque de Caxias.\n"
+                        "O munícipe não compreendeu a resposta anterior e pediu que você esclareça ou simplifique.\n"
+                        "DIRETRIZES OBRIGATÓRIAS:\n"
+                        "1. Se o cidadão demonstrou irritação, comece pedindo sinceras desculpas com muita humildade e educação ('Peço sinceras desculpas se a resposta anterior ficou confusa...').\n"
+                        "2. Seja extremamente claro, didático e direto ao ponto.\n"
+                        "3. Use tópicos curtos (máximo 3 a 4 passos práticos).\n"
+                        "4. Evite jargões burocráticos ou frases longas.\n"
+                        "5. Conclua perguntando se agora ficou mais simples de entender.\n"
+                        "NUNCA encaminhe para a Ouvidoria nem abra protocolo a menos que ele explicitamente solicite registrar manifestação formal."
+                    )
+                    prompt = (
+                        f"Pergunta original do munícipe: \"{prev_user}\"\n"
+                        f"Resposta anterior que ele não entendeu: \"{prev_assistant[:600]}\"\n"
+                        f"Mensagem atual do munícipe: \"{query}\"\n\n"
+                        "Reexplique o assunto de forma simples, prática e acolhedora:"
+                    )
+                    ans = agent.gemini_client.generate_response(
+                        prompt,
+                        system_instruction=sys_instruct,
+                        model="gemini-3.1-flash-lite",
+                        temperature=0.2,
+                        max_output_tokens=300
+                    ).strip()
+                except Exception:
+                    ans = (
+                        "Peço desculpas se a explicação anterior ficou confusa! "
+                        f"Sobre **{prev_user}**, o atendimento é realizado pelos órgãos municipais oficiais de Duque de Caxias. "
+                        "Como posso explicar de forma mais simples para ajudar você?"
+                    )
+            else:
+                ans = (
+                    "Peço desculpas se a resposta anterior não foi clara! "
+                    f"Resumindo de forma direta sobre *\"{prev_user}\"*: o atendimento é realizado pelos canais municipais oficiais. "
+                    "Gostaria que eu detalhasse algum ponto específico?"
+                )
+
+        return {
+            "answer": ans,
+            "sources": [],
+            "confidence": 0.98,
+            "intent_detected": "CLARIFICACAO_RESPOSTA",
+            "triage_info": triage_info,
+            "metrics": {
+                "retrieval_time_ms": 0,
+                "llm_time_ms": round(elapsed * 1000, 2),
                 "total_time_ms": round(elapsed * 1000, 2),
                 "tokens_used": 0,
                 "keywords": extract_query_keywords(query)

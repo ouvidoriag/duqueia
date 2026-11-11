@@ -50,3 +50,4 @@ else:
 
 # Também atualiza se o equipamento_01164 tiver menção antiga ou precisar de complemento
 conn.close()
+

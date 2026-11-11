@@ -38,7 +38,9 @@ ALLOWED_INTENTS = {
     "CONVERSA",
     "RAG_GERAL",
     "POSSIVEL_DENUNCIA",
-    "AUTORIDADE_PUBLICA"
+    "AUTORIDADE_PUBLICA",
+    "MEMORIA_CONVERSACIONAL",
+    "CLARIFICACAO_RESPOSTA"
 }
 
 # --------------------------------------------------------------------------
@@ -116,6 +118,19 @@ POSSIVEL_DENUNCIA_FAST_PATTERNS = [
     (r"\b(?:aconteceu\s+(?:\w+\s+)?comigo)\b", "POSSIVEL_DENUNCIA", "Relato pessoal de ocorrido."),
     (r"\b(?:pediu\s+dinheiro|pediram\s+dinheiro|cobrou\s+propina|pediu\s+propina|cobrando\s+propina|suborno|concussão|concussao)\b", "POSSIVEL_DENUNCIA", "Relato de cobrança indevida ou corrupção de agente público."),
     (r"\b(?:praticou\s+(?:uma\s+)?irregularidade|cometeu\s+(?:uma\s+)?irregularidade|desvio\s+de\s+conduta)\b", "POSSIVEL_DENUNCIA", "Relato de conduta irregular ou infração disciplinar de agente.")
+]
+
+MEMORIA_CONVERSACIONAL_FAST_PATTERNS = [
+    (r"\b(?:qual\s+(?:foi|era)|sabe\s+qual\s+foi|lembra\s+qual\s+foi|o\s+que\s+(?:eu\s+)?perguntei)\s+(?:a\s+|minha\s+)?(?:primeira|1ª|1a)\s+(?:pergunta|dúvida|duvida|coisa)\b", "MEMORIA_CONVERSACIONAL", "Consulta sobre a primeira pergunta da sessão."),
+    (r"\b(?:qual\s+foi\s+a\s+primeira|minha\s+primeira\s+pergunta)\b", "MEMORIA_CONVERSACIONAL", "Consulta sobre a primeira pergunta da sessão."),
+    (r"\b(?:o\s+que\s+(?:você|vc|voce)\s+(?:me\s+)?respondeu\s+(?:antes|no\s+turno\s+anterior|anteriormente)|qual\s+foi\s+(?:a\s+)?última\s+resposta|qual\s+foi\s+(?:a\s+)?ultima\s+resposta)\b", "MEMORIA_CONVERSACIONAL", "Consulta sobre a resposta anterior da sessão."),
+    (r"\b(?:repita\s+(?:a\s+)?(?:primeira|segunda|terceira|quarta|última|ultima|\d+ª|\d+a)\s+(?:resposta|mensagem))\b", "MEMORIA_CONVERSACIONAL", "Solicitação de repetição de turno específico."),
+    (r"\b(?:sobre\s+o\s+que\s+(?:nós\s+)?(?:estávamos|estamos|a\s+gente\s+estava)\s+(?:conversando|falando)|quais\s+perguntas\s+(?:eu\s+)?já\s+fiz)\b", "MEMORIA_CONVERSACIONAL", "Consulta sobre o histórico geral de assuntos da sessão.")
+]
+
+CLARIFICACAO_RESPOSTA_FAST_PATTERNS = [
+    (r"\b(?:não\s+entendi|nao\s+entendi|não\s+compreendi|nao\s+compreendi|não\s+ficou\s+claro|nao\s+ficou\s+claro|ficou\s+confuso|muito\s+confuso|não\s+foi\s+isso\s+que\s+(?:eu\s+)?perguntei|nao\s+foi\s+isso\s+que\s+(?:eu\s+)?perguntei|explique\s+melhor|explica\s+melhor|explica\s+de\s+novo|explique\s+de\s+novo|pode\s+explicar\s+melhor|pode\s+explicar\s+de\s+novo|desenha\s+pra\s+mim|simplifica|não\s+ajudou|nao\s+ajudou)\b", "CLARIFICACAO_RESPOSTA", "Pedido de esclarecimento ou simplificação da resposta anterior."),
+    (r"\b(?:vai\s+à\s+merda|vai\s+a\s+merda|vai\s+se\s+foder|vai\s+se\s+ferrar|vai\s+tomar\s+no|robô\s+burro|robo\s+burro|inútil|inutil|assistente\s+burro|péssimo\s+assistente)\b", "CLARIFICACAO_RESPOSTA", "Frustração ou insatisfação com a comunicação do assistente virtual.")
 ]
 
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
@@ -344,7 +359,29 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
                 "source": "FAST_GATE"
             }
 
-    # 1º B: Relatos de ofensas/xingamentos/mau atendimento por agente/servidor (alta prioridade, antes de conversa casual)
+    # 1º B1: Memória Conversacional (meta-perguntas sobre perguntas e respostas anteriores)
+    for regex, intent, reason in MEMORIA_CONVERSACIONAL_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+
+    # 1º B2: Pedidos de Clarificação Didática e Insatisfação com a Comunicação do Assistente
+    for regex, intent, reason in CLARIFICACAO_RESPOSTA_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
+
+    # 1º B3: Relatos de ofensas/xingamentos/mau atendimento por agente/servidor (alta prioridade, antes de conversa casual)
     is_private_or_commercial = any(w in query_lower for w in [
         "comércio", "comercio", "loja", "bar", "restaurante", "lanchonete", "padaria",
         "mercado", "supermercado", "banco", "empresa", "vizinho", "vizinha", "motorista de ônibus",
@@ -355,8 +392,12 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         "guarda municipal", "guarda", "fiscal", "secretaria", "posto de saúde", "posto de saude",
         "upa", "hospital municipal", "escola municipal", "creche municipal"
     ])
-    # Se mencionar entidade comercial privada sem menção de servidor municipal, não é POSSIVEL_DENUNCIA funcional
-    if not (is_private_or_commercial and not has_municipal_agent):
+    is_bot_frustration = any(w in query_lower for w in [
+        "resposta", "robô", "robo", "assistente", "você é", "voce e", "não entendi", "nao entendi",
+        "vai à merda", "vai a merda", "vai se ferrar", "vai se foder", "inútil", "inutil"
+    ])
+    # Se mencionar entidade comercial privada ou frustração com a IA sem menção de servidor municipal, não é POSSIVEL_DENUNCIA funcional
+    if not (is_private_or_commercial and not has_municipal_agent) and not is_bot_frustration:
         for regex, intent, reason in POSSIVEL_DENUNCIA_FAST_PATTERNS:
             if re.search(regex, query_lower):
                 return {
@@ -510,12 +551,14 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- Manifestação de Ouvidoria com protocolo/atraso ou sem assunto = OUVIDORIA_MANIFESTACAO (needs_clarification=true se sem assunto).\n"
         "- Barulho sem local explícito = AMBIGUO_BARULHO (needs_clarification=true).\n"
         "- JURIDICO = Usar APENAS se o cidadão solicitar explicitamente que a IA formule petição jurídica, redija recurso/parecer legal ou elabore argumentos em ação judicial contra a prefeitura. Dúvidas sobre onde recorrer de multas municipais (JARI), prazos legais para recorrer de infrações, como consultar processos administrativos ou localização de secretarias NÃO são JURIDICO -> use RAG_GERAL.\n"
-        "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n\n"
+        "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n"
+        "- MEMORIA_CONVERSACIONAL = Perguntas reflexivas sobre o histórico do diálogo, primeira pergunta feita, respostas anteriores ou assuntos já conversados (ex: \"qual foi minha primeira pergunta?\", \"o que você me respondeu antes?\", \"repita a segunda resposta\", \"sobre o que estamos conversando?\").\n"
+        "- CLARIFICACAO_RESPOSTA = Pedidos de explicação didática, simplificação da resposta anterior (ex: \"não entendi\", \"explique melhor\", \"ficou confuso\") ou frustração e desabafo com a IA (ex: \"não entendi a resposta. vai à merda\", \"robô burro\"). NUNCA use POSSIVEL_DENUNCIA para insatisfação ou ofensas direcionadas ao assistente virtual!\n\n"
         f"{history_context}"
         f"Consulta: \"{query}\"\n\n"
         "Retorne APENAS um JSON:\n"
         "{\n"
-        '  "intent": "SAUDACAO"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
+        '  "intent": "SAUDACAO"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA"|"MEMORIA_CONVERSACIONAL"|"CLARIFICACAO_RESPOSTA"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
         '  "tipo_manifestacao": "reclamacao"|"denuncia"|"elogio"|"sugestao"|"geral"|null,\n'
         '  "confidence": 0.0-1.0,\n'
         '  "needs_clarification": true|false,\n'
@@ -634,6 +677,14 @@ def _add_routing_metadata(triage_res: dict) -> dict:
     elif intent == "PROGRAMACAO":
         triage_res["next_agent"] = "PROGRAMACAO_HANDLER"
         triage_res["workflow"] = "PROGRAMACAO"
+        triage_res["clarification_type"] = None
+    elif intent == "MEMORIA_CONVERSACIONAL":
+        triage_res["next_agent"] = "MEMORY_RECALL_HANDLER"
+        triage_res["workflow"] = "MEMORY"
+        triage_res["clarification_type"] = None
+    elif intent == "CLARIFICACAO_RESPOSTA":
+        triage_res["next_agent"] = "CLARIFICATION_HANDLER"
+        triage_res["workflow"] = "CLARIFICATION"
         triage_res["clarification_type"] = None
     else:
         # Default: RAG_GERAL e outros informativos

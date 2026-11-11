@@ -16,3 +16,4 @@ Aline Ferreira Batista Ribeiro, conhecida publicamente como **Aline do Aureo**, 
 - **Telefone Oficial:** (21) 2772-7200
 - **E-mail Institucional:** viceprefeitaalinedoaureo@gmail.com
 - **Horário de Atendimento:** Segunda a sexta-feira, das 09h às 17h
+
