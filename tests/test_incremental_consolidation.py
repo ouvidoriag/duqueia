@@ -44,7 +44,8 @@ def test_catalogo_59_apis_transparencia():
         cur = conn.cursor()
         rows = cur.execute("SELECT id, titulo FROM chunks_fts WHERE chunks_fts MATCH ?", ("despesas_liquidadas",)).fetchall()
         assert len(rows) > 0, "Deveria encontrar catálogo das 59 APIs da Transparência no FTS5"
-        assert rows[0][0] == "transparencia_catalogo_59_apis"
+        assert rows[0][0] == "transparencia_api_orcamento_receitas_despesas"
+        assert "Portal da Transparência" in rows[0][1]
 
 def test_golden_source_escola_resolution():
     resolver = GoldenSourceResolver()
@@ -65,6 +66,23 @@ def test_school_contacts_grounding():
     ans = f"A escola CIEP Monteiro Lobato atende pelo e-mail oficial {school_email}."
     assert check_output_guardrail("contato escola", ans, None) is True
 
+def test_bairros_atomicos_fts():
+    with sqlite3.connect(DATABASE_VECTOR) as conn:
+        cur = conn.cursor()
+        rows = cur.execute("SELECT id, titulo FROM chunks WHERE id = 'bairro_1_distrito_25_de_agosto'").fetchall()
+        assert len(rows) > 0, "Deveria encontrar chunk atômico do bairro 25 de Agosto em chunks"
+        assert "25 de Agosto" in rows[0][1]
+
+        fts_rows = cur.execute("SELECT id, titulo FROM chunks_fts WHERE chunks_fts MATCH ?", ("25 de Agosto",)).fetchall()
+        assert len(fts_rows) > 0, "Deveria encontrar bairro 25 de Agosto no FTS5"
+
+def test_servico_subdivisao_secoes():
+    with sqlite3.connect(DATABASE_VECTOR) as conn:
+        cur = conn.cursor()
+        rows = cur.execute("SELECT id, titulo FROM chunks WHERE id = 'servico_00366_p1'").fetchall()
+        assert len(rows) > 0, "Deveria encontrar Parte 1 do serviço 366"
+        assert "Parte 1" in rows[0][1]
+
 if __name__ == "__main__":
     print("\n=======================================================")
     print("   TESTE DE VALIDAÇÃO DA CONSOLIDAÇÃO INCREMENTAL     ")
@@ -76,14 +94,18 @@ if __name__ == "__main__":
     test_editais_concursos_2026()
     print("✓ test_editais_concursos_2026: PASS (Editais 2026 OK)")
     test_catalogo_59_apis_transparencia()
-    print("✓ test_catalogo_59_apis_transparencia: PASS (59 APIs OK)")
+    print("✓ test_catalogo_59_apis_transparencia: PASS (59 APIs Sub-chunks OK)")
     test_golden_source_escola_resolution()
     print("✓ test_golden_source_escola_resolution: PASS (0ms Golden Source OK)")
     test_synonyms_expansion()
     print("✓ test_synonyms_expansion: PASS (1.623 Sinônimos OK)")
     test_school_contacts_grounding()
     print("✓ test_school_contacts_grounding: PASS (Grounding Escolas OK)")
+    test_bairros_atomicos_fts()
+    print("✓ test_bairros_atomicos_fts: PASS (47 Bairros Atômicos GIS OK)")
+    test_servico_subdivisao_secoes()
+    print("✓ test_servico_subdivisao_secoes: PASS (Subdivisão de Serviços OK)")
     print("=======================================================")
-    print("TODOS OS 7 TESTES DE CONSOLIDAÇÃO APROVADOS! 🎯")
+    print("TODOS OS 9 TESTES DE CONSOLIDAÇÃO APROVADOS! 🎯")
     print("=======================================================\n")
 
