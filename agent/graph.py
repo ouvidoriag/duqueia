@@ -404,6 +404,10 @@ def node_clarification(state: AgentState, ctx: GraphContext) -> AgentState:
     return _run_handler(state, ctx, "CLARIFICATION_HANDLER")
 
 
+def node_ai_meta(state: AgentState, ctx: GraphContext) -> AgentState:
+    return _run_handler(state, ctx, "AI_META_HANDLER")
+
+
 # ---------------------------------------------------------------------------
 # Factory: build the default Duque IA graph
 # ---------------------------------------------------------------------------
@@ -432,6 +436,7 @@ def build_duque_ia_graph() -> AgentGraph:
     graph.add_node(Node("AUTHORITY_HANDLER",             node_authority,     on_error_next="END"))
     graph.add_node(Node("MEMORY_RECALL_HANDLER",         node_memory_recall, on_error_next="END"))
     graph.add_node(Node("CLARIFICATION_HANDLER",         node_clarification, on_error_next="END"))
+    graph.add_node(Node("AI_META_HANDLER",               node_ai_meta,       on_error_next="END"))
 
     graph.set_entry("fast_gate")
     return graph

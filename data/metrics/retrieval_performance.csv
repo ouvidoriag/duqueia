@@ -1842,3 +1842,12 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-11 15:06:52,eu queria levar meu cachorro na emergencia e agora,6277.66,5306.43,11705.93,1.0000,2728,0.00029600
 2026-11-11 15:06:57,Como solicitar o conserto de lâmpada de poste apagada?,505.73,4644.48,5153.37,1.0000,1651,0.00021570
 2026-11-11 15:59:30,Minha avó é idosa; possui dificuldade de locomoção e depende de medicamentos fornecidos pela rede municipal. Entretanto; há dois meses estamos enfrentando dificuldades para conseguir os medicamentos na unidade de saúde. Quando perguntamos aos funcionários; cada um fornece uma informação diferente. Como podemos formalizar essa situação e solicitar uma solução sem precisar nos deslocar diversas vezes?,9600.44,7120.69,18580.22,1.0000,3391,0.00038680
+2026-11-11 16:06:31,Como solicitar o conserto de lâmpada de poste apagada?,849.07,5298.99,6151.60,1.0000,1656,0.00021720
+2026-11-11 16:13:20,Como pedir operação tapa-buraco na minha rua?,888.49,4276.85,6326.61,1.0000,2300,0.00022650
+2026-11-11 16:14:16,Como funciona o Castramóvel e castração gratuita de animais?,1408.23,5627.85,7041.07,1.0000,2755,0.00030680
+2026-11-11 16:46:41,Minha avó é idosa; possui dificuldade de locomoção e depende de medicamentos fornecidos pela rede municipal. Entretanto; há dois meses estamos enfrentando dificuldades para conseguir os medicamentos na unidade de saúde. Quando perguntamos aos funcionários; cada um fornece uma informação diferente. Como podemos formalizar essa situação e solicitar uma solução sem precisar nos deslocar diversas vezes?,15108.91,9343.62,26335.89,1.0000,3529,0.00042820
+2026-11-11 16:46:55,Morte,656.99,7614.05,9515.99,0.9405,3314,0.00037260
+2026-11-11 16:47:02,O serviço municipal de resgate de animais atende animais silvestres?,813.17,5325.45,7238.00,1.0000,2699,0.00028740
+2026-11-11 17:03:55,Minha avó é idosa; possui dificuldade de locomoção e depende de medicamentos fornecidos pela rede municipal. Entretanto; há dois meses estamos enfrentando dificuldades para conseguir os medicamentos na unidade de saúde. Quando perguntamos aos funcionários; cada um fornece uma informação diferente. Como podemos formalizar essa situação e solicitar uma solução sem precisar nos deslocar diversas vezes?,8086.61,8126.02,20409.90,1.0000,3584,0.00041350
+2026-11-11 17:04:09,Morte,585.37,8724.01,10865.45,0.9405,3307,0.00037010
+2026-11-11 17:04:16,O serviço municipal de resgate de animais atende animais silvestres?,816.36,4910.23,6594.61,1.0000,2652,0.00027470

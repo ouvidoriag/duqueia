@@ -40,7 +40,8 @@ ALLOWED_INTENTS = {
     "POSSIVEL_DENUNCIA",
     "AUTORIDADE_PUBLICA",
     "MEMORIA_CONVERSACIONAL",
-    "CLARIFICACAO_RESPOSTA"
+    "CLARIFICACAO_RESPOSTA",
+    "AI_META_INFO"
 }
 
 # --------------------------------------------------------------------------
@@ -133,6 +134,14 @@ CLARIFICACAO_RESPOSTA_FAST_PATTERNS = [
     (r"\b(?:vai\s+à\s+merda|vai\s+a\s+merda|vai\s+se\s+foder|vai\s+se\s+ferrar|vai\s+tomar\s+no|robô\s+burro|robo\s+burro|inútil|inutil|assistente\s+burro|péssimo\s+assistente)\b", "CLARIFICACAO_RESPOSTA", "Frustração ou insatisfação com a comunicação do assistente virtual.")
 ]
 
+AI_META_INFO_FAST_PATTERNS = [
+    (r"\b(?:inventa(?:ria)?|inventar)\s+(?:informaç|protocol|telefon|dado|contato|encaminha|respost)", "AI_META_INFO", "Questionamento sobre não-invenção de dados e protocolos pela IA."),
+    (r"\b(?:a\s+ia|você|voce)\s+(?:inventa|inventaria|mente|alucina|engana)", "AI_META_INFO", "Questionamento sobre veracidade e limites da IA."),
+    (r"\b(?:para\s+me\s+agradar|pra\s+me\s+agradar)\b", "AI_META_INFO", "Questionamento sobre invenção de respostas para agradar o munícipe."),
+    (r"\b(?:posso\s+confiar\s+em\s+você|posso\s+confiar\s+na\s+ia|você\s+é\s+confi[aá]vel|voce\s+e\s+confiavel)\b", "AI_META_INFO", "Pergunta sobre confiabilidade da IA."),
+    (r"\b(?:como\s+(?:você|voce)\s+funciona|de\s+onde\s+v[eê]m\s+(?:suas|as)\s+informaç[õo]es)\b", "AI_META_INFO", "Pergunta sobre funcionamento e fontes da IA.")
+]
+
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
     (r"\b(?:quem\s+é\s+o\s+prefeito|quem\s+e\s+o\s+prefeito|quem\s+é\s+o\s+prefeitor|qual\s+o\s+prefeito|qual\s+é\s+o\s+prefeito)\b", "AUTORIDADE_PUBLICA", "Busca direta pelo prefeito."),
     (r"\b(?:quem\s+é\s+o\s+vice|quem\s+e\s+o\s+vice|quem\s+é\s+a\s+vice|quem\s+e\s+a\s+vice|vice-prefeito|vice\s+prefeito|vice-prefeita|vice\s+prefeita)\b", "AUTORIDADE_PUBLICA", "Busca pelo vice-prefeito."),
@@ -176,7 +185,8 @@ INDEPENDENT_TOPIC_KEYWORDS = [
     "iluminação", "iluminacao", "lixo", "buraco", "asfalto", "bueiro",
     "vacina", "matrícula", "matricula", "remédio", "remedio", "hospital",
     "veterinário", "veterinario", "cachorro", "gato", "pet", "animal", "hmv",
-    "upa", "creche", "escola"
+    "upa", "creche", "escola", "inventa", "inventaria", "alucina",
+    "confiável", "confiavel", "como você funciona", "como voce funciona"
 ]
 
 INDEPENDENT_QUESTION_PREFIXES = [
@@ -184,7 +194,10 @@ INDEPENDENT_QUESTION_PREFIXES = [
     "como posso", "onde posso", "preciso saber", "preciso do", "qual o horário",
     "qual o horario", "tenho uma reclamação sobre o comércio ambulante",
     "reclamação sobre o comércio ambulante", "quero denunciar um comércio funcionando irregularmente",
-    "o estabelecimento onde trabalho", "quero abrir uma reclamação contra um estabelecimento por falta de higiene"
+    "o estabelecimento onde trabalho", "quero abrir uma reclamação contra um estabelecimento por falta de higiene",
+    "você inventaria", "voce inventaria", "você inventa", "voce inventa",
+    "você mente", "voce mente", "você é confiável", "voce e confiavel",
+    "posso confiar", "como você funciona", "como voce funciona"
 ]
 
 def check_fast_gate(query: str, history: list = None) -> dict | None:
@@ -208,6 +221,17 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
             "reason": "Query extremamente curta tratada como saudação padrão.",
             "source": "FAST_GATE"
         }
+
+    # 0º Prioridade Máxima: Integridade e Transparência da IA (não-invenção de dados/protocolos)
+    for regex, intent, reason in AI_META_INFO_FAST_PATTERNS:
+        if re.search(regex, query_lower):
+            return {
+                "intent": intent,
+                "confidence": 1.0,
+                "needs_clarification": False,
+                "reason": reason,
+                "source": "FAST_GATE"
+            }
 
     # Desambiguação instantânea multi-turno (0ms) baseada no histórico recente
     if history:
@@ -555,12 +579,13 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- JURIDICO = Usar APENAS se o cidadão solicitar explicitamente que a IA formule petição jurídica, redija recurso/parecer legal ou elabore argumentos em ação judicial contra a prefeitura. Dúvidas sobre onde recorrer de multas municipais (JARI), prazos legais para recorrer de infrações, como consultar processos administrativos ou localização de secretarias NÃO são JURIDICO -> use RAG_GERAL.\n"
         "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n"
         "- MEMORIA_CONVERSACIONAL = Perguntas reflexivas sobre o histórico do diálogo, primeira pergunta feita, respostas anteriores ou assuntos já conversados (ex: \"qual foi minha primeira pergunta?\", \"o que você me respondeu antes?\", \"repita a segunda resposta\", \"sobre o que estamos conversando?\").\n"
-        "- CLARIFICACAO_RESPOSTA = Pedidos de explicação didática, simplificação da resposta anterior (ex: \"não entendi\", \"explique melhor\", \"ficou confuso\") ou frustração e desabafo com a IA (ex: \"não entendi a resposta. vai à merda\", \"robô burro\"). NUNCA use POSSIVEL_DENUNCIA para insatisfação ou ofensas direcionadas ao assistente virtual!\n\n"
+        "- CLARIFICACAO_RESPOSTA = Pedidos de explicação didática, simplificação da resposta anterior (ex: \"não entendi\", \"explique melhor\", \"ficou confuso\") ou frustração e desabafo com a IA (ex: \"não entendi a resposta. vai à merda\", \"robô burro\"). NUNCA use POSSIVEL_DENUNCIA para insatisfação ou ofensas direcionadas ao assistente virtual!\n"
+        "- AI_META_INFO = Perguntas sobre funcionamento, limites, confiabilidade ou se a IA inventa informações, números de protocolos, telefones ou encaminhamentos para agradar (ex: \"você inventaria informações para me agradar?\", \"você inventa protocolos?\", \"como você funciona?\"). NUNCA encaminhe para secretarias aleatórias!\n\n"
         f"{history_context}"
         f"Consulta: \"{query}\"\n\n"
         "Retorne APENAS um JSON:\n"
         "{\n"
-        '  "intent": "SAUDACAO"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA"|"MEMORIA_CONVERSACIONAL"|"CLARIFICACAO_RESPOSTA"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
+        '  "intent": "SAUDACAO"|"LGPD"|"JURIDICO"|"FORA_COMPETENCIA"|"AMBIGUO_LUZ"|"AMBIGUO_LAMPADA"|"AMBIGUO_BARULHO"|"RESIDENCIAL"|"OUVIDORIA_MANIFESTACAO"|"ESCALONAMENTO_HUMANO"|"POSSIVEL_DENUNCIA"|"AUTORIDADE_PUBLICA"|"MEMORIA_CONVERSACIONAL"|"CLARIFICACAO_RESPOSTA"|"AI_META_INFO"|"PROGRAMACAO"|"CONVERSA"|"RAG_GERAL",\n'
         '  "tipo_manifestacao": "reclamacao"|"denuncia"|"elogio"|"sugestao"|"geral"|null,\n'
         '  "confidence": 0.0-1.0,\n'
         '  "needs_clarification": true|false,\n'
@@ -687,6 +712,10 @@ def _add_routing_metadata(triage_res: dict) -> dict:
     elif intent == "CLARIFICACAO_RESPOSTA":
         triage_res["next_agent"] = "CLARIFICATION_HANDLER"
         triage_res["workflow"] = "CLARIFICATION"
+        triage_res["clarification_type"] = None
+    elif intent == "AI_META_INFO":
+        triage_res["next_agent"] = "AI_META_HANDLER"
+        triage_res["workflow"] = "AI_TRANSPARENCY"
         triage_res["clarification_type"] = None
     else:
         # Default: RAG_GERAL e outros informativos

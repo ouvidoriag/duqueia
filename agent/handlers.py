@@ -1071,7 +1071,14 @@ class RagHandler(BaseHandler):
                 "21. **Auxílio para Famílias Atingidas por Chuvas e Enchentes**: Para desastres naturais com perda de moradia ou enchentes: oriente imediatamente a **Defesa Civil (199)** para emergência e risco ativo. Para suporte social, acolhimento, benefícios eventuais (Aluguel Social Emergencial, Cesta Básica, Colchões) e inscrição no **CadÚnico**, oriente comparecer ao **CRAS (Centro de Referência de Assistência Social)** de referência do bairro ou à **Secretaria Municipal de Assistência Social e Direitos Humanos (SMASDH)**. NUNCA oriente procurar postos de saúde (UBS/SMS) para benefício de enchente ou moradia destruída!\n"
                 "22. **Foco e Relevância Estrita**: NUNCA mencione ou justifique serviços irrelevantes que aparecerem acidentalmente no contexto se não tiverem relação direta com a pergunta do munícipe (ex: não cite 'tabagismo' ou 'banco de leite' se a pergunta for sobre água ou rua). Responda com foco exclusivo no que foi perguntado!\n"
                 "23. NÃO use saudações redundantes se a conversa já estiver em andamento.\n"
-                "24. **Diferença entre Secretaria de Obras (SMOA) e Secretaria de Urbanismo (SMUH)**: A **Secretaria Municipal de Obras e Agricultura (SMOA)** cuida da execução física da infraestrutura e obras públicas da cidade (pavimentação asfáltica, tapa-buraco, drenagem pluvial, dragagem de canais, contenção de encostas e quebra-molas). Já a **Secretaria Municipal de Urbanismo e Habitação (SMUH)** cuida do planejamento urbano e regulação/licenciamento privado (Alvará de Construção, Habite-se, fiscalização de posturas edilícias, numeração predial e REURB - Regularização Fundiária Urbana)."
+                "24. **Diferença entre Secretaria de Obras (SMOA) e Secretaria de Urbanismo (SMUH)**: A **Secretaria Municipal de Obras e Agricultura (SMOA)** cuida da execução física da infraestrutura e obras públicas da cidade (pavimentação asfáltica, tapa-buraco, drenagem pluvial, dragagem de canais, contenção de encostas e quebra-molas). Já a **Secretaria Municipal de Urbanismo e Habitação (SMUH)** cuida do planejamento urbano e regulação/licenciamento privado (Alvará de Construção, Habite-se, fiscalização de posturas edilícias, numeração predial e REURB - Regularização Fundiária Urbana).\n"
+                "25. **Falta de Medicamentos na Rede Municipal e Pacientes Idosos / Com Mobilidade Reduzida**:\n"
+                "   - Quando o munícipe relatar falta de medicamentos (desabastecimento) para paciente vulnerável, idoso ou com dificuldade de locomoção:\n"
+                "     * **Priorize o Cuidado e Assistência de Saúde**: Oriente primeiro que a família pode buscar apoio na **Unidade de Saúde da Família (USF / Clínica da Família)** ou UBS de referência do território. As equipes da **Estratégia Saúde da Família (ESF)** e os **Agentes Comunitários de Saúde (ACS)** realizam visitas e acompanhamento domiciliar territorial, facilitando a verificação de receitas e a dispensação de medicamentos contínuos (Farmácia Básica Municipal / polos da SMS) para que a pessoa não precise se deslocar.\n"
+                "     * **Canais Remotos Oficiais**: Informe canais digitais/remotos confirmados para evitar deslocamentos presenciais desnecessários: aplicativo/portal **Colab (duquedecaxias.colab.re)** e o **WhatsApp Oficial da Ouvidoria Geral ((21) 99824-5903)**.\n"
+                "     * **Diferenciação Clara**: Separe com precisão o suporte assistencial de saúde (USF/ACS) da formalização de reclamação por falta de medicamento (Ouvidoria da Saúde via Colab ou WhatsApp).\n"
+                "     * **NÃO Exija Documentação Excessiva**: Para relatar ou registrar a falta de medicamento na Ouvidoria, NÃO imponha listas burocráticas rígidas de documentos obrigatórios (como comprovante de residência em nome próprio ou termo formal de representação). Indique apenas as informações úteis para localização e averiguação do fato: nome do paciente, nome e dosagem do medicamento em falta, unidade de saúde onde foi procurado e a data da tentativa.\n"
+                "26. **Anti-Vazamento de Metadados Internos e OCR**: NUNCA exponha nomes de arquivos técnicos, códigos de chunks (ex: 'carta_01237'), termos de scanner óptico (ex: 'OCR Óptico', 'Página 1 *(OCR Óptico)*') ou prefixos de pastas (ex: '07_Secretaria...'). Use SEMPRE o nome oficial e humanizado do órgão ou serviço público."
             )
             
             if history:
@@ -1147,6 +1154,11 @@ class RagHandler(BaseHandler):
             # Remove eventuais menções a serviços irrelevantes que vazaram no contexto (ex: tabagismo/banco de leite)
             answer = re.sub(r'(?i)^.*?(?:Tratamento para Fumantes|Banco de Leite Humano).*?$\n?', '', answer, flags=re.MULTILINE)
             answer = re.sub(r'(?i)^.*?as informações que possuo no momento são sobre os serviços de.*?$\n?', '', answer, flags=re.MULTILINE)
+            # Sanitização determinística de vazamento de metadados internos, OCR óptico e códigos de chunks
+            answer = re.sub(r'\s*\*?\(OCR[^\)]*\)\*?', '', answer, flags=re.IGNORECASE)
+            answer = re.sub(r'###\s*Página\s*\d+\s*\*?\(OCR[^\)]*\)\*?', '', answer, flags=re.IGNORECASE)
+            answer = re.sub(r'\b\d{2}_([A-Za-z0-9_]+):\s*Página\s*\d+', lambda m: m.group(1).replace('_', ' '), answer)
+            answer = re.sub(r'\bcarta_\d+\b', '', answer, flags=re.IGNORECASE)
             answer = re.sub(r'\(\s*\)', '', answer)
             answer = re.sub(r'\s*\(\s*$', '.', answer)  # Remove parêntese órfão no final substituindo por ponto
             answer = re.sub(r'\n\s*\n\s*\n', '\n\n', answer).strip()
@@ -1768,6 +1780,79 @@ class ClarificationHandler(BaseHandler):
             "sources": [],
             "confidence": 0.98,
             "intent_detected": "CLARIFICACAO_RESPOSTA",
+            "triage_info": triage_info,
+            "metrics": {
+                "retrieval_time_ms": 0,
+                "llm_time_ms": round(elapsed * 1000, 2),
+                "total_time_ms": round(elapsed * 1000, 2),
+                "tokens_used": 0,
+                "keywords": extract_query_keywords(query)
+            }
+        }
+
+
+class AIMetaHandler(BaseHandler):
+    """Trata perguntas sobre integridade, transparência, limites, confiabilidade e não-invenção de dados pela IA."""
+    def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
+        elapsed = time.time() - start_time
+        
+        if agent.using_real and agent.gemini_client:
+            try:
+                sys_instruct = (
+                    "Você é o DUQUE IA, assistente virtual oficial da Prefeitura de Duque de Caxias — RJ.\n"
+                    "O munícipe fez uma pergunta sobre seu funcionamento, limites, confiabilidade ou se você inventa informações, protocolos ou telefones para agradá-lo.\n"
+                    "DIRETRIZES DE TRANSPARÊNCIA E INTEGRIDADE:\n"
+                    "1. Responda com clareza, firmeza institucional e empatia:\n"
+                    "   - Afirme categoricamente que você NUNCA inventa informações, números de protocolos ou telefones.\n"
+                    "   - Explique que protocolos oficiais de atendimento só existem quando gerados pelos sistemas municipais homologados (como o aplicativo Colab, o portal da Prefeitura ou o atendimento telefônico oficial).\n"
+                    "   - Explique que todas as informações que você fornece vêm de fontes oficiais e da Carta de Serviços de Duque de Caxias.\n"
+                    "   - Destaque que, quando um dado não consta na base ou há incerteza, seu dever é admitir a limitação com honestidade e orientar o cidadão aos canais oficiais.\n"
+                    "2. Forneça os contatos da Ouvidoria Geral como canal oficial e humano:\n"
+                    f"   - Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
+                    f"   - WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+                    f"   - Online: aplicativo **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))\n"
+                    "3. NUNCA mencione nem desvie para secretarias ou institutos aleatórios (como IPMDC ou Fazenda).\n"
+                    "4. Mantenha tom caloroso, objetivo e educado (máximo 4 a 5 frases estruturadas)."
+                )
+                prompt = (
+                    f"Pergunta do munícipe: \"{query}\"\n\n"
+                    "Gere a resposta de integridade e transparência:"
+                )
+                ans = agent.gemini_client.generate_response(
+                    prompt,
+                    system_instruction=sys_instruct,
+                    model="gemini-3.1-flash-lite",
+                    temperature=0.1,
+                    max_output_tokens=350
+                ).strip()
+            except Exception:
+                ans = (
+                    "Não, de forma alguma! Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
+                    "• **Não invento protocolos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios.\n"
+                    "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados e da Carta de Serviços da Prefeitura de Duque de Caxias.\n"
+                    "• **Transparência e Limites**: Se uma informação não constar em minha base oficial, informo com clareza a limitação e oriento você a contatar os atendentes da **Ouvidoria Geral de Duque de Caxias**:\n"
+                    f"  - **Telefone**: {OUVIDORIA_CONTACTS['telefone']}\n"
+                    f"  - **WhatsApp**: {OUVIDORIA_CONTACTS['whatsapp']}\n"
+                    f"  - **Online**: aplicativo **Colab** ({OUVIDORIA_CONTACTS['colab_url_clean']})\n\n"
+                    "Meu compromisso é fornecer um atendimento factual, seguro e 100% transparente para a nossa cidade."
+                )
+        else:
+            ans = (
+                "Não, de forma alguma! Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
+                "• **Não invento protocolos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios.\n"
+                "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados e da Carta de Serviços da Prefeitura de Duque de Caxias.\n"
+                "• **Transparência e Limites**: Se uma informação não constar em minha base oficial, informo com clareza a limitação e oriento você a contatar os atendentes da **Ouvidoria Geral de Duque de Caxias**:\n"
+                f"  - **Telefone**: {OUVIDORIA_CONTACTS['telefone']}\n"
+                f"  - **WhatsApp**: {OUVIDORIA_CONTACTS['whatsapp']}\n"
+                f"  - **Online**: aplicativo **Colab** ({OUVIDORIA_CONTACTS['colab_url_clean']})\n\n"
+                "Meu compromisso é fornecer um atendimento factual, seguro e 100% transparente para a nossa cidade."
+            )
+
+        return {
+            "answer": ans,
+            "sources": ["Diretrizes de Integridade e Transparência do Duque IA"],
+            "confidence": 1.0,
+            "intent_detected": "ai_meta_info",
             "triage_info": triage_info,
             "metrics": {
                 "retrieval_time_ms": 0,

@@ -47,7 +47,8 @@ from agent.handlers import (
     RagHandler,
     AuthorityHandler,
     MemoryRecallHandler,
-    ClarificationHandler
+    ClarificationHandler,
+    AIMetaHandler
 )
 
 
@@ -409,7 +410,8 @@ class DuqueIAAgent:
             "RAG_HANDLER": RagHandler(),
             "AUTHORITY_HANDLER": AuthorityHandler(),
             "MEMORY_RECALL_HANDLER": MemoryRecallHandler(),
-            "CLARIFICATION_HANDLER": ClarificationHandler()
+            "CLARIFICATION_HANDLER": ClarificationHandler(),
+            "AI_META_HANDLER": AIMetaHandler()
         }
         
         os.makedirs(os.path.join(os.path.dirname(self.db_path), "..", "logs"), exist_ok=True)
