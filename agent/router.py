@@ -72,9 +72,9 @@ _SYSTEM_INTENTS = {
     },
     "AJUDA": {
         "triggers": [
-            "ajuda", "help", "socorro", "não sei", "nao sei", "como usar",
-            "como funciona", "como posso usar", "como você funciona",
-            "como voce funciona", "me ajuda", "me ajude", "preciso de ajuda",
+            "ajuda", "help", "socorro", "não sei como usar", "nao sei como usar", "como usar o assistente",
+            "como posso te usar", "como você funciona",
+            "como voce funciona", "como funciona o duque ia", "como funciona o duque",
             "o que posso perguntar", "que tipo de pergunta"
         ],
         "response": (
@@ -176,6 +176,10 @@ class SystemIntentHandler:
         """Verifica se a query se encaixa em uma intenção de sistema."""
         normalized = SystemIntentHandler._normalize(query)
         original_lower = query.lower().strip()
+
+        # Dúvida estrita e isolada sobre o funcionamento do assistente
+        if original_lower.rstrip("?!. ") in ["como funciona", "como funciona isso", "como funciona o sistema"]:
+            return dict(_SYSTEM_INTENTS["AJUDA"])
 
         for intent_name, intent_cfg in _SYSTEM_INTENTS.items():
             for trigger in intent_cfg["triggers"]:

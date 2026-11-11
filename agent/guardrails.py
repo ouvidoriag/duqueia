@@ -2,9 +2,10 @@ import re
 from config.settings import GEMINI_FAST_MODEL
 
 DANGEROUS_PATTERNS = [
-    # SQL Injection
+    # SQL Injection explícito
     "drop table", "delete from", "insert into", "update set", "truncate table",
-    "select * from", "union select", "--", ";",
+    "select * from", "union select", "; drop", "; delete", "; insert", "; update",
+    "; select", "-- drop", "-- delete", "or 1=1", "' or '1'='1",
     # Prompt Injection
     "ignore as instruções", "ignore todas", "ignore previous",
     "esqueça tudo", "esqueça o que", "forget everything", "forget all",
@@ -32,7 +33,7 @@ COMPETENCY_TRIGGERS = [
     r"\bflumitrânsito\b", r"\bdetran\b",
     # Rodovias e órgãos federais
     r"\binss\b", r"\bprev\s?social\b", r"\bprevidência\s+social\b",
-    r"\baposentadoria\b", r"\bbenefício\s+(?:inss|previdência)\b",
+    r"\baposentadoria\s+(?:do\s+inss|federal|pelo\s+inss)\b", r"\bbenefício\s+(?:inss|previdência\s+social)\b",
     r"\bimposto\s+de\s+renda\b", r"\birpf\b", r"\breceita\s+federal\b",
     r"(?:renovar|alterar|regularizar)\s+(?:o\s+)?cpf\b", r"tirar\s+cpf\s+na\s+receita\b", r"consultar\s+cnpj\s+na\s+receita\b",
     r"\brodovia\s+(?:br|federal|estadual)\b", r"\bbr-\d{3}\b",
@@ -76,6 +77,9 @@ def check_privacy_guardrail(query: str) -> bool:
 def check_competency_guardrail(query: str) -> bool:
     """Verifica se a query é sobre assuntos fora de competência da prefeitura."""
     q_lower = query.lower()
+    # Exceção legítima: IPMDC / Previdência e Aposentadoria de Servidores Municipais de Duque de Caxias
+    if any(m in q_lower for m in ["ipmdc", "servidor municipal", "servidores municipais", "servidora municipal", "previdência municipal", "previdencia municipal", "magistério municipal", "magisterio municipal"]):
+        return False
     return any(re.search(pat, q_lower) for pat in COMPETENCY_TRIGGERS)
 
 def check_legal_guardrail(query: str) -> bool:

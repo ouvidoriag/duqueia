@@ -270,7 +270,9 @@ class GoldenSourceResolver:
             "demora", "esperando", "espera", "marcação", "marcacao", "marcar", "especialista", "como proceder",
             "reclamar", "reclamação", "reclamacao", "agendamento", "fila", "sisreg", "regulação", "regulacao",
             "consulta", "diferenca", "diferença", "diferente", "comparar", "escopo", "competencia", "competência",
-            "exemplos", "atribuicao", "atribuição", "atribuições", "atribuicoes"
+            "exemplos", "atribuicao", "atribuição", "atribuições", "atribuicoes",
+            "funcao", "função", "funcoes", "funções", "o que faz", "papel", "atividades", "atividade",
+            "esportes", "esporte", "modalidades", "atuacao", "atuação", "responsabilidades"
         ])
         is_location_query = any(w in q_norm for w in [
             "onde", "fica", "endereco", "endereço", "qual o endereco", "qual o endereço",

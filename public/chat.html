@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Duque IA — Atendimento Virtual da Prefeitura de Duque de Caxias</title>
-  
+
   <!-- Tipografia Oficial: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
-      --brand-primary:   #003f99;
-      --brand-dark:      #002255;
-      --brand-light:     #e8f1fc;
-      --brand-accent:    #0284c7;
-      --bg-page:         #f1f5f9;
-      --surface:         #ffffff;
-      --surface-subtle:  #f8fafc;
-      --border:          #cbd5e1;
-      --border-light:    #e2e8f0;
-      --text-main:       #0f172a;
-      --text-muted:      #475569;
-      --text-soft:       #64748b;
-      --user-bubble:     #003f99;
-      --bot-bubble:      #ffffff;
-      --green:           #10b981;
-      --libras:          #0284c7;
-      --shadow-sm:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md:       0 4px 12px rgba(0, 43, 102, 0.08);
-      --shadow-lg:       0 12px 36px rgba(0, 34, 85, 0.12);
-      --radius-card:     24px;
-      --radius-bubble:   18px;
+      --brand-primary: #003f99;
+      --brand-dark: #002255;
+      --brand-light: #e8f1fc;
+      --brand-accent: #0284c7;
+      --bg-page: #f1f5f9;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-soft: #64748b;
+      --user-bubble: #003f99;
+      --bot-bubble: #ffffff;
+      --green: #10b981;
+      --libras: #0284c7;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 12px rgba(0, 43, 102, 0.08);
+      --shadow-lg: 0 12px 36px rgba(0, 34, 85, 0.12);
+      --radius-card: 24px;
+      --radius-bubble: 18px;
     }
 
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -156,8 +161,17 @@
     }
 
     @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50%      { transform: scale(1.2); opacity: 0.7; }
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+      }
     }
 
     .header-actions {
@@ -203,7 +217,10 @@
       letter-spacing: 0.2px;
       box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
     }
-    .libras-status-bar.visible { display: flex; }
+
+    .libras-status-bar.visible {
+      display: flex;
+    }
 
     /* ── Área de Mensagens (Feed) ────────────────────────────── */
     .messages-area {
@@ -217,7 +234,10 @@
       background: var(--surface-subtle);
     }
 
-    .messages-area::-webkit-scrollbar { width: 6px; }
+    .messages-area::-webkit-scrollbar {
+      width: 6px;
+    }
+
     .messages-area::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 10px;
@@ -238,8 +258,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .welcome-avatar {
@@ -299,7 +326,7 @@
       align-items: center;
       gap: 0.35rem;
       transition: all 0.2s ease;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .chip-btn:hover {
@@ -318,8 +345,15 @@
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .message-row.user {
@@ -377,19 +411,41 @@
     }
 
     /* Markdown dentro da resposta */
-    .message-bubble strong { font-weight: 700; color: #002255; }
-    .message-row.user .message-bubble strong { color: #ffffff; }
-    .message-bubble p { margin-bottom: 0.5rem; }
-    .message-bubble p:last-child { margin-bottom: 0; }
-    .message-bubble ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
-    .message-bubble li { margin-bottom: 0.25rem; }
-    
+    .message-bubble strong {
+      font-weight: 700;
+      color: #002255;
+    }
+
+    .message-row.user .message-bubble strong {
+      color: #ffffff;
+    }
+
+    .message-bubble p {
+      margin-bottom: 0.5rem;
+    }
+
+    .message-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-bubble ul {
+      padding-left: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .message-bubble li {
+      margin-bottom: 0.25rem;
+    }
+
     .message-bubble a {
       color: #0284c7;
       text-decoration: underline;
       font-weight: 600;
     }
-    .message-row.user .message-bubble a { color: #ffffff; }
+
+    .message-row.user .message-bubble a {
+      color: #ffffff;
+    }
 
     /* Metadados e Tags Técnicas */
     .meta-info {
@@ -400,7 +456,10 @@
       margin-top: 0.35rem;
       padding: 0 0.2rem;
     }
-    .message-row.user .meta-info { justify-content: flex-end; }
+
+    .message-row.user .meta-info {
+      justify-content: flex-end;
+    }
 
     .tag-meta {
       background: #f1f5f9;
@@ -467,12 +526,28 @@
       border-radius: 50%;
       animation: dotPulse 1.2s infinite ease-in-out both;
     }
-    .dot-w:nth-child(1) { animation-delay: -0.32s; }
-    .dot-w:nth-child(2) { animation-delay: -0.16s; }
+
+    .dot-w:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .dot-w:nth-child(2) {
+      animation-delay: -0.16s;
+    }
 
     @keyframes dotPulse {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-      40%           { transform: scale(1.1); opacity: 1; }
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
     }
 
     /* ── Barra de Entrada (Input) ────────────────────────────── */
@@ -527,10 +602,12 @@
       color: var(--text-muted);
       border: 1px solid var(--border);
     }
+
     .btn-mic:hover {
       background: #e2e8f0;
       color: var(--brand-dark);
     }
+
     .btn-mic.recording {
       background: #ef4444;
       color: #ffffff;
@@ -539,9 +616,17 @@
     }
 
     @keyframes pulse-red {
-      0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-      70%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
     }
 
     .btn-send {
@@ -549,10 +634,12 @@
       color: #ffffff;
       box-shadow: 0 2px 8px rgba(0, 63, 153, 0.25);
     }
+
     .btn-send:hover {
       opacity: 0.92;
       transform: translateY(-1px);
     }
+
     .btn-send:disabled {
       background: #cbd5e1;
       cursor: not-allowed;
@@ -572,12 +659,16 @@
       justify-content: center;
       cursor: zoom-out;
     }
-    .image-modal.active { display: flex; }
+
+    .image-modal.active {
+      display: flex;
+    }
+
     .image-modal img {
       max-width: 90vw;
       max-height: 85vh;
       border-radius: 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
     @media (max-width: 640px) {
@@ -588,20 +679,33 @@
         border-radius: 0;
         border: none;
       }
-      .message-row { max-width: 92%; }
-      .welcome-card { flex-direction: column; text-align: center; }
-      .header-info p { display: none; }
+
+      .message-row {
+        max-width: 92%;
+      }
+
+      .welcome-card {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .header-info p {
+        display: none;
+      }
     }
 
     /* ── Mascote Inteligente Duque IA Apoiado na Caixa de Digitação ── */
     .duque-mascot-wrapper {
       position: absolute;
-      bottom: 100%; /* Apoiado perfeitamente sobre a borda superior da input-bar */
-      right: 1.2rem; /* Canto inferior direito, alinhado sobre os botões */
+      bottom: 100%;
+      /* Apoiado perfeitamente sobre a borda superior da input-bar */
+      right: 1.2rem;
+      /* Canto inferior direito, alinhado sobre os botões */
       z-index: 30;
       display: flex;
       flex-direction: column;
-      align-items: flex-end; /* Mantém o balão e o mascote alinhados à direita */
+      align-items: flex-end;
+      /* Mantém o balão e o mascote alinhados à direita */
       user-select: none;
       pointer-events: none;
       margin-bottom: 0px;
@@ -612,13 +716,15 @@
       width: 135px;
       height: 135px;
       display: flex;
-      align-items: flex-end; /* Base do mascote encostada na borda superior */
+      align-items: flex-end;
+      /* Base do mascote encostada na borda superior */
       justify-content: center;
       cursor: pointer;
       pointer-events: auto;
       filter: drop-shadow(0 -3px 12px rgba(0, 34, 85, 0.18));
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
-      transform-origin: bottom center; /* Animações e interações partem da linha de apoio */
+      transform-origin: bottom center;
+      /* Animações e interações partem da linha de apoio */
       animation: mascotBreathing 4s ease-in-out infinite;
     }
 
@@ -628,9 +734,12 @@
     }
 
     @keyframes mascotBreathing {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: scale(1);
       }
+
       50% {
         transform: scale(1.018);
       }
@@ -646,7 +755,8 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      object-position: bottom center; /* Ponto de apoio na linha da borda */
+      object-position: bottom center;
+      /* Ponto de apoio na linha da borda */
       display: block;
       pointer-events: auto;
       transition: opacity 0.2s ease, transform 0.2s ease;
@@ -673,7 +783,7 @@
       justify-content: center;
       cursor: pointer;
       pointer-events: auto;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
       opacity: 0;
       transition: all 0.2s ease;
       z-index: 10;
@@ -749,7 +859,8 @@
     .mascot-bubble-tail {
       position: absolute;
       bottom: -7px;
-      right: 52px; /* Aponta diretamente para a cabeça do Duque */
+      right: 52px;
+      /* Aponta diretamente para a cabeça do Duque */
       width: 0;
       height: 0;
       border-left: 6px solid transparent;
@@ -818,15 +929,18 @@
       .duque-mascot-wrapper {
         right: 0.8rem;
       }
+
       .mascot-body {
         width: 105px;
         height: 105px;
       }
+
       .mascot-speech-bubble {
         max-width: 175px;
         font-size: 0.72rem;
         padding: 0.45rem 0.75rem;
       }
+
       .mascot-bubble-tail {
         right: 42px;
       }
@@ -836,30 +950,35 @@
       .duque-mascot-wrapper {
         right: 0.5rem;
       }
+
       .mascot-body {
         width: 90px;
         height: 90px;
       }
+
       .mascot-speech-bubble {
         max-width: 150px;
         font-size: 0.68rem;
         padding: 0.35rem 0.6rem;
       }
+
       .mascot-bubble-tail {
         right: 34px;
       }
     }
   </style>
 </head>
+
 <body>
 
   <div class="chat-container">
-    
+
     <!-- Header Oficial PMDC -->
     <header class="chat-header">
       <div class="header-left">
         <div class="avatar-wrapper" id="avatarTrigger" title="Clique para ampliar o avatar oficial">
-          <img class="avatar-img" id="headerAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3" alt="Atendente Oficial Duque IA">
+          <img class="avatar-img" id="headerAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3"
+            alt="Atendente Oficial Duque IA">
         </div>
         <div class="header-info">
           <h1>
@@ -873,11 +992,13 @@
       <div class="header-actions">
         <!-- Botão VLibras -->
         <button class="btn-header" id="librasToggleBtn" title="Ativar acessibilidade em Libras">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
-            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
-            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
-            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
+            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+            <path
+              d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
           </svg>
           Libras
         </button>
@@ -907,32 +1028,39 @@
 
     <!-- Feed de Mensagens -->
     <div class="messages-area" id="messagesArea">
-      
+
       <!-- Card de Apresentação e Boas-Vindas -->
       <div class="welcome-card" id="welcomeCard">
-        <img class="welcome-avatar" id="welcomeAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3" alt="Duque IA Oficial" title="Clique para ampliar o mascote oficial">
+        <img class="welcome-avatar" id="welcomeAvatar" src="assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3"
+          alt="Duque IA Oficial" title="Clique para ampliar o mascote oficial">
         <div class="welcome-text">
           <h2>Olá! Seja muito bem-vindo ao Duque IA.</h2>
           <p>
-            Sou o atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>. Estou pronto para tirar suas dúvidas sobre serviços, prazos, secretarias, unidades de saúde e registrar solicitações da Ouvidoria Geral.
+            Sou o atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>. Estou pronto para tirar
+            suas dúvidas sobre serviços, prazos, secretarias, unidades de saúde e registrar solicitações da Ouvidoria
+            Geral.
           </p>
-          
+
           <div class="chips-section">
             <div class="chips-label">Perguntas Frequentes:</div>
             <div class="chips-grid">
-              <button class="chip-btn" onclick="sendQuickPrompt('Como funciona o Castramóvel e castração gratuita de animais?')">
+              <button class="chip-btn"
+                onclick="sendQuickPrompt('Como funciona o Castramóvel e castração gratuita de animais?')">
                 🐾 Castramóvel & Pets
               </button>
-              <button class="chip-btn" onclick="sendQuickPrompt('Como solicitar o conserto de lâmpada de poste apagada?')">
+              <button class="chip-btn"
+                onclick="sendQuickPrompt('Como solicitar o conserto de lâmpada de poste apagada?')">
                 💡 Iluminação Pública
               </button>
               <button class="chip-btn" onclick="sendQuickPrompt('Como pedir operação tapa-buraco na minha rua?')">
                 🚗 Tapa-Buraco / Obras
               </button>
-              <button class="chip-btn" onclick="sendQuickPrompt('Como agendar consulta ou encontrar um posto de saúde?')">
+              <button class="chip-btn"
+                onclick="sendQuickPrompt('Como agendar consulta ou encontrar um posto de saúde?')">
                 🏥 Saúde / UPH e USF
               </button>
-              <button class="chip-btn" onclick="sendQuickPrompt('Quais são os telefones e contatos da Ouvidoria Geral de Duque de Caxias?')">
+              <button class="chip-btn"
+                onclick="sendQuickPrompt('Quais são os telefones e contatos da Ouvidoria Geral de Duque de Caxias?')">
                 📞 Contatos da Ouvidoria
               </button>
               <button class="chip-btn" onclick="sendQuickPrompt('Como funciona o ônibus Tarifa Zero no município?')">
@@ -963,9 +1091,10 @@
         <!-- Corpo do Mascote apoiado na borda superior -->
         <div class="mascot-body" id="mascotBody" title="Clique para interagir com o Duque!">
           <img id="mascotImg" src="assets/mascot/duque-welcome.png?v=3" alt="Mascote Duque IA" class="mascot-figure">
-          
+
           <!-- Botão de Minimizar / Fechar -->
-          <button id="mascotToggleBtn" class="mascot-btn-toggle" title="Minimizar Mascote" aria-label="Minimizar Mascote">
+          <button id="mascotToggleBtn" class="mascot-btn-toggle" title="Minimizar Mascote"
+            aria-label="Minimizar Mascote">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
@@ -979,17 +1108,13 @@
         </button>
       </div>
 
-      <textarea
-        class="chat-textarea"
-        id="chatInput"
-        placeholder="Escreva sua dúvida... (Shift+Enter para pular linha)"
-        rows="1"
-        maxlength="2000"
-      ></textarea>
+      <textarea class="chat-textarea" id="chatInput" placeholder="Escreva sua dúvida... (Shift+Enter para pular linha)"
+        rows="1" maxlength="2000"></textarea>
 
       <!-- Botão de Microfone -->
       <button class="btn-icon btn-mic" id="micBtn" title="Gravar mensagem de voz">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
           <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -999,7 +1124,8 @@
 
       <!-- Botão de Enviar -->
       <button class="btn-icon btn-send" id="sendBtn" title="Enviar mensagem">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
@@ -1028,61 +1154,67 @@
   <!-- Script da Aplicação -->
   <script>
     // ── Referências do DOM ──────────────────────────────────────────────────
-    const messagesArea    = document.getElementById('messagesArea');
-    const chatInput       = document.getElementById('chatInput');
-    const sendBtn         = document.getElementById('sendBtn');
-    const micBtn          = document.getElementById('micBtn');
-    const newChatBtn      = document.getElementById('newChatBtn');
-    const headerAvatar    = document.getElementById('headerAvatar');
-    const avatarTrigger   = document.getElementById('avatarTrigger');
-    const imageModal      = document.getElementById('imageModal');
-    const modalImg        = document.getElementById('modalImg');
+    const messagesArea = document.getElementById('messagesArea');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const micBtn = document.getElementById('micBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const avatarTrigger = document.getElementById('avatarTrigger');
+    const imageModal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
     const librasToggleBtn = document.getElementById('librasToggleBtn');
     const librasStatusBar = document.getElementById('librasStatusBar');
 
     // Catálogo dos Novos Personagens Oficiais do Duque IA
     const AVATARS = {
-      acolhe:      'assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3',
-      pensando:    'assets/personagens/duque_desenvolvedor_notebook.png?v=3',
-      joinha:      'assets/personagens/duque_joinha_aprovado.png?v=3',
-      tablet:      'assets/personagens/duque_consultando_tablet.png?v=3',
-      saude:       'assets/personagens/duque_saude_jaleco.png?v=3',
-      telefone:    'assets/personagens/duque_atendimento_telefone.png?v=3',
-      executivo:   'assets/personagens/duque_executivo_analisando.png?v=3',
-      gestao:      'assets/personagens/duque_gestao_foco_caneca.png?v=3',
-      gamer:       'assets/personagens/duque_gamer_headset.png?v=3',
-      jovem:       'assets/personagens/duque_jovem_mochila_paz.png?v=3',
-      polo:        'assets/personagens/duque_polo_apresenta.png?v=3',
-      confiante:   'assets/personagens/duque_confiante_bracos_cruzados.png?v=3'
+      acolhe: 'assets/personagens/duque_boas_vindas_bracos_abertos.png?v=3',
+      pensando: 'assets/personagens/duque_desenvolvedor_notebook.png?v=3',
+      joinha: 'assets/personagens/duque_joinha_aprovado.png?v=3',
+      tablet: 'assets/personagens/duque_consultando_tablet.png?v=3',
+      saude: 'assets/personagens/duque_saude_jaleco.png?v=3',
+      telefone: 'assets/personagens/duque_atendimento_telefone.png?v=3',
+      executivo: 'assets/personagens/duque_executivo_analisando.png?v=3',
+      gestao: 'assets/personagens/duque_gestao_foco_caneca.png?v=3',
+      gamer: 'assets/personagens/duque_gamer_headset.png?v=3',
+      jovem: 'assets/personagens/duque_jovem_mochila_paz.png?v=3',
+      polo: 'assets/personagens/duque_polo_apresenta.png?v=3',
+      confiante: 'assets/personagens/duque_confiante_bracos_cruzados.png?v=3'
     };
 
     // Catálogo Oficial dos Mascotes das Secretarias Municipais com Crachá
     const SECRETARIA_AVATARS = {
-      'SMS':       { sigla: 'SMS',       name: 'Secretaria Municipal de Saúde', file: 'assets/personagens/secretarias/secretaria_sms.png' },
-      'SMOA':      { sigla: 'SMOA',      name: 'Secretaria Municipal de Obras e Agricultura', file: 'assets/personagens/secretarias/secretaria_smoa.png' },
-      'SMPA':      { sigla: 'SMPA',      name: 'Secretaria Municipal de Proteção Animal', file: 'assets/personagens/secretarias/secretaria_smpa.png' },
-      'SMTSP':     { sigla: 'SMTSP',     name: 'Secretaria Municipal de Transportes e Serviços Públicos', file: 'assets/personagens/secretarias/secretaria_smtsp.png' },
+      'SMS': { sigla: 'SMS', name: 'Secretaria Municipal de Saúde', file: 'assets/personagens/secretarias/secretaria_sms.png' },
+      'SMOA': { sigla: 'SMOA', name: 'Secretaria Municipal de Obras e Agricultura', file: 'assets/personagens/secretarias/secretaria_smoa.png' },
+      'SMPA': { sigla: 'SMPA', name: 'Secretaria Municipal de Proteção Animal', file: 'assets/personagens/secretarias/secretaria_smpa.png' },
+      'SMTSP': { sigla: 'SMTSP', name: 'Secretaria Municipal de Transportes e Serviços Públicos', file: 'assets/personagens/secretarias/secretaria_smtsp.png' },
       'SMCSRPTER': { sigla: 'SMCSRPTER', name: 'Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral', file: 'assets/personagens/secretarias/secretaria_smcsrpter.png' },
-      'SMCT':      { sigla: 'SMCT',      name: 'Secretaria Municipal de Cultura e Turismo', file: 'assets/personagens/secretarias/secretaria_smct.png' },
-      'SMEL':      { sigla: 'SMEL',      name: 'Secretaria Municipal de Esporte e Lazer', file: 'assets/personagens/secretarias/secretaria_smel.png' },
-      'SME':       { sigla: 'SME',       name: 'Secretaria Municipal de Educação', file: 'assets/personagens/secretarias/secretaria_sme.png' },
-      'FUNDEC':    { sigla: 'FUNDEC',    name: 'Fundação de Apoio à Escola Técnica (FUNDEC)', file: 'assets/personagens/secretarias/secretaria_fundec.png' },
-      'SMASDH':    { sigla: 'SMASDH',    name: 'Secretaria Municipal de Assistência Social e Direitos Humanos', file: 'assets/personagens/secretarias/secretaria_smasdh.png' },
-      'SMF':       { sigla: 'SMF',       name: 'Secretaria Municipal de Fazenda', file: 'assets/personagens/secretarias/secretaria_smf.png' },
-      'SMA':       { sigla: 'SMA',       name: 'Secretaria Municipal de Administração', file: 'assets/personagens/secretarias/secretaria_sma.png' },
-      'SMSP':      { sigla: 'SMSP',      name: 'Secretaria Municipal de Segurança e Ordem Pública', file: 'assets/personagens/secretarias/secretaria_smsp.png' },
-      'SMMA':      { sigla: 'SMMA',      name: 'Secretaria Municipal de Meio Ambiente', file: 'assets/personagens/secretarias/secretaria_smma.png' },
-      'SMDC':      { sigla: 'SMDC',      name: 'Secretaria Municipal de Defesa Civil', file: 'assets/personagens/secretarias/secretaria_smdc.png' },
-      'SMGIM':     { sigla: 'SMGIM',     name: 'Secretaria Municipal de Gestão, Inclusão e Mulher', file: 'assets/personagens/secretarias/secretaria_smgim.png' },
-      'PGM':       { sigla: 'PGM',       name: 'Procuradoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_pgm.png' },
-      'CGM':       { sigla: 'CGM',       name: 'Controladoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_cgm.png' },
-      'IPMDC':     { sigla: 'IPMDC',     name: 'Instituto de Previdência dos Servidores Públicos (IPMDC)', file: 'assets/personagens/secretarias/secretaria_ipmdc.png' },
-      'SMUH':      { sigla: 'SMUH',      name: 'Secretaria Municipal de Urbanismo e Habitação', file: 'assets/personagens/secretarias/secretaria_smuh.png' },
-      'SMG':       { sigla: 'SMG',       name: 'Secretaria Municipal de Governo', file: 'assets/personagens/secretarias/secretaria_smg.png' },
-      'CONS':      { sigla: 'CONS',      name: 'Consolidado (Projetos e Programas Transversais)', file: 'assets/personagens/secretarias/secretaria_cons.png' }
+      'SMCT': { sigla: 'SMCT', name: 'Secretaria Municipal de Cultura e Turismo', file: 'assets/personagens/secretarias/secretaria_smct.png' },
+      'SMEL': { sigla: 'SMEL', name: 'Secretaria Municipal de Esporte e Lazer', file: 'assets/personagens/secretarias/secretaria_smel.png' },
+      'SME': { sigla: 'SME', name: 'Secretaria Municipal de Educação', file: 'assets/personagens/secretarias/secretaria_sme.png' },
+      'FUNDEC': { sigla: 'FUNDEC', name: 'Fundação de Apoio à Escola Técnica (FUNDEC)', file: 'assets/personagens/secretarias/secretaria_fundec.png' },
+      'SMASDH': { sigla: 'SMASDH', name: 'Secretaria Municipal de Assistência Social e Direitos Humanos', file: 'assets/personagens/secretarias/secretaria_smasdh.png' },
+      'SMF': { sigla: 'SMF', name: 'Secretaria Municipal de Fazenda', file: 'assets/personagens/secretarias/secretaria_smf.png' },
+      'SMA': { sigla: 'SMA', name: 'Secretaria Municipal de Administração', file: 'assets/personagens/secretarias/secretaria_sma.png' },
+      'SMSP': { sigla: 'SMSP', name: 'Secretaria Municipal de Segurança e Ordem Pública', file: 'assets/personagens/secretarias/secretaria_smsp.png' },
+      'SMMA': { sigla: 'SMMA', name: 'Secretaria Municipal de Meio Ambiente', file: 'assets/personagens/secretarias/secretaria_smma.png' },
+      'SMDC': { sigla: 'SMDC', name: 'Secretaria Municipal de Defesa Civil', file: 'assets/personagens/secretarias/secretaria_smdc.png' },
+      'SMGIM': { sigla: 'SMGIM', name: 'Secretaria Municipal de Gestão, Inclusão e Mulher', file: 'assets/personagens/secretarias/secretaria_smgim.png' },
+      'PGM': { sigla: 'PGM', name: 'Procuradoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_pgm.png' },
+      'CGM': { sigla: 'CGM', name: 'Controladoria-Geral do Município', file: 'assets/personagens/secretarias/secretaria_cgm.png' },
+      'IPMDC': { sigla: 'IPMDC', name: 'Instituto de Previdência dos Servidores Públicos (IPMDC)', file: 'assets/personagens/secretarias/secretaria_ipmdc.png' },
+      'SMUH': { sigla: 'SMUH', name: 'Secretaria Municipal de Urbanismo e Habitação', file: 'assets/personagens/secretarias/secretaria_smuh.png' },
+      'SMG': { sigla: 'SMG', name: 'Secretaria Municipal de Governo', file: 'assets/personagens/secretarias/secretaria_smg.png' },
+      'CONS': { sigla: 'CONS', name: 'Consolidado (Projetos e Programas Transversais)', file: 'assets/personagens/secretarias/secretaria_cons.png' }
     };
 
-    let sessionId = 'sess_' + Date.now();
+    function generateSecureSessionId() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return 'sess_' + crypto.randomUUID();
+      }
+      return 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+    }
+    let sessionId = generateSecureSessionId();
     let librasMode = false;
     let avatarTimer = null;
 
@@ -1324,35 +1456,35 @@
     // ── Componente Mascote Flutuante Contextual Duque IA ─────────────────────
     class DuqueMascotController {
       constructor() {
-        this.wrapper    = document.getElementById('duqueMascot');
-        this.img        = document.getElementById('mascotImg');
-        this.bubble     = document.getElementById('mascotBubble');
+        this.wrapper = document.getElementById('duqueMascot');
+        this.img = document.getElementById('mascotImg');
+        this.bubble = document.getElementById('mascotBubble');
         this.bubbleText = document.getElementById('mascotBubbleText');
-        this.toggleBtn  = document.getElementById('mascotToggleBtn');
-        this.pillBadge  = document.getElementById('mascotPillMinimized');
-        this.body       = document.getElementById('mascotBody');
+        this.toggleBtn = document.getElementById('mascotToggleBtn');
+        this.pillBadge = document.getElementById('mascotPillMinimized');
+        this.body = document.getElementById('mascotBody');
 
         this.currentState = 'welcome';
-        this.isMinimized  = false;
-        this.bubbleTimer  = null;
-        this.idleTimer    = null;
+        this.isMinimized = false;
+        this.bubbleTimer = null;
+        this.idleTimer = null;
 
         // Poses mapeadas da pasta assets/mascot/ com canal alfa de alta resolução
         this.poses = {
-          idle:       'assets/mascot/duque-idle.png?v=3',
-          welcome:    'assets/mascot/duque-welcome.png?v=3',
-          listening:  'assets/mascot/duque-listening.png?v=3',
-          thinking:   'assets/mascot/duque-thinking.png?v=3',
-          happy:      'assets/mascot/duque-happy.png?v=3',
+          idle: 'assets/mascot/duque-idle.png?v=3',
+          welcome: 'assets/mascot/duque-welcome.png?v=3',
+          listening: 'assets/mascot/duque-listening.png?v=3',
+          thinking: 'assets/mascot/duque-thinking.png?v=3',
+          happy: 'assets/mascot/duque-happy.png?v=3',
           explaining: 'assets/mascot/duque-explaining.png?v=3',
           empathetic: 'assets/mascot/duque-empathetic.png?v=3',
-          serious:    'assets/mascot/duque-serious.png?v=3',
-          goodbye:    'assets/mascot/duque-goodbye.png?v=3',
-          error:      'assets/mascot/duque-error.png?v=3',
-          pets:       'assets/mascot/duque-pets.png?v=3',
-          works:      'assets/mascot/duque-works.png?v=3',
-          education:  'assets/mascot/duque-education.png?v=3',
-          telephone:  'assets/mascot/duque-telephone.png?v=3'
+          serious: 'assets/mascot/duque-serious.png?v=3',
+          goodbye: 'assets/mascot/duque-goodbye.png?v=3',
+          error: 'assets/mascot/duque-error.png?v=3',
+          pets: 'assets/mascot/duque-pets.png?v=3',
+          works: 'assets/mascot/duque-works.png?v=3',
+          education: 'assets/mascot/duque-education.png?v=3',
+          telephone: 'assets/mascot/duque-telephone.png?v=3'
         };
 
         this.init();
@@ -1592,7 +1724,7 @@
     });
 
     newChatBtn.addEventListener('click', () => {
-      sessionId = 'sess_' + Date.now();
+      sessionId = generateSecureSessionId();
       headerAvatar.src = AVATARS.acolhe;
       duqueMascot?.setState('welcome', 'Nova conversa iniciada! Como posso ajudar você?');
       messagesArea.innerHTML = '';
@@ -1669,4 +1801,5 @@
     });
   </script>
 </body>
+
 </html>

@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import time
+import sqlite3
 from typing import Optional, Dict, List, Any, Tuple, Union
 
 from utils.gemini_client import GeminiClient
@@ -59,8 +60,144 @@ class DuqueIAAgent:
     # ---------------------------------------------------------------------- #
     _history: Dict[str, List[str]] = {}
     _session_state: Dict[str, Any] = {}
+    _session_versions: Dict[str, int] = {}
     _model_sessions: Dict[str, str] = {}
     _interaction_map: Dict[str, str] = {}
+
+    @classmethod
+    def _init_session_db(cls):
+        """Garante a existência da tabela compartilhada de sessões entre workers com WAL e busy_timeout."""
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute("PRAGMA synchronous=NORMAL;")
+                conn.execute("PRAGMA busy_timeout=10000;")
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS agent_session_storage (
+                        session_id TEXT PRIMARY KEY,
+                        version INTEGER DEFAULT 1,
+                        history_json TEXT,
+                        state_json TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                # Migração defensiva: adiciona colunas se a tabela foi criada anteriormente sem elas
+                cols = [c[1] for c in conn.execute("PRAGMA table_info(agent_session_storage)").fetchall()]
+                if "version" not in cols:
+                    conn.execute("ALTER TABLE agent_session_storage ADD COLUMN version INTEGER DEFAULT 1;")
+                if "created_at" not in cols:
+                    conn.execute("ALTER TABLE agent_session_storage ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_session_updated ON agent_session_storage(updated_at);")
+                conn.commit()
+        except Exception:
+            pass
+
+    @classmethod
+    def get_session_history(cls, conversation_id: str) -> List[str]:
+        """Recupera histórico persistente sincronizado em tempo real."""
+        if not conversation_id:
+            return []
+        cls._load_session_from_db(conversation_id)
+        return cls._history.get(conversation_id, [])
+
+    @classmethod
+    def get_session_state(cls, conversation_id: str) -> Dict[str, Any]:
+        """Recupera estado da sessão sincronizado entre todos os workers."""
+        if not conversation_id:
+            return {}
+        cls._load_session_from_db(conversation_id)
+        return cls._session_state.setdefault(conversation_id, {
+            "redirect_count": 0,
+            "last_channel": None,
+            "slots": {},
+            "history": []
+        })
+
+    @classmethod
+    def _load_session_from_db(cls, conversation_id: str) -> dict:
+        """Carrega os dados mais recentes da sessão do banco SQLite compartilhado."""
+        if not conversation_id:
+            return {}
+        cls._init_session_db()
+        for attempt in range(4):
+            try:
+                with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                    conn.execute("PRAGMA journal_mode=WAL;")
+                    conn.execute("PRAGMA busy_timeout=10000;")
+                    row = conn.execute(
+                        "SELECT version, history_json, state_json FROM agent_session_storage WHERE session_id = ?",
+                        (conversation_id,)
+                    ).fetchone()
+                    if row:
+                        ver, hist_json, state_json = row
+                        cls._session_versions[conversation_id] = ver or 1
+                        cls._history[conversation_id] = json.loads(hist_json) if hist_json else []
+                        cls._session_state[conversation_id] = json.loads(state_json) if state_json else {}
+                    else:
+                        cls._session_versions[conversation_id] = 0
+                        cls._history.setdefault(conversation_id, [])
+                        cls._session_state.setdefault(conversation_id, {
+                            "redirect_count": 0,
+                            "last_channel": None,
+                            "slots": {},
+                            "history": []
+                        })
+                    return cls._session_state[conversation_id]
+            except sqlite3.OperationalError as e:
+                if "locked" in str(e).lower() and attempt < 3:
+                    time.sleep(0.04 * (attempt + 1))
+                    continue
+                break
+            except Exception:
+                break
+        return cls._session_state.get(conversation_id, {})
+
+    @classmethod
+    def save_session_to_db(cls, conversation_id: str):
+        """Persiste atomicamente histórico e estado da sessão com controle de versão."""
+        if not conversation_id:
+            return
+        cls._init_session_db()
+        hist = cls._history.get(conversation_id, [])
+        state = cls._session_state.get(conversation_id, {})
+        hist_json = json.dumps(hist, ensure_ascii=False)
+        state_json = json.dumps(state, ensure_ascii=False)
+
+        for attempt in range(5):
+            try:
+                with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                    conn.execute("PRAGMA journal_mode=WAL;")
+                    conn.execute("PRAGMA busy_timeout=10000;")
+                    conn.execute("""
+                        INSERT INTO agent_session_storage (session_id, version, history_json, state_json, updated_at)
+                        VALUES (?, 1, ?, ?, CURRENT_TIMESTAMP)
+                        ON CONFLICT(session_id) DO UPDATE SET
+                            version = version + 1,
+                            history_json = excluded.history_json,
+                            state_json = excluded.state_json,
+                            updated_at = CURRENT_TIMESTAMP
+                    """, (conversation_id, hist_json, state_json))
+                    conn.commit()
+                    return
+            except sqlite3.OperationalError as e:
+                if "locked" in str(e).lower() and attempt < 4:
+                    time.sleep(0.05 * (2 ** attempt))
+                    continue
+                break
+            except Exception:
+                break
+
+    @classmethod
+    def cleanup_expired_sessions(cls, days: int = 7):
+        """Remove sessões antigas preservando a LGPD e liberando espaço em disco."""
+        try:
+            with sqlite3.connect(DATABASE_TELEMETRY, timeout=10.0) as conn:
+                conn.execute("PRAGMA busy_timeout=10000;")
+                conn.execute("DELETE FROM agent_session_storage WHERE updated_at < datetime('now', ?)", (f"-{days} days",))
+                conn.commit()
+        except Exception:
+            pass
 
     # ---------------------------------------------------------------------- #
     # Tuplas de termos para checagem rápida em mensagens (Redução de Código) #
@@ -367,16 +504,19 @@ class DuqueIAAgent:
         if use_triage is None:
             use_triage = USE_TRIAGE_LAYER
 
-        conversation_id = context_holder.get("conversation_id") if context_holder else None
-        if not conversation_id:
-            conversation_id = f"sess_{int(time.time() * 1000)}"
-            if context_holder:
-                context_holder["conversation_id"] = conversation_id
+        # Validação segura e anti-colisão do conversation_id (Isolamento por UUID)
+        raw_cid = context_holder.get("conversation_id") if context_holder else None
+        if not raw_cid or str(raw_cid).strip() in ["", "default", "undefined", "null"] or not re.match(r"^[a-zA-Z0-9_\-]{6,128}$", str(raw_cid).strip()):
+            import uuid
+            conversation_id = f"sess_{uuid.uuid4().hex}"
+        else:
+            conversation_id = str(raw_cid).strip()
 
-        # Extrai o histórico no início para estar sempre disponível
-        hist: Optional[List[str]] = None
-        if conversation_id and conversation_id in DuqueIAAgent._history:
-            hist = DuqueIAAgent._history[conversation_id]
+        if context_holder:
+            context_holder["conversation_id"] = conversation_id
+
+        # Carrega atomicamente o histórico mais recente do SQLite (sincronizado multi-worker)
+        hist: Optional[List[str]] = DuqueIAAgent.get_session_history(conversation_id)
 
         # ---------------------------------------------------------------- #
         # 0. Grafo de Estados (LangGraph Lite)                              #
@@ -392,13 +532,26 @@ class DuqueIAAgent:
                     history=hist or [],
                     agent=self
                 )
-                # Registra histórico
+                # Registra histórico persistente compartilhado
                 if conversation_id:
-                    prev = DuqueIAAgent._history.get(conversation_id, [])
+                    prev = DuqueIAAgent.get_session_history(conversation_id)
                     ans_text = result_dict.get("answer", "")
                     DuqueIAAgent._history[conversation_id] = (
                         prev + [f"Munícipe: {user_query}", f"DUQUE IA: {ans_text}"]
                     )[-6:]
+                    DuqueIAAgent.save_session_to_db(conversation_id)
+                    # Registra a mensagem na tabela de telemetria chat_messages
+                    try:
+                        with sqlite3.connect(DATABASE_TELEMETRY, timeout=5.0) as conn:
+                            conn.execute("PRAGMA journal_mode=WAL;")
+                            conn.execute("PRAGMA busy_timeout=5000;")
+                            conn.execute(
+                                "INSERT INTO chat_messages (session_id, role, content, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP), (?, ?, ?, CURRENT_TIMESTAMP)",
+                                (conversation_id, "user", user_query, conversation_id, "assistant", ans_text)
+                            )
+                            conn.commit()
+                    except Exception:
+                        pass
                 return json.dumps(result_dict, ensure_ascii=False, indent=2)
             except Exception as graph_err:
                 # Fallback seguro: se o grafo falhar catastroficamente, cai no fluxo legado

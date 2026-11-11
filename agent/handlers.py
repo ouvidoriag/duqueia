@@ -1388,43 +1388,68 @@ class AuthorityHandler(BaseHandler):
 
         q_normalized = _normalize(q_clean)
         auth = None
+        matched_by_name = False
 
-        # 3. Busca por similaridade combinada (Token/Word Overlap + Character-level SequenceMatcher)
+        # 3.1 Busca prioritária por Nome de Autoridade ou Apelido (ex: "Netinho Reis", "Boquinha", "Valber")
         q_norm_words = set(q_normalized.split())
         stopwords = {"de", "da", "do", "o", "a", "em", "para", "quem", "e"}
         q_clean_words = q_norm_words - stopwords
 
-        best_match_key = None
-        best_match_score = 0.0
+        for key, val in AUTHORITIES.items():
+            nome_raw = val.get("nome", "")
+            nome_norm = _normalize(nome_raw)
+            apelidos = re.findall(r'\((.*?)\)', nome_raw)
+            apelidos_norm = [_normalize(a) for a in apelidos]
 
-        for key in AUTHORITIES.keys():
-            key_norm = _normalize(key)
-            key_norm_words = set(key_norm.split())
-            key_clean_words = key_norm_words - stopwords
-            
-            # Similaridade por interseção de palavras
-            word_score = 0.0
-            if key_clean_words:
-                intersection = q_clean_words.intersection(key_clean_words)
-                word_score = len(intersection) / len(key_clean_words)
-                
-            # Similaridade por caracteres (difflib)
-            char_score = difflib.SequenceMatcher(None, q_normalized, key_norm).ratio()
-            
-            # Score combinado: 70% peso nas palavras estruturais, 30% nos caracteres
-            combined_score = 0.7 * word_score + 0.3 * char_score
-            
-            # Boost especial para substrings exatas
-            if key_norm == q_normalized or (len(key_norm) > 3 and key_norm in q_normalized) or (len(q_normalized) > 3 and q_normalized in key_norm):
-                combined_score = max(combined_score, 0.90)
-                
-            if combined_score > best_match_score:
-                best_match_score = combined_score
-                best_match_key = key
+            if len(q_normalized) >= 4:
+                if q_normalized in nome_norm or any(q_normalized in ap for ap in apelidos_norm):
+                    auth = val
+                    matched_by_name = True
+                    break
+                if any(len(ap) >= 4 and ap in q_normalized for ap in apelidos_norm):
+                    auth = val
+                    matched_by_name = True
+                    break
+                nome_tokens = set(nome_norm.replace("(", "").replace(")", "").split()) - stopwords
+                if q_clean_words and q_clean_words.issubset(nome_tokens) and len(q_clean_words) >= 1:
+                    if any(len(w) >= 5 for w in q_clean_words) or len(q_clean_words) >= 2:
+                        auth = val
+                        matched_by_name = True
+                        break
 
-        # Só consideramos correspondência se o score combinado for alto (ex: >= 0.70)
-        if best_match_key and best_match_score >= 0.70:
-            auth = AUTHORITIES[best_match_key]
+        # 3.2 Se não encontrou por nome, busca por Cargo / Secretaria via similaridade combinada
+        if not auth:
+            best_match_key = None
+            best_match_score = 0.0
+
+            for key in AUTHORITIES.keys():
+                key_norm = _normalize(key)
+                key_norm_words = set(key_norm.split())
+                key_clean_words = key_norm_words - stopwords
+                
+                # Similaridade por interseção de palavras
+                word_score = 0.0
+                if key_clean_words:
+                    intersection = q_clean_words.intersection(key_clean_words)
+                    word_score = len(intersection) / len(key_clean_words)
+                    
+                # Similaridade por caracteres (difflib)
+                char_score = difflib.SequenceMatcher(None, q_normalized, key_norm).ratio()
+                
+                # Score combinado: 70% peso nas palavras estruturais, 30% nos caracteres
+                combined_score = 0.7 * word_score + 0.3 * char_score
+                
+                # Boost especial para substrings exatas
+                if key_norm == q_normalized or (len(key_norm) > 3 and key_norm in q_normalized) or (len(q_normalized) > 3 and q_normalized in key_norm):
+                    combined_score = max(combined_score, 0.90)
+                    
+                if combined_score > best_match_score:
+                    best_match_score = combined_score
+                    best_match_key = key
+
+            # Só consideramos correspondência se o score combinado for alto (ex: >= 0.70)
+            if best_match_key and best_match_score >= 0.70:
+                auth = AUTHORITIES[best_match_key]
 
         if auth:
             nome = auth["nome"]
@@ -1482,12 +1507,22 @@ class AuthorityHandler(BaseHandler):
 
             sugestoes_str = "\n".join(sugestoes)
 
-            answer = (
-                f"O {cargo} de Duque de Caxias é **{nome}**.\n\n"
-                f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
-                f"Caso deseje, posso informar também:\n"
-                f"{sugestoes_str}"
-            )
+            detalhes_str = f"\n\n{auth.get('detalhes', '')}" if auth.get('detalhes') else ""
+            cargo_title = cargo if "duque de caxias" in cargo.lower() else f"{cargo} de Duque de Caxias"
+            if matched_by_name:
+                answer = (
+                    f"**{nome}** é o **{cargo_title}**.{detalhes_str}\n\n"
+                    f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
+                    f"Caso deseje, posso informar também:\n"
+                    f"{sugestoes_str}"
+                )
+            else:
+                answer = (
+                    f"O **{cargo_title}** é **{nome}**.{detalhes_str}\n\n"
+                    f"Essa informação consta na estrutura oficial da Prefeitura (Fonte: **{fonte}** / Versão do Catálogo: **{CATALOG_VERSION}**).\n\n"
+                    f"Caso deseje, posso informar também:\n"
+                    f"{sugestoes_str}"
+                )
             
             agent.log_execution_metrics(query, 0, 0, elapsed, 0, 0, 0)
             return {
@@ -1505,6 +1540,17 @@ class AuthorityHandler(BaseHandler):
                 }
             }
         
+        # Fallback dinâmico para RAG: se não constar no catálogo estático, busca em vector.db / chunks
+        if agent and hasattr(agent, "handlers") and "RAG_HANDLER" in agent.handlers:
+            return agent.handlers["RAG_HANDLER"].execute(
+                query=query,
+                triage_info=triage_info,
+                agent=agent,
+                conversation_id=conversation_id,
+                start_time=start_time,
+                history=history
+            )
+
         # Fallback offline se nada for encontrado (usa cópia genérica segura)
         answer = (
             "Não encontrei a autoridade correspondente na base oficial estática do município.\n\n"

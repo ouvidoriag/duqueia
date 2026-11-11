@@ -3,6 +3,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 // Cache para arquivos estáticos: Map<filePath, { raw: Buffer, gzipped: Buffer, contentType: string, ext: string, isCacheable: boolean }>
 const staticCache = new Map();
@@ -140,6 +141,7 @@ function createWorker(workerId) {
     process: pyProcess,
     busy: false,
     activeRequestId: null,
+    activeSessionId: null,
     pendingRequests: new Map(), // requestId -> { resolve, reject, turnTimeout, startTime }
     buffer: '',
     lastActive: Date.now()
@@ -228,6 +230,7 @@ function handleWorkerResponse(worker, data) {
   const reqId = data.request_id || worker.activeRequestId;
   worker.busy = false;
   worker.activeRequestId = null;
+  worker.activeSessionId = null;
   worker.lastActive = Date.now();
 
   if (reqId && worker.pendingRequests.has(reqId)) {
@@ -242,14 +245,27 @@ function handleWorkerResponse(worker, data) {
   processQueue();
 }
 
-// ── Fila de Requisições e Despacho ao Pool ────────────────────────────────────
+// ── Fila de Requisições e Despacho Concorrente ao Pool ────────────────────────
 function processQueue() {
   if (requestQueue.length === 0) return;
 
-  // Busca worker livre (preferência por afinidade de sessão)
-  const nextTask = requestQueue[0];
-  let targetWorker = null;
+  // Identifica quais sessões já têm requisição ativa em execução em algum worker
+  const activeSessions = new Set(
+    workerPool.filter(w => w.busy && w.activeSessionId).map(w => w.activeSessionId)
+  );
 
+  // Busca a primeira tarefa da fila cuja sessão NÃO esteja em processamento concorrente
+  // Isso garante serialização estrita (FIFO) por sessão e concorrência paralela entre usuários distintos!
+  const taskIndex = requestQueue.findIndex(t => !activeSessions.has(t.sessionId));
+  if (taskIndex === -1) {
+    // Todas as tarefas na fila pertencem a sessões que já possuem um turno ativo em execução
+    return;
+  }
+
+  const nextTask = requestQueue[taskIndex];
+
+  // Busca worker livre (preferência por afinidade de sessão)
+  let targetWorker = null;
   if (sessionWorkerMap.has(nextTask.sessionId)) {
     const preferredId = sessionWorkerMap.get(nextTask.sessionId);
     const candidate = workerPool.find(w => w.id === preferredId && !w.busy && w.process.exitCode === null);
@@ -261,15 +277,17 @@ function processQueue() {
   }
 
   if (!targetWorker) {
-    // Todos os workers estão ocupados no momento; tarefa permanece no início da fila
+    // Todos os workers estão ocupados no momento
     return;
   }
 
-  requestQueue.shift();
+  // Despacha a tarefa
+  requestQueue.splice(taskIndex, 1);
   sessionWorkerMap.set(nextTask.sessionId, targetWorker.id);
 
   targetWorker.busy = true;
   targetWorker.activeRequestId = nextTask.requestId;
+  targetWorker.activeSessionId = nextTask.sessionId;
   targetWorker.lastActive = Date.now();
 
   const turnTimeout = setTimeout(() => {
@@ -277,6 +295,7 @@ function processQueue() {
       targetWorker.pendingRequests.delete(nextTask.requestId);
       targetWorker.busy = false;
       targetWorker.activeRequestId = null;
+      targetWorker.activeSessionId = null;
       nextTask.reject(new Error('Tempo de resposta do agente excedido (90s).'));
       processQueue();
     }
@@ -296,6 +315,11 @@ function processQueue() {
   }) + '\n';
 
   targetWorker.process.stdin.write(Buffer.from(payload, 'utf-8'));
+
+  // Se houver mais tarefas e workers livres para sessões distintas, processa imediatamente em paralelo
+  if (requestQueue.length > 0 && workerPool.some(w => !w.busy && w.process.exitCode === null)) {
+    setImmediate(processQueue);
+  }
 }
 
 /**
@@ -391,7 +415,10 @@ const server = http.createServer((req, res) => {
       try {
         const payload = JSON.parse(body);
         let message = (payload.message || '').trim();
-        const sessionId = (payload.sessionId || 'default').replace(/[^a-zA-Z0-9_-]/g, '');
+        const rawSessionId = payload.sessionId ? String(payload.sessionId).replace(/[^a-zA-Z0-9_-]/g, '') : '';
+        const sessionId = (rawSessionId && rawSessionId !== 'default' && rawSessionId.length >= 8)
+          ? rawSessionId
+          : 'sess_' + crypto.randomUUID();
 
         if (payload.audio) {
           const base64Data = payload.audio.split(';base64,').pop();
