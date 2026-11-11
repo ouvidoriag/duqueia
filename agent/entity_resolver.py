@@ -188,7 +188,15 @@ class GoldenSourceResolver:
                 FROM secretaria_unidades u
                 LEFT JOIN secretarias s ON u.secretaria_id = s.id
             """)
-            rows = cur.fetchall()
+            rows = list(cur.fetchall())
+            try:
+                cur.execute("""
+                    SELECT id, nome, endereco || ' - ' || bairro || ' - CEP: ' || cep, telefone, '', 'Secretaria Municipal de Educação', 'SME'
+                    FROM escolas_municipais
+                """)
+                rows.extend(cur.fetchall())
+            except Exception:
+                pass
             conn.close()
         except Exception:
             GoldenSourceResolver._UNIDADES_CACHE = unidades

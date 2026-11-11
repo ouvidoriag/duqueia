@@ -42,6 +42,15 @@ def _get_db_phones() -> Set[str]:
                     phones.add(clean)
                     if len(clean) in (10, 11) and clean.startswith("21"):
                         phones.add(clean[2:])
+            try:
+                for row in cur.execute("SELECT telefone FROM escolas_municipais WHERE telefone IS NOT NULL AND telefone != ''").fetchall():
+                    clean = re.sub(r'\D', '', row[0])
+                    if clean:
+                        phones.add(clean)
+                        if len(clean) in (10, 11) and clean.startswith("21"):
+                            phones.add(clean[2:])
+            except Exception:
+                pass
     except Exception:
         pass
     _CACHED_DB_PHONES = phones
@@ -64,6 +73,13 @@ def _get_db_emails() -> Set[str]:
                 e = row[0].strip().lower()
                 if "@" in e:
                     emails.add(e)
+            try:
+                for row in cur.execute("SELECT email FROM escolas_municipais WHERE email IS NOT NULL AND email != ''").fetchall():
+                    e = row[0].strip().lower()
+                    if "@" in e:
+                        emails.add(e)
+            except Exception:
+                pass
     except Exception:
         pass
     _CACHED_DB_EMAILS = emails
