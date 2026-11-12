@@ -42,6 +42,26 @@ const MAX_WORKERS = Math.max(1, parseInt(process.env.MAX_WORKERS || '4', 10));
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || '';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'duqueia2026';
+const DUQUE_IA_WEBHOOK_SECRET = process.env.DUQUE_IA_WEBHOOK_SECRET || 'duque_ia_gse_secret_key_2026';
+
+/**
+ * Validação de integridade criptográfica HMAC-SHA256 para webhooks do GSE/OGM.
+ */
+function verifyHmacSignature(rawBody, signatureHeader, secret) {
+  if (!signatureHeader || !secret) return false;
+  let receivedHex = String(signatureHeader).trim();
+  if (receivedHex.startsWith('sha256=')) {
+    receivedHex = receivedHex.slice(7).trim();
+  }
+  try {
+    const computedHex = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+    if (receivedHex.length !== computedHex.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(receivedHex, 'hex'), Buffer.from(computedHex, 'hex'));
+  } catch (err) {
+    console.error('[Webhook] Erro ao validar assinatura HMAC:', err);
+    return false;
+  }
+}
 
 // Map em memória de sessões de administradores autenticados: token -> { username, createdAt, expiresAt }
 const activeAdminSessions = new Map();
@@ -421,6 +441,68 @@ const server = http.createServer((req, res) => {
       status: 'ok',
       message: `Sinal de recarga enviado para ${currentCount} workers Python. Novos processos com o código atualizado serão gerados automaticamente.`
     }));
+    return;
+  }
+
+  // ── Webhook Receptor GSE / OGM (Sincronização Automática com HMAC) ───────────
+  if ((req.url === '/api/webhook/gse' || req.url.endsWith('/api/webhook/gse')) && req.method === 'POST') {
+    let rawBody = '';
+    req.on('data', chunk => { rawBody += chunk.toString('utf-8'); });
+    req.on('end', () => {
+      const signature = req.headers['x-hub-signature-256'] || req.headers['x-signature'] || req.headers['x-hub-signature'];
+      
+      if (!verifyHmacSignature(rawBody, signature, DUQUE_IA_WEBHOOK_SECRET)) {
+        console.warn('[Webhook GSE] Assinatura HMAC inválida ou ausente. Rejeitando requisição.');
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Assinatura HMAC-SHA256 inválida ou ausente.' }));
+        return;
+      }
+
+      let payload;
+      try {
+        payload = JSON.parse(rawBody);
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload JSON inválido.' }));
+        return;
+      }
+
+      console.log(`[Webhook GSE] Evento recebido: ${payload.evento} (${payload.modulo} id: ${payload.id})`);
+
+      // Despacha assincronamente para o processador Python (scripts/webhook_processor.py)
+      const pyScript = path.join(__dirname, 'scripts', 'webhook_processor.py');
+      const proc = spawn(PYTHON_PATH, [pyScript], { stdio: ['pipe', 'pipe', 'pipe'] });
+      
+      let stdoutData = '';
+      let stderrData = '';
+      proc.stdout.on('data', d => { stdoutData += d.toString(); });
+      proc.stderr.on('data', d => { stderrData += d.toString(); });
+
+      proc.on('close', code => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdoutData.trim());
+            console.log('[Webhook GSE] Processado com sucesso:', result);
+          } catch (_) {
+            console.log(`[Webhook GSE] Processado: ${stdoutData.trim()}`);
+          }
+        } else {
+          console.error(`[Webhook GSE] Erro ao processar evento (exit code ${code}):`, stderrData);
+        }
+      });
+
+      proc.stdin.write(rawBody);
+      proc.stdin.end();
+
+      // Responde 200 OK imediatamente para liberar a fila de envio do GSE
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: true,
+        message: 'Evento recebido e enfileirado para processamento imediato.',
+        evento: payload.evento,
+        id: payload.id
+      }));
+    });
     return;
   }
 

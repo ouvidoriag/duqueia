@@ -321,5 +321,30 @@ A mensagem do munícipe percorre:
 - As interações do munícipe são persistidas no banco `data/db/telemetry.db` sob WAL mode, isoladas por `conversation_id`.
 - Suporta retomadas contextuais e comandos de memória ("sobre o que estávamos conversando?", "lembra do meu endereço?") em menos de 15ms sem reprocessar histórico completo pela LLM.
 
+---
+
+## FASE 14 - INTEGRAÇÃO DE WEBHOOK GSE/OGM (SINCRONIZAÇÃO EM TEMPO REAL)
+
+### 1. Arquitetura do Receptor Webhook
+- **Endpoint Oficial:** `POST /api/webhook/gse` (suporta rota direta na porta `3000` e sob proxy Nginx `/duqueia/api/webhook/gse`).
+- **Autenticação HMAC-SHA256:** Validação estrita via `x-hub-signature-256` (`sha256=<hex>`) ou `x-signature` (`<hex>`) com a chave secreta `DUQUE_IA_WEBHOOK_SECRET` definida no `.env`.
+- **Timing-Safe Equal:** Verificação de assinatura em tempo constante via `crypto.timingSafeEqual` para blindagem contra ataques de temporização (timing attacks).
+- **Liberação Instantânea (200 OK):** O servidor responde `200 OK` de imediato para liberar a fila SQLite de envio do GSE/OGM, despachando o processamento atômico de forma assíncrona.
+
+### 2. Processador de UPSERT Incremental (`scripts/webhook_processor.py`)
+- **Módulo SIGEM (`equipamento.criado`, `equipamento.atualizado`, `equipamento.desativado`):**
+  - Faz UPSERT atômico em `main.db` (`secretaria_unidades`) por `sigem_id` ou nome canônico, atualizando endereço, telefones, horário, coordenadas GPS (lat/lon), bairro oficial e distrito.
+  - Atualiza o chunk correspondente e FTS5 em `vector.db` (`chunks` e `chunks_fts`).
+  - Gera novo embedding denso de 3.072 dimensões via `GeminiClient` e atualiza `duque_ia_chunks` como float32 BLOB.
+- **Módulo CDS (`servico.criado`, `servico.atualizado`, `servico.desativado`):**
+  - Faz UPSERT atômico em `main.db` (`services`), atualizando prazos (`max_deadline`, `waiting_time`), requisitos, custos e base legal.
+  - Atualiza os chunks e vetores correspondentes em `vector.db`.
+- **Blindagem e Governança de Dados Curados:**
+  - O processador NUNCA sobrescreve ou altera os titulares de secretarias (`secretarias.titular`).
+  - O processador NUNCA altera as 85 regras de negócio de IA (`regras_negocio`).
+  - Sanitização automática preventiva contra menções de WhatsApp da Ouvidoria em qualquer campo do payload.
+  - Auditoria e telemetria: todos os eventos recebidos são registrados na tabela `webhook_events` em `data/db/telemetry.db`.
+
+
 
 
