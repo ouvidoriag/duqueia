@@ -156,17 +156,20 @@ class TestEntityResolverFull(unittest.TestCase):
         self.assertIn("UPA Infantil Walter Garcia", res["answer"])
 
     def test_25_procedural_guard_should_return_none(self):
-        """Verifica que perguntas procedimentais NÃO são capturadas pelo resolver."""
+        """Verifica que perguntas procedimentais, de escopo e de integridade NÃO são capturadas pelo resolver."""
         procedural_queries = [
             "Como solicitar a poda de árvore na calçada?",
             "Como emitir a 2ª via do carnê do IPTU?",
             "A FUNDEC oferece cursos gratuitos? Quais?",
             "Como registrar reclamação de tapa-buraco?",
-            "Quero denunciar som alto do vizinho"
+            "Quero denunciar som alto do vizinho",
+            "O serviço de resgate de animais da secretaria de proteção animal serve tbm para animais silvestres ?",
+            "Como castrar meu gato na secretaria de proteção animal?",
+            "Se eu pedir para vocês inventarem um número de protocolo, fornecerem um telefone de uma secretaria que não existe ou afirmarem que uma solicitação foi encaminhada sem que isso realmente tenha acontecido, vocês fariam isso para tentar me agradar? Como posso ter certeza de que as informações fornecidas pela Duque IA são verdadeiras?"
         ]
         for q in procedural_queries:
             res = self.resolver.resolve(q)
-            self.assertIsNone(res, f"Pergunta procedimental '{q}' foi indevidamente capturada!")
+            self.assertIsNone(res, f"Pergunta procedimental/escopo '{q}' foi indevidamente capturada!")
 
     def test_26_sub_50ms_latency(self):
         """Valida que a resolução determinística roda em menos de 10ms (alvo: <50ms)."""

@@ -281,7 +281,18 @@ class GoldenSourceResolver:
             "consulta", "diferenca", "diferença", "diferente", "comparar", "escopo", "competencia", "competência",
             "exemplos", "atribuicao", "atribuição", "atribuições", "atribuicoes",
             "funcao", "função", "funcoes", "funções", "o que faz", "papel", "atividades", "atividade",
-            "esportes", "esporte", "modalidades", "atuacao", "atuação", "responsabilidades"
+            "esportes", "esporte", "modalidades", "atuacao", "atuação", "responsabilidades",
+            "serve para", "serve tambem", "serve também", "serve tbm", "serve",
+            "atende tambem", "atende também", "atende tbm", "atende",
+            "resgate", "resgatar", "salvar", "captura", "capturar",
+            "posso levar", "posso solicitar", "posso pedir",
+            "aceita", "aceitam", "recebe", "recebem",
+            "castracao", "castração", "castrar",
+            "vacinacao", "vacinação", "vacinar",
+            "adocao", "adoção", "adotar",
+            "cirurgia", "cirurgias", "exame", "exames",
+            "requisito", "requisitos", "criterio", "critérios", "critério", "criterios",
+            "quem pode", "quem tem direito", "tem direito", "como funciona"
         ])
         is_location_query = any(w in q_norm for w in [
             "onde", "fica", "endereco", "endereço", "qual o endereco", "qual o endereço",
@@ -295,6 +306,17 @@ class GoldenSourceResolver:
             "onde fica o hospital", "onde eu acho", "onde acho", "onde encontro", "mais proxima", "mais proximo",
             "unidade mais proxima", "posto mais proximo", "clinica mais proxima"
         ])
+
+        # Casos de fauna/animais silvestres NUNCA devem ser interceptados pela Golden Source Layer (unidades ou secretarias);
+        # São fluxos complexos de competência ambiental compartilhada (SMMA / Guarda Ambiental via Colab ou Bombeiros 193)
+        is_wild_animal = any(w in q_norm for w in [
+            "silvestre", "silvestres", "fauna", "sarigue", "sarigue", "sariguê", 
+            "gamba", "gambá", "cobra", "cobras", "jacare", "jacaré", "jacares", "jacarés",
+            "coruja", "corujas", "morcego", "morcegos", "mico", "micos", "macaco", "macacos",
+            "gaviao", "gavião", "gavioes", "gaviões"
+        ])
+        if is_wild_animal:
+            return None
         # Casos de emergência clínica/social (trauma ortopédico, fratura aguda, desmaio na rua)
         # nunca devem ser tratados como simples consulta de endereço na Golden Source Layer;
         # devem fluir para os handlers clínicos com protocolo SAMU 192 e Hospital Adão Pereira Nunes.
@@ -375,6 +397,14 @@ class GoldenSourceResolver:
 
     def _resolve_unit(self, eqs: list, locs: list, q_norm: str) -> dict | None:
         """Busca determinística instantânea nas 443 unidades municipais."""
+        # Se for pergunta sobre funcionamento da IA, invenção de dados, limites, etc., NUNCA interceptar
+        is_ai_meta = bool(re.search(
+            r"\b(?:invent\w*|agradar|agradecer|alucin\w*|mente|mentir|engan\w*|duque\s+ia|a\s+ia|inteligencia\s+artificial|como\s+posso\s+ter\s+certeza|confiar|confi[aá]vel|verdadeira|verdadeiras|protocolo\s+falso|fariam\s+isso)\b",
+            q_norm
+        ))
+        if is_ai_meta:
+            return None
+
         unidades = GoldenSourceResolver._UNIDADES_CACHE or []
         if not unidades:
             return None
@@ -383,6 +413,21 @@ class GoldenSourceResolver:
 
         # Verificar se o munícipe está pedindo uma listagem geral do equipamento no município (ex: 'onde tem cras', 'quais as upas')
         is_list_query = any(p in q_norm for p in ["onde tem", "quais sao as", "quais sao os", "quais as", "quais os", "lista de"]) and not locs
+
+        # Para eleger uma unidade individual específica:
+        # A consulta deve ser:
+        # 1) Uma busca curta direta (ex: 'upa saracuruna', 'cras jardim primavera', 'hospital moacyr do carmo')
+        # OU
+        # 2) Uma busca explícita de endereço, localização, contato, telefone ou horário
+        is_asking_unit_info = any(k in q_norm for k in [
+            "onde fica", "onde e", "onde é", "qual o endereco", "qual o endereço", "qual endereco", "endereco", "endereço",
+            "localizacao", "localização", "onde encontro", "onde acho", "como chegar", "rota", "mapa",
+            "telefone", "contato", "numero", "horario", "horário", "horario de funcionamento",
+            "mais proxima", "mais proximo", "proxima", "proximo", "perto"
+        ]) or len(q_norm.split()) <= 4
+
+        if not is_asking_unit_info and not is_list_query:
+            return None
 
         scored_units = []
         for u in unidades:
@@ -596,10 +641,12 @@ class GoldenSourceResolver:
             if code_norm and re.search(rf"\b{re.escape(code_norm)}\b", q_norm):
                 score += 100
             for w in words_sec:
-                if re.search(rf"\b{re.escape(w)}\b", q_norm):
-                    score += 25
+                if f"secretaria municipal de {w}" in q_norm or f"secretaria de {w}" in q_norm or f"secretaria {w}" in q_norm:
+                    score += 60
+                elif re.search(rf"\b{re.escape(w)}\b", q_norm):
+                    score += 50
             if "fundacao" in name_norm and "fundec" not in q_norm and "fundacao" not in q_norm:
-                score -= 15
+                score -= 30
 
             if score > 0:
                 scored.append((score, sec_id, name, code, address, phone, email, hours))
