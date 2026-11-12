@@ -1842,23 +1842,23 @@ class AIMetaHandler(BaseHandler):
                 ).strip()
             except Exception:
                 ans = (
-                    "Não, de forma alguma! Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
-                    "• **Não invento protocolos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios.\n"
-                    "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados e da Carta de Serviços da Prefeitura de Duque de Caxias.\n"
-                    "• **Transparência e Limites**: Se uma informação não constar em minha base oficial, informo com clareza a limitação e oriento você a contatar os atendentes da **Ouvidoria Geral de Duque de Caxias**:\n"
+                    "**Não, de forma alguma!** Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
+                    "• **Não invento protocolos nem encaminhamentos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios nem afirmo que uma solicitação foi encaminhada se isso não ocorreu.\n"
+                    "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados oficial e da Carta de Serviços ao Cidadão de Duque de Caxias.\n"
+                    "• **Não invento para agradar**: Minhas respostas são estritamente factuais. Se uma informação não constar em minha base oficial, informo com total transparência a limitação e oriento você a falar com a equipe humana da **Ouvidoria Geral de Duque de Caxias**:\n"
                     f"  - **Telefone**: {OUVIDORIA_CONTACTS['telefone']}\n"
-                    f"  - **WhatsApp**: {OUVIDORIA_CONTACTS['whatsapp']}\n"
+                    f"  - **E-mail**: {OUVIDORIA_CONTACTS['email']}\n"
                     f"  - **Online**: aplicativo **Colab** ({OUVIDORIA_CONTACTS['colab_url_clean']})\n\n"
                     "Meu compromisso é fornecer um atendimento factual, seguro e 100% transparente para a nossa cidade."
                 )
         else:
             ans = (
-                "Não, de forma alguma! Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
-                "• **Não invento protocolos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios.\n"
-                "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados e da Carta de Serviços da Prefeitura de Duque de Caxias.\n"
-                "• **Transparência e Limites**: Se uma informação não constar em minha base oficial, informo com clareza a limitação e oriento você a contatar os atendentes da **Ouvidoria Geral de Duque de Caxias**:\n"
+                "**Não, de forma alguma!** Como assistente virtual oficial da Prefeitura de Duque de Caxias, sigo princípios estritos de integridade, transparência e responsabilidade com o munícipe:\n\n"
+                "• **Não invento protocolos nem encaminhamentos**: Números de protocolo oficiais só existem quando gerados por sistemas municipais homologados (como o aplicativo **Colab** ou a Central da Prefeitura). Eu nunca crio protocolos fictícios nem afirmo que uma solicitação foi encaminhada se isso não ocorreu.\n"
+                "• **Fontes oficiais e verificadas**: Todas as informações fornecidas sobre órgãos, serviços, horários, telefones e endereços são consultadas diretamente da base de dados oficial e da Carta de Serviços ao Cidadão de Duque de Caxias.\n"
+                "• **Não invento para agradar**: Minhas respostas são estritamente factuais. Se uma informação não constar em minha base oficial, informo com total transparência a limitação e oriento você a falar com a equipe humana da **Ouvidoria Geral de Duque de Caxias**:\n"
                 f"  - **Telefone**: {OUVIDORIA_CONTACTS['telefone']}\n"
-                f"  - **WhatsApp**: {OUVIDORIA_CONTACTS['whatsapp']}\n"
+                f"  - **E-mail**: {OUVIDORIA_CONTACTS['email']}\n"
                 f"  - **Online**: aplicativo **Colab** ({OUVIDORIA_CONTACTS['colab_url_clean']})\n\n"
                 "Meu compromisso é fornecer um atendimento factual, seguro e 100% transparente para a nossa cidade."
             )

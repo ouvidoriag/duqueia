@@ -305,6 +305,15 @@ class GoldenSourceResolver:
         if is_emergency_clinical and not is_animal_query:
             return None
 
+        # Se for pergunta sobre funcionamento da IA, limites, integridade ou meta-questionamento,
+        # NUNCA interceptar deterministicamente na Golden Source Layer!
+        is_ai_meta = bool(re.search(
+            r"\b(?:invent\w*|agradar|agradecer|alucin\w*|mente|mentir|engan\w*|duque\s+ia|a\s+ia|inteligencia\s+artificial|como\s+posso\s+ter\s+certeza|confiar|confi[aá]vel|verdadeira|verdadeiras|protocolo\s+falso|fariam\s+isso)\b",
+            q_norm
+        ))
+        if is_ai_meta:
+            return None
+
         if is_procedural and not is_asking_place:
             return None
 
@@ -529,6 +538,14 @@ class GoldenSourceResolver:
 
     def _resolve_secretaria(self, q_norm: str) -> dict | None:
         """Busca determinística na tabela secretarias (apenas para contato/endereço direto)."""
+        # Se for pergunta sobre funcionamento da IA, invenção de dados, limites, etc., NUNCA interceptar
+        is_ai_meta = bool(re.search(
+            r"\b(?:invent\w*|agradar|agradecer|alucin\w*|mente|mentir|engan\w*|duque\s+ia|a\s+ia|inteligencia\s+artificial|como\s+posso\s+ter\s+certeza|confiar|confi[aá]vel|verdadeira|verdadeiras|protocolo\s+falso|fariam\s+isso)\b",
+            q_norm
+        ))
+        if is_ai_meta:
+            return None
+
         # Se for pergunta sobre escopo, atribuições, comparações ou procedimentos, NÃO interceptar deterministicamente
         is_comparative_or_procedural = any(w in q_norm for w in [
             "diferenca", "diferença", "diferente", "comparar", "escopo", "competencia", "competência",
@@ -561,13 +578,19 @@ class GoldenSourceResolver:
 
         conn.close()
 
+        stop_sec_words = {
+            "secretaria", "municipal", "municipio", "duque", "caxias", "direitos", "humanos",
+            "apoio", "para", "instituto", "fundacao", "fundacão", "servidores", "publicos",
+            "publico", "geral", "subsecretaria", "superintendencia", "governo", "trabalho"
+        }
+
         scored = []
         for sec_id, name, code, address, phone, email, hours in rows:
             name_norm = normalize_text(name)
             code_norm = normalize_text(code) if code else ""
 
-            # Extrai palavras significativas da secretaria (ex: saude, obras, fazenda, urbanismo, educacao)
-            words_sec = [w for w in name_norm.split() if len(w) >= 4 and w not in ["secretaria", "municipal", "direitos", "humanos", "apoio", "para"]]
+            # Extrai palavras distintivas da secretaria (ex: saude, obras, fazenda, urbanismo, educacao)
+            words_sec = [w for w in name_norm.split() if len(w) >= 4 and w not in stop_sec_words]
 
             score = 0
             if code_norm and re.search(rf"\b{re.escape(code_norm)}\b", q_norm):
@@ -586,6 +609,10 @@ class GoldenSourceResolver:
 
         scored.sort(key=lambda x: x[0], reverse=True)
         best_score, sec_id, name, code, address, phone, email, hours = scored[0]
+
+        # Exige pontuação mínima confiável: ou acertou a sigla (100) ou pelo menos duas palavras fortes (>= 50)
+        if best_score < 50:
+            return None
 
         ans = (
             f"O endereço da **{name} ({code})** é **{address or 'Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)'}**.\n\n"

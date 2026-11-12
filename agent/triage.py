@@ -135,11 +135,11 @@ CLARIFICACAO_RESPOSTA_FAST_PATTERNS = [
 ]
 
 AI_META_INFO_FAST_PATTERNS = [
-    (r"\b(?:inventa(?:ria)?|inventar)\s+(?:informaç|protocol|telefon|dado|contato|encaminha|respost)", "AI_META_INFO", "Questionamento sobre não-invenção de dados e protocolos pela IA."),
-    (r"\b(?:a\s+ia|você|voce)\s+(?:inventa|inventaria|mente|alucina|engana)", "AI_META_INFO", "Questionamento sobre veracidade e limites da IA."),
-    (r"\b(?:para\s+me\s+agradar|pra\s+me\s+agradar)\b", "AI_META_INFO", "Questionamento sobre invenção de respostas para agradar o munícipe."),
-    (r"\b(?:posso\s+confiar\s+em\s+você|posso\s+confiar\s+na\s+ia|você\s+é\s+confi[aá]vel|voce\s+e\s+confiavel)\b", "AI_META_INFO", "Pergunta sobre confiabilidade da IA."),
-    (r"\b(?:como\s+(?:você|voce)\s+funciona|de\s+onde\s+v[eê]m\s+(?:suas|as)\s+informaç[õo]es)\b", "AI_META_INFO", "Pergunta sobre funcionamento e fontes da IA.")
+    (r"\b(?:invent\w*)\s+(?:.*?)(?:protocol|telefon|informaç|dado|contato|encaminha|respost)", "AI_META_INFO", "Questionamento sobre não-invenção de dados e protocolos pela IA."),
+    (r"\b(?:a\s+ia|duque\s+ia|voc[eê]|voc[eê]s)\s+(?:invent\w*|mente|mentir|alucin\w*|engan\w*|fariam\s+isso)", "AI_META_INFO", "Questionamento sobre veracidade e limites da IA."),
+    (r"\b(?:para|pra)\s+(?:\w+\s+)?(?:me\s+)?agradar\b", "AI_META_INFO", "Questionamento sobre invenção de respostas para agradar o munícipe."),
+    (r"\b(?:posso\s+confiar|confi[aá]vel|como\s+posso\s+ter\s+certeza|s[aã]o\s+verdadeiras?|informaç[õo]es\s+verdadeiras?)\b", "AI_META_INFO", "Pergunta sobre confiabilidade e veracidade da IA."),
+    (r"\b(?:como\s+(?:você|voce|a\s+ia|duque\s+ia)\s+funciona|de\s+onde\s+v[eê]m\s+(?:suas|as)\s+informaç[õo]es)\b", "AI_META_INFO", "Pergunta sobre funcionamento e fontes da IA.")
 ]
 
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
