@@ -46,3 +46,13 @@ CREATE TABLE IF NOT EXISTS chat_feedback (
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session_turn ON chat_messages(session_id, turn_index);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_chat_feedback_created ON chat_feedback(created_at);
+
+-- Trigger para garantir que a sessão exista automaticamente em chat_sessions antes de inserir a mensagem
+CREATE TRIGGER IF NOT EXISTS trg_chat_messages_auto_session
+BEFORE INSERT ON chat_messages
+FOR EACH ROW
+WHEN new.session_id IS NOT NULL AND new.session_id != ''
+BEGIN
+    INSERT OR IGNORE INTO chat_sessions (id, created_at)
+    VALUES (new.session_id, CURRENT_TIMESTAMP);
+END;

@@ -1937,3 +1937,11 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-12 13:38:30,Moro em Duque de Caxias há 20 anos; pago meus impostos e minha rua continua sem asfalto; iluminação e coleta de lixo adequada. Já reclamei várias vezes e ninguém resolve. Quero saber exatamente quem é responsável; como registrar uma reclamação formal; como acompanhar o protocolo e o que fazer se a prefeitura não responder.,800.39,13382.72,14189.03,1.0000,3125,0.00046530
 2026-11-12 13:44:24,Minha mãe tá passando mal e mora em Jardim Primavera. Onde fica a unidade de saúde mais próxima que pode atender ela hoje?,2405.05,7741.03,12315.70,1.0000,2546,0.00031450
 2026-11-12 13:44:29,Como tiro a segunda via do IPTU pela internet sem precisar ir até o centro de Caxias?,825.96,4894.54,5724.46,1.0000,2213,0.00023700
+2026-11-12 13:49:32,quem é netinho reis,0.00,0.00,654.46,0.0000,0,0.00000000
+2026-11-12 13:49:32,quem é o prefeito,0.00,0.00,0.36,0.0000,0,0.00000000
+2026-11-12 13:49:33,quem é o secretário de obras,0.00,0.00,0.22,0.0000,0,0.00000000
+2026-11-12 13:49:33,quem é boquinha,0.00,0.00,4.15,0.0000,0,0.00000000
+2026-11-12 13:49:51,Quem é a vice-prefeita de Duque de Caxias?,0.00,0.00,21.63,0.0000,0,0.00000000
+2026-11-12 13:49:51,Quem é a vice prefeita?,0.00,0.00,0.46,0.0000,0,0.00000000
+2026-11-12 13:49:53,Quem é Aline do Aureo?,0.00,0.00,1640.28,0.0000,0,0.00000000
+2026-11-12 13:49:55,Quem é Aline Ferreira Batista Ribeiro?,0.00,0.00,1521.08,0.0000,0,0.00000000
