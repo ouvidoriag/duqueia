@@ -1375,37 +1375,38 @@ class AuthorityHandler(BaseHandler):
 
         # 2. Parser de prefixos de perguntas de autoridades (apenas pronomes e verbos de pergunta)
         AUTHORITY_PATTERNS = [
-            "quem é o",
-            "quem é a",
-            "quem é",
-            "quem e o",
-            "quem e a",
-            "quem e",
-            "qual é o",
-            "qual é a",
-            "qual é",
-            "qual e o",
-            "qual e a",
-            "qual e",
-            "quem dirige o",
-            "quem dirige a",
-            "quem dirige",
-            "quem administra o",
-            "quem administra a",
-            "quem administra",
-            "quem comanda o",
-            "quem comanda a",
-            "quem comanda",
-            "quem ocupa o cargo de",
-            "quem ocupa o cargo da",
-            "quem ocupa o cargo",
-            "o responsável pela",
-            "o responsavel pela",
-            "o responsável pelo",
-            "o responsavel pelo",
-            "qual o",
-            "qual a",
+            "voce sabe qual o nome do", "você sabe qual o nome do",
+            "voce sabe qual o nome da", "você sabe qual o nome da",
+            "voce sabe qual o", "você sabe qual o",
+            "voce sabe qual a", "você sabe qual a",
+            "voce sabe quem é o", "você sabe quem é o",
+            "voce sabe quem e o", "você sabe quem e o",
+            "voce sabe quem é a", "você sabe quem é a",
+            "voce sabe quem e a", "você sabe quem e a",
+            "voce sabe quem é", "você sabe quem é",
+            "voce sabe quem e", "você sabe quem e",
+            "sabe qual o nome do", "sabe qual o nome da",
+            "sabe quem é o", "sabe quem e o",
+            "sabe quem é a", "sabe quem e a",
+            "sabe quem é", "sabe quem e",
+            "qual o nome do", "qual o nome da", "qual o nome",
+            "qual é o nome do", "qual é o nome da", "qual é o nome",
+            "qual e o nome do", "qual e o nome da", "qual e o nome",
+            "quem é o titular do", "quem é o titular da", "quem e o titular do", "quem e o titular da",
+            "quem é o titular", "quem e o titular",
+            "quem é o", "quem é a", "quem é",
+            "quem e o", "quem e a", "quem e",
+            "qual é o", "qual é a", "qual é",
+            "qual e o", "qual e a", "qual e",
+            "quem dirige o", "quem dirige a", "quem dirige",
+            "quem administra o", "quem administra a", "quem administra",
+            "quem comanda o", "quem comanda a", "quem comanda",
+            "quem ocupa o cargo de", "quem ocupa o cargo da", "quem ocupa o cargo",
+            "o responsável pela", "o responsavel pela",
+            "o responsável pelo", "o responsavel pelo",
+            "qual o", "qual a",
         ]
+        AUTHORITY_PATTERNS.sort(key=len, reverse=True)
 
         q_clean = query.lower().strip()
         q_clean = re.sub(r'^[¿\?¡\!]+|[¿\?¡\!]+$', '', q_clean).strip() # remove pontuações finais/iniciais
@@ -1422,7 +1423,7 @@ class AuthorityHandler(BaseHandler):
 
         # 3.1 Busca prioritária por Nome de Autoridade ou Apelido (ex: "Netinho Reis", "Boquinha", "Valber")
         q_norm_words = set(q_normalized.split())
-        stopwords = {"de", "da", "do", "o", "a", "em", "para", "quem", "e"}
+        stopwords = {"de", "da", "do", "o", "a", "em", "para", "quem", "e", "voce", "você", "sabe", "qual", "nome"}
         q_clean_words = q_norm_words - stopwords
 
         for key, val in AUTHORITIES.items():

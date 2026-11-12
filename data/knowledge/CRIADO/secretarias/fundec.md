@@ -4,8 +4,8 @@
 - **Sede:** Av. Brigadeiro Lima e Silva, 131 - Parque Duque
 - **Telefone:** (21) 2672-5650
 
-## Presidente
-**Roseli Duarte**
+## Liderança
+- **Presidente:** Roseli Duarte.
 
 ## Atuação e Qualificação Profissional
 A FUNDEC é o principal braço de qualificação profissional de Duque de Caxias, oferecendo milhares de vagas em cursos gratuitos.

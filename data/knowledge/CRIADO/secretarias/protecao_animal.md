@@ -4,8 +4,8 @@
 - **Linha Direta:** (21) 2776-8704
 - **Localização:** Vila Sarapuí (Sede revitalizada em 2026).
 
-## Secretária
-**Nadja Rissi (Naná)**
+## Liderança
+- **Secretária:** Nadja Rissi (Naná).
 
 ## Políticas de Bem-estar Animal
 A secretaria foca no controle populacional e na assistência a animais abandonados ou vítimas de maus-tratos.

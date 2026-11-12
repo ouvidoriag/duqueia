@@ -143,11 +143,11 @@ AI_META_INFO_FAST_PATTERNS = [
 ]
 
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
-    (r"\b(?:quem\s+é\s+o\s+prefeito|quem\s+e\s+o\s+prefeito|quem\s+é\s+o\s+prefeitor|qual\s+o\s+prefeito|qual\s+é\s+o\s+prefeito)\b", "AUTORIDADE_PUBLICA", "Busca direta pelo prefeito."),
-    (r"\b(?:quem\s+é\s+o\s+vice|quem\s+e\s+o\s+vice|quem\s+é\s+a\s+vice|quem\s+e\s+a\s+vice|vice-prefeito|vice\s+prefeito|vice-prefeita|vice\s+prefeita)\b", "AUTORIDADE_PUBLICA", "Busca pelo vice-prefeito."),
-    (r"\b(?:quem\s+é\s+o\s+secretário|quem\s+e\s+o\s+secretario|quem\s+é\s+a\s+secretária|quem\s+e\s+a\s+secretaria|qual\s+o\s+secretário|qual\s+o\s+secretario)\b", "AUTORIDADE_PUBLICA", "Busca por secretário."),
-    (r"\b(?:quem\s+dirige|quem\s+administra|quem\s+comanda|quem\s+ocupa\s+o\s+cargo|responsável\s+pela\s+secretaria|responsavel\s+pela\s+secretaria|responsável\s+pelo\s+órgão|responsavel\s+pelo\s+orgao)\b", "AUTORIDADE_PUBLICA", "Busca pelo responsável de secretaria/órgão."),
-    (r"\b(?:quem\s+é\s+o\s+ouvidor|quem\s+e\s+o\s+ouvidor|quem\s+é\s+o\s+procurador|quem\s+e\s+o\s+procurador|quem\s+é\s+o\s+controlador|quem\s+e\s+o\s+controlador)\b", "AUTORIDADE_PUBLICA", "Busca por autoridades de controle.")
+    (r"\b(?:quem\s+(?:é|e)\s+o\s+prefeito|qual\s+(?:é\s+)?o\s+prefeito|prefeito\s+municipal)\b", "AUTORIDADE_PUBLICA", "Busca direta pelo prefeito."),
+    (r"\b(?:quem\s+(?:é|e)\s+(?:o|a)\s+vice|vice-prefeita?|vice\s+prefeita?)\b", "AUTORIDADE_PUBLICA", "Busca pelo vice-prefeito."),
+    (r"\b(?:(?:qual\s+(?:é\s+)?(?:o\s+)?nome\s+d[oa]|quem\s+(?:é|e)\s+[oa]|qual\s+(?:é\s+)?[oa])\s+secret[áa]ri[oa]|secret[áa]ri[oa]\s+d[ea]|titular\s+d[ea]\s+secretaria)\b", "AUTORIDADE_PUBLICA", "Busca por secretário municipal."),
+    (r"\b(?:quem\s+dirige|quem\s+administra|quem\s+comanda|quem\s+ocupa\s+o\s+cargo|responsável\s+pel[ao]|responsavel\s+pel[ao])\s+(?:secretaria|órgão|orgao|pasta|prefeitura)\b", "AUTORIDADE_PUBLICA", "Busca pelo responsável de secretaria/órgão."),
+    (r"\b(?:(?:qual\s+(?:é\s+)?(?:o\s+)?nome\s+d[oa]|quem\s+(?:é|e)\s+[oa]|qual\s+(?:é\s+)?[oa])\s+(?:ouvidor|procurador|controlador|presidente\s+d[ao]|subprefeito)|presidente\s+d[ao]\s+(?:fundec|ipmdc)|quem\s+preside\s+(?:a\s+fundec|o\s+ipmdc))\b", "AUTORIDADE_PUBLICA", "Busca por autoridades de controle, autarquias ou fundações.")
 ]
 
 RAG_GERAL_FAST_PATTERNS = [

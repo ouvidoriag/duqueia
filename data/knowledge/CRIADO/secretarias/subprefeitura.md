@@ -1,7 +1,7 @@
 # Subprefeitura e Limpeza Urbana - Duque de Caxias
 
-## Subprefeito
-**Carlos José Corrêa Paulo (Saúva)**
+## Liderança
+- **Subprefeito e Responsável pela Limpeza Urbana:** Carlos José Corrêa Paulo (Saúva).
 
 ## Perfil e Gestão
 O subprefeito Saúva possui ampla experiência no setor público e é o responsável pela **Secretaria Municipal de Limpeza Urbana** desde 2017.

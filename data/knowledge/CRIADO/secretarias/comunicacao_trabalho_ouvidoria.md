@@ -25,18 +25,23 @@ A pasta unifica três frentes de atendimento e gestão pública fundamentais:
 
 ---
 
+## Liderança
+- **Secretário:** Douglas Rhanieri Machado dos Santos (Interino) / Michaell Cezar Soares Franca (Michaell Soares).
+- **Ouvidor-Geral do Município:** Edrisio Avelino da Costa.
+
+---
+
 ## 3. Ouvidoria Geral do Município (OGM)
 A **Ouvidoria Geral de Duque de Caxias** é o canal oficial de segunda instância e acolhimento para o munícipe registrar manifestações, solicitações, sugestões, elogios, reclamações e denúncias:
 - **Plataforma Colab:** Aplicativo e sistema oficial integrado para abertura e acompanhamento de protocolos de serviços públicos (tapa-buraco, iluminação pública, vazamento de água/esgoto, limpeza urbana, etc.).
 - **Atendimento Telefônico Direto:** **(21) 2652-3835**
-- **Atendimento via WhatsApp Oficial:** **(21) 99824-5903**
 - **E-mail da Ouvidoria:** `ouvidoria@duquedecaxias.rj.gov.br`
-- **Atendimento Presencial:** Alameda Dona Mariana, 91 - 25 de Agosto, Duque de Caxias - RJ, CEP 25075-010.
-- **Horário de Funcionamento:** Segunda a sexta-feira, das 08h às 17h.
+- **Atendimento Presencial:** Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura), Duque de Caxias - RJ.
+- **Horário de Funcionamento:** Segunda a sexta-feira, das 09h às 17h.
 
 ---
 
 ## Diretrizes no Atendimento RAG e Agentes
-- Quando o munícipe buscar contatos de reclamações, ouvidoria, elogios ou status de protocolos de serviços públicos, direcionar prioritariamente para os canais da **Ouvidoria Geral (SMCSRPTER)** via telefone **(21) 2652-3835**, WhatsApp **(21) 99824-5903** ou aplicativo **Colab**.
+- Quando o munícipe buscar contatos de reclamações, ouvidoria, elogios ou status de protocolos de serviços públicos, direcionar prioritariamente para os canais da **Ouvidoria Geral (SMCSRPTER)** via telefone **(21) 2652-3835**, e-mail **ouvidoria@duquedecaxias.rj.gov.br** ou aplicativo **Colab**. (A Ouvidoria NÃO possui canal de WhatsApp).
 - Consultas sobre vagas de emprego, primeiro emprego e SINE devem ser direcionadas ao setor de Trabalho e Renda da pasta.
 

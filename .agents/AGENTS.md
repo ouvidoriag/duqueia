@@ -273,6 +273,11 @@ A mensagem do munícipe percorre:
   - **Presencial:** Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)
   - **Web / Aplicativo:** **Colab** (`duquedecaxias.colab.re`)
 
+### 5. Cobertura Canônica de Autoridades e Secretários (Gestão 2025–2028)
+- 100% das 21 Secretarias Municipais, Autarquias (IPMDC), Fundações (FUNDEC) e Órgãos de Controle (PGM, CGM, Ouvidoria Geral) possuem seus titulares mapeados deterministicamente no `AuthorityHandler`.
+- Padrão uniforme: Perguntas sobre titulares e secretários ("quem é o secretário de X", "qual o nome do presidente da FUNDEC/IPMDC", "quem é o procurador geral", "quem é o ouvidor") são resolvidas com resposta padronizada e fontes oficiais em menos de 1s (0 tokens LLM).
+- Os cartões de endereço de secretarias na Golden Source Layer (`_resolve_secretaria`) exibem obrigatoriamente a linha `• **Titular / Responsável:** **{nome}** ({cargo})` para garantir consistência em todas as consultas da Prefeitura.
+
 ---
 
 ## FASE 12 - ENGENHARIA DE DADOS VETORIAIS E OTIMIZAÇÃO BINÁRIA (SEM GIT LFS)

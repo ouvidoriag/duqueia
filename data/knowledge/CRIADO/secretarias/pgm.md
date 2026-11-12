@@ -5,8 +5,8 @@
 - **Telefone:** (21) 2672-8889
 - **E-mail:** gabineteadm.pgmdc@gmail.com
 
-## Procurador Geral
-**Dr. Fabrício Gaspar Rodrigues**
+## Liderança
+- **Procurador-Geral:** Dr. Fabrício Gaspar Rodrigues.
 
 ## Função
 Órgão gestor do sistema jurídico municipal, responsável pela defesa judicial e extrajudicial do município, consultoria jurídica e cobrança da dívida ativa.

@@ -661,9 +661,41 @@ class GoldenSourceResolver:
         if best_score < 50:
             return None
 
+        # Mapeamento canônico do titular da pasta para exibição padronizada
+        SEC_TITULAR_MAP = {
+            "SMS": ("Secretária Municipal de Saúde", "Dra. Célia Serrano da Silva"),
+            "SME": ("Secretária Municipal de Educação", "Iracema Medeiros da Costa Silva"),
+            "SMF": ("Secretário Municipal de Fazenda", "Carlos Soutinho de Mello"),
+            "SMOA": ("Secretário Municipal de Obras e Agricultura", "Valber Rodrigues Januario"),
+            "SMUH": ("Secretária Municipal de Urbanismo", "Leieny Martins Ramos"),
+            "SMASDH": ("Secretário Municipal de Assistência Social e Direitos Humanos", "Marcus Vinícius de Moraes (Boquinha)"),
+            "SMG": ("Secretária Municipal de Governo", "Luciana R. Bertella"),
+            "SMA": ("Secretário Municipal de Administração, Planejamento e Orçamento", "Fabrício Abílio"),
+            "SMMA": ("Secretário Municipal de Meio Ambiente", "Vinicius Thomaz"),
+            "SMTSP": ("Secretário Municipal de Transportes e Serviços Públicos", "Sandro Lellis"),
+            "SMSP": ("Secretário Municipal de Segurança e Ordem Pública", "Vinícius Carvalho"),
+            "SMDC": ("Secretária Municipal de Defesa Civil", "Tenente-Coronel Kaline Marcelino (CBMERJ)"),
+            "SMCT": ("Secretário Municipal de Cultura e Turismo", "Aroldo Cândido de Brito"),
+            "SMEL": ("Secretário Municipal de Esporte e Lazer", "Leandro Guimarães"),
+            "SMGIM": ("Secretária Municipal de Gestão e Inclusão", "Anna Christina Barichello"),
+            "SMPA": ("Secretária Municipal de Proteção Animal", "Nadja Rissi (Naná)"),
+            "PGM": ("Procurador-Geral do Município", "Dr. Fabrício Gaspar Rodrigues"),
+            "CGM": ("Secretária de Controle Interno / Controladora-Geral", "Patrícia Lucia Coll"),
+            "FUNDEC": ("Presidente da FUNDEC", "Roseli Duarte"),
+            "IPMDC": ("Presidente do IPMDC", "Ana Carolina Freire Klojda"),
+            "SMCSRPTER": ("Secretário de Comunicação, Trabalho e Renda", "Douglas Rhanieri Machado dos Santos (Interino) / Michaell Soares")
+        }
+
+        titular_info = ""
+        if code and code.upper() in SEC_TITULAR_MAP:
+            cargo_t, nome_t = SEC_TITULAR_MAP[code.upper()]
+            titular_info = f"• **Titular / Responsável:** **{nome_t}** ({cargo_t})\n"
+
         ans = (
             f"O endereço da **{name} ({code})** é **{address or 'Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)'}**.\n\n"
         )
+        if titular_info:
+            ans += titular_info
         if phone and phone.lower() not in ("não cadastrado", "none", ""):
             ans += f"• **Telefone:** **{phone}**\n"
         if email and email.lower() not in ("não cadastrado", "none", ""):

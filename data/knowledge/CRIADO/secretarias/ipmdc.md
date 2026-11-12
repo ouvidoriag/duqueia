@@ -5,6 +5,9 @@
 - **Whatsapp:** (21) 3257-6000
 - **E-mail:** gabinete.ipmdc@gmail.com / protocolo@ipmdc.com.br
 
+## Liderança
+- **Presidente:** Ana Carolina Freire Klojda.
+
 ## Função
 Autarquia responsável pela gestão dos ativos financeiros e pelo pagamento de aposentadorias e pensões dos servidores municipais.
 
