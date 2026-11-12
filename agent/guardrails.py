@@ -19,9 +19,18 @@ OFFICIAL_CANONICAL_PHONES = {
     # Concessionárias essenciais atuantes no território municipal de Duque de Caxias
     "08000210196",  # Light (Emergência e Alta Tensão)
     "08001950195",  # Águas do Rio (Saneamento e Esgoto)
+    "972118064",    # WhatsApp Oficial Águas do Rio
+    "21972118064",  # WhatsApp Oficial Águas do Rio (com DDD)
+    "08000249040",  # AGENERSA (Agência Reguladora de Energia e Saneamento do RJ)
     "08000240197",  # Naturgy (Gás Canalizado)
     "08000000755",  # Iluminação Pública
     "08007787272",  # Iluminação Pública
+    # Órgãos municipais de atendimento e defesa do consumidor
+    "971797900",    # WhatsApp Petzap (Proteção Animal - SMPA)
+    "21971797900",  # WhatsApp Petzap (Proteção Animal - SMPA com DDD)
+    "27736200",     # Central Geral da Prefeitura de Duque de Caxias
+    "26726668",     # PROCON Duque de Caxias
+    "26728800",     # Secretaria Municipal de Saúde (SMS)
 }
 
 _CACHED_DB_PHONES: Optional[Set[str]] = None

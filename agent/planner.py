@@ -105,6 +105,59 @@ OFFLINE_RULES = [
         "focus": ["address", "phone", "hours", "steps"]
     },
     {
+        "intent": "service_location",
+        "triggers": [
+            r"\b[aá]guas\s+do\s+rio\b", r"\bdesabastecimento\b", r"\bsem\s+[aá]gua\b",
+            r"\bfalta\s+d['\s]?[aá]gua\b", r"\bfornecimento\s+de\s+[aá]gua\b", r"\bagenersa\b"
+        ],
+        "queries": [
+            "Águas do Rio falta de água desabastecimento concessionária Ouvidoria Colab",
+            "AGENERSA agência reguladora saneamento água esgoto denúncia",
+            "Ouvidoria Geral Duque de Caxias intermediação concessionária Águas do Rio"
+        ],
+        "focus": ["phone", "steps", "channel"]
+    },
+    {
+        "intent": "service_location",
+        "triggers": [
+            r"\blava[- ]?jato\b", r"\bobst[aá]culo\s+na\s+rua\b", r"\bcones?\s+na\s+rua\b",
+            r"\bocupando\s+a\s+cal[cç]ada\b", r"\bcal[cç]ada\s+obstru[ií]da\b", r"\bfechando\s+a\s+rua\b",
+            r"\bcavaletes?\s+na\s+rua\b"
+        ],
+        "queries": [
+            "Superintendência de Ordem Pública SUOP desobstrução de calçadas cones lava jato Colab",
+            "Fiscalização de Posturas Urbanismo ocupação indevida de logradouro público",
+            "Denúncia de lava jato irregular sem alvará ocupando calçada Ouvidoria"
+        ],
+        "focus": ["steps", "channel", "phone"]
+    },
+    {
+        "intent": "service_location",
+        "triggers": [
+            r"\bverificar\s+alvar[aá]\b", r"\bconsultar\s+alvar[aá]\b", r"\bdescobrir\s+se\s+tem\s+alvar[aá]\b",
+            r"\balvar[aá]\s+do\s+vizinho\b", r"\bcom[eé]rcio\s+sem\s+alvar[aá]\b", r"\boficina\s+sem\s+alvar[aá]\b"
+        ],
+        "queries": [
+            "Denúncia de funcionamento irregular comércio sem alvará Colab Fiscalização Fazenda",
+            "Superintendência de Ordem Pública fiscalização de estabelecimentos sem alvará",
+            "Sigilo fiscal consulta de alvará de terceiros e-SIC Portal Cidadão"
+        ],
+        "focus": ["steps", "channel"]
+    },
+    {
+        "intent": "general_info",
+        "triggers": [
+            r"\be-?sic\b", r"\blai\b", r"\bacesso\s+[aà]\s+informaç", r"\bportal\s+cidad[aã]o\b",
+            r"\brelaç[aã]o\s+de\s+contratad", r"\bgastos?\s+com\s+limpeza", r"\bc[oó]pia\s+de\s+contrato"
+        ],
+        "queries": [
+            "e-SIC Lei de Acesso à Informação Portal Cidadão Duque de Caxias transparência",
+            "Solicitação de documentos contratos e relação de contratados PSS e-SIC",
+            "Ouvidoria Geral denúncia preterição irregularidade Colab"
+        ],
+        "focus": ["channel", "steps"]
+    },
+    {
         "intent": "secretaria_info",
         "triggers": [r"\bsaude\b", r"\bhomem\b", r"\bmulher\b", r"\bmedico\b", r"\bposto\b"],
         "queries": ["Secretaria Municipal de Saúde", "saúde"],
