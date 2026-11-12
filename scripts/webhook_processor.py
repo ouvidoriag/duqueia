@@ -27,11 +27,23 @@ DB_TELEMETRY = os.path.join(_PROJECT_ROOT, "data", "db", "telemetry.db")
 # Proibição absoluta do WhatsApp fictício
 FORBIDDEN_WHATSAPP_PATTERN = re.compile(r'\(?21\)?\s*99824[-.\s]?5903', re.IGNORECASE)
 
+def fix_encoding(text: str) -> str:
+    """Corrige mojibake de UTF-8 interpretado como Latin-1 (ex: Ã§ -> ç, Ã£ -> ã)."""
+    if not text or not isinstance(text, str):
+        return text or ""
+    if any(m in text for m in ['Ã', 'Â', 'â', 'ð']):
+        try:
+            return text.encode('latin1').decode('utf-8')
+        except Exception:
+            pass
+    return text
+
 def sanitize_text(text: str) -> str:
     if not text:
         return ""
+    fixed = fix_encoding(str(text))
     # Remove número fictício se vier em qualquer campo
-    cleaned = FORBIDDEN_WHATSAPP_PATTERN.sub('', str(text))
+    cleaned = FORBIDDEN_WHATSAPP_PATTERN.sub('', fixed)
     return cleaned.strip()
 
 def ensure_schema():
@@ -131,24 +143,24 @@ def process_sigem_event(payload: dict) -> dict:
         return {"success": False, "error": "dados_atuais vazio"}
 
     sigem_id = str(dados.get("id") or "").strip()
-    nome = sanitize_text(dados.get("nome", ""))
-    sigla = sanitize_text(dados.get("sigla", ""))
-    categoria = sanitize_text(dados.get("categoria", ""))
+    nome = sanitize_text(dados.get("nome") or dados.get("name") or "")
+    sigla = sanitize_text(dados.get("sigla") or "")
+    categoria = sanitize_text(dados.get("categoria") or "")
     secretaria_sigla = (dados.get("secretaria_sigla") or "").strip()
-    secretaria_nome = sanitize_text(dados.get("secretaria_nome", ""))
-    status = sanitize_text(dados.get("status", "Ativo"))
-    horario = sanitize_text(dados.get("horario_funcionamento", ""))
-    endereco = sanitize_text(dados.get("endereco_completo", ""))
-    bairro = sanitize_text(dados.get("bairro_oficial", ""))
-    distrito = sanitize_text(dados.get("distrito_oficial", ""))
-    lat = dados.get("latitude")
-    lon = dados.get("longitude")
-    telefones = dados.get("telefones", [])
+    secretaria_nome = sanitize_text(dados.get("secretaria_nome") or "")
+    status = sanitize_text(dados.get("status") or "Ativo")
+    horario = sanitize_text(dados.get("horario_funcionamento") or dados.get("horario") or dados.get("working_hours") or "")
+    endereco = sanitize_text(dados.get("endereco_completo") or dados.get("endereco") or dados.get("address") or "")
+    bairro = sanitize_text(dados.get("bairro_oficial") or dados.get("bairro") or "")
+    distrito = sanitize_text(dados.get("distrito_oficial") or dados.get("distrito") or "")
+    lat = dados.get("latitude") or dados.get("lat")
+    lon = dados.get("longitude") or dados.get("lon")
+    telefones = dados.get("telefones") or dados.get("phone") or []
     if isinstance(telefones, list):
         telefones_str = ", ".join([sanitize_text(t) for t in telefones if sanitize_text(t)])
     else:
         telefones_str = sanitize_text(telefones)
-    emails = dados.get("emails", [])
+    emails = dados.get("emails") or dados.get("email") or []
     if isinstance(emails, list):
         emails_str = ", ".join([sanitize_text(e) for e in emails if sanitize_text(e)])
     else:
@@ -292,19 +304,24 @@ def process_cds_event(payload: dict) -> dict:
         return {"success": False, "error": "dados_atuais vazio"}
 
     cds_id = str(dados.get("id") or "").strip()
-    name = sanitize_text(dados.get("name", ""))
-    description = sanitize_text(dados.get("description", ""))
-    how_to_access = sanitize_text(dados.get("how_to_access", ""))
-    address = sanitize_text(dados.get("address", ""))
-    who_can_request = sanitize_text(dados.get("who_can_request", ""))
-    waiting_time = sanitize_text(dados.get("waiting_time", ""))
-    max_deadline = sanitize_text(dados.get("max_deadline", ""))
-    cost = sanitize_text(dados.get("cost", "Gratuito"))
-    regulation_norm = sanitize_text(dados.get("regulation_norm", ""))
-    status = sanitize_text(dados.get("status", "published"))
-    secretaria_nome = sanitize_text(dados.get("secretaria_nome", ""))
+    name = sanitize_text(dados.get("nome") or dados.get("name") or "")
+    description = sanitize_text(dados.get("descricao") or dados.get("description") or "")
+    how_to_access = sanitize_text(dados.get("como_acessar") or dados.get("how_to_access") or "")
+    address = sanitize_text(dados.get("endereco") or dados.get("address") or "")
+    who_can_request = sanitize_text(dados.get("quem_pode_solicitar") or dados.get("who_can_request") or "")
+    waiting_time = sanitize_text(dados.get("tempo_espera") or dados.get("waiting_time") or "")
+    max_deadline = sanitize_text(dados.get("prazo_maximo") or dados.get("max_deadline") or "")
+    cost = sanitize_text(dados.get("custo") or dados.get("cost") or "Gratuito")
+    regulation_norm = sanitize_text(dados.get("norma_regulamentadora") or dados.get("regulation_norm") or "")
+    status = sanitize_text(dados.get("status") or "published")
+    secretaria_nome = sanitize_text(dados.get("secretaria_nome") or "")
     secretaria_sigla = (dados.get("secretaria_sigla") or "").strip()
-    categoria_nome = sanitize_text(dados.get("categoria_nome", ""))
+    
+    cat = dados.get("categorias") or dados.get("categoria_nome") or dados.get("categoria") or ""
+    if isinstance(cat, list) and cat:
+        categoria_nome = sanitize_text(cat[0])
+    else:
+        categoria_nome = sanitize_text(cat)
     atualizado_em = dados.get("atualizado_em") or datetime.utcnow().isoformat()
 
     is_desativado = (evento == "servico.desativado") or (status.lower() in ["disabled", "desativado", "desativada", "inativo"])
@@ -491,3 +508,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
