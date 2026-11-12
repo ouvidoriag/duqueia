@@ -248,4 +248,73 @@ A mensagem do munícipe percorre:
 * **SMG (Secretaria Municipal de Governo):** Articulação política, relações parlamentares e governança do executivo (sem a Ouvidoria Geral).
 * **SMCSRPTER (Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral):** Integração estratégica da Ouvidoria Geral do Município (OGM / Colab / Telefone 21 2652-3835), Assessoria de Imprensa, Comunicação Institucional e Políticas de Trabalho/Empregabilidade (SINE Caxias).
 
+---
+
+## FASE 11 - BLINDAGEM DE RESOLUÇÃO DETERMINÍSTICA E PREVENÇÃO DE FALSOS POSITIVOS (GOLDEN SOURCE GUARDS)
+
+### 1. Regra de Não-Interceptação em Perguntas de Serviços/Procedimentos
+- A camada `GoldenSourceResolver` (0ms) só deve retornar cartões de endereço quando houver clara intenção locacional (`is_asking_unit_info`: `"onde fica"`, `"endereço"`, `"telefone"`, `"horário"`, ou termos diretos de até 4 palavras como `"UPA Saracuruna"`).
+- Consultas com mais de 4 palavras ou contendo verbos e substantivos procedimentais (`"serve para"`, `"serve tbm"`, `"atende tbm"`, `"resgate"`, `"posso levar"`, `"aceita"`, `"castração"`, `"vacinação"`, `"como funciona"`) NUNCA podem ser interceptadas pela camada de unidades físicas. Devem fluir para o motor RAG analítico.
+
+### 2. Diferenciação Estrita de Competência de Animais (Fauna Silvestre vs Animais Domésticos)
+- **Fauna Silvestre (gambás, sariguês, cobras, jacarés, corujas, morcegos, gaviões, etc.):** NUNCA é atendida pela Secretaria de Proteção Animal (SMPA). O resgate sem risco imediato é de competência da **Guarda Ambiental / Secretaria Municipal de Meio Ambiente (SMMA)** via chamado no aplicativo **Colab** (categoria **Meio Ambiente > Resgate de Animais Silvestres / Proteção Animal**). Em caso de risco iminente ou animal agressivo, acionar o **Corpo de Bombeiros Militar (193)** ou a **Defesa Civil (199)**. Termos de fauna silvestre possuem bypass imediato (`is_wild_animal`) que impede interceptação na Golden Source Layer.
+- **Animais Domésticos (cães e gatos):** Competência da **Secretaria Municipal de Proteção Animal (SMPA)** e **Hospital Municipal Veterinário (HMV)**, para castração gratuita (Castramóvel), maus-tratos, acolhimento temporário e atendimento de urgência/emergência para moradores de Duque de Caxias, com suporte pelo **Petzap: (21) 97179-7900**.
+
+### 3. Blindagem de Integridade, Anti-Alucinação e Meta-Questionamento da IA (AI_META_HANDLER)
+- A Duque IA jamais inventa protocolos, telefones fictícios de secretarias ou afirmações falsas de encaminhamento para agradar o cidadão (Anti-Sycophancy).
+- Quando o munícipe questionar a veracidade das informações, testar a integridade da IA ou perguntar como confiar no sistema, a resposta é roteada para o `AI_META_HANDLER`, assegurando resposta formal, auditável e transparente, esclarecendo que as respostas são baseadas em dados públicos oficiais e indicando os canais da Ouvidoria Geral em caso de auditoria de protocolos.
+- NUNCA permitir que a palavra "Duque" na query provoque falso positivo na busca determinística de secretarias (ex: direcionamento errôneo para o IPMDC).
+
+### 4. Proibição Absoluta do WhatsApp da Ouvidoria Geral
+- O número `(21) 99824-5903` é fictício/inexistente e foi 100% erradicado de todas as bases, prompts, handlers e caches.
+- A Ouvidoria Geral de Duque de Caxias **NÃO possui canal de WhatsApp**. Os canais oficiais exclusivos são:
+  - **Telefone:** **(21) 2652-3835**
+  - **E-mail:** **ouvidoria@duquedecaxias.rj.gov.br**
+  - **Presencial:** Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)
+  - **Web / Aplicativo:** **Colab** (`duquedecaxias.colab.re`)
+
+---
+
+## FASE 12 - ENGENHARIA DE DADOS VETORIAIS E OTIMIZAÇÃO BINÁRIA (SEM GIT LFS)
+
+### 1. Compactação de Embeddings em float32 Binário (`vector.db`)
+- Os 1.575 chunks mestres utilizam vetores densos do modelo `gemini-embedding-2` com 3.072 dimensões.
+- Os vetores NÃO são armazenados como JSON textual (que inflava o banco para 151,5 MB). São armazenados como BLOBs binários em precisão simples (`float32` de 12.288 bytes).
+- O tamanho físico do banco de dados vetorial foi reduzido para **46,4 MB**, permitindo versionamento nativo no Git abaixo do limite de 50 MB do GitHub sem dependência de Git LFS.
+- Leitura de alta velocidade com decodificação via `numpy.frombuffer(blob, dtype=np.float32)` em menos de 3ms.
+
+### 2. Índice Híbrido (BM25 FTS5 + Similaridade Vetorial)
+- Tabela virtual `chunks_fts` configurada com tokenizer FTS5 e suporte a trigramas para tolerância a erros de digitação de nomes de bairros e secretarias.
+- Busca combinada balanceada: Vetorial (0.7) + BM25 Lexical (0.3).
+- Atalho de Reranking: Similaridade híbrida `>= 0.70` descarta reranker de rede (0ms), economizando tokens da cota Gemini.
+
+---
+
+## FASE 13 - GOVERNANÇA DE DEPLOY, AMBIENTE LINUX E SEGURANÇA EM PRODUÇÃO
+
+### 1. Ambiente Homologado de Execução
+- **Sistema Operacional:** Ubuntu Linux 22.04 / 24.04 LTS.
+- **Python:** Versões homologadas **Python 3.11** ou **Python 3.12** (Python 3.13 pode apresentar instabilidades em wheels binárias).
+- **Node.js:** Versão 20+ LTS com gerenciador PM2.
+
+### 2. Procedimento Padrão de Atualização e Deploy
+- Na máquina de desenvolvimento: `git add .`, `git commit -m "..."`, `git push origin main`.
+- Na VM de Produção:
+  ```bash
+  cd ~/duqueia
+  git pull origin main
+  pm2 restart duqueia
+  ```
+- NUNCA deletar ou recriar os bancos de dados em produção. O script `bootstrap/database_init.py` aplica migrações de forma estritamente incremental e segura (WAL Mode ativo em todas as 4 bases).
+
+### 3. Painel de Observabilidade e Controle de Acesso (Dashboard)
+- Dashboard Executivo em `http://ogm.duquedecaxias.rj.gov.br/duqueia/dashboard.html` (ou `localhost:3000/dashboard.html`).
+- Credenciais canônicas: usuário `admin` e senha `admin123` (configuráveis via variáveis de ambiente `ADMIN_USERNAME` e `ADMIN_PASSWORD_HASH`).
+- Monitoramento em tempo real de latência, secretarias mais acionadas, economia de tokens, volume de consultas e taxa de resolução de primeiro nível.
+
+### 4. Memória Conversacional Persistente (Multiturno 50+ Turnos)
+- As interações do munícipe são persistidas no banco `data/db/telemetry.db` sob WAL mode, isoladas por `conversation_id`.
+- Suporta retomadas contextuais e comandos de memória ("sobre o que estávamos conversando?", "lembra do meu endereço?") em menos de 15ms sem reprocessar histórico completo pela LLM.
+
+
 

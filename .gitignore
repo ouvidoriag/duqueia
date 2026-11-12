@@ -25,7 +25,9 @@ htmlcov/
 .env.development.local
 .env.test.local
 .env.production.local
-.agents/
+.agents/*
+!.agents/AGENTS.md
+!.agents/agente_rag.md
 scratch/
 
 # Banco de Dados SQLite Local (Bancos da aplicação inclusos no repositório)
