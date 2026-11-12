@@ -120,7 +120,7 @@ class SecurityHandler(BaseHandler):
                     "• **Denúncia Municipal**: Você pode registrar denúncia no **Conselho Tutelar de Duque de Caxias** ou na **Ouvidoria Geral de Duque de Caxias**: telefone **(21) 2652-3835**, ou pelo aplicativo **Colab** (categoria Assistência Social e Direitos Humanos)."
                 )
             else:
-                ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
+                ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
             intent_detected = "human_escalation"
         elif intent == "DEFESA_CIVIL_EMERGENCIA":
             ans = (
@@ -393,7 +393,7 @@ class CollectorHandler(BaseHandler):
                 "   - Se for som automotivo, carro com som ou paredão na rua: Tema **Ordem Pública** (categoria som automotivo/via pública). Informe a necessidade de indicar a rua, ponto de referência e horários.\n"
                 "   - Se for evento ou show em via pública/praça: Tema **Ordem Pública / Meio Ambiente** (fiscalização de eventos e perturbação da ordem).\n"
                 "   CRÍTICO: Sugira temas/categorias oficiais e reais. Nunca invente órgãos ou temas inexistentes.\n"
-                f"2. Informe os canais da Ouvidoria Geral como alternativa: telefone **{OUVIDORIA_CONTACTS['telefone']}**, WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}** e e-mail **{OUVIDORIA_CONTACTS['email']}**.\n"
+                f"2. Informe os canais da Ouvidoria Geral como alternativa: telefone **{OUVIDORIA_CONTACTS['telefone']}** e e-mail **{OUVIDORIA_CONTACTS['email']}**.\n"
                 f"3. Dica rápida: oriente-o a ter em mãos a foto/vídeo e o endereço correto para o registro no Colab ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']})).\n"
                 "4. Mantenha a resposta concisa, calorosa, objetiva e sem saudações repetidas se o diálogo já estiver em andamento. NÃO faça perguntas desnecessárias se a demanda já estiver clara.\n"
                 "5. **Distinção entre Pedido de Informação (e-SIC / LAI) e Reclamação (Ouvidoria)**: Se o cidadão perguntar se deve fazer solicitação única ou separada para obter dados/estatísticas públicas (ex: quantos médicos trabalham no posto) e reclamar de atendimento, oriente expressamente que DEVEM ser feitas em solicitações SEPARADAS: 1) O pedido de informação tramita pelo portal do **e-SIC da Prefeitura** (`https://duquedecaxias.rj.gov.br/e-sic`) com prazo de até 20 dias; 2) A reclamação sobre a falta de atendimento tramita pela **Ouvidoria Geral no aplicativo Colab** (`https://duquedecaxias.colab.re`) com prazo de até 30 dias. NUNCA oriente a registrar os dois juntos em uma única solicitação."
@@ -417,12 +417,12 @@ class CollectorHandler(BaseHandler):
                         f"Você pode registrar essa reclamação diretamente no aplicativo **Colab** ou pelo site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}), "
                         "selecionando a categoria **Ordem Pública** (ruídos de bares, restaurantes e comércios) ou **Meio Ambiente**.\n\n"
                         "**Dica importante para a fiscalização:** Ao registrar, informe o **nome e endereço completo do estabelecimento**, os **dias e horários** em que o som alto costuma acontecer e, se possível, anexe fotos ou vídeos.\n\n"
-                        f"Caso prefira, você também pode registrar através da Ouvidoria Geral: Telefone **{OUVIDORIA_CONTACTS['telefone']}** ou WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**."
+                        f"Caso prefira, você também pode registrar através da Ouvidoria Geral: Telefone **{OUVIDORIA_CONTACTS['telefone']}** ou e-mail **{OUVIDORIA_CONTACTS['email']}**."
                     )
                 else:
                     answer = (
                         f"Entendi perfeitamente o seu problema. Para registrar essa sua **{label}**, o caminho oficial é através da nossa Ouvidoria Geral de Duque de Caxias. "
-                        f"Você pode registrar diretamente pelo aplicativo **Colab**, no site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}), ligando para o telefone **{OUVIDORIA_CONTACTS['telefone']}**, enviando mensagem para o WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}** ou enviando um e-mail para **{OUVIDORIA_CONTACTS['email']}**.\n\n"
+                        f"Você pode registrar diretamente pelo aplicativo **Colab**, no site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}), ligando para o telefone **{OUVIDORIA_CONTACTS['telefone']}** ou enviando um e-mail para **{OUVIDORIA_CONTACTS['email']}**.\n\n"
                         f"**Dica de amigo:** Quando for registrar no Colab, lembre-se de colocar o endereço bem certinho, com ponto de referência e, se tiver, anexar fotos ou vídeos do local. Isso agiliza muito o trabalho da secretaria para resolver o problema!"
                     )
         else:
@@ -433,7 +433,7 @@ class CollectorHandler(BaseHandler):
                     f"Você pode registrar essa reclamação diretamente no aplicativo **Colab** ou pelo site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}), "
                     "selecionando a categoria **Ordem Pública** (ruídos de bares, restaurantes e comércios) ou **Meio Ambiente**.\n\n"
                     "**Dica importante para a fiscalização:** Ao registrar, informe o **nome e endereço completo do estabelecimento**, os **dias e horários** em que o som alto costuma acontecer e, se possível, anexe fotos ou vídeos.\n\n"
-                    f"Caso prefira, você também pode registrar através da Ouvidoria Geral: Telefone **{OUVIDORIA_CONTACTS['telefone']}** ou WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**."
+                    f"Caso prefira, você também pode registrar através da Ouvidoria Geral: Telefone **{OUVIDORIA_CONTACTS['telefone']}** ou e-mail **{OUVIDORIA_CONTACTS['email']}**."
                 )
             else:
                 sugerido_txt = ""
@@ -458,7 +458,6 @@ class CollectorHandler(BaseHandler):
                     f"{sugerido_txt}"
                     f"Para dar andamento à sua **{label}**, você pode registrá-la diretamente nos canais oficiais da nossa **Ouvidoria Geral de Duque de Caxias**:\n\n"
                     f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
-                    f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
                     f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
                     f"• Online: aplicativo **Colab** ou site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}).\n\n"
                     f"**Dica de amigo para agilizar o seu atendimento:**\n"
@@ -1825,7 +1824,7 @@ class AIMetaHandler(BaseHandler):
                     "   - Destaque que, quando um dado não consta na base ou há incerteza, seu dever é admitir a limitação com honestidade e orientar o cidadão aos canais oficiais.\n"
                     "2. Forneça os contatos da Ouvidoria Geral como canal oficial e humano:\n"
                     f"   - Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
-                    f"   - WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+                    f"   - E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
                     f"   - Online: aplicativo **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))\n"
                     "3. NUNCA mencione nem desvie para secretarias ou institutos aleatórios (como IPMDC ou Fazenda).\n"
                     "4. Mantenha tom caloroso, objetivo e educado (máximo 4 a 5 frases estruturadas)."

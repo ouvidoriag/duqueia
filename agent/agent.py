@@ -641,7 +641,6 @@ class DuqueIAAgent:
                     "Desculpe, não consegui formular uma resposta segura ou precisa para sua pergunta. "
                     "Para registrar sua solicitação ou denúncia com total segurança, você pode falar diretamente com a nossa **Ouvidoria Geral de Duque de Caxias**:\n\n"
                     f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
-                    f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
                     f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
                     f"• Online: aplicativo **Colab** ou site oficial da Prefeitura."
                 )

@@ -35,7 +35,7 @@ STOPWORDS = {
 EQUIPMENT_PATTERNS = {
     "cras": r"\bcras\b|\bcentros?\s+de\s+referencia\s+de\s+assistencia\s+social\b",
     "creas": r"\bcreas\b|\bcentros?\s+de\s+referencia\s+especializados?\b",
-    "ubs": r"\bubs\b|\bunidades?\s+basicas?\s+de\s+saude\b|\bpostos?\s+de\s+saude\b|\bpostos?\s+medicos?\b|\bambulatorios?\b",
+    "ubs": r"\bubs\b|\bunidades?\s+(?:basicas?\s+de\s+)?saude\b|\bpostos?\s+de\s+saude\b|\bpostos?\s+medicos?\b|\bambulatorios?\b|\batendimento\s+medico\b",
     "usf": r"\busfs?\b|\bunidades?\s+de\s+saude\s+da\s+familia\b|\bclinicas?\s+da\s+familia\b|\bcasf\b",
     "upa": r"\bupas?\b|\bunidades?\s+de\s+pronto\s+atendimento\b",
     "uph": r"\buphs?\b|\bunidades?\s+pre\s+hospitalares?\b",
@@ -321,7 +321,8 @@ class GoldenSourceResolver:
         # nunca devem ser tratados como simples consulta de endereço na Golden Source Layer;
         # devem fluir para os handlers clínicos com protocolo SAMU 192 e Hospital Adão Pereira Nunes.
         is_emergency_clinical = any(w in q_norm for w in [
-            "quebrei", "quebrado", "fratura", "trauma", "ortopedia", "desmaiado", "desmaio", "socorro"
+            "quebrei", "quebrado", "fratura", "trauma", "ortopedia", "desmaiado", "desmaio", "socorro",
+            "passando mal", "passar mal", "dor no peito", "infarto", "mal subito", "falecendo", "atender ela hoje", "atender ele hoje"
         ])
         is_animal_query = any(w in q_norm for w in ["cachorro", "cachorros", "cao", "caes", "gato", "gatos", "pet", "pets", "animal", "animais", "veterinario", "veterinaria"])
         if is_emergency_clinical and not is_animal_query:

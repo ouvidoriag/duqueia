@@ -98,7 +98,7 @@ def build_controlled_web_fallback(query: str, gemini_client=None) -> dict:
         "A informação solicitada não pôde ser totalmente confirmada nos portais públicos e sistemas consultados no momento.\n\n"
         "Para obter orientação oficial sem riscos de desencontro de dados, fale com a **Ouvidoria Geral de Duque de Caxias**:\n"
         f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
-        f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**\n"
+        f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
         f"• Aplicativo: **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))\n\n"
         "📚 **Fontes consultadas**\n"
         "✓ Portal Oficial da Prefeitura\n"

@@ -148,6 +148,6 @@ HUMAN_ESCALATION_MESSAGE = (
     f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. "
     "Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente "
     f"sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, "
-    f"WhatsApp **{OUVIDORIA_CONTACTS['whatsapp']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** "
+    f"e-mail **{OUVIDORIA_CONTACTS['email']}** "
     f"ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
 )

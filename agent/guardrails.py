@@ -211,7 +211,7 @@ LEGAL_TRIGGERS = [
 
 HUMAN_ESCALATION_TRIGGERS = [
     r"desvi(?:o|ando)\s+verba|roub(?:o|ando)|suborn(?:o|ar|ando)|corrupç(?:ão|ao)|\bsecretário\s+roub\w+",
-    r"\b(?:matar|agredir|bater|violentar|assassinar|morrer|espancar|facada|tiro)\b",
+    r"\b(?:matar|agredir|violentar|assassinar|morrer|espancar|facada|tiros|tiroteio|balead[oa]s?|disparos?|arma\s+de\s+fogo)\b",
     r"\bmenor\b.*?\b(?:agressão|agressao|agredid[oa]|apanhando|espancad[oa]|maus-tratos|maustratos|abuso|violência|violencia)\b",
     r"\b(?:criança|crianca|menor|infantil)\b.*?\b(?:sofrendo|vítima|vitima|agredid[oa]|espancad[oa]|maus-tratos|maustratos|abuso)\b",
     r"\b(?:vizinho|pais?|mãe|mae|pai)\b.*?\b(?:menor|criança|crianca)\b.*?\b(?:agressão|agressao|apanhando|espancando|maus-tratos)\b"
