@@ -9,8 +9,7 @@ OFFICIAL_SHORT_PHONES = {"190", "192", "193", "199", "100", "180", "181", "153",
 
 # Telefones oficiais centrais da Prefeitura de Duque de Caxias e concessionárias de utilidade pública
 OFFICIAL_CANONICAL_PHONES = {
-    "26523835",     # Ouvidoria Geral
-    "998245903",    # WhatsApp Ouvidoria Geral
+    "26523835",     # Ouvidoria Geral (Telefone Fixo Oficial - Ouvidoria NÃO tem WhatsApp)
     "26764444",     # Defesa Civil Caxias
     "26732203",     # Defesa Civil Caxias
     "27734550",     # IPMDC Caxias

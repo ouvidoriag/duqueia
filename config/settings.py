@@ -118,7 +118,7 @@ EMBEDDING_DIMS = {
 # Dados de contato centralizados da Ouvidoria Geral
 OUVIDORIA_CONTACTS = {
     "telefone": "(21) 2652-3835",
-    "whatsapp": "(21) 99824-5903",
+    "whatsapp": None,  # A Ouvidoria Geral NÃO possui WhatsApp
     "email": "ouvidoria@duquedecaxias.rj.gov.br",
     "presencial": "Alameda Esmeralda, 206 - Jardim Primavera",
     "colab_url": "https://duquedecaxias.colab.re",

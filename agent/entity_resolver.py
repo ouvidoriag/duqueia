@@ -314,7 +314,7 @@ class GoldenSourceResolver:
                 "answer": (
                     "Os contatos oficiais da **Ouvidoria Geral do Município de Duque de Caxias** são:\n\n"
                     "• **Telefone:** **(21) 2652-3835**\n"
-                    "• **WhatsApp:** **(21) 99824-5903**\n"
+                    "• **E-mail:** **ouvidoria@duquedecaxias.rj.gov.br**\n"
                     "• **Endereço:** **Alameda Esmeralda, 206 - Jardim Primavera (Sede da Prefeitura)**\n"
                     "• **Funcionamento:** Segunda a sexta-feira, das 9h às 17h\n"
                     "• **Solicitações Web:** Aplicativo Colab ([duquedecaxias.colab.re](https://duquedecaxias.colab.re/))"
@@ -337,7 +337,7 @@ class GoldenSourceResolver:
                 "answer": (
                     "A Sede da **Prefeitura Municipal de Duque de Caxias** fica localizada na **Alameda Esmeralda, 206 - Jardim Primavera, Duque de Caxias - RJ**.\n\n"
                     "• **Horário de Atendimento:** Segunda a sexta-feira, das 9h às 17h\n"
-                    "• **Atendimento Geral:** Telefone da Ouvidoria **(21) 2652-3835** ou WhatsApp **(21) 99824-5903**."
+                    "• **Atendimento Geral:** Telefone da Ouvidoria **(21) 2652-3835**."
                 ),
                 "sources": ["Golden Source Layer (Prefeitura Municipal)"],
                 "confidence": 1.0,

@@ -2289,21 +2289,21 @@ AUTHORITIES = {
         "cargo": "Ouvidor Geral do Município",
         "nome": "Ouvidoria Geral de Duque de Caxias",
         "fonte": "ouvidoria.md",
-        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelos telefones (21) 2652-3835, WhatsApp (21) 99824-5903 e aplicativo Colab.",
+        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelo telefone (21) 2652-3835, e-mail ouvidoria@duquedecaxias.rj.gov.br e aplicativo Colab.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "ouvidor": {
         "cargo": "Ouvidor Geral do Município",
         "nome": "Ouvidoria Geral de Duque de Caxias",
         "fonte": "ouvidoria.md",
-        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelos telefones (21) 2652-3835, WhatsApp (21) 99824-5903 e aplicativo Colab.",
+        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelo telefone (21) 2652-3835, e-mail ouvidoria@duquedecaxias.rj.gov.br e aplicativo Colab.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "quem é o ouvidor geral": {
         "cargo": "Ouvidor Geral do Município",
         "nome": "Ouvidoria Geral de Duque de Caxias",
         "fonte": "ouvidoria.md",
-        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelos telefones (21) 2652-3835, WhatsApp (21) 99824-5903 e aplicativo Colab.",
+        "detalhes": "A Ouvidoria Geral do Município integra a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral (SMCSRPTER), com atendimento pelo telefone (21) 2652-3835, e-mail ouvidoria@duquedecaxias.rj.gov.br e aplicativo Colab.",
         "documento": "Estrutura Administrativa Oficial"
     },
     "secretário de comunicação": {
@@ -2324,7 +2324,7 @@ AUTHORITIES = {
         "cargo": "Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral",
         "nome": "SMCSRPTER",
         "fonte": "estrutura_administrativa.md",
-        "detalhes": "A SMCSRPTER é a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral de Duque de Caxias, sediada na Alameda Dona Mariana, 91 - 25 de Agosto, atendendo pelo telefone (21) 2652-3835 e WhatsApp (21) 99824-5903.",
+        "detalhes": "A SMCSRPTER é a Secretaria Municipal de Comunicação Social, Relações Públicas, Trabalho, Emprego e Renda e Ouvidoria Geral de Duque de Caxias, sediada na Alameda Dona Mariana, 91 - 25 de Agosto, atendendo pelo telefone (21) 2652-3835.",
         "documento": "Estrutura Administrativa Oficial"
     }
 }
