@@ -367,8 +367,13 @@ class RAGPipelineAuditor:
                 
                 if self.agent.using_real and query_vector and emb_str:
                     try:
-                        emb = json.loads(emb_str)
-                        score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
+                        if isinstance(emb_str, (bytes, bytearray)):
+                            emb = np.frombuffer(emb_str, dtype=np.float32).tolist()
+                        elif isinstance(emb_str, str):
+                            emb = json.loads(emb_str)
+                        else:
+                            emb = None
+                        score = cosine_similarity(query_vector, emb) if emb and len(emb) == len(query_vector) else 0.0
                     except Exception:
                         score = 0.0
                 else:

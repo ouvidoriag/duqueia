@@ -817,10 +817,16 @@ def _get_vector_index_cache(force_reload: bool = False):
             title = clean_metadata_and_ocr(meta.get("title", source))
             emb = None
             if emb_str:
-                try:
-                    emb = json.loads(emb_str)
-                except Exception:
-                    emb = None
+                if isinstance(emb_str, (bytes, bytearray)):
+                    try:
+                        emb = np.frombuffer(emb_str, dtype=np.float32).tolist()
+                    except Exception:
+                        emb = None
+                elif isinstance(emb_str, str):
+                    try:
+                        emb = json.loads(emb_str)
+                    except Exception:
+                        emb = None
 
             metadata_list.append({
                 "source": clean_metadata_and_ocr(source),
@@ -987,8 +993,13 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
 
                         if using_real and query_vector:
                             try:
-                                emb = json.loads(emb_str)
-                                semantic_score = cosine_similarity(query_vector, emb) if len(emb) == len(query_vector) else 0.0
+                                if isinstance(emb_str, (bytes, bytearray)):
+                                    emb = np.frombuffer(emb_str, dtype=np.float32).tolist()
+                                elif isinstance(emb_str, str):
+                                    emb = json.loads(emb_str)
+                                else:
+                                    emb = None
+                                semantic_score = cosine_similarity(query_vector, emb) if emb and len(emb) == len(query_vector) else 0.0
                             except Exception:
                                 semantic_score = 0.0
                         else:
