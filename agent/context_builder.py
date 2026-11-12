@@ -14,6 +14,17 @@ class ContextBuilder:
     """
 
     @staticmethod
+    def clean_metadata_and_ocr(text: str) -> str:
+        """Limpa identificadores internos de OCR, números de arquivo e metadados de escaneamento."""
+        if not text:
+            return ""
+        t = re.sub(r'\s*\*?\(OCR[^\)]*\)\*?', '', text, flags=re.IGNORECASE)
+        t = re.sub(r'###\s*Página\s*\d+\s*\*?\(OCR[^\)]*\)\*?', '', t, flags=re.IGNORECASE)
+        t = re.sub(r'\b\d{2}_([A-Za-z0-9_]+)', lambda m: m.group(1).replace('_', ' '), t)
+        t = re.sub(r'\.(?:pdf|docx?|xlsx?|json|csv|md)\b', '', t, flags=re.IGNORECASE)
+        return t.strip()
+
+    @staticmethod
     def _normalize_key(title: str, content: str, source: str = "") -> str:
         """Gera chave canônica para detectar duplicatas entre tabelas (ex: regras_negocio vs bancoduqueia)."""
         t_clean = re.sub(r'^(?:regra canônica:?|serviço:?)\s*', '', title or '', flags=re.IGNORECASE).strip().lower()
@@ -162,10 +173,10 @@ class ContextBuilder:
 
         for src in ordered_sources:
             data = grouped_sources[src]
-            merged_content = "\n\n".join(data["contents"])
+            merged_content = ContextBuilder.clean_metadata_and_ocr("\n\n".join(data["contents"]))
             
             cat = data.get("category", "").lower()
-            src_name = data["source"]
+            src_name = ContextBuilder.clean_metadata_and_ocr(str(data["source"]))
             is_regra = "regra" in cat or src_name.startswith("regras_negocio") or src_name.startswith("bancoduqueia (regra_")
             
             if is_regra:

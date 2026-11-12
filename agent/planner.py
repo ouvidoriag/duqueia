@@ -79,8 +79,23 @@ OFFLINE_RULES = [
     {
         "intent": "service_location",
         "triggers": [
+            r"\bsilvestre", r"\bcobra\b", r"\bgamb[aá]", r"\bsarigu[eê]", r"\bcoruja",
+            r"\bgavi[aã]o", r"\bmorcego", r"\bjacar[eé]", r"\bcapivara", r"\bfauna\b",
+            r"resgate\s+de\s+anima", r"resgate\s+animal"
+        ],
+        "queries": [
+            "Resgate de animais silvestres Guarda Ambiental Secretaria Municipal de Meio Ambiente SMMA",
+            "Recolhimento de animais silvestres Colab Meio Ambiente",
+            "Emergência risco iminente animal agressivo Bombeiros 193 Defesa Civil 199"
+        ],
+        "focus": ["steps", "phone", "channel"]
+    },
+    {
+        "intent": "service_location",
+        "triggers": [
             r"\bveterinari", r"\bcachorr", r"\bcaes\b", r"\bcao\b", r"\bgato\b", r"\bgatos\b",
-            r"\bpet\b", r"\bpets\b", r"\banimal\b", r"\banimais\b", r"\bhmv\b", r"\bcastramov", r"\bzoonose"
+            r"\bpet\b", r"\bpets\b", r"\bhmv\b", r"\bcastramov", r"\bzoonose",
+            r"hospital\s+(?:de\s+)?anima", r"emerg[eê]ncia\s+veterin[aá]ria"
         ],
         "queries": [
             "Hospital Municipal Veterinário de Duque de Caxias (HMV)",

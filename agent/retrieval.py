@@ -14,6 +14,16 @@ from agent.scoring import (
 from config.settings import DATABASE_VECTOR, DATABASE_MAIN
 from storage import storage_manager
 
+def clean_metadata_and_ocr(text: str) -> str:
+    """Limpa identificadores internos de OCR, números de arquivo e metadados de escaneamento."""
+    if not text:
+        return ""
+    t = re.sub(r'\s*\*?\(OCR[^\)]*\)\*?', '', text, flags=re.IGNORECASE)
+    t = re.sub(r'###\s*Página\s*\d+\s*\*?\(OCR[^\)]*\)\*?', '', t, flags=re.IGNORECASE)
+    t = re.sub(r'\b\d{2}_([A-Za-z0-9_]+)', lambda m: m.group(1).replace('_', ' '), t)
+    t = re.sub(r'\.(?:pdf|docx?|xlsx?|json|csv|md)\b', '', t, flags=re.IGNORECASE)
+    return t.strip()
+
 # Algoritmo de Distância de Levenshtein leve para Fuzzy Matching offline
 def Levenshtein_distance(s1: str, s2: str) -> int:
     if len(s1) > len(s2):
@@ -742,8 +752,8 @@ def retrieve_fts_chunks(query: str, query_keywords: list, top_k: int = 5) -> lis
                 candidates.append({
                     "source": f"bancoduqueia ({cid})",
                     "category": tipo.lower(),
-                    "content": cont,
-                    "title": tit,
+                    "content": clean_metadata_and_ocr(cont),
+                    "title": clean_metadata_and_ocr(tit),
                     "semantic_score": calibrated,
                     "similarity": calibrated,
                     "chunk_keywords": search_words,
@@ -804,7 +814,7 @@ def _get_vector_index_cache(force_reload: bool = False):
             except Exception:
                 chunk_keywords = []
 
-            title = meta.get("title", source)
+            title = clean_metadata_and_ocr(meta.get("title", source))
             emb = None
             if emb_str:
                 try:
@@ -813,9 +823,9 @@ def _get_vector_index_cache(force_reload: bool = False):
                     emb = None
 
             metadata_list.append({
-                "source": source,
+                "source": clean_metadata_and_ocr(source),
                 "category": category,
-                "content": content,
+                "content": clean_metadata_and_ocr(content),
                 "title": title,
                 "chunk_keywords": chunk_keywords,
                 "has_embedding": emb is not None and len(emb) == 3072
