@@ -534,7 +534,7 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
             params.extend([f"%{w}%", f"%{w}%"])
             
         sql = f"""
-            SELECT id, name, code, address, phone, email, working_hours
+            SELECT id, name, code, address, phone, email, working_hours, COALESCE(titular, '')
             FROM secretarias
             WHERE {" OR ".join(conditions)}
             ORDER BY
@@ -560,7 +560,7 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
         scored_rows = []
         q_tokens = [w.lower() for w in re.findall(r'\w+', query) if len(w) >= 3 and w not in ignore_words]
         for row in rows:
-            sec_id, name, code, address, phone, email, hours = row
+            sec_id, name, code, address, phone, email, hours, titular = row
             if not address and not phone and not email:
                 continue
 
@@ -590,7 +590,7 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
             
         results = []
         for idx, (m_score, row) in enumerate(scored_rows):
-            sec_id, name, code, address, phone, email, hours = row
+            sec_id, name, code, address, phone, email, hours, titular = row
                 
             content_parts = [
                 "[FONTE OFICIAL ESTRUTURADA]",
@@ -599,11 +599,15 @@ def retrieve_structured_secretaria(db_path: str, query: str, query_keywords: lis
                 "Última Atualização: 2026-07-01",
                 "",
                 f"Órgão Oficial: {name} ({code})",
+            ]
+            if titular:
+                content_parts.append(f"Titular / Responsável: {titular}")
+            content_parts.extend([
                 f"Endereço Oficial: {address or 'Não cadastrado'}",
                 f"Telefone de Contato: {phone or 'Não cadastrado'}",
                 f"E-mail de Contato: {email or 'Não cadastrado'}",
                 f"Horário de Funcionamento: {hours or 'Segunda a sexta-feira, das 9h às 17h'}"
-            ]
+            ])
             structured_text = "\n".join(content_parts)
             
             # Score de relevância calibrado

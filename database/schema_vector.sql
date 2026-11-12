@@ -51,11 +51,27 @@ CREATE TABLE IF NOT EXISTS chunks (
     vetor_blob BLOB
 );
 
--- Tabela Virtual 'chunks_fts': Índice FTS5 de texto completo de ultra-alta velocidade (0ms) para busca híbrida.
+-- Tabela Virtual 'chunks_fts': Índice FTS5 de texto completo externo (content='chunks') com suporte a acentos.
 CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
-    id UNINDEXED,
+    id,
+    tipo,
     titulo,
     conteudo,
-    tipo,
-    tokenize = 'unicode61 remove_diacritics 1'
+    content='chunks',
+    content_rowid='rowid',
+    tokenize = 'unicode61 remove_diacritics 2'
 );
+
+-- Triggers para sincronização automática e contínua do FTS5
+CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN
+    INSERT INTO chunks_fts(rowid, id, tipo, titulo, conteudo) VALUES (new.rowid, new.id, new.tipo, new.titulo, new.conteudo);
+END;
+
+CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN
+    INSERT INTO chunks_fts(chunks_fts, rowid, id, tipo, titulo, conteudo) VALUES('delete', old.rowid, old.id, old.tipo, old.titulo, old.conteudo);
+END;
+
+CREATE TRIGGER IF NOT EXISTS chunks_au AFTER UPDATE ON chunks BEGIN
+    INSERT INTO chunks_fts(chunks_fts, rowid, id, tipo, titulo, conteudo) VALUES('delete', old.rowid, old.id, old.tipo, old.titulo, old.conteudo);
+    INSERT INTO chunks_fts(rowid, id, tipo, titulo, conteudo) VALUES (new.rowid, new.id, new.tipo, new.titulo, new.conteudo);
+END;

@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     role TEXT CHECK(role IN ('user', 'assistant')),
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    turn_index INTEGER DEFAULT 1,
+    intent TEXT,
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
 );
 
@@ -36,5 +38,11 @@ CREATE TABLE IF NOT EXISTS chat_feedback (
     feedback_type TEXT CHECK(feedback_type IN ('upvote', 'downvote')),
     comment TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    session_id TEXT,
+    topic TEXT,
     FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_chat_messages_session_turn ON chat_messages(session_id, turn_index);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_created ON chat_messages(created_at);
+CREATE INDEX IF NOT EXISTS idx_chat_feedback_created ON chat_feedback(created_at);

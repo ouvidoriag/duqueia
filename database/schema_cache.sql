@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS triage_cache (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(query_hash, prompt_version)
 );
+
+CREATE INDEX IF NOT EXISTS idx_triage_cache_lookup ON triage_cache(query_hash, prompt_version, model_version);
+CREATE INDEX IF NOT EXISTS idx_triage_cache_created ON triage_cache(created_at);

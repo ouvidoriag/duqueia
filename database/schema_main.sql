@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS secretarias (
     address TEXT,
     phone TEXT,
     email TEXT,
-    working_hours TEXT
+    working_hours TEXT,
+    titular TEXT
 );
 
 -- Tabela 'secretaria_unidades': Armazena as unidades físicas descentralizadas associadas às secretarias (como postos de CRAS).
