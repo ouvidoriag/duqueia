@@ -252,12 +252,17 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         if not last_assistant_turn and len(history) > 0:
             last_assistant_turn = history[-1].lower()
 
-        # Continuidade prioritária de Coleta / Manifestação Ativa (antes de INDEPENDENT_TOPIC_KEYWORDS para não perder respostas curtas como "buraco")
-        is_manifestation_ctx = any(w in last_assistant_turn for w in [
-            "reclamação", "reclamacao", "manifestação", "manifestacao", "denúncia", "denuncia",
-            "qual é o assunto", "qual é o problema", "qual problema", "qual é a rua", "nome da rua",
-            "qual o bairro", "onde está o problema", "em qual secretaria", "em qual unidade",
-            "colab", "protocolo diretamente"
+        # Continuidade prioritária de Coleta / Manifestação Ativa (APENAS quando o turno anterior foi uma pergunta explícita de coleta)
+        is_explicit_collection_prompt = any(w in last_assistant_turn for w in [
+            "qual problema ou assunto você deseja relatar",
+            "qual é o problema na rua que você deseja relatar",
+            "qual é o problema que você deseja relatar",
+            "qual é a rua e o bairro",
+            "qual é o nome da rua",
+            "qual é o assunto da reclamação",
+            "qual é o assunto da denúncia",
+            "protocolo diretamente no sistema",
+            "deixar a categoria e o texto prontos",
         ])
         is_operational_q = any(p in query_lower for p in [
             "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
@@ -265,8 +270,18 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
             "mas aí eu marco", "mas ai eu marco", "eu marco o quê", "eu marco o que",
             "marco o quê", "marco o que", "qual categoria", "qual tema"
         ])
+        is_conversational_or_meta = any(p in query_lower for p in [
+            "conversar", "conversa", "bate-papo", "bate papo",
+            "você faz", "voce faz", "o que você", "o que voce", "oq você", "oq voce",
+            "quem é você", "quem e voce", "deixa isso", "esquece", "outro assunto", "mudar de assunto"
+        ])
         starts_indep_q = any(query_lower.startswith(p) for p in INDEPENDENT_QUESTION_PREFIXES)
-        if not is_intent_change and is_manifestation_ctx and (is_operational_q or (len(query_lower.split()) <= 8 and not starts_indep_q)):
+        if (
+            not is_intent_change
+            and not is_conversational_or_meta
+            and is_explicit_collection_prompt
+            and (is_operational_q or (len(query_lower.split()) <= 4 and "?" not in query_lower and not starts_indep_q))
+        ):
             return {
                 "intent": "OUVIDORIA_MANIFESTACAO",
                 "tipo_manifestacao": "reclamacao",

@@ -357,21 +357,21 @@ class CollectorHandler(BaseHandler):
         if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
             state["via_publica"] = True
 
-        # Detecta localização (ex: "Rua A", "Rua A, Centro", "Av. Brasil")
+        # Detecta localização (ex: "Rua A", "Rua A, Centro", "Av. Brasil") — nunca aceita perguntas ou conversa casual
         loc_match = re.search(
             r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+[^\n?!.;]+)",
             q_raw,
             re.IGNORECASE,
         )
-        if loc_match and not any(w in q_low for w in ["sobre rua", "na rua", "da rua", "buraco"]):
+        if loc_match and not any(w in q_low for w in ["sobre rua", "na rua", "da rua", "minha rua", "buraco"]):
             state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
-        elif history and not state.get("localizacao") and not is_op_question and not is_category_question:
+        elif history and not state.get("localizacao") and not is_op_question and not is_category_question and "?" not in q_raw:
             last_ai = next((h.lower() for h in reversed(history) if "duque ia:" in h.lower()), "")
             if any(w in last_ai for w in ["nome da rua", "rua e o bairro", "qual o bairro", "endereço"]):
-                if not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"]):
+                if not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda", "conversar", "faz oq"]):
                     state["localizacao"] = q_raw.rstrip(".,!?")
 
-        # Detecta problema concreto (ignora frases genéricas, perguntas operacionais e endereços puros)
+        # Detecta problema concreto (exige palavra-chave concreta de problema; nunca assume conversa genérica como problema)
         _PROBLEM_KEYWORDS = [
             "buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao",
             "lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz",
@@ -383,17 +383,6 @@ class CollectorHandler(BaseHandler):
         ]
         if any(pk in q_low for pk in _PROBLEM_KEYWORDS):
             # Extrai descrição limpa do problema
-            state["problema"] = q_raw.rstrip(".,!?")
-        elif (
-            not is_op_question
-            and not is_category_question
-            and not re.fullmatch(r"(?:eu\s+)?quero\s+(?:abrir|fazer)\s+(?:uma\s+)?(?:reclamação|reclamacao|manifestação|manifestacao|denúncia|denuncia)\.?!?", q_low)
-            and not re.fullmatch(r"(?:era\s+)?sobre\s+(?:a\s+)?rua\.?!?", q_low)
-            and not loc_match
-            and len(q_raw) >= 4
-            and not triage_info.get("needs_clarification")
-            and state.get("localizacao") != q_raw.rstrip(".,!?")
-        ):
             state["problema"] = q_raw.rstrip(".,!?")
 
         if hasattr(agent, "update_manifestation_state"):

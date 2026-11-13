@@ -722,6 +722,10 @@ class DuqueIAAgent:
                     DuqueIAAgent._history[conversation_id] = (
                         prev + [f"Munícipe: {user_query}", f"DUQUE IA: {ans_text}"]
                     )[-6:]
+                    # Se o turno saiu do fluxo de ouvidoria/coleta (mudança de assunto), desativa estado pendente
+                    det_intent = (result_dict.get("intent_detected") or "").lower()
+                    if not det_intent.startswith("ouvidoria"):
+                        self.update_manifestation_state(conversation_id, active=False)
                     DuqueIAAgent.save_session_to_db(conversation_id)
                     # Registra a mensagem na tabela de telemetria chat_messages com turn_index sequencial
                     try:
