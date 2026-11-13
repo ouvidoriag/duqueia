@@ -252,7 +252,7 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         if not last_assistant_turn and len(history) > 0:
             last_assistant_turn = history[-1].lower()
 
-        # Retomada explícita de manifestação pausada (ex: "Quero voltar ao buraco", "Quero voltar à reclamação")
+        # Retomada explícita ou atualização de dados de manifestação anterior
         if re.search(r"\b(?:quero\s+)?voltar\s+(?:ao|à|a|para\s+o|para\s+a)\s+(?:buraco|reclamação|reclamacao|manifestação|manifestacao|atendimento|denúncia|denuncia|assunto\s+anterior)\b", query_lower):
             return {
                 "intent": "OUVIDORIA_MANIFESTACAO",
@@ -260,6 +260,26 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
                 "confidence": 0.95,
                 "needs_clarification": False,
                 "reason": "Retomada explícita de manifestação/coleta anterior.",
+                "source": "FAST_GATE"
+            }
+
+        has_prior_manifestation = any(
+            w in t.lower()
+            for t in history
+            for w in ["zeladoria urbana", "solicito vistoria", "abrir solicitação no colab", "qual é a rua e o bairro", "qual problema ou assunto"]
+        )
+        if has_prior_manifestation and any(p in query_lower for p in [
+            "fica na ", "fica no ", "o bairro é", "o bairro e", "bairro é", "bairro e",
+            "prepara o texto", "texto certinho", "qual endereço você", "qual endereco voce",
+            "outra reclamação", "outra reclamacao", "nova reclamação", "nova reclamacao",
+            "começar outra", "comecar outra", "sobre iluminação", "sobre iluminacao"
+        ]):
+            return {
+                "intent": "OUVIDORIA_MANIFESTACAO",
+                "tipo_manifestacao": "reclamacao",
+                "confidence": 0.95,
+                "needs_clarification": False,
+                "reason": "Atualização, consulta de estado ou novo ciclo de manifestação.",
                 "source": "FAST_GATE"
             }
 

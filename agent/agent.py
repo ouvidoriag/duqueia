@@ -86,9 +86,18 @@ class DuqueIAAgent:
             "via_publica": False,
         })
 
-    def update_manifestation_state(self, conversation_id: str, **kwargs) -> Dict[str, Any]:
+    def update_manifestation_state(self, conversation_id: str, reset: bool = False, **kwargs) -> Dict[str, Any]:
         """Atualiza campos do estado estruturado da manifestação na sessão."""
         state = self.get_manifestation_state(conversation_id)
+        if reset:
+            state.update({
+                "active": False,
+                "awaiting_field": None,
+                "tipo": "geral",
+                "problema": None,
+                "localizacao": None,
+                "via_publica": False,
+            })
         for k, v in kwargs.items():
             if v is not None:
                 state[k] = v

@@ -339,6 +339,47 @@ class CollectorHandler(BaseHandler):
         if tipo and tipo != "geral":
             state["tipo"] = tipo
 
+        # Reinicia o estado estruturado se o cidadão pedir explicitamente uma nova/outra reclamação
+        is_new_complaint = any(p in q_low for p in [
+            "outra reclamação", "outra reclamacao", "nova reclamação", "nova reclamacao",
+            "outra manifestação", "outra manifestacao", "começar outra", "comecar outra"
+        ])
+        if is_new_complaint:
+            state = {
+                "active": True,
+                "awaiting_field": None,
+                "tipo": tipo if tipo != "geral" else "reclamacao",
+                "problema": None,
+                "localizacao": None,
+                "via_publica": False,
+            }
+
+        is_ask_address = any(p in q_low for p in [
+            "qual endereço você", "qual endereco voce", "qual o endereço que você", "qual o endereco que voce",
+            "qual endereço colocou", "qual endereco colocou"
+        ])
+        if is_ask_address:
+            loc_saved = state.get("localizacao")
+            ans_addr = (
+                f"O endereço registrado na sua solicitação é **{loc_saved}**."
+                if loc_saved
+                else "Ainda não registrei nenhum endereço para esta solicitação. Qual é a **rua e o bairro**?"
+            )
+            return {
+                "answer": ans_addr,
+                "sources": [],
+                "confidence": 0.98,
+                "intent_detected": f"ouvidoria_{tipo}",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(effective_query)
+                }
+            }
+
         is_op_question = any(p in q_low for p in [
             "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
             "você abre", "voce abre", "você registra", "voce registra", "abre pra mim",
@@ -368,19 +409,33 @@ class CollectorHandler(BaseHandler):
             if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
                 state["via_publica"] = True
 
-            # Detecta localização explícita (ex: "Rua A", "Fica na Rua das Flores, no Centro", "Av. Brasil")
+            # Detecta localização explícita (ex: "Rua A", "Fica na Rua das Flores, no Centro", "Rua das Acácias, não na Rua das Flores")
+            q_loc_scan = re.split(r",?\s+n[ãa]o\s+(?:na|no|em)\s+", q_raw, maxsplit=1, flags=re.IGNORECASE)[0]
             loc_match = re.search(
                 r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+(?!da\s+minha|minha|sua|esta|essa\b)[^\n?!.;]+)",
-                q_raw,
+                q_loc_scan,
                 re.IGNORECASE,
             )
+            bairro_match = re.search(
+                r"\b(?:bairro\s+(?:é|e)?\s*)([A-ZÀ-Ú][^\n?!.;,]+)",
+                q_raw,
+                re.IGNORECASE,
+            ) if "bairro" in q_low else None
+
             is_invalid_loc = any(w in q_low for w in [
-                "sobre rua", "minha rua", "buraco",
+                "sobre rua", "minha rua",
                 "manifestação", "manifestacao", "reclamação", "reclamacao",
                 "conversar", "faz oq", "você", "voce"
             ])
             if loc_match and not is_invalid_loc and "?" not in q_raw:
                 state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
+            elif bairro_match and "?" not in q_raw:
+                novo_bairro = re.sub(r"^(?:é|e)\s+", "", bairro_match.group(1).strip(), flags=re.IGNORECASE).rstrip(".,!?")
+                if state.get("localizacao"):
+                    rua_base = state["localizacao"].split(",")[0].strip()
+                    state["localizacao"] = f"{rua_base}, {novo_bairro}"
+                else:
+                    state["localizacao"] = novo_bairro
             elif (
                 state.get("active")
                 and state.get("awaiting_field") == "localizacao"
@@ -389,26 +444,32 @@ class CollectorHandler(BaseHandler):
                 and not is_category_question
                 and "?" not in q_raw
                 and not is_invalid_loc
-                and not any(w in q_low for w in ["lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"])
+                and not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"])
                 and len(q_raw) >= 3
             ):
                 state["localizacao"] = q_raw.rstrip(".,!?")
 
-            # Detecta problema concreto (exige palavra-chave concreta de problema; nunca assume frase de intenção como problema)
-            _PROBLEM_KEYWORDS = [
-                "buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao",
-                "lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz",
-                "lixo", "entulho", "capina", "roçagem", "rocagem", "mato",
-                "bueiro", "drenagem", "esgoto", "alagamento", "enchente",
-                "árvore", "arvore", "poda", "calçada", "calcada",
-                "barulho", "som alto", "mau atendimento", "atendimento", "médico", "medico",
-                "remédio", "remedio", "medicamento", "água", "agua", "servidor", "escola", "creche"
+            # Normaliza problema concreto em formato estruturado limpo (não armazena frase solta de saudação/preâmbulo)
+            _CANONICAL_PROBLEMS = [
+                (("buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao"), "buraco na via pública"),
+                (("lâmpada", "lampada", "poste", "iluminação", "iluminacao"), "problema de iluminação pública"),
+                (("lixo", "entulho", "capina", "roçagem", "rocagem", "mato"), "limpeza urbana / acúmulo de resíduos"),
+                (("bueiro", "drenagem", "esgoto", "alagamento", "enchente"), "problema de drenagem / bueiro"),
+                (("árvore", "arvore", "poda"), "poda de árvore"),
+                (("calçada", "calcada"), "obstrução ou reparo de calçada"),
+                (("barulho", "som alto"), "perturbação do sossego / poluição sonora"),
+                (("mau atendimento", "atendimento", "servidor"), "atendimento de serviço público"),
+                (("médico", "medico", "remédio", "remedio", "medicamento"), "atendimento de saúde / medicamento"),
+                (("água", "agua"), "abastecimento de água"),
+                (("escola", "creche"), "educação / unidade escolar"),
             ]
-            if any(pk in q_low for pk in _PROBLEM_KEYWORDS):
-                state["problema"] = q_raw.rstrip(".,!?")
+            for keys, canonical_label in _CANONICAL_PROBLEMS:
+                if any(pk in q_low for pk in keys):
+                    state["problema"] = canonical_label
+                    break
 
         if hasattr(agent, "update_manifestation_state"):
-            agent.update_manifestation_state(conversation_id, **state)
+            agent.update_manifestation_state(conversation_id, reset=is_new_complaint, **state)
 
         problema_atual = state.get("problema")
         local_atual = state.get("localizacao")
@@ -439,7 +500,7 @@ class CollectorHandler(BaseHandler):
             }
 
         # Passo 2 da coleta: problema conhecido, mas falta localização (para demandas urbanas)
-        _NEEDS_LOCATION_KEYS = ["buraco", "asfalto", "poste", "lâmpada", "lampada", "lixo", "entulho", "capina", "mato", "bueiro", "esgoto", "poda", "árvore", "arvore", "calçada", "calcada"]
+        _NEEDS_LOCATION_KEYS = ["buraco", "asfalto", "poste", "lâmpada", "lampada", "ilumina", "lixo", "entulho", "capina", "mato", "bueiro", "esgoto", "poda", "árvore", "arvore", "calçada", "calcada"]
         needs_loc = bool(problema_atual and any(k in problema_atual.lower() for k in _NEEDS_LOCATION_KEYS))
         if needs_loc and not local_atual and not is_category_question:
             answer = f"{op_prefix}Entendi (**{problema_atual}**). Qual é a **rua e o bairro** (ou ponto de referência) onde está o problema?"
