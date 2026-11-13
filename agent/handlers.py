@@ -206,9 +206,11 @@ class ConversationHandler(BaseHandler):
                 if intent == "SAUDACAO":
                     if not history:
                         sys_instruct = (
-                            "Você é o Duque IA, assistente virtual da Prefeitura de Duque de Caxias.\n"
-                            "O munícipe enviou uma saudação inicial. Responda de forma muito calorosa, descontraída e "
-                            "diga: 'Olá! Sou o DUQUE IA, assistente virtual da Prefeitura de Duque de Caxias. Como posso ajudar você hoje?'"
+                            "Você é o Duque IA, assistente virtual oficial da Prefeitura de Duque de Caxias.\n"
+                            "O munícipe enviou uma saudação inicial (ex: 'Olá', 'Oi', 'Bom dia').\n"
+                            "Responda de forma muito amigável, acolhedora e humana (2 a 3 frases curtas), dando as boas-vindas como **DUQUE IA**, "
+                            "mostrando entusiasmo em ajudar e citando brevemente alguns exemplos do que ele pode perguntar "
+                            "(como serviços da Prefeitura, endereços de unidades, saúde, educação, IPTU ou Ouvidoria/Colab)."
                         )
                     else:
                         sys_instruct = (

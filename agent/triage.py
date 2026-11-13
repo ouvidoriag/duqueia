@@ -221,6 +221,14 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
             "reason": "Query extremamente curta tratada como saudação padrão.",
             "source": "FAST_GATE"
         }
+    if re.match(r"^(?:ol[áa]+|oi+|oie+|bom\s+dia|boa\s+tarde|boa\s+noite|tudo\s+bem\??|td\s+bem\??|e\s*a[íi]+|opa+|salve|hello|hi)(?:\s+(?:duque|ia|tudo\s+bem\??))?[!.,\s?]*$", query_lower):
+        return {
+            "intent": "SAUDACAO",
+            "confidence": 1.0,
+            "needs_clarification": False,
+            "reason": "Saudação inicial detectada no Fast Gate.",
+            "source": "FAST_GATE"
+        }
 
     # 0º Prioridade Máxima: Integridade e Transparência da IA (não-invenção de dados/protocolos)
     for regex, intent, reason in AI_META_INFO_FAST_PATTERNS:
