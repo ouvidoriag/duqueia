@@ -595,7 +595,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
     )
     
     try:
-        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=150)
+        response_text = gemini_client.generate_response(prompt, model="gemini-3.1-flash-lite", temperature=0.0, max_output_tokens=350)
         match = re.search(r'\{.*\}', response_text.replace('\n', ' '), re.DOTALL)
         if match:
             triage_data = json.loads(match.group(0))

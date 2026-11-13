@@ -559,7 +559,7 @@ class DuqueIAAgent:
                 "denuncia":  "Entendido. Qual é o **assunto da denúncia**? \n\nEx: irregularidade em obra, serviço não prestado, mau atendimento...",
                 "sugestao":  "Que ótimo! Qual **melhoria ou serviço** você gostaria de sugerir à Prefeitura?",
                 "reclamacao":"Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Qual é o **assunto da reclamação**?\n\nEx: buraco na rua, capina, iluminação pública, lixo, som alto...",
-                "geral":     "Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Sua manifestação é uma **reclamação**, **denúncia**, **sugestão** ou **elogio**? E sobre qual assunto ou serviço municipal?",
+                "geral":     "Claro! Para começarmos, sua manifestação é uma **reclamação**, **denúncia**, **sugestão** ou **elogio**?",
             }
             fallback_msg = _PERGUNTAS_TIPO.get(tipo, _PERGUNTAS_TIPO["geral"])
             
@@ -575,7 +575,7 @@ class DuqueIAAgent:
                 "REGRAS DE COMUNICAÇÃO:\n"
                 "1. Adote tom profissional, simpático e orientado à resolução. NUNCA use expressões de pesar como 'Que pena que você precisa reclamar' ou 'Sinto muito que você precise fazer isso'. Use abordagem afirmativa e acolhedora: 'Claro! Estamos prontos para receber sua manifestação e ajudar a encaminhá-la da melhor forma possível. Qual é o assunto da reclamação?'\n"
                 "2. Se o tipo de manifestação já é conhecido (elogio/denúncia/sugestão/reclamação), faça apenas UMA pergunta de forma descontraída sobre o assunto específico.\n"
-                "3. Se o tipo não é conhecido, pergunte primeiro o tipo, depois o assunto.\n"
+                "3. Se o tipo não é conhecido, faça APENAS uma pergunta pedindo primeiro o tipo (reclamação, denúncia, sugestão ou elogio), sem acumular outras perguntas no mesmo turno.\n"
                 "4. Personalize a pergunta pelo tipo com empatia.\n"
                 "5. EVITE SAUDAÇÕES REDUNDANTES: Como o diálogo já está em andamento, NÃO inclua palavras de boas-vindas ou saudações (como 'Olá', 'Oi', 'Como vai', 'Que bom falar com você') se o usuário já foi saudado no início. Vá direto para a coleta de dados de forma natural."
             )
