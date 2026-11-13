@@ -145,7 +145,7 @@ AI_META_INFO_FAST_PATTERNS = [
 AUTORIDADE_PUBLICA_FAST_PATTERNS = [
     (r"\b(?:quem\s+(?:é|e)\s+o\s+prefeito|qual\s+(?:é\s+)?o\s+prefeito|prefeito\s+municipal)\b", "AUTORIDADE_PUBLICA", "Busca direta pelo prefeito."),
     (r"\b(?:quem\s+(?:é|e)\s+(?:o|a)\s+vice|vice-prefeita?|vice\s+prefeita?)\b", "AUTORIDADE_PUBLICA", "Busca pelo vice-prefeito."),
-    (r"\b(?:(?:qual\s+(?:é\s+)?(?:o\s+)?nome\s+d[oa]|quem\s+(?:é|e)\s+[oa]|qual\s+(?:é\s+)?[oa])\s+secret[áa]ri[oa]|secret[áa]ri[oa]\s+d[ea]|titular\s+d[ea]\s+secretaria)\b", "AUTORIDADE_PUBLICA", "Busca por secretário municipal."),
+    (r"\b(?:(?:qual\s+(?:é\s+)?(?:o\s+)?nome\s+d[oa]|quem\s+(?:é|e)\s+[oa]|qual\s+(?:é\s+)?[oa])\s+secret[áa]ri[oa]|secret[á]ri[oa]\s+d[ea]|secretario\s+d[ea]|titular\s+d[ea]\s+secretaria)\b", "AUTORIDADE_PUBLICA", "Busca por secretário municipal."),
     (r"\b(?:quem\s+dirige|quem\s+administra|quem\s+comanda|quem\s+ocupa\s+o\s+cargo|responsável\s+pel[ao]|responsavel\s+pel[ao])\s+(?:secretaria|órgão|orgao|pasta|prefeitura)\b", "AUTORIDADE_PUBLICA", "Busca pelo responsável de secretaria/órgão."),
     (r"\b(?:(?:qual\s+(?:é\s+)?(?:o\s+)?nome\s+d[oa]|quem\s+(?:é|e)\s+[oa]|qual\s+(?:é\s+)?[oa])\s+(?:ouvidor|procurador|controlador|presidente\s+d[ao]|subprefeito)|presidente\s+d[ao]\s+(?:fundec|ipmdc)|quem\s+preside\s+(?:a\s+fundec|o\s+ipmdc))\b", "AUTORIDADE_PUBLICA", "Busca por autoridades de controle, autarquias ou fundações.")
 ]
@@ -577,7 +577,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- Manifestação de Ouvidoria com protocolo/atraso ou sem assunto = OUVIDORIA_MANIFESTACAO (needs_clarification=true se sem assunto).\n"
         "- Barulho sem local explícito = AMBIGUO_BARULHO (needs_clarification=true).\n"
         "- JURIDICO = Usar APENAS se o cidadão solicitar explicitamente que a IA formule petição jurídica, redija recurso/parecer legal ou elabore argumentos em ação judicial contra a prefeitura. Dúvidas sobre onde recorrer de multas municipais (JARI), prazos legais para recorrer de infrações, como consultar processos administrativos ou localização de secretarias NÃO são JURIDICO -> use RAG_GERAL.\n"
-        "- Perguntas de secretários, prefeito, vice = AUTORIDADE_PUBLICA.\n"
+        "- Perguntas sobre QUEM É ou qual o nome do secretário/titular, prefeito ou vice = AUTORIDADE_PUBLICA (NÃO use para perguntas sobre o que faz uma secretaria ou diferença entre secretarias, que são RAG_GERAL).\n"
         "- MEMORIA_CONVERSACIONAL = Perguntas reflexivas sobre o histórico do diálogo, primeira pergunta feita, respostas anteriores ou assuntos já conversados (ex: \"qual foi minha primeira pergunta?\", \"o que você me respondeu antes?\", \"repita a segunda resposta\", \"sobre o que estamos conversando?\").\n"
         "- CLARIFICACAO_RESPOSTA = Pedidos de explicação didática, simplificação da resposta anterior (ex: \"não entendi\", \"explique melhor\", \"ficou confuso\") ou frustração e desabafo com a IA (ex: \"não entendi a resposta. vai à merda\", \"robô burro\"). NUNCA use POSSIVEL_DENUNCIA para insatisfação ou ofensas direcionadas ao assistente virtual!\n"
         "- AI_META_INFO = Perguntas sobre funcionamento, limites, confiabilidade ou se a IA inventa informações, números de protocolos, telefones ou encaminhamentos para agradar (ex: \"você inventaria informações para me agradar?\", \"você inventa protocolos?\", \"como você funciona?\"). NUNCA encaminhe para secretarias aleatórias!\n\n"
