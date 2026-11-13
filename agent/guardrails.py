@@ -240,6 +240,24 @@ def check_legal_guardrail(query: str) -> bool:
     q_lower = query.lower()
     return any(re.search(pat, q_lower) for pat in LEGAL_TRIGGERS)
 
+def sanitize_ouvidoria_whatsapp(text: str) -> str:
+    """Remove qualquer menção ao número fictício 99824-5903 ou WhatsApp da Ouvidoria Geral."""
+    if not text:
+        return text
+    cleaned = re.sub(
+        r'(?im)^[ \t]*[•\*\-]?\s*(?:\*\*)?(?:WhatsApp(?:\s+da\s+Ouvidoria(?:\s+Geral)?)?|WhatsApp:?)(?:\*\*)?:?\s*(?:\(21\)\s*)?99824[-.\s]?5903[^\n]*\n?',
+        '',
+        text,
+    )
+    cleaned = re.sub(
+        r'(?i)(?:,\s*)?(?:e\s+)?(?:ou\s+)?(?:pelo\s+)?WhatsApp(?:\s+da\s+Ouvidoria(?:\s+Geral)?)?\s*(?:\*\*)?(?:\(21\)\s*)?99824[-.\s]?5903(?:\*\*)?',
+        '',
+        cleaned,
+    )
+    cleaned = re.sub(r'(?i)(?:\(21\)\s*)?99824[-.\s]?5903', '', cleaned)
+    return re.sub(r'\n{3,}', '\n\n', cleaned).strip()
+
+
 def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None, history: list = None, triage_info: dict = None) -> bool:
     """
     Valida a resposta gerada pela IA contra alucinações, vazamento de PII (LGPD), ofensas e contatos falsos.
@@ -255,6 +273,11 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     forbidden_words = ["filho da puta", "desgraça", "vagabundo", "burro", "idiota"]
     if any(word in ans_lower for word in forbidden_words):
         print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Palavra proibida detectada.", file=sys.stderr)
+        return False
+
+    # 1b. Bloqueio obrigatório de WhatsApp fictício da Ouvidoria Geral (0ms)
+    if re.search(r'99824[-.\s]?5903', ans_lower):
+        print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Número fictício 99824-5903 detectado.", file=sys.stderr)
         return False
 
     # 2. Validação de Vazamento de CPF de Terceiros (RegEx LGPD)

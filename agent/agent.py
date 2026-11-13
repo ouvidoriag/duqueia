@@ -32,7 +32,8 @@ from agent.guardrails import (
     check_privacy_guardrail,
     check_competency_guardrail,
     check_legal_guardrail,
-    check_output_guardrail
+    check_output_guardrail,
+    sanitize_ouvidoria_whatsapp,
 )
 from agent.fallback import build_fallback_guidance, is_query_too_vague
 from agent.confidence import calibrate_confidence
@@ -624,7 +625,8 @@ class DuqueIAAgent:
             data["conversation_id"] = cid
             
             # Validação do Output Guardrail
-            answer = data.get("answer", "")
+            answer = sanitize_ouvidoria_whatsapp(data.get("answer", ""))
+            data["answer"] = answer
             last_context = getattr(self, "_last_context", None)
             triage_info = data.get("triage_info", None)
             

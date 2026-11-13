@@ -498,12 +498,8 @@ class AmbiguityHandler(BaseHandler):
                 "O cidadão está em uma conversa sobre um assunto ambíguo (falta de luz, troca de lâmpada ou barulho) e precisamos esclarecer ou confirmar a intenção dele.\n"
                 "REGRAS DE CONVERSA:\n"
                 "1. Se a última mensagem do cidadão (ou o histórico recente) permitir inferir com razoável certeza qual é a intenção dele, confirme essa escolha de forma natural e dê as orientações de imediato (sem fazer a pergunta de escolha de novo). Exemplo: se ele diz 'lâmpada' ou 'lâmpada queimada' após perguntarmos se era na casa ou no poste, infira que é iluminação pública. Responda: 'Entendi! Você está falando de uma lâmpada de um poste de iluminação pública, certo? Se for isso, o serviço é realizado pela Prefeitura...'\n"
-                "2. Se ainda for totalmente ambíguo (sem nenhuma pista no histórico), peça esclarecimento de forma amigável, listando as opções de forma clara (ex: falta de luz em casa = Light; poste apagado na rua = Prefeitura).\n"
-                "3. Ao indicar a abertura de chamados para iluminação pública ou manutenção urbana, instrua o cidadão a registrar no aplicativo Colab (duquedecaxias.colab.re) e peça para ele informar:\n"
-                "   - Endereço completo\n"
-                "   - Ponto de referência\n"
-                "   - Número aproximado do poste (se houver)\n"
-                "   - Anexar fotos do local (opcional)\n"
+                "2. Se ainda for totalmente ambíguo (sem nenhuma pista no histórico), peça esclarecimento de forma amigável, listando as opções de forma clara (ex: falta de luz em casa = Light; poste apagado na rua = Prefeitura, onde posso te orientar a registrar o pedido).\n"
+                "3. NUNCA prometa que a IA abre chamados ou gera protocolos diretamente (ex: NUNCA diga 'podemos abrir um chamado para você'). Diga sempre que você **orienta como o cidadão pode registrar a solicitação** no aplicativo **Colab** (`duquedecaxias.colab.re`), informando endereço completo, ponto de referência, número do poste (se houver) e foto.\n"
                 "4. Se o assunto for barulho, som alto ou perturbação do sossego:\n"
                 "   - Em caso de flagrante de perturbação do sossego alheio, som alto, brigas ou ilícitos penais em andamento (inclusive em casas de festas, bares e eventos noturnos): a competência imediata é de **Segurança Pública**, oriente ligar para a **Polícia Militar pelo 190**.\n"
                 "   - Para denúncia e fiscalização administrativa da Prefeitura via **Colab** ou **Ouvidoria Geral ((21) 2652-3835)**, oriente a atuação integrada dos órgãos municipais:\n"
@@ -511,9 +507,10 @@ class AmbiguityHandler(BaseHandler):
                 "     * **Secretaria Municipal de Urbanismo (SMUU / Posturas)**: fiscalização do alvará de funcionamento, exigência de isolamento acústico e interdição do imóvel;\n"
                 "     * **Superintendência de Ordem Pública (SUOP)**: fiscalização ostensiva com unidades móveis em bares e vias públicas, desobstrução de calçadas e apreensão de aparelhagem de som com a Guarda Municipal.\n"
                 "   - NUNCA mencione 'horário administrativo'.\n"
-                "5. Formate informações importantes em **negrito** (números, telefones, links, temas).\n"
-                "6. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
-                "7. Mantenha a resposta curta, objetiva, prestativa e calorosa. Máximo 4 frases."
+                "5. Formate informações importantes em **negrito** (telefones, links, temas) com lista limpa, sem misturar `*` com numeração.\n"
+                "6. A Ouvidoria Geral NÃO possui WhatsApp (NUNCA cite WhatsApp ou o número 99824-5903). Canais da Ouvidoria: **(21) 2652-3835**, **ouvidoria@duquedecaxias.rj.gov.br** e **Colab**.\n"
+                "7. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
+                "8. Mantenha a resposta conversacional, curta e objetiva (máximo 3 a 4 frases)."
             )
             
             if history:
