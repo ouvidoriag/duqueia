@@ -368,14 +368,14 @@ class CollectorHandler(BaseHandler):
             if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
                 state["via_publica"] = True
 
-            # Detecta localização explícita (ex: "Rua A", "Rua A, Centro", "Av. Brasil")
+            # Detecta localização explícita (ex: "Rua A", "Fica na Rua das Flores, no Centro", "Av. Brasil")
             loc_match = re.search(
-                r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+[^\n?!.;]+)",
+                r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+(?!da\s+minha|minha|sua|esta|essa\b)[^\n?!.;]+)",
                 q_raw,
                 re.IGNORECASE,
             )
             is_invalid_loc = any(w in q_low for w in [
-                "sobre rua", "na rua", "da rua", "minha rua", "buraco",
+                "sobre rua", "minha rua", "buraco",
                 "manifestação", "manifestacao", "reclamação", "reclamacao",
                 "conversar", "faz oq", "você", "voce"
             ])
