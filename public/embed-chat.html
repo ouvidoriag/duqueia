@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Duque IA — Atendimento Virtual</title>
+
+  <!-- Tipografia Oficial -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --brand-primary: #003f99;
+      --brand-dark: #002255;
+      --brand-light: #e8f1fc;
+      --brand-accent: #0284c7;
+      --bg-page: #f8fafc;
+      --surface: #ffffff;
+      --surface-subtle: #f1f5f9;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-soft: #64748b;
+      --user-bubble: #003f99;
+      --bot-bubble: #ffffff;
+      --green: #10b981;
+      --red: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 12px rgba(0, 43, 102, 0.08);
+      --radius-bubble: 18px;
+    }
+
+    /* Tema Alternativo (Verde Sustentável / SMMA) */
+    body[data-theme="verde"] {
+      --brand-primary: #047857;
+      --brand-dark: #064e3b;
+      --brand-light: #ecfdf5;
+      --brand-accent: #10b981;
+      --user-bubble: #047857;
+    }
+
+    /* Tema Escuro Elegante */
+    body[data-theme="escuro"] {
+      --bg-page: #0f172a;
+      --surface: #1e293b;
+      --surface-subtle: #334155;
+      --border: #475569;
+      --border-light: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-soft: #94a3b8;
+      --bot-bubble: #1e293b;
+      --brand-primary: #0284c7;
+      --brand-dark: #0369a1;
+      --brand-light: #082f49;
+      --user-bubble: #0284c7;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-main);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Contêiner Principal do Chat Embutido ── */
+    .embed-chat {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Header Compacto e Elegante ── */
+    .embed-header {
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      z-index: 10;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+    }
+
+    .header-avatar {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #ffffff;
+      padding: 2px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .header-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .header-status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 11px;
+      height: 11px;
+      background: var(--green);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .header-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-subtitle {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.82);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .header-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.28);
+      transform: scale(1.05);
+    }
+
+    .header-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ── Lista de Mensagens com Rolagem Suave ── */
+    .messages-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      scroll-behavior: smooth;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 0.55rem;
+      max-width: 90%;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .bot-avatar-mini {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      flex-shrink: 0;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .bot-avatar-mini img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .bubble {
+      padding: 0.75rem 0.95rem;
+      border-radius: var(--radius-bubble);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      word-break: break-word;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .message-row.user .bubble {
+      background: var(--user-bubble);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-row.bot .bubble {
+      background: var(--bot-bubble);
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* ── Renderização Markdown Dentro dos Balões ── */
+    .bubble p {
+      margin-bottom: 0.5rem;
+    }
+
+    .bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .bubble strong {
+      font-weight: 700;
+      color: inherit;
+    }
+
+    .bubble a {
+      color: var(--brand-accent);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .message-row.user .bubble a {
+      color: #e0f2fe;
+    }
+
+    .bubble ul,
+    .bubble ol {
+      margin: 0.45rem 0 0.45rem 1.25rem;
+    }
+
+    .bubble li {
+      margin-bottom: 0.25rem;
+      line-height: 1.45;
+    }
+
+    .bubble code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8em;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    .bubble blockquote {
+      border-left: 3px solid var(--brand-primary);
+      padding-left: 0.65rem;
+      margin: 0.5rem 0;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    /* ── Rodapé do Balão: Horário & Ações (Áudio / Feedback) ── */
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.35rem;
+      font-size: 0.68rem;
+      color: var(--text-soft);
+    }
+
+    .message-row.user .bubble-meta {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .feedback-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      opacity: 0.65;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .feedback-btn:hover {
+      opacity: 1;
+      background: var(--surface-subtle);
+    }
+
+    .feedback-btn.active {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+
+    .audio-play-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--brand-primary);
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      background: var(--brand-light);
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .audio-play-btn:hover {
+      background: #d0e3fa;
+    }
+
+    /* ── Indicador de Digitação (Typing dots) ── */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.65rem 0.95rem;
+      background: var(--bot-bubble);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-bubble);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      width: fit-content;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-soft);
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── Chips de Sugestão Rápida ── */
+    .quick-chips {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      padding: 0.4rem 0.85rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border-light);
+      scrollbar-width: none;
+    }
+
+    .quick-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip-btn {
+      white-space: nowrap;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--brand-primary);
+      background: var(--brand-light);
+      border: 1px solid rgba(0, 63, 153, 0.18);
+      border-radius: 16px;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .chip-btn:hover {
+      background: var(--brand-primary);
+      color: #ffffff;
+      border-color: var(--brand-primary);
+      transform: translateY(-1px);
+    }
+
+    /* ── Barra de Entrada de Mensagem ── */
+    .input-bar {
+      padding: 0.65rem 0.85rem 0.8rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.4rem 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--brand-primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 63, 153, 0.12);
+    }
+
+    .input-textarea {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.875rem;
+      color: var(--text-main);
+      resize: none;
+      outline: none;
+      max-height: 90px;
+      min-height: 22px;
+      line-height: 1.4;
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--brand-primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: var(--brand-dark);
+      transform: scale(1.06);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .mic-btn {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: transparent;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .mic-btn:hover {
+      color: var(--brand-primary);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .mic-btn.recording {
+      color: var(--red);
+      animation: pulse 1s infinite;
+    }
+
+    .footer-brand {
+      font-size: 0.65rem;
+      text-align: center;
+      color: var(--text-soft);
+      padding: 0.2rem 0.5rem 0.4rem;
+      background: var(--surface);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="embed-chat">
+    <!-- Header -->
+    <header class="embed-header">
+      <div class="header-info">
+        <div class="header-avatar">
+          <img id="headerMascotImg" src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque IA">
+          <div class="header-status-dot" title="Online e pronto para responder"></div>
+        </div>
+        <div class="header-text">
+          <h1 class="header-title" id="chatTitle">Duque IA</h1>
+          <span class="header-subtitle">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="#10b981"><circle cx="4" cy="4" r="4"/></svg>
+            Prefeitura de Duque de Caxias
+          </span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <!-- Áudio TTS -->
+        <button class="header-btn" id="btnAudioToggle" title="Ativar/desativar voz do assistente">
+          <svg id="iconVolume" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </button>
+        <!-- Limpar Sessão -->
+        <button class="header-btn" id="btnResetSession" title="Nova Conversa">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+        <!-- Expandir / Restaurar -->
+        <button class="header-btn" id="btnExpandToggle" title="Expandir / Restaurar janela">
+          <svg id="iconExpand" width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+        <!-- Fechar Widget -->
+        <button class="header-btn" id="btnCloseWidget" title="Fechar chat">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Área de Mensagens -->
+    <main class="messages-area" id="messagesArea">
+      <!-- Mensagem Inicial de Boas-Vindas -->
+      <div class="message-row bot">
+        <div class="bot-avatar-mini">
+          <img src="assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque">
+        </div>
+        <div class="bubble">
+          <p>Olá! Sou o <strong>DUQUE IA</strong>, atendente virtual oficial da <strong>Prefeitura de Duque de Caxias</strong>.</p>
+          <p>Como posso ajudar você hoje? Tire dúvidas sobre <strong>IPTU</strong>, <strong>saúde</strong>, <strong>ônibus Tarifa Zero</strong>, <strong>escolas</strong> ou serviços da Ouvidoria.</p>
+          <div class="bubble-meta">
+            <span id="initTime">Agora</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Chips de Ações Rápidas -->
+    <div class="quick-chips" id="quickChips">
+      <button class="chip-btn" data-query="Que horas passa o ônibus Tarifa Zero?">🚌 Tarifa Zero</button>
+      <button class="chip-btn" data-query="Como emitir o boleto do IPTU?">📄 Boleto IPTU</button>
+      <button class="chip-btn" data-query="Como agendar consulta médica na rede municipal?">🏥 Consulta Saúde</button>
+      <button class="chip-btn" data-query="Como pedir conserto de lâmpada queimada na rua?">💡 Luz na Rua</button>
+      <button class="chip-btn" data-query="Como abrir chamado na Ouvidoria Geral?">📋 Ouvidoria / Colab</button>
+    </div>
+
+    <!-- Barra de Digitação -->
+    <footer class="input-bar">
+      <div class="input-wrapper">
+        <textarea
+          id="messageInput"
+          class="input-textarea"
+          rows="1"
+          placeholder="Digite sua dúvida ou serviço..."
+          autocomplete="off"></textarea>
+        <button class="mic-btn" id="btnMic" title="Gravar mensagem de voz">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+      </div>
+      <button class="send-btn" id="btnSend" title="Enviar mensagem" disabled>
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </footer>
+    <div class="footer-brand">Prefeitura Municipal de Duque de Caxias</div>
+  </div>
+
+  <script>
+    // ── Estado Global do Widget Embutido ──
+    const urlParams = new URLSearchParams(window.location.search);
+    const customTitle = urlParams.get('title') || 'Duque IA';
+    const customTheme = urlParams.get('theme') || 'prefeitura';
+    const customChar = urlParams.get('char') || 'boas_vindas';
+
+    // Aplica configurações vindas por URL
+    document.title = customTitle;
+    document.getElementById('chatTitle').textContent = customTitle;
+    if (customTheme) document.body.setAttribute('data-theme', customTheme);
+
+    const CHAR_MAP = {
+      'boas_vindas': 'assets/personagens/duque_boas_vindas_bracos_abertos.png',
+      'atendimento': 'assets/personagens/duque_atendimento_telefone.png',
+      'joinha': 'assets/personagens/duque_joinha_aprovado.png',
+      'saude': 'assets/personagens/duque_saude_jaleco.png',
+      'tablet': 'assets/personagens/duque_consultando_tablet.png',
+      'executivo': 'assets/personagens/duque_executivo_analisando.png',
+      'gestao': 'assets/personagens/duque_gestao_foco_caneca.png',
+      'polo': 'assets/personagens/duque_polo_apresenta.png',
+      'notebook': 'assets/personagens/duque_desenvolvedor_notebook.png',
+      'confiante': 'assets/personagens/duque_confiante_bracos_cruzados.png'
+    };
+
+    const headerAvatarImg = document.getElementById('headerMascotImg');
+    if (CHAR_MAP[customChar]) {
+      headerAvatarImg.src = CHAR_MAP[customChar];
+    }
+
+    // Gerador de SessionId Persistente por Visitante
+    function getOrCreateSessionId() {
+      let sid = sessionStorage.getItem('duque_embed_session_id');
+      if (!sid) {
+        sid = 'widget_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+        sessionStorage.setItem('duque_embed_session_id', sid);
+      }
+      return sid;
+    }
+
+    let sessionId = getOrCreateSessionId();
+    let isTtsEnabled = localStorage.getItem('duque_tts_enabled') === 'true';
+    let isExpanded = false;
+    let isRecording = false;
+    let recognition = null;
+
+    // Atualiza estado do ícone de áudio
+    function updateAudioIcon() {
+      const btn = document.getElementById('btnAudioToggle');
+      if (isTtsEnabled) {
+        btn.style.background = 'rgba(255, 255, 255, 0.35)';
+        btn.setAttribute('title', 'Voz da IA: ATIVADA (clique para silenciar)');
+      } else {
+        btn.style.background = 'rgba(255, 255, 255, 0.15)';
+        btn.setAttribute('title', 'Voz da IA: DESATIVADA (clique para ativar)');
+      }
+    }
+    updateAudioIcon();
+
+    document.getElementById('btnAudioToggle').addEventListener('click', () => {
+      isTtsEnabled = !isTtsEnabled;
+      localStorage.setItem('duque_tts_enabled', isTtsEnabled ? 'true' : 'false');
+      updateAudioIcon();
+    });
+
+    // Horário formatado
+    function getNowTime() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+    document.getElementById('initTime').textContent = getNowTime();
+
+    // ── Renderizador de Markdown Homologado ──
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatInline(text) {
+      let t = escapeHtml(text);
+      // Links Markdown [label](url)
+      t = t.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s\)]+)\)/g, (match, label, url) => {
+        const cleanUrl = url.replace(/["']/g, '');
+        if (!/^https?:\/\/|^\//i.test(cleanUrl) || /^javascript:/i.test(cleanUrl)) return label;
+        return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+      });
+      // URLs soltas
+      t = t.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)([\s)]|$)/g, (match, before, url, after) => {
+        let punct = '';
+        const m = url.match(/[.,;:!?]+$/);
+        if (m) {
+          punct = m[0];
+          url = url.slice(0, -punct.length);
+        }
+        return `${before}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${punct}${after}`;
+      });
+      // Código inline
+      t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Negrito
+      t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      // Itálico
+      t = t.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+      return t;
+    }
+
+    function formatMarkdown(text) {
+      if (!text) return '';
+      const lines = String(text).replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      const out = [];
+      let inUl = false;
+      let inOl = false;
+
+      function closeLists() {
+        if (inUl) { out.push('</ul>'); inUl = false; }
+        if (inOl) { out.push('</ol>'); inOl = false; }
+      }
+
+      for (let rawLine of lines) {
+        const trimmed = rawLine.trim();
+        if (!trimmed) {
+          closeLists();
+          continue;
+        }
+
+        const ulMatch = rawLine.match(/^(\s*)[*•-]\s+(.*)$/);
+        if (ulMatch) {
+          if (inOl) { out.push('</ol>'); inOl = false; }
+          if (!inUl) { out.push('<ul>'); inUl = true; }
+          out.push(`<li>${formatInline(ulMatch[2])}</li>`);
+          continue;
+        }
+
+        const olMatch = rawLine.match(/^(\s*)\d+\.\s+(.*)$/);
+        if (olMatch) {
+          if (inUl) { out.push('</ul>'); inUl = false; }
+          if (!inOl) { out.push('<ol>'); inOl = true; }
+          out.push(`<li>${formatInline(olMatch[2])}</li>`);
+          continue;
+        }
+
+        closeLists();
+        out.push(`<p>${formatInline(trimmed)}</p>`);
+      }
+      closeLists();
+      return out.join('');
+    }
+
+    // ── Manipulação do DOM das Mensagens ──
+    const messagesArea = document.getElementById('messagesArea');
+    const messageInput = document.getElementById('messageInput');
+    const btnSend = document.getElementById('btnSend');
+
+    function appendMessage(role, text, meta = {}) {
+      const row = document.createElement('div');
+      row.className = `message-row ${role}`;
+
+      if (role === 'bot') {
+        const avatar = document.createElement('div');
+        avatar.className = 'bot-avatar-mini';
+        const img = document.createElement('img');
+        img.src = CHAR_MAP[customChar] || 'assets/personagens/duque_boas_vindas_bracos_abertos.png';
+        avatar.appendChild(img);
+        row.appendChild(avatar);
+      }
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.innerHTML = formatMarkdown(text);
+
+      // Meta: horário e ações
+      const bubbleMeta = document.createElement('div');
+      bubbleMeta.className = 'bubble-meta';
+
+      if (role === 'bot') {
+        // Botão de Áudio (se houver áudio sintetizado ou TTS)
+        if (meta.audio_url || meta.audio_path || isTtsEnabled) {
+          const audioBtn = document.createElement('button');
+          audioBtn.className = 'audio-play-btn';
+          audioBtn.innerHTML = '🔊 Ouvir';
+          audioBtn.title = 'Ouvir resposta';
+          audioBtn.addEventListener('click', () => {
+            playResponseAudio(meta.audio_url || meta.audio_path || text, audioBtn);
+          });
+          bubbleMeta.appendChild(audioBtn);
+        }
+
+        // Feedback CSAT (Joinha / Não Joinha)
+        const btnUp = document.createElement('button');
+        btnUp.className = 'feedback-btn';
+        btnUp.innerHTML = '👍';
+        btnUp.title = 'Essa resposta ajudou';
+        btnUp.onclick = () => sendFeedback('positive', meta, btnUp, btnDown);
+
+        const btnDown = document.createElement('button');
+        btnDown.className = 'feedback-btn';
+        btnDown.innerHTML = '👎';
+        btnDown.title = 'Essa resposta não ajudou';
+        btnDown.onclick = () => sendFeedback('negative', meta, btnDown, btnUp);
+
+        bubbleMeta.appendChild(btnUp);
+        bubbleMeta.appendChild(btnDown);
+      }
+
+      const timeSpan = document.createElement('span');
+      timeSpan.textContent = getNowTime();
+      bubbleMeta.appendChild(timeSpan);
+
+      bubble.appendChild(bubbleMeta);
+      row.appendChild(bubble);
+      messagesArea.appendChild(row);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+
+      // Comunica com o host que houve mensagem
+      notifyHost('duque:message_received', { role, textLength: text.length });
+    }
+
+    function showTyping() {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+      row.id = 'typingRow';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'bot-avatar-mini';
+      const img = document.createElement('img');
+      img.src = CHAR_MAP[customChar] || 'assets/personagens/duque_boas_vindas_bracos_abertos.png';
+      avatar.appendChild(img);
+
+      const indicator = document.createElement('div');
+      indicator.className = 'typing-indicator';
+      indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+      row.appendChild(avatar);
+      row.appendChild(indicator);
+      messagesArea.appendChild(row);
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    function hideTyping() {
+      const row = document.getElementById('typingRow');
+      if (row) row.remove();
+    }
+
+    // ── Envio de Feedback CSAT ──
+    async function sendFeedback(type, meta, btnActive, btnOther) {
+      btnActive.classList.add('active');
+      btnOther.classList.remove('active');
+      try {
+        await fetch('api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: sessionId,
+            type: type,
+            secretaria: meta.secretaria || meta.category || null,
+            question: meta.question || null,
+            bot_response: meta.answer || null
+          })
+        });
+      } catch (err) {
+        console.warn('[Feedback] Falha ao registrar feedback:', err);
+      }
+    }
+
+    // ── Player de Áudio TTS ──
+    let currentAudio = null;
+    function playResponseAudio(source, btn) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        btn.innerHTML = '🔊 Ouvir';
+        return;
+      }
+      if (typeof source === 'string' && (source.endsWith('.mp3') || source.endsWith('.wav'))) {
+        currentAudio = new Audio(source);
+        btn.innerHTML = '⏸ Pausar';
+        currentAudio.onended = () => { btn.innerHTML = '🔊 Ouvir'; currentAudio = null; };
+        currentAudio.play().catch(() => { btn.innerHTML = '🔊 Ouvir'; currentAudio = null; });
+      } else {
+        // Fallback para Web Speech API
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const cleanText = String(source).replace(/[*_#`\[\]\(\)]/g, '');
+          const utter = new SpeechSynthesisUtterance(cleanText);
+          utter.lang = 'pt-BR';
+          utter.rate = 1.05;
+          btn.innerHTML = '⏸ Pausar';
+          utter.onend = () => { btn.innerHTML = '🔊 Ouvir'; };
+          utter.onerror = () => { btn.innerHTML = '🔊 Ouvir'; };
+          window.speechSynthesis.speak(utter);
+        }
+      }
+    }
+
+    // ── Disparo de Pergunta para o Backend ──
+    async function sendMessage(textToSend) {
+      const text = (textToSend || messageInput.value).trim();
+      if (!text) return;
+
+      appendMessage('user', text);
+      messageInput.value = '';
+      adjustTextareaHeight();
+      btnSend.disabled = true;
+      showTyping();
+
+      try {
+        const response = await fetch('api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            sessionId: sessionId
+          })
+        });
+
+        const data = await response.json();
+        hideTyping();
+
+        if (data.error) {
+          appendMessage('bot', `Desculpe, ocorreu uma instabilidade temporária: ${data.error}`);
+        } else {
+          appendMessage('bot', data.answer, {
+            ...data,
+            question: text,
+            audio_url: data.audio_url || data.audio_path || null
+          });
+
+          // Se áudio estiver ativado globalmente, fala a resposta
+          if (isTtsEnabled) {
+            playResponseAudio(data.audio_url || data.audio_path || data.answer, { innerHTML: '' });
+          }
+        }
+      } catch (err) {
+        hideTyping();
+        appendMessage('bot', 'Não foi possível conectar ao servidor no momento. Por favor, tente novamente em instantes.');
+      } finally {
+        btnSend.disabled = false;
+        messageInput.focus();
+      }
+    }
+
+    // Auto-crescimento do textarea
+    function adjustTextareaHeight() {
+      messageInput.style.height = 'auto';
+      messageInput.style.height = `${Math.min(messageInput.scrollHeight, 90)}px`;
+      btnSend.disabled = !messageInput.value.trim();
+    }
+
+    messageInput.addEventListener('input', adjustTextareaHeight);
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    btnSend.addEventListener('click', () => sendMessage());
+
+    // Chips de Sugestão
+    document.querySelectorAll('.chip-btn').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const q = chip.getAttribute('data-query');
+        if (q) sendMessage(q);
+      });
+    });
+
+    // Limpar Sessão
+    document.getElementById('btnResetSession').addEventListener('click', () => {
+      if (confirm('Deseja iniciar uma nova conversa com o Duque IA?')) {
+        sessionStorage.removeItem('duque_embed_session_id');
+        sessionId = getOrCreateSessionId();
+        messagesArea.innerHTML = '';
+        appendMessage('bot', 'Conversa reiniciada! Como posso te ajudar agora?');
+      }
+    });
+
+    // Gravação por Microfone (Web Speech API)
+    const btnMic = document.getElementById('btnMic');
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.lang = 'pt-BR';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isRecording = true;
+        btnMic.classList.add('recording');
+        btnMic.title = 'Ouvindo... Fale agora';
+      };
+
+      recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        if (transcript) {
+          messageInput.value = transcript;
+          adjustTextareaHeight();
+          sendMessage();
+        }
+      };
+
+      recognition.onerror = () => {
+        isRecording = false;
+        btnMic.classList.remove('recording');
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        btnMic.classList.remove('recording');
+        btnMic.title = 'Gravar mensagem de voz';
+      };
+
+      btnMic.addEventListener('click', () => {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          recognition.start();
+        }
+      });
+    } else {
+      btnMic.style.display = 'none';
+    }
+
+    // ── Protocolo PostMessage (Comunicação Segura com o Site Hospedeiro) ──
+    function notifyHost(type, payload = {}) {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          source: 'duque-widget',
+          type: type,
+          payload: payload
+        }, '*');
+      }
+    }
+
+    // Botão Fechar
+    document.getElementById('btnCloseWidget').addEventListener('click', () => {
+      if (currentAudio) currentAudio.pause();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      notifyHost('duque:close');
+    });
+
+    // Botão Expandir / Restaurar
+    document.getElementById('btnExpandToggle').addEventListener('click', () => {
+      isExpanded = !isExpanded;
+      const icon = document.getElementById('iconExpand');
+      if (isExpanded) {
+        icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-14v3h3v2h-5V5h2z"/>';
+      } else {
+        icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+      }
+      notifyHost('duque:toggle_expand', { expanded: isExpanded });
+    });
+
+    // Escuta comandos enviados pelo site hospedeiro via postMessage
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (!data || data.source !== 'duque-host') return;
+
+      switch (data.type) {
+        case 'duque:send_message':
+          if (data.payload && data.payload.text) {
+            sendMessage(data.payload.text);
+          }
+          break;
+        case 'duque:set_character':
+          if (data.payload && data.payload.character && CHAR_MAP[data.payload.character]) {
+            headerAvatarImg.src = CHAR_MAP[data.payload.character];
+          }
+          break;
+        case 'duque:set_title':
+          if (data.payload && data.payload.title) {
+            document.getElementById('chatTitle').textContent = data.payload.title;
+          }
+          break;
+        case 'duque:focus':
+          messageInput.focus();
+          break;
+      }
+    });
+
+    // Notifica o host que o iframe foi carregado com sucesso
+    window.addEventListener('DOMContentLoaded', () => {
+      notifyHost('duque:ready', { sessionId: sessionId });
+    });
+  </script>
+</body>
+
+</html>
+

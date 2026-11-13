@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste Widget Duque IA — Portal Simulado</title>
+<style>
+  /* Simula um portal da Prefeitura */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #1a2340; }
+  header {
+    background: linear-gradient(135deg, #1a56a0, #0d3b7a);
+    color: #fff; padding: 20px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  header h1 { font-size: 1.3rem; }
+  header small { opacity: 0.8; font-size: 0.85rem; }
+  main { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+  .card { background: #fff; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: #1a56a0; }
+  .card p { font-size: 0.95rem; line-height: 1.6; color: #444; }
+  .badge { display: inline-block; background: #e6f0ff; color: #1a56a0; border-radius: 20px; padding: 3px 10px; font-size: 0.8rem; margin: 4px 2px; }
+
+  /* Painel de debug postMessage */
+  #debug-panel {
+    position: fixed; bottom: 100px; left: 16px;
+    width: 320px; max-height: 260px; overflow-y: auto;
+    background: rgba(10,20,50,0.92); color: #7effa0;
+    font-family: monospace; font-size: 11px;
+    padding: 10px; border-radius: 10px;
+    z-index: 99000; display: none;
+  }
+  #debug-panel h3 { color: #fff; font-size: 11px; margin-bottom: 6px; }
+  #debug-panel .log-entry { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 4px 0; word-break: break-all; }
+  #debug-toggle {
+    position: fixed; bottom: 100px; left: 16px;
+    background: #0d3b7a; color: #fff; border: none;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;
+    z-index: 99001;
+  }
+  .test-btn {
+    background: #1a56a0; color: #fff; border: none;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; margin: 4px 4px 4px 0;
+    font-size: 13px;
+  }
+  .test-btn:hover { background: #0d3b7a; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏛️ Portal Simulado — Prefeitura de Duque de Caxias</h1>
+    <small>Página de teste do Chat Widget Embutível</small>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>🧪 Teste de Integração do Widget</h2>
+    <p>Esta página simula um portal externo da Prefeitura que incorpora a Duque IA via <code>&lt;script&gt;</code>.</p>
+    <p style="margin-top:10px;">O widget aparece no canto inferior direito. Clique no mascote para abrir o chat.</p>
+    <div style="margin-top:16px;">
+      <button class="test-btn" onclick="DuqueWidget.open()">📂 Abrir widget</button>
+      <button class="test-btn" onclick="DuqueWidget.close()">❌ Fechar widget</button>
+      <button class="test-btn" onclick="DuqueWidget.toggle()">🔄 Toggle</button>
+      <button class="test-btn" onclick="DuqueWidget.send('Olá, Duque IA!')">💬 Enviar msg</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>✅ Checklist de Verificação</h2>
+    <p>Verifique manualmente os seguintes comportamentos:</p>
+    <ul style="margin-top:10px; padding-left:20px; line-height:2;">
+      <li>🔵 Mascote aparece no canto inferior direito</li>
+      <li>🔵 Tooltip "Falar com a Duque IA" ao passar o mouse</li>
+      <li>🔵 Clique no mascote → painel abre com animação</li>
+      <li>🔵 Pressionar ESC → painel fecha</li>
+      <li>🔵 Badge laranja aparece quando chega mensagem nova (painel fechado)</li>
+      <li>🔵 Badge some ao abrir o painel</li>
+      <li>🔵 Botão "expandir" no iframe → painel aumenta para tela cheia</li>
+      <li>🔵 Botão "fechar" no iframe → painel fecha e foco retorna ao botão</li>
+      <li>🔵 Eventos aparecem no painel de debug (botão abaixo)</li>
+      <li>🔵 Em tela < 480px → painel ocupa largura total, bottom sheet</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>🏷️ Tags de configuração disponíveis</h2>
+    <span class="badge">data-position</span>
+    <span class="badge">data-theme</span>
+    <span class="badge">data-title</span>
+    <span class="badge">data-char</span>
+    <span class="badge">data-src</span>
+    <span class="badge">data-mascot-src</span>
+    <span class="badge">data-allowed-origins</span>
+    <span class="badge">data-z-index</span>
+  </div>
+
+  <div class="card">
+    <h2>📡 API JavaScript disponível</h2>
+    <pre style="background:#f4f6fa;padding:12px;border-radius:8px;font-size:12px;overflow-x:auto;">
+DuqueWidget.open()           // Abre o painel
+DuqueWidget.close()          // Fecha o painel
+DuqueWidget.toggle()         // Alterna aberto/fechado
+DuqueWidget.send('texto')    // Envia mensagem ao chat
+DuqueWidget.version          // Versão do widget</pre>
+  </div>
+</main>
+
+<!-- Debug postMessage -->
+<button id="debug-toggle" onclick="toggleDebug()">🐛 Debug postMessage</button>
+<div id="debug-panel">
+  <h3>📡 Eventos postMessage recebidos</h3>
+  <div id="debug-log"></div>
+</div>
+
+<script>
+  function toggleDebug() {
+    var p = document.getElementById('debug-panel');
+    var btn = document.getElementById('debug-toggle');
+    var visible = p.style.display !== 'none';
+    p.style.display = visible ? 'none' : 'block';
+    btn.style.bottom = visible ? '100px' : (10 + 270) + 'px';
+  }
+
+  window.addEventListener('message', function (e) {
+    var log = document.getElementById('debug-log');
+    var entry = document.createElement('div');
+    entry.className = 'log-entry';
+    var d = e.data;
+    var text = '[' + new Date().toLocaleTimeString() + '] ';
+    if (d && typeof d === 'object') {
+      text += (d.source || '?') + ' → ' + (d.type || '?');
+      if (d.payload) text += ' | ' + JSON.stringify(d.payload).substring(0, 60);
+    } else {
+      text += String(e.data).substring(0, 80);
+    }
+    entry.textContent = text;
+    log.insertBefore(entry, log.firstChild);
+    // Mantém no máximo 30 entradas
+    while (log.children.length > 30) log.removeChild(log.lastChild);
+  });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     INTEGRAÇÃO DO WIDGET — copie as linhas abaixo para qualquer site
+     Ajuste o src para a URL de produção: https://ogm.duquedecaxias.rj.gov.br/duqueia/widget.js
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<script
+  src="/widget.js"
+  data-position="bottom-right"
+  data-theme="prefeitura"
+  data-title="Duque IA"
+  data-char="boas_vindas"
+  data-allowed-origins="http://localhost:3000"
+  defer>
+</script>
+
+</body>
+</html>

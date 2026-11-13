@@ -1066,12 +1066,73 @@ const server = http.createServer((req, res) => {
   }
 
 
+  // ── Widget Embed Route (/embed/chat) ────────────────────────────────────────
+  // Serve embed-chat.html com headers CSP que autorizam embedding via iframe.
+  // EMBED_ALLOWED_ORIGINS: lista separada por vírgula no .env (padrão: * em dev)
+  const EMBED_ALLOWED_ORIGINS_RAW = process.env.EMBED_ALLOWED_ORIGINS || '*';
+  const EMBED_ALLOWED_ORIGINS_LIST = EMBED_ALLOWED_ORIGINS_RAW
+    .split(',').map(s => s.trim()).filter(Boolean);
+
+  const embedPaths = ['/embed', '/embed/chat', '/embed/chat.html'];
+  if (embedPaths.includes((req.url || '/').split('?')[0]) && req.method === 'GET') {
+    const embedFile = path.join(path.resolve(__dirname, 'public'), 'embed-chat.html');
+    fs.readFile(embedFile, (err, content) => {
+      if (err) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Widget embed page not found');
+        return;
+      }
+
+      // frame-ancestors: controla quais origens podem embutir via iframe
+      const frameAncestors = EMBED_ALLOWED_ORIGINS_LIST.includes('*')
+        ? "'self' *"
+        : `'self' ${EMBED_ALLOWED_ORIGINS_LIST.join(' ')}`;
+
+      const cspValue = [
+        `frame-ancestors ${frameAncestors}`,
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data:",
+        "connect-src 'self'",
+        "media-src 'self'",
+      ].join('; ');
+
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=0, must-revalidate',
+        // X-Frame-Options: apenas para browsers que não entendem CSP frame-ancestors
+        // 'ALLOWALL' é o valor permissivo para wildcard; em produção com origens fixas usar SAMEORIGIN
+        'X-Frame-Options': EMBED_ALLOWED_ORIGINS_LIST.includes('*') ? 'ALLOWALL' : 'ALLOWALL',
+        'Content-Security-Policy': cspValue,
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(content);
+    });
+    return;
+  }
+
   // ── Arquivos Estáticos ──────────────────────────────────────────────────
   const publicRoot = path.resolve(__dirname, 'public');
   let cleanUrl = (req.url || '/').split('?')[0];
   if (cleanUrl === '/' || cleanUrl === '') cleanUrl = '/chat.html';
   if (cleanUrl === '/login' || cleanUrl.endsWith('/login')) cleanUrl = '/login.html';
   if (cleanUrl === '/dashboard' || cleanUrl.endsWith('/dashboard')) cleanUrl = '/dashboard.html';
+  // Widget.js: cache curto (5 min) para propagação rápida de atualizações em sites externos
+  if (cleanUrl === '/widget.js') {
+    const wPath = path.join(publicRoot, 'widget.js');
+    fs.readFile(wPath, (err, content) => {
+      if (err) { res.writeHead(404); res.end('Not found'); return; }
+      res.writeHead(200, {
+        'Content-Type': 'application/javascript; charset=utf-8',
+        'Cache-Control': 'public, max-age=300, must-revalidate',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(content);
+    });
+    return;
+  }
 
   let decodedPath = '';
   try {
