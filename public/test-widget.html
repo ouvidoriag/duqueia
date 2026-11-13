@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Central de Integração Duque IA — Guia Oficial Prefeitura de Duque de Caxias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #004a99;
+      --primary-dark: #002d62;
+      --primary-light: #e6f0fa;
+      --accent: #ff6600;
+      --accent-light: #fff0e6;
+      --success: #10b981;
+      --dark: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --white: #ffffff;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--slate-50);
+      color: var(--slate-800);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header Institucional */
+    header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      color: var(--white);
+      padding: 36px 24px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 4px solid var(--accent);
+    }
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .header-info { display: flex; align-items: center; gap: 20px; }
+    .header-logo {
+      width: 64px;
+      height: 64px;
+      background: var(--white);
+      border-radius: 50%;
+      padding: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .header-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+    .header-titles h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+    .header-titles p { color: #cbd5e1; font-size: 0.95rem; margin-top: 4px; }
+    .badge-gov {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #93c5fd;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Abas Principais (Tabs) */
+    .nav-tabs-wrapper {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-200);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-tabs {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      padding: 0 24px;
+    }
+    .tab-btn {
+      padding: 18px 28px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--slate-500);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover { color: var(--primary); background: var(--slate-50); }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .tab-btn .tag {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--slate-200);
+      color: var(--slate-700);
+    }
+    .tab-btn.active .tag { background: var(--primary); color: var(--white); }
+
+    /* Layout do Conteudo */
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px 80px 24px;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Cards e Secoes */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: var(--shadow-md); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--slate-100);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title .icon {
+      font-size: 1.4rem;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-light);
+      border-radius: 8px;
+      color: var(--primary);
+    }
+
+    /* Blocos de Codigo */
+    .code-block {
+      background: var(--dark);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: 16px 0;
+      border: 1px solid var(--slate-700);
+    }
+    .code-header {
+      background: var(--slate-800);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .copy-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--white);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.25); }
+    pre {
+      padding: 18px;
+      overflow-x: auto;
+      color: #f8fafc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    /* Tabelas */
+    .table-responsive { overflow-x: auto; margin: 16px 0; border-radius: var(--radius-md); border: 1px solid var(--slate-200); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+    th { background: var(--slate-50); padding: 12px 16px; font-weight: 600; color: var(--slate-700); border-bottom: 2px solid var(--slate-200); }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--slate-200); color: var(--slate-600); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafcff; }
+
+    /* Botoes de Acao e Teste */
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .btn {
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-accent { background: var(--accent); color: var(--white); }
+    .btn-accent:hover { background: #e05500; }
+    .btn-outline { background: var(--white); border: 1px solid var(--slate-200); color: var(--slate-700); }
+    .btn-outline:hover { background: var(--slate-100); }
+
+    /* Destaques e Alertas */
+    .alert {
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      margin: 16px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 0.9rem;
+    }
+    .alert-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e40af; }
+    .alert-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #92400e; }
+    .alert-success { background: #f0fdf4; border-left: 4px solid #10b981; color: #065f46; }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .header-container { flex-direction: column; text-align: center; }
+      .header-info { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecalho Institucional -->
+  <header>
+    <div class="header-container">
+      <div class="header-info">
+        <div class="header-logo">
+          <img src="/assets/personagens/duque_boas_vindas_bracos_abertos.png" alt="Duque IA">
+        </div>
+        <div class="header-titles">
+          <h1>Central de Integração Duque IA</h1>
+          <p>Manual oficial de implantação para sites municipais, aplicativos móveis (React Native, Flutter) e portais</p>
+        </div>
+      </div>
+      <div>
+        <span class="badge-gov">🏛️ Prefeitura de Duque de Caxias · Versão 1.0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Selecao das Duas Abas -->
+  <div class="nav-tabs-wrapper">
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('widget')">
+        💬 Versão 1: Chat Widget Embutível
+        <span class="tag">Flutuante · 1 linha de código</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('fullpage')">
+        🖥️ Versão 2: Página de Chat Completa
+        <span class="tag">Tela Inteira / App Móvel / iFrame</span>
+      </button>
+    </nav>
+  </div>
+
+  <main class="container">
+
+    <!-- =====================================================================
+         ABA 1: CHAT WIDGET EMBUTIVEL (BOTAO FLUTUANTE)
+         ===================================================================== -->
+    <div id="tab-widget" class="tab-content active">
+      
+      <!-- Visao Geral e Painel de Teste Interativo -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">⚡</span> O que é o Chat Widget Embutível?</h2>
+          <span style="color: var(--success); font-weight: 700; font-size: 0.85rem;">● Pronto para Produção</span>
+        </div>
+        <p>O <strong>Chat Widget</strong> é uma solução leve (apenas 13 KB, em JavaScript puro sem frameworks) que adiciona um botão flutuante com o mascote oficial do <strong>Duque IA</strong> no canto da tela de qualquer site da Prefeitura. Ao clicar no mascote, abre-se uma janela de conversa rápida sem tirar o munícipe da página atual.</p>
+        
+        <div class="btn-group" style="margin-top: 20px;">
+          <button class="btn btn-primary" onclick="DuqueWidget.open()">📂 Testar Abertura do Widget</button>
+          <button class="btn btn-outline" onclick="DuqueWidget.close()">❌ Fechar Widget</button>
+          <button class="btn btn-outline" onclick="DuqueWidget.toggle()">🔄 Alternar Aberto/Fechado</button>
+          <button class="btn btn-accent" onclick="DuqueWidget.send('Como funciona o Tarifa Zero?')">💬 Enviar Pergunta Pronta</button>
+        </div>
+      </div>
+
+      <!-- Instalacao Rapida em 1 Linha -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">🚀</span> Instalação Rápida (1 Linha de Código)</h2>
+        </div>
+        <p>Copie e cole este código antes da tag de fechamento <code>&lt;/body&gt;</code> em qualquer site ou sistema web:</p>
+        
+        <div class="code-block">
+          <div class="code-header">
+            <span>HTML (Sites externos, WordPress, Joomla, Portais)</span>
+            <button class="copy-btn" onclick="copyCode('code-quick-widget')">Copiar Código</button>
+          </div>
+          <pre id="code-quick-widget">&lt;script 
+  src="https://ogm.duquedecaxias.rj.gov.br/duqueia/widget.js"
+  data-title="Duque IA"
+  data-position="bottom-right"
+  data-theme="prefeitura"
+  defer&gt;
+&lt;/script&gt;</pre>
+        </div>
+
+        <div class="alert alert-info">
+          <span>ℹ️</span>
+          <div>
+            <strong>Carregamento sem atrasos:</strong> O script usa <code>defer</code> para garantir que a página principal carregue primeiro, sem impactar na velocidade do portal nem na nota de performance (Lighthouse/SEO).
+          </div>
+        </div>
+      </div>
+
+      <!-- Opcoes de Customizacao -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">⚙️</span> Parâmetros de Configuração (data-attributes)</h2>
+        </div>
+        <p>Personalize o comportamento e a aparência adicionando atributos à tag <code>&lt;script&gt;</code>:</p>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Atributo</th>
+                <th>Padrão</th>
+                <th>Valores Disponíveis</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>data-position</code></td>
+                <td><code>bottom-right</code></td>
+                <td><code>bottom-right</code>, <code>bottom-left</code></td>
+                <td>Canto da tela onde o botão flutuante ficará fixado.</td>
+              </tr>
+              <tr>
+                <td><code>data-theme</code></td>
+                <td><code>prefeitura</code></td>
+                <td><code>prefeitura</code> (Azul), <code>verde</code> (Saúde/Ambiente), <code>escuro</code> (Dark)</td>
+                <td>Tema de cores da janela do chat.</td>
+              </tr>
+              <tr>
+                <td><code>data-title</code></td>
+                <td><code>Duque IA</code></td>
+                <td>Texto livre (Ex: "Atendimento Saúde", "Dúvidas IPTU")</td>
+                <td>Título no topo da caixa de diálogo.</td>
+              </tr>
+              <tr>
+                <td><code>data-char</code></td>
+                <td><code>boas_vindas</code></td>
+                <td><code>boas_vindas</code>, <code>saude</code>, <code>atendimento</code>, <code>joinha</code>, <code>executivo</code></td>
+                <td>Foto/mascote exibido no botão flutuante e no cabeçalho.</td>
+              </tr>
+              <tr>
+                <td><code>data-allowed-origins</code></td>
+                <td>Origem do script</td>
+                <td>Lista separada por vírgula de domínios autorizados</td>
+                <td>Validação de segurança postMessage para evitar abusos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Integracao com CMS (WordPress, React, Vue, HTML puro) -->
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom: 12px; color: var(--primary);">Integrando no WordPress / CMS</h3>
+          <p style="font-size: 0.9rem; margin-bottom: 12px;">Abra o arquivo <code>footer.php</code> do seu tema filho ou utilize o plugin <em>"Insert Headers and Footers"</em> e cole no bloco Footer:</p>
+          <div class="code-block">
+            <div class="code-header"><span>WordPress footer.php</span></div>
+            <pre>&lt;?php wp_footer(); ?&gt;
+&lt;script src="https://ogm.duquedecaxias.rj.gov.br/duqueia/widget.js" defer&gt;&lt;/script&gt;
+&lt;/body&gt;</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom: 12px; color: var(--primary);">Integrando no React / Next.js</h3>
+          <p style="font-size: 0.9rem; margin-bottom: 12px;">Adicione dinamicamente através de um <code>useEffect</code> ou utilize o componente <code>next/script</code>:</p>
+          <div class="code-block">
+            <div class="code-header"><span>Next.js / React</span></div>
+            <pre>import Script from 'next/script';
+
+export default function Layout({ children }) {
+  return (
+    &lt;&gt;
+      {children}
+      &lt;Script 
+        src="https://ogm.duquedecaxias.rj.gov.br/duqueia/widget.js" 
+        strategy="lazyOnload" 
+      /&gt;
+    &lt;/&gt;
+  );
+}</pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =====================================================================
+         ABA 2: PAGINA DE CHAT COMPLETA (FULLPAGE / APP MOBILE / IFRAME)
+         ===================================================================== -->
+    <div id="tab-fullpage" class="tab-content">
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">🖥️</span> O que é a Página de Chat Completa?</h2>
+          <span style="color: var(--primary); font-weight: 700; font-size: 0.85rem;">● Modo Imersivo</span>
+        </div>
+        <p>A <strong>Página de Chat Completa</strong> é ideal para ser usada como canal principal de atendimento ao munícipe (ex: <code>chat.duquedecaxias.rj.gov.br</code>), para embutimento em tela cheia dentro de <strong>Aplicativos Móveis</strong> (Android / iOS via WebView), ou dentro de portais através de um <code>&lt;iframe&gt;</code> dedicado em uma página inteira de serviços.</p>
+
+        <div class="btn-group" style="margin-top: 20px;">
+          <a class="btn btn-primary" href="/chat.html" target="_blank">🚀 Abrir Chat Oficial Completo (/chat.html)</a>
+          <a class="btn btn-outline" href="/embed/chat" target="_blank">🔍 Abrir Versão Embed Leve (/embed/chat)</a>
+        </div>
+      </div>
+
+      <!-- Exemplos de Aplicativos Moveis (Flutter e React Native) -->
+      <div class="grid-2">
+        
+        <!-- React Native -->
+        <div class="card">
+          <h3 style="margin-bottom: 12px; color: var(--primary);">📱 Embutir em Aplicativo React Native (Expo)</h3>
+          <p style="font-size: 0.9rem; margin-bottom: 12px;">Utilize a biblioteca <code>react-native-webview</code> para criar uma tela nativa de atendimento:</p>
+          
+          <div class="code-block">
+            <div class="code-header">
+              <span>ChatScreen.jsx (React Native)</span>
+              <button class="copy-btn" onclick="copyCode('code-rn')">Copiar</button>
+            </div>
+            <pre id="code-rn">import React from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { WebView } from 'react-native-webview';
+
+export default function ChatScreen() {
+  return (
+    &lt;SafeAreaView style={styles.container}&gt;
+      &lt;WebView
+        source={{ uri: 'https://ogm.duquedecaxias.rj.gov.br/duqueia/embed/chat?theme=prefeitura' }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        startInLoadingState={true}
+      /&gt;
+    &lt;/SafeAreaView&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#ffffff' }
+});</pre>
+          </div>
+        </div>
+
+        <!-- Flutter -->
+        <div class="card">
+          <h3 style="margin-bottom: 12px; color: var(--primary);">📱 Embutir em Aplicativo Flutter (Android / iOS)</h3>
+          <p style="font-size: 0.9rem; margin-bottom: 12px;">Utilize o pacote oficial <code>webview_flutter</code> para adicionar o Duque IA no app:</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>chat_page.dart (Flutter)</span>
+              <button class="copy-btn" onclick="copyCode('code-flutter')">Copiar</button>
+            </div>
+            <pre id="code-flutter">import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+class DuqueChatPage extends StatefulWidget {
+  @override
+  _DuqueChatPageState createState() => _DuqueChatPageState();
+}
+
+class _DuqueChatPageState extends State&lt;DuqueChatPage&gt; {
+  late final WebViewController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse('https://ogm.duquedecaxias.rj.gov.br/duqueia/embed/chat'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Atendimento Duque IA'), backgroundColor: Color(0xFF004A99)),
+      body: WebViewWidget(controller: controller),
+    );
+  }
+}</pre>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- iFrame Completo em Pagina Web -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">🖼️</span> Embutir via iFrame Fixo em Portais Municipais</h2>
+        </div>
+        <p>Se o objetivo for disponibilizar o chat fixo ocupando uma página inteira de suporte do portal:</p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span>HTML iFrame Responsivo</span>
+            <button class="copy-btn" onclick="copyCode('code-iframe')">Copiar</button>
+          </div>
+          <pre id="code-iframe">&lt;!-- Container responsivo com altura total --&gt;
+&lt;div style="width: 100%; height: 750px; max-width: 900px; margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"&gt;
+  &lt;iframe 
+    src="https://ogm.duquedecaxias.rj.gov.br/duqueia/embed/chat?theme=prefeitura&amp;title=Atendimento%20Cidad%C3%A3o"
+    width="100%" 
+    height="100%" 
+    frameborder="0"
+    allow="microphone"
+    title="Duque IA"&gt;
+  &lt;/iframe&gt;
+&lt;/div&gt;</pre>
+        </div>
+      </div>
+
+      <!-- Tabela Comparativa Widget vs Fullpage -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title"><span class="icon">⚖️</span> Quando usar o Widget ou a Página Completa?</h2>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Critério</th>
+                <th>Versão 1: Chat Widget</th>
+                <th>Versão 2: Página Completa</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Objetivo Principal</strong></td>
+                <td>Tirar dúvidas rápidas sem tirar o munícipe da página</td>
+                <td>Atendimento aprofundado, abertura de protocolo e navegação guiada</td>
+              </tr>
+              <tr>
+                <td><strong>Espaço Ocupado</strong></td>
+                <td>Discreto (canto inferior direito)</td>
+                <td>Tela cheia (100% largura e altura)</td>
+              </tr>
+              <tr>
+                <td><strong>Melhor Utilização</strong></td>
+                <td>Portal da Prefeitura, Notícias, IPTU Online, Carta de Serviços</td>
+                <td>Aplicativos de celular (Android/iOS), Totens físicos, Página de Ouvidoria</td>
+              </tr>
+              <tr>
+                <td><strong>Complexidade de Instalação</strong></td>
+                <td>Extremamente simples (1 tag de script)</td>
+                <td>Link direto ou WebView nativa</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script de Controle das Abas e Copia de Codigo -->
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      if (tabName === 'widget') {
+        document.getElementById('tab-widget').classList.add('active');
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      } else {
+        document.getElementById('tab-fullpage').classList.add('active');
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      }
+    }
+
+    function copyCode(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const code = el.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Código copiado para a área de transferência!');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('Código copiado para a área de transferência!');
+      });
+    }
+  </script>
+
+  <!-- Integracao do Widget da Duque IA para Teste Real no Rodape -->
+  <script
+    src="/widget.js"
+    data-position="bottom-right"
+    data-theme="prefeitura"
+    data-title="Duque IA"
+    data-char="boas_vindas"
+    data-allowed-origins="http://localhost:3000">
+  </script>
+
+</body>
+</html>

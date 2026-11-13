@@ -311,3 +311,4 @@ location /duqueia/embed {
 - O badge só aparece quando o painel está **fechado** e chega um evento `duque:message_received`
 - Verifique se o iframe está emitindo o evento (painel de debug)
 - Confirme que a origem do iframe está em `data-allowed-origins`
+

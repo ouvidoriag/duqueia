@@ -122,6 +122,19 @@ function isRateLimited(ip) {
   return false;
 }
 
+// Limpeza periódica automática do Rate Limiter para prevenir vazamento de memória (Memory Leak)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of ipRateLimitMap.entries()) {
+    const valid = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+    if (valid.length === 0) {
+      ipRateLimitMap.delete(ip);
+    } else {
+      ipRateLimitMap.set(ip, valid);
+    }
+  }
+}, 5 * 60 * 1000).unref();
+
 // ── Governança e Limpeza Periódica de Arquivos Temporários de Áudio ───────────
 const AUDIO_CLEANUP_INTERVAL_MS = 15 * 60 * 1000; // a cada 15 minutos
 const MAX_AUDIO_AGE_MS = 60 * 60 * 1000;          // expurgo de áudios com mais de 1 hora
@@ -390,8 +403,8 @@ function sendMessageToAgent(sessionId, message) {
 const server = http.createServer((req, res) => {
   // ── CORS ────────────────────────────────────────────────────────────────
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Session-Id, x-api-key, x-hub-signature-256, x-signature');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -423,14 +436,43 @@ const server = http.createServer((req, res) => {
     }
   }
 
-  // ── Health Check ────────────────────────────────────────────────────────
+  // ── Health Check Avançado com Diagnóstico de Infraestrutura ────────────
   if ((req.url === '/health' || req.url.endsWith('/health')) && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    const mem = process.memoryUsage();
+    const dbPaths = {
+      main: path.join(__dirname, 'data', 'db', 'main.db'),
+      vector: path.join(__dirname, 'data', 'db', 'vector.db'),
+      cache: path.join(__dirname, 'data', 'db', 'cache.db'),
+      telemetry: path.join(__dirname, 'data', 'db', 'telemetry.db'),
+    };
+
+    const dbsStatus = {};
+    for (const [name, p] of Object.entries(dbPaths)) {
+      try {
+        dbsStatus[name] = fs.existsSync(p) ? 'online' : 'missing';
+      } catch (_) {
+        dbsStatus[name] = 'error';
+      }
+    }
+
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end(JSON.stringify({
       status: 'ok',
-      workers: workerPool.length,
-      busyWorkers: workerPool.filter(w => w.busy).length,
-      queueLength: requestQueue.length
+      service: 'Duque IA Backend',
+      version: '2.0.0',
+      uptime_seconds: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+      memory: {
+        rss_mb: Math.round((mem.rss / 1024 / 1024) * 10) / 10,
+        heap_used_mb: Math.round((mem.heapUsed / 1024 / 1024) * 10) / 10,
+        heap_total_mb: Math.round((mem.heapTotal / 1024 / 1024) * 10) / 10
+      },
+      workers: {
+        total: workerPool.length,
+        busy: workerPool.filter(w => w.busy).length,
+        queue_length: requestQueue.length
+      },
+      databases: dbsStatus
     }));
     return;
   }
@@ -465,7 +507,19 @@ const server = http.createServer((req, res) => {
   // ── Webhook Receptor GSE / OGM (Sincronização Automática com HMAC) ───────────
   if ((req.url === '/api/webhook/gse' || req.url.endsWith('/api/webhook/gse')) && req.method === 'POST') {
     let rawBody = '';
-    req.on('data', chunk => { rawBody += chunk.toString('utf-8'); });
+    let rawBodyLength = 0;
+    const MAX_WEBHOOK_PAYLOAD = 10 * 1024 * 1024; // 10MB máximo
+
+    req.on('data', chunk => {
+      rawBodyLength += chunk.length;
+      if (rawBodyLength > MAX_WEBHOOK_PAYLOAD) {
+        res.writeHead(413, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Payload de webhook excede o limite máximo permitido (10MB).' }));
+        req.destroy();
+        return;
+      }
+      rawBody += chunk.toString('utf-8');
+    });
     req.on('end', () => {
       const signature = req.headers['x-hub-signature-256'] || req.headers['x-signature'] || req.headers['x-hub-signature'];
 
@@ -696,7 +750,19 @@ const server = http.createServer((req, res) => {
       return;
     }
     let body = '';
-    req.on('data', chunk => { body += chunk.toString('utf-8'); });
+    let bodyLength = 0;
+    const MAX_CHAT_PAYLOAD = 15 * 1024 * 1024; // 15MB máximo (para suporte a áudio gravado em base64 sem estourar heap)
+
+    req.on('data', chunk => {
+      bodyLength += chunk.length;
+      if (bodyLength > MAX_CHAT_PAYLOAD) {
+        res.writeHead(413, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Payload excede o limite máximo permitido (15MB).' }));
+        req.destroy();
+        return;
+      }
+      body += chunk.toString('utf-8');
+    });
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body);

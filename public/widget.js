@@ -8,15 +8,31 @@
   'use strict';
 
   // ── Localiza a própria tag <script> ─────────────────────────────────────────
+  // IMPORTANTE: document.currentScript é null em scripts com `defer` ou `async`.
+  // Estratégia: busca pelo src que contém "widget.js", depois pelo data-title,
+  // depois pelo último <script> como último recurso.
   var currentScript = (function () {
     if (document.currentScript) return document.currentScript;
-    // Fallback para IE11 / módulos assíncronos
     var scripts = document.getElementsByTagName('script');
+    // 1ª tentativa: script cujo src contém "widget.js"
+    for (var i = scripts.length - 1; i >= 0; i--) {
+      if (scripts[i].src && scripts[i].src.indexOf('widget.js') !== -1) {
+        return scripts[i];
+      }
+    }
+    // 2ª tentativa: script com data-title (atributo único do widget)
+    for (var j = scripts.length - 1; j >= 0; j--) {
+      if (scripts[j].hasAttribute('data-title') || scripts[j].hasAttribute('data-position')) {
+        return scripts[j];
+      }
+    }
+    // 3ª tentativa: último script da página
     return scripts[scripts.length - 1];
   })();
 
   // ── Lê atributos de configuração da tag <script> ────────────────────────────
   function attr(name, fallback) {
+    if (!currentScript) return fallback;
     var val = currentScript.getAttribute('data-' + name);
     return (val !== null && val !== undefined && val !== '') ? val : fallback;
   }
@@ -24,9 +40,9 @@
   // Resolve a origem (origin) a partir da URL do script
   function resolveScriptOrigin() {
     try {
-      var src = currentScript.src || '';
+      var src = (currentScript && currentScript.src) ? currentScript.src : '';
       if (!src) return global.location.origin;
-      var url = new URL(src);
+      var url = new URL(src, global.location.href);
       return url.origin;
     } catch (e) {
       return global.location.origin;
@@ -36,7 +52,7 @@
   // Resolve base path do widget (remove /widget.js do final)
   function resolveBasePath() {
     try {
-      var src = currentScript.src || '';
+      var src = (currentScript && currentScript.src) ? currentScript.src : '';
       if (!src) return '';
       return src.replace(/\/widget\.js(\?.*)?$/, '');
     } catch (e) {
@@ -355,3 +371,4 @@
   };
 
 })(window);
+
