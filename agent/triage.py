@@ -94,6 +94,18 @@ AMBIGUITY_FAST_PATTERNS = [
         r"\b(?:qual|onde\s+fica|qual\s+é|onde\s+tem)\s+(?:a|o)?\s*(?:creche|posto\s+de\s+saúde|posto\s+de\s+saude|escola|ubs|cras)\s+(?:mais\s+próxim[ao]|mais\s+perto)\b(?!.*(?:bairro|rua|centro|xerém|xerem|saracuruna|imparti|pantanal|manoa|25\s+de\s+agosto|figueira))",
         "AMBIGUO_LOCALIZACAO",
         "Solicitação de proximidade de unidade sem informação de bairro ou rua."
+    ),
+    # Dúvida ou esclarecimento sobre poste (distinção entre lâmpada vs estrutura física vs risco elétrico)
+    (
+        r"\b(?:problema\s+(?:é|e)\s+(?:no|o|do)?\s*poste|n[ãa]o\s+[ée]\s+(?:a\s+)?l[âa]mpada|poste\s+(?:est[áa]|t[áa])\s+(?:quebrado|danificado|inclinado|torto|ca[íi]do)|fios?\s+(?:ca[íi]dos?|soltos?|partidos?|expostos?)\s+(?:no|do)?\s*poste)\b",
+        "AMBIGUO_POSTE",
+        "Dúvida ou relato sobre poste necessitando esclarecimento entre lâmpada (Prefeitura), estrutura física ou risco elétrico/fiação (Light/Defesa Civil)."
+    ),
+    # Consulta sobre itinerários/linhas de ônibus municipais onde o cidadão não informa o bairro
+    (
+        r"\b(?:itiner[aá]rios?|hor[aá]rios?|linhas?|quais\s+[oô]nibus)\b.*\b(?:meu\s+bairro|minha\s+rua|minha\s+regi[aã]o|aqui\s+no\s+bairro|por\s+aqui|meu\s+ponto)\b",
+        "CLARIFICA_BAIRRO_TRANSPORTE",
+        "Consulta sobre itinerários e linhas de ônibus municipais sem especificação do bairro."
     )
 ]
 
@@ -200,7 +212,27 @@ INDEPENDENT_QUESTION_PREFIXES = [
     "posso confiar", "como você funciona", "como voce funciona"
 ]
 
-def check_fast_gate(query: str, history: list = None) -> dict | None:
+_EXPLICIT_SWITCH_TOPICS = [
+    "iptu", "segunda via", "2ª via", "vacina", "matrícula", "matricula",
+    "hospital", "upa", "creche", "escola", "alvará", "alvara", "abrir empresa",
+    "ambulante", "veterinário", "veterinario", "hmv", "horário", "horario",
+    "onde fica", "onde tem", "qual o telefone", "qual o endereço da secretaria",
+]
+
+
+def is_explicit_topic_switch(query: str) -> bool:
+    """Identifica se o usuário está mudando explicitamente de assunto para outro serviço."""
+    q = (query or "").lower().strip()
+    if any(sig in q for sig in INTENT_CHANGE_SIGNALS):
+        return True
+    if any(t in q for t in _EXPLICIT_SWITCH_TOPICS):
+        return True
+    if any(q.startswith(p) for p in ("quero saber", "gostaria de saber", "como faço para", "como faco para", "qual o horário", "qual o horario")):
+        return True
+    return False
+
+
+def check_fast_gate(query: str, history: list = None, manifestation_state: dict = None) -> dict | None:
     """Valida a query usando regras locais de baixíssima latência (0ms)."""
     query_lower = query.lower().strip()
     
@@ -266,11 +298,17 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         has_prior_manifestation = any(
             w in t.lower()
             for t in history
-            for w in ["zeladoria urbana", "solicito vistoria", "abrir solicitação no colab", "qual é a rua e o bairro", "qual problema ou assunto"]
+            for w in [
+                "zeladoria urbana", "solicito vistoria", "abrir solicitação no colab",
+                "qual é a rua e o bairro", "qual problema ou assunto", "qual é o **bairro**",
+                "qual é o bairro", "quer que eu já prepare", "posso montar a orientação"
+            ]
         )
         if has_prior_manifestation and any(p in query_lower for p in [
-            "fica na ", "fica no ", "o bairro é", "o bairro e", "bairro é", "bairro e",
+            "fica na ", "fica no ", "é na ", "e na ", "é no ", "e no ",
+            "o bairro é", "o bairro e", "bairro é", "bairro e", "no bairro ",
             "prepara o texto", "texto certinho", "qual endereço você", "qual endereco voce",
+            "me ajuda a fazer", "ajuda a fazer",
             "outra reclamação", "outra reclamacao", "nova reclamação", "nova reclamacao",
             "começar outra", "comecar outra", "sobre iluminação", "sobre iluminacao"
         ]):
@@ -407,13 +445,46 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
                         "source": "FAST_GATE"
                     }
 
-            # Desambiguação de Iluminação Pública vs Residencial
+            # Continuidade de Transporte: Munícipe responde o bairro após solicitação de esclarecimento
+            is_bus_bairro_context = any(w in last_assistant_turn for w in [
+                "qual é o seu bairro", "qual e o seu bairro", "clarifica_bairro_transporte",
+                "linhas municipais atendem a sua região", "nome do bairro posso verificar"
+            ])
+            if is_bus_bairro_context:
+                bairro_clean = query.strip().title()
+                return {
+                    "intent": "RAG_GERAL",
+                    "confidence": 1.0,
+                    "needs_clarification": False,
+                    "reason": f"Continuidade de transporte coletivo: bairro '{bairro_clean}' informado pelo munícipe.",
+                    "rewritten_query": f"Linhas e itinerários de ônibus municipais que atendem o bairro {bairro_clean} Duque de Caxias",
+                    "source": "FAST_GATE"
+                }
+
+            # Desambiguação de Iluminação Pública vs Residencial vs Estrutura do Poste
             is_light_context = any(w in last_assistant_turn for w in [
                 "falta de energia elétrica dentro da sua residência", "iluminação pública (como um poste",
-                "poste ou lâmpada", "ambiguo_luz", "poste apagado", "lâmpada queimada"
+                "poste ou lâmpada", "ambiguo_luz", "poste apagado", "lâmpada queimada", "iluminação pública"
             ])
             if is_light_context:
-                if any(w in query_lower for w in ["poste", "rua", "fora", "apagado", "apagada", "quebrada", "pública", "publica", "na rua"]):
+                # Se o munícipe esclarece que o problema é no poste em si ou nega a lâmpada
+                is_pole_structure_or_hazard = any(p in query_lower for p in [
+                    "problema é no poste", "problema e no poste", "problema é o poste", "problema e o poste",
+                    "não é a lâmpada", "nao e a lampada", "não é só a lâmpada", "nao e so a lampada",
+                    "poste danificado", "poste quebrado", "poste caído", "poste caido", "poste inclinado", 
+                    "poste torto", "fio caído", "fio caido", "fiação", "fiacao", "fios caídos", "fios caidos", 
+                    "fios soltos", "fio solto", "faísca", "faisca", "curto circuito", "curto-circuito"
+                ])
+                if is_pole_structure_or_hazard:
+                    return {
+                        "intent": "AMBIGUO_POSTE",
+                        "confidence": 1.0,
+                        "needs_clarification": True,
+                        "sub_intent": "poste_estrutura_ou_lampada",
+                        "reason": "Munícipe esclarece que a falha é na estrutura do poste ou rede elétrica, e não na lâmpada.",
+                        "source": "FAST_GATE"
+                    }
+                elif any(w in query_lower for w in ["poste", "rua", "fora", "apagado", "apagada", "quebrada", "pública", "publica", "na rua"]):
                     return {
                         "intent": "RAG_GERAL",
                         "confidence": 1.0,
@@ -774,7 +845,7 @@ def _add_routing_metadata(triage_res: dict) -> dict:
         triage_res["next_agent"] = "AUTHORITY_HANDLER"
         triage_res["workflow"] = "RAG"
         triage_res["clarification_type"] = None
-    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO", "AMBIGUO_LOCALIZACAO"]:
+    elif intent in ["AMBIGUO_LUZ", "AMBIGUO_LAMPADA", "AMBIGUO_BARULHO", "AMBIGUO_LOCALIZACAO", "AMBIGUO_POSTE", "CLARIFICA_BAIRRO_TRANSPORTE"]:
         triage_res["next_agent"] = "AMBIGUITY_HANDLER"
         triage_res["workflow"] = "AMBIGUITY_RESOLVER"
         triage_res["clarification_type"] = "AMBIGUITY" if needs_clarification else None

@@ -251,6 +251,40 @@ class ConversationHandler(BaseHandler):
 
 class CollectorHandler(BaseHandler):
     """Trata fluxos de Ouvidoria (reclamação, denúncia, sugestão, elogio) e triagem incremental."""
+
+    @staticmethod
+    def _extract_semantic_fields(q_raw: str, state: dict, gemini_client) -> dict:
+        """Extrai semanticamente problema, logradouro e bairro sem confundir gírias ou menções genéricas à rua."""
+        try:
+            prompt = (
+                "Analise a mensagem do cidadão de Duque de Caxias (português informal brasileiro, incluindo gírias como 'cntg'=contigo, 'tá osso'=está difícil).\n"
+                f"Estado atual da coleta: problema={state.get('problema')!r}, localizacao={state.get('localizacao')!r}, awaiting_field={state.get('awaiting_field')!r}.\n"
+                f"Mensagem: {q_raw!r}\n\n"
+                "Regras estritas:\n"
+                "- 'logradouro': SOMENTE nome real de rua, avenida, estrada, travessa, praça ou ponto de referência específico (ex: 'Rua das Flores', 'Av. Kennedy'). "
+                "NUNCA extraia expressões genéricas ou informais como 'minha rua', 'minha rua cntg', 'essa rua', 'aqui perto de casa', 'na rua'. Use null nesses casos.\n"
+                "- 'bairro': SOMENTE nome de bairro real (ex: 'Centro', 'Jardim Primavera'). Use null se não houver.\n"
+                "- 'problema_canonico': se houver problema concreto, normalize para um rótulo limpo: "
+                "'buraco na via pública', 'problema de iluminação pública', 'limpeza urbana / acúmulo de resíduos', "
+                "'problema de drenagem / bueiro', 'poda de árvore', 'obstrução ou reparo de calçada', 'abastecimento de água', ou null.\n"
+                "- 'via_publica': true se citar rua/via/avenida/praça, senão false.\n"
+                "Responda APENAS JSON válido: "
+                '{"problema_canonico": null, "logradouro": null, "bairro": null, "via_publica": false}'
+            )
+            raw = gemini_client.generate_content(
+                prompt=prompt,
+                model_name="gemini-3.1-flash-lite",
+                temperature=0.0,
+                max_output_tokens=150,
+            )
+            if not raw:
+                return {}
+            cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
+            parsed = json.loads(cleaned)
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception:
+            return {}
+
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
         elapsed = time.time() - start_time
         intent = triage_info.get("intent")
@@ -336,6 +370,8 @@ class CollectorHandler(BaseHandler):
         state = agent.get_manifestation_state(conversation_id) if hasattr(agent, "get_manifestation_state") else {
             "active": False, "awaiting_field": None, "tipo": "geral", "problema": None, "localizacao": None, "via_publica": False
         }
+        prev_active = bool(state.get("active"))
+        prev_awaiting = state.get("awaiting_field")
         if tipo and tipo != "geral":
             state["tipo"] = tipo
 
@@ -397,6 +433,10 @@ class CollectorHandler(BaseHandler):
             r"(?:eu\s+)?(?:quero|queria|gostaria\s+de|preciso|vou)\s+(?:abrir|fazer|registrar|iniciar)\s+(?:uma\s+|um\s+)?(?:manifestação|manifestacao|reclamação|reclamacao|denúncia|denuncia|sugestão|sugestao|elogio|chamado)\.?!?",
             q_low,
         ))
+        is_help_request = any(p in q_low for p in [
+            "me ajuda a fazer", "ajuda a fazer", "prepara o texto", "texto certinho",
+            "como faço a solicitação", "como faco a solicitacao"
+        ])
         op_prefix = (
             "Não consigo registrar o protocolo diretamente no sistema — o envio oficial é feito por você no aplicativo **Colab**, "
             "mas posso deixar a categoria e o texto prontos para você enviar.\n\n"
@@ -404,32 +444,63 @@ class CollectorHandler(BaseHandler):
         )
 
         # Se for apenas abertura de intenção ("Queria abrir uma manifestação"), NÃO extrai problema nem endereço
-        if not is_intent_opening and not is_resume_request:
+        if not is_intent_opening and not is_resume_request and not is_help_request:
             # Detecta menção genérica à via pública ("era sobre rua") sem especificar o problema
             if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
+                state["via_publica"] = True
+
+            # Extração semântica via LLM (flash-lite) para linguagem informal/coloquial
+            sem_data = {}
+            if (
+                getattr(agent, "using_real", False)
+                and getattr(agent, "gemini_client", None)
+                and len(q_raw.split()) >= 3
+                and not is_op_question
+                and not is_category_question
+            ):
+                sem_data = self._extract_semantic_fields(q_raw, state, agent.gemini_client)
+
+            if sem_data.get("via_publica"):
                 state["via_publica"] = True
 
             # Detecta localização explícita (ex: "Rua A", "Fica na Rua das Flores, no Centro", "Rua das Acácias, não na Rua das Flores")
             q_loc_scan = re.split(r",?\s+n[ãa]o\s+(?:na|no|em)\s+", q_raw, maxsplit=1, flags=re.IGNORECASE)[0]
             loc_match = re.search(
-                r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+(?!da\s+minha|minha|sua|esta|essa\b)[^\n?!.;]+)",
+                r"(?<!\bminha\s)(?<!\bsua\s)(?<!\bessa\s)(?<!\besta\s)(?<!\bnossa\s)\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+(?!da\s+minha|minha|sua|esta|essa|aqui|tá|ta|está|cheia|cheio|sem|com|toda|todo|muito|cntg\b)[^\n?!.;]+)",
                 q_loc_scan,
                 re.IGNORECASE,
             )
             bairro_match = re.search(
-                r"\b(?:bairro\s+(?:é|e)?\s*)([A-ZÀ-Ú][^\n?!.;,]+)",
+                r"\b(?:bairro\s+(?:é|e)?\s*)([A-ZÀ-Úa-zà-ú][^\n?!.;,]+)",
                 q_raw,
                 re.IGNORECASE,
             ) if "bairro" in q_low else None
 
+            sem_logradouro = sem_data.get("logradouro")
+            sem_bairro = sem_data.get("bairro")
+            if sem_data and not sem_logradouro and not sem_bairro:
+                # Semântica confirmou ausência de local real (ex: "minha rua cntg", "aqui perto de casa")
+                loc_match = None
+                bairro_match = None
+
             is_invalid_loc = any(w in q_low for w in [
-                "sobre rua", "minha rua",
+                "sobre rua", "minha rua", "aqui perto", "perto de casa",
                 "manifestação", "manifestacao", "reclamação", "reclamacao",
-                "conversar", "faz oq", "você", "voce"
+                "conversar", "faz oq", "você", "voce", "tô com problema", "to com problema"
             ])
-            if loc_match and not is_invalid_loc and "?" not in q_raw:
+            if sem_logradouro and sem_bairro:
+                state["localizacao"] = f"{sem_logradouro}, {sem_bairro}"
+            elif sem_logradouro:
+                state["localizacao"] = sem_logradouro
+            elif sem_bairro:
+                if state.get("localizacao"):
+                    rua_base = state["localizacao"].split(",")[0].strip()
+                    state["localizacao"] = f"{rua_base}, {sem_bairro}"
+                else:
+                    state["localizacao"] = sem_bairro
+            elif loc_match and not is_invalid_loc and "?" not in q_raw:
                 state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
-            elif bairro_match and "?" not in q_raw:
+            elif bairro_match and not is_invalid_loc and "?" not in q_raw:
                 novo_bairro = re.sub(r"^(?:é|e)\s+", "", bairro_match.group(1).strip(), flags=re.IGNORECASE).rstrip(".,!?")
                 if state.get("localizacao"):
                     rua_base = state["localizacao"].split(",")[0].strip()
@@ -438,35 +509,42 @@ class CollectorHandler(BaseHandler):
                     state["localizacao"] = novo_bairro
             elif (
                 state.get("active")
-                and state.get("awaiting_field") == "localizacao"
-                and not state.get("localizacao")
+                and state.get("awaiting_field") in ("localizacao", "bairro")
+                and not sem_data
                 and not is_op_question
                 and not is_category_question
                 and "?" not in q_raw
                 and not is_invalid_loc
-                and not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"])
+                and not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda", "queria", "falar", "aqui", "cntg"])
                 and len(q_raw) >= 3
             ):
-                state["localizacao"] = q_raw.rstrip(".,!?")
+                if state.get("awaiting_field") == "bairro" and state.get("localizacao"):
+                    rua_base = state["localizacao"].split(",")[0].strip()
+                    state["localizacao"] = f"{rua_base}, {q_raw.rstrip('.,!?')}"
+                elif not state.get("localizacao"):
+                    state["localizacao"] = q_raw.rstrip(".,!?")
 
             # Normaliza problema concreto em formato estruturado limpo (não armazena frase solta de saudação/preâmbulo)
-            _CANONICAL_PROBLEMS = [
-                (("buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao"), "buraco na via pública"),
-                (("lâmpada", "lampada", "poste", "iluminação", "iluminacao"), "problema de iluminação pública"),
-                (("lixo", "entulho", "capina", "roçagem", "rocagem", "mato"), "limpeza urbana / acúmulo de resíduos"),
-                (("bueiro", "drenagem", "esgoto", "alagamento", "enchente"), "problema de drenagem / bueiro"),
-                (("árvore", "arvore", "poda"), "poda de árvore"),
-                (("calçada", "calcada"), "obstrução ou reparo de calçada"),
-                (("barulho", "som alto"), "perturbação do sossego / poluição sonora"),
-                (("mau atendimento", "atendimento", "servidor"), "atendimento de serviço público"),
-                (("médico", "medico", "remédio", "remedio", "medicamento"), "atendimento de saúde / medicamento"),
-                (("água", "agua"), "abastecimento de água"),
-                (("escola", "creche"), "educação / unidade escolar"),
-            ]
-            for keys, canonical_label in _CANONICAL_PROBLEMS:
-                if any(pk in q_low for pk in keys):
-                    state["problema"] = canonical_label
-                    break
+            if sem_data.get("problema_canonico"):
+                state["problema"] = sem_data["problema_canonico"]
+            else:
+                _CANONICAL_PROBLEMS = [
+                    (("buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao"), "buraco na via pública"),
+                    (("lâmpada", "lampada", "poste", "iluminação", "iluminacao"), "problema de iluminação pública"),
+                    (("lixo", "entulho", "capina", "roçagem", "rocagem", "mato"), "limpeza urbana / acúmulo de resíduos"),
+                    (("bueiro", "drenagem", "esgoto", "alagamento", "enchente"), "problema de drenagem / bueiro"),
+                    (("árvore", "arvore", "poda"), "poda de árvore"),
+                    (("calçada", "calcada"), "obstrução ou reparo de calçada"),
+                    (("barulho", "som alto"), "perturbação do sossego / poluição sonora"),
+                    (("mau atendimento", "atendimento", "servidor"), "atendimento de serviço público"),
+                    (("médico", "medico", "remédio", "remedio", "medicamento"), "atendimento de saúde / medicamento"),
+                    (("água", "agua"), "abastecimento de água"),
+                    (("escola", "creche"), "educação / unidade escolar"),
+                ]
+                for keys, canonical_label in _CANONICAL_PROBLEMS:
+                    if any(pk in q_low for pk in keys):
+                        state["problema"] = canonical_label
+                        break
 
         if hasattr(agent, "update_manifestation_state"):
             agent.update_manifestation_state(conversation_id, reset=is_new_complaint, **state)
@@ -479,7 +557,7 @@ class CollectorHandler(BaseHandler):
             if local_atual:
                 answer = f"{op_prefix}Qual é o problema que você deseja relatar em **{local_atual}** (ex: buraco no asfalto, poste apagado, lixo ou bueiro)?"
             elif state.get("via_publica"):
-                answer = f"{op_prefix}Qual é o problema na rua que você deseja relatar (ex: buraco no asfalto, iluminação, lixo ou drenagem)?"
+                answer = f"{op_prefix}Ah, entendi! Sua rua está com algum problema? Me conta o que está acontecendo por lá (ex: buraco no asfalto, iluminação, lixo ou drenagem)."
             else:
                 answer = f"{op_prefix}Qual problema ou assunto você deseja relatar?"
             if hasattr(agent, "update_manifestation_state"):
@@ -510,6 +588,66 @@ class CollectorHandler(BaseHandler):
                 "answer": answer,
                 "sources": [],
                 "confidence": triage_info.get("confidence", 0.9),
+                "intent_detected": f"ouvidoria_{tipo}",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(effective_query)
+                }
+            }
+
+        # Passo 2b: cidadão informou apenas o logradouro quando perguntado pela localização -> pede o bairro
+        if (
+            needs_loc
+            and local_atual
+            and "," not in local_atual
+            and prev_active
+            and prev_awaiting == "localizacao"
+            and not is_category_question
+            and not is_help_request
+            and not is_op_question
+        ):
+            answer = f"{op_prefix}Certo, anotei **{local_atual}**. Qual é o **bairro**?"
+            if hasattr(agent, "update_manifestation_state"):
+                agent.update_manifestation_state(conversation_id, active=True, awaiting_field="bairro")
+            return {
+                "answer": answer,
+                "sources": [],
+                "confidence": 0.92,
+                "intent_detected": f"ouvidoria_{tipo}",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(effective_query)
+                }
+            }
+
+        # Passo 2c: cidadão acabou de informar o bairro após o logradouro -> confirma e oferece texto pronto
+        if (
+            needs_loc
+            and local_atual
+            and prev_active
+            and prev_awaiting == "bairro"
+            and not is_category_question
+            and not is_help_request
+            and not is_op_question
+        ):
+            answer = (
+                f"{op_prefix}Perfeito, anotei **{local_atual}** para **{problema_atual}**.\n\n"
+                f"Quer que eu já prepare a categoria e o texto pronto para você registrar a solicitação no **Colab**?"
+            )
+            if hasattr(agent, "update_manifestation_state"):
+                agent.update_manifestation_state(conversation_id, active=True, awaiting_field="confirmacao_colab")
+            return {
+                "answer": answer,
+                "sources": [],
+                "confidence": 0.94,
                 "intent_detected": f"ouvidoria_{tipo}",
                 "triage_info": triage_info,
                 "metrics": {
@@ -729,7 +867,14 @@ class AmbiguityHandler(BaseHandler):
                 "5. Formate informações importantes em **negrito** (telefones, links, temas) com lista limpa, sem misturar `*` com numeração.\n"
                 "6. A Ouvidoria Geral NÃO possui WhatsApp (NUNCA cite WhatsApp ou o número 99824-5903). Canais da Ouvidoria: **(21) 2652-3835**, **ouvidoria@duquedecaxias.rj.gov.br** e **Colab**.\n"
                 "7. NUNCA use saudações repetitivas (como 'Olá', 'Oi') se o diálogo já estiver em andamento. Vá direto ao ponto de forma calorosa.\n"
-                "8. Mantenha a resposta conversacional, curta e objetiva (máximo 3 a 4 frases)."
+                "8. Mantenha a resposta conversacional, curta e objetiva (máximo 3 a 4 frases).\n"
+                "9. Se o assunto for poste vs lâmpada vs estrutura física (AMBIGUO_POSTE) ou quando o cidadão disser 'o problema é no poste' / 'não é a lâmpada':\n"
+                "   - Perceba a distinção entre a lâmpada e a estrutura/fiação do poste. Esclareça de forma humana perguntando se o problema é só a lâmpada que não acende ou se o próprio poste está danificado, inclinado ou com fios soltos/expostos, pois o atendimento é diferente:\n"
+                "     * **Lâmpada apagada/queimada:** Iluminação Pública da Prefeitura pelo aplicativo **Colab** (`duquedecaxias.colab.re`);\n"
+                "     * **Poste danificado, quebrado ou inclinado com risco de queda:** Concessionária **Light** (**0800 021 0196**) para substituição e **Defesa Civil pelo 199** se houver risco de desabamento ou acidente;\n"
+                "     * **Fios caídos, soltos ou faíscas:** Risco grave de choque elétrico! Instrua expressamente a **manter distância segura** e acionar a **Light Emergência (0800 021 0196)** e a **Defesa Civil (199)**.\n"
+                "10. Se o assunto for itinerários/linhas de ônibus sem especificação do bairro (CLARIFICA_BAIRRO_TRANSPORTE):\n"
+                "   - Pergunte diretamente e com simpatia qual é o bairro do munícipe (ex: 'Claro! Qual é o seu bairro? Com o nome do bairro posso verificar quais linhas municipais atendem a sua região e buscar os trajetos e horários disponíveis.'). NUNCA comece dizendo que não tem horários em tempo real e NUNCA encaminhe para a Ouvidoria Geral."
             )
             
             if history:
@@ -839,6 +984,18 @@ class AmbiguityHandler(BaseHandler):
             answer = (
                 "Para eu te indicar a **unidade ou creche mais próxima de você**, por favor me informe o seu **Bairro** e a sua **Rua**.\n\n"
                 "Com a sua localização exata, poderei verificar o equipamento público municipal mais conveniente!"
+            )
+        elif intent == "AMBIGUO_POSTE":
+            answer = (
+                "Entendi! O problema é só a lâmpada que não acende ou o próprio poste está danificado, inclinado ou com fios soltos/expostos?\n\n"
+                "Pergunto porque o atendimento depende da situação:\n"
+                "• **Se for apenas a lâmpada queimada:** O serviço é de Iluminação Pública da Prefeitura, solicitado facilmente pelo aplicativo **Colab** (`duquedecaxias.colab.re`).\n"
+                "• **Se o poste estiver quebrado, danificado ou com risco de queda:** A substituição cabe à concessionária **Light** (**0800 021 0196**). Se houver risco iminente de desabamento, acione a **Defesa Civil pelo 199**.\n"
+                "• **Se houver fios partidos ou faíscas:** Mantenha distância segura por risco de choque e ligue imediatamente para a **Light** e a **Defesa Civil (199)**."
+            )
+        elif intent == "CLARIFICA_BAIRRO_TRANSPORTE":
+            answer = (
+                "Claro! Qual é o seu bairro? Com o nome do bairro posso verificar quais linhas municipais atendem a sua região e buscar as informações disponíveis sobre trajetos e itinerários."
             )
         else:
             answer = (
@@ -1016,6 +1173,11 @@ def _build_rag_system_instruction(effective_query: str, context_str: str, histor
     ]
 
     domain_rules = []
+
+    if any(k in haystack for k in ("ônibus", "onibus", "itinerário", "itinerario", "tarifa zero", "linha", "linhas", "transporte", "van", "vans")):
+        domain_rules.append(
+            "- **Linhas e Itinerários de Ônibus / Transporte Coletivo**: Diferencie com clareza **itinerários e linhas regulares** de **localização por GPS em tempo real**. NUNCA comece dizendo de forma negativa que 'não tem acesso a horários em tempo real' ou empurrando o munícipe diretamente para a Ouvidoria Geral. Apresente as linhas municipais e trajetos conhecidos no contexto e oriente o contato com a **Secretaria Municipal de Transportes e Serviços Públicos (SMTSP)** e empresas operadoras para confirmação de tabelas horárias vigentes."
+        )
 
     if any(k in haystack for k in ("emprego", "vaga", "sine", "concurso", "edital", "processo seletivo", "fundec", "curso", "trabalho")):
         domain_rules.append(

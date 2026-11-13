@@ -159,7 +159,12 @@ def node_fast_gate(state: AgentState, ctx: GraphContext) -> AgentState:
     """Camada 0: verifica regras de segurança locais sem LLM."""
     from agent.triage import check_fast_gate, _add_routing_metadata
 
-    result = check_fast_gate(state.query, history=state.history)
+    m_state = (
+        ctx.agent.get_manifestation_state(state.conversation_id)
+        if ctx.agent and hasattr(ctx.agent, "get_manifestation_state")
+        else None
+    )
+    result = check_fast_gate(state.query, history=state.history, manifestation_state=m_state)
     if result:
         triage = _add_routing_metadata(result)
         next_node = triage.get("next_agent", "RAG_HANDLER")
@@ -238,6 +243,22 @@ def node_tool_router(state: AgentState, ctx: GraphContext) -> AgentState:
         
         # Agora sim segue para o handler que a triagem originalmente definiu
         next_node = new_triage.get("next_agent", "RAG_HANDLER")
+
+        # Continuidade de estado ativo: se há coleta em andamento e a triagem caiu em RAG/AMBIGUITY
+        # sem mudança explícita de assunto, mantém no COLLECTOR_HANDLER
+        m_state = (
+            ctx.agent.get_manifestation_state(state.conversation_id)
+            if ctx.agent and hasattr(ctx.agent, "get_manifestation_state")
+            else None
+        )
+        if m_state and m_state.get("active") and next_node in ("RAG_HANDLER", "AMBIGUITY_HANDLER"):
+            from agent.triage import is_explicit_topic_switch
+            if not is_explicit_topic_switch(state.query):
+                new_triage["intent"] = "OUVIDORIA_MANIFESTACAO"
+                new_triage["tipo_manifestacao"] = m_state.get("tipo", "reclamacao")
+                new_triage["next_agent"] = "COLLECTOR_HANDLER"
+                next_node = "COLLECTOR_HANDLER"
+
         return state.with_update(triage_info=new_triage, next_node=next_node)
     except Exception as e:
         import sys

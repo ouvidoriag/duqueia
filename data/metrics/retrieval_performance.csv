@@ -2043,3 +2043,35 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-13 11:37:00,ate produtos roubados ?,588.40,2963.55,4815.76,1.0000,2143,0.00018910
 2026-11-13 11:37:35,O que você consegue fazer?,1872.24,4777.27,8134.41,0.9500,3282,0.00033030
 2026-11-13 11:37:45,Esquece isso; quero saber sobre IPTU.,873.25,3288.48,5797.56,1.0000,2058,0.00019200
+2026-11-13 11:37:52,Podemos voltar àquele problema da rua?,580.47,3423.36,7128.51,1.0000,2192,0.00021290
+2026-11-13 11:38:23,Quero reclamar de um buraco na minha rua,2288.31,3236.64,6942.55,1.0000,1878,0.00018540
+2026-11-13 11:38:31,Na verdade; deixa isso; quero saber sobre IPTU,843.52,5519.16,7235.54,1.0000,2335,0.00027450
+2026-11-13 11:38:43,Na verdade quero falar de IPTU,499.25,3556.62,5143.02,1.0000,2086,0.00019890
+2026-11-13 11:41:18,minha rua aqui cheio de buraco,2731.07,3717.40,7984.39,1.0000,2250,0.00021280
+2026-11-13 11:43:26,Como faço para alterar a titularidade do IPTU para o meu nome após comprar um imóvel?,639.61,4035.48,4679.30,1.0000,2187,0.00022920
+2026-11-13 11:43:41,Qual é o procedimento para pedir a revisão da metragem ou da área construída no meu carnê de IPTU?,1434.01,4942.86,8625.35,1.0000,2169,0.00022040
+2026-11-13 11:43:53,Onde consigo emitir a segunda via da taxa de expediente ou certidão de quitação fiscal?,550.89,3188.53,4781.30,1.0000,2077,0.00019340
+2026-11-13 11:44:03,Como funciona o atendimento da Central de Atendimentos Funerários (CAF/DC) e onde ela fica?,598.15,3245.97,5294.12,1.0000,2634,0.00022990
+2026-11-13 11:45:28,Meu filho fez 18 anos: como ele faz para se alistar na Junta Militar de Duque de Caxias?,610.37,8677.17,11023.41,1.0000,3004,0.00028270
+2026-11-13 11:45:57,Mulheres podem se voluntariar para o alistamento militar pelo município? Quais documentos levar?,817.51,2791.57,6145.61,0.9783,2989,0.00025920
+2026-11-13 11:46:19,'Tem uma árvore com risco de queda na minha calçada: como peço a poda ou o corte para a Prefeitura?',655.63,5100.21,5766.23,1.0000,1840,0.00020710
+2026-11-13 11:46:34,'Apareceu um enxame de abelhas na minha casa: como aciono a equipe de manejo e resgate de apicultura?',587.68,3677.32,6805.20,1.0000,2504,0.00024520
+2026-11-13 11:46:51,'Preciso de autorização para cortar uma árvore que está dentro do meu terreno particular?',581.47,3976.79,6774.52,0.9783,2184,0.00022490
+2026-11-13 11:47:05,'A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?',832.57,3381.36,4219.32,1.0000,1591,0.00017270
+2026-11-13 11:47:45,mas o problema é n o psote,572.66,3503.15,6181.89,1.0000,1584,0.00017160
+2026-11-13 11:48:04,'Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro?',554.64,3064.85,4580.99,1.0000,2150,0.00019100
+2026-11-13 11:48:10,'Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?',520.96,2328.73,4169.32,0.9467,2500,0.00022620
+2026-11-13 11:48:23,Quero reclamar de um buraco na minha rua,2014.07,3205.40,6692.19,1.0000,1867,0.00018170
+2026-11-13 11:48:29,Na verdade; deixa isso; quero saber sobre IPTU,551.90,4308.83,5930.13,1.0000,2301,0.00026490
+2026-11-13 11:48:40,Na verdade quero falar de IPTU,582.64,3279.76,5412.95,1.0000,2082,0.00019630
+2026-11-13 11:48:58,O que você consegue fazer?,2497.59,5931.13,9969.16,0.9500,3249,0.00032050
+2026-11-13 11:49:07,Esquece isso; quero saber sobre IPTU.,571.98,4025.15,5532.00,1.0000,2248,0.00024900
+2026-11-13 12:02:58,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,1933.97,3670.27,5685.69,0.9467,2440,0.00022780
+2026-11-13 12:08:24,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,2031.74,3531.44,5650.63,0.9452,2034,0.00021330
+2026-11-13 12:12:54,A lâmpada do poste da minha rua está queimada; como faço para trocar?,2007.08,4052.09,6170.64,1.0000,1800,0.00019500
+2026-11-13 12:12:58,Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro?,580.95,3484.84,4069.56,0.9800,846,0.00010800
+2026-11-13 12:13:03,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,550.37,3623.32,4177.51,0.9452,2030,0.00021210
+2026-11-13 12:14:49,A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?,2700.92,3919.19,6741.13,1.0000,1646,0.00018670
+2026-11-13 12:14:52,Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro?,553.95,3213.37,3773.26,1.0000,2160,0.00019500
+2026-11-13 12:14:58,Centro,586.39,3208.18,5026.32,1.0000,2191,0.00020310
+2026-11-13 12:15:02,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,881.57,2934.00,3819.36,0.9467,2421,0.00022210

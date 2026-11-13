@@ -351,9 +351,12 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
             
             for w in search_words:
                 w_norm = ''.join(c for c in unicodedata.normalize('NFKD', w.lower()) if not unicodedata.combining(c))
+                stem = w_norm[:-2] if (len(w_norm) >= 6 and w_norm.endswith(('ar', 'er', 'ir', 'ao', 'es'))) else w_norm
                 if w_norm in s_name_norm:
-                    match_score += 4.0 if w_norm == "buraco" and "buraco" in s_name_norm else 2.0
-                elif desc_norm and w_norm in desc_norm:
+                    match_score += 4.0 if w_norm == "buraco" and "buraco" in s_name_norm else 3.0
+                elif len(stem) >= 5 and stem in s_name_norm:
+                    match_score += 2.5
+                elif desc_norm and (w_norm in desc_norm or (len(stem) >= 5 and stem in desc_norm)):
                     match_score += 2.0 if w_norm == "buraco" and "buraco" in desc_norm else 1.0
                     
             if match_score > 0.0:
@@ -361,6 +364,9 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
                 
         if not matched_services:
             return []
+
+        # Ordena serviços com maior correspondência no topo
+        matched_services.sort(key=lambda m: m[1], reverse=True)
 
         # 2. Batch Prefetch de Tabelas Relacionadas (Eliminação de N+1 Query)
         matching_ids = [m[0][0] for m in matched_services]

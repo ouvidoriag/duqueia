@@ -28,10 +28,24 @@ BOOST_RULES = [
     {
         "name": "education_and_nursery",
         "description": "Boost de matrícula escolar, creche e vagas municipais",
-        "query_terms": ["creche", "escola", "matricula", "matricular", "vaga"],
+        "query_terms": ["creche", "creches", "matricula", "matricular", "vaga escolar", "escola municipal", "ensino fundamental"],
         "source_contains": ["lacunas_dados_resolvidas", "educacao", "escola"],
         "category_match": ["educacao"],
-        "boost": BOOST_WEIGHTS["DOMAIN_MATCH"]
+        "boost": BOOST_WEIGHTS["DOMAIN_MATCH"],
+        "penalty_rules": [
+            {"category": "transportes", "penalty": -0.30}
+        ]
+    },
+    {
+        "name": "transport_and_permits",
+        "description": "Boost para concessões e permissões de transporte (transporte escolar, táxi, ônibus e vistorias)",
+        "query_terms": ["transporte escolar", "transporte por taxi", "transporte por táxi", "onibus", "ônibus", "tarifa zero", "permissao", "permissão", "vistoria anual", "legalizacao", "legalização"],
+        "source_contains": ["transporte", "vw_ia_servicos"],
+        "category_match": ["transporte", "transportes", "servicos_publicos", "carta_servicos"],
+        "boost": 0.40,
+        "penalty_rules": [
+            {"category": "educacao", "penalty": -0.40}
+        ]
     },
     {
         "name": "public_lighting",

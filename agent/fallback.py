@@ -93,22 +93,20 @@ def build_controlled_web_fallback(query: str, gemini_client=None) -> dict:
             pass
 
     # CAMADA < 0.60: INFORMAÇÃO NÃO CONFIRMADA + EXIBIÇÃO TRANSPARENTE DAS FONTES PESQUISADAS
+    sector_guidance = _get_sector_guidance(query)
     unconfirmed_response = (
         "📌 **Pesquisa Inteligente (Informação Não Confirmada)**\n\n"
-        "A informação solicitada não pôde ser totalmente confirmada nos portais públicos e sistemas consultados no momento.\n\n"
-        "Para obter orientação oficial sem riscos de desencontro de dados, fale com a **Ouvidoria Geral de Duque de Caxias**:\n"
-        f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**\n"
-        f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
-        f"• Aplicativo: **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))\n\n"
+        "A informação solicitada não pôde ser totalmente confirmada nos portais públicos e bases oficiais consultadas no momento.\n\n"
+        f"{sector_guidance}\n\n"
         "📚 **Fontes consultadas**\n"
-        "✓ Portal Oficial da Prefeitura\n"
-        "✓ Portal do Contribuinte\n"
-        "✓ Portal da Transparência"
+        "✓ Portal Oficial da Prefeitura de Duque de Caxias\n"
+        "✓ Portal da Transparência e Diário Oficial\n"
+        "✓ Carta de Serviços ao Cidadão"
     )
 
     return {
         "answer": unconfirmed_response,
-        "sources": ["Ouvidoria Geral de Duque de Caxias"],
+        "sources": ["Portal Oficial da Prefeitura de Duque de Caxias"],
         "confidence": 0.55,
         "metrics_triple": {
             "retrieval_confidence": 0.40,
@@ -118,38 +116,76 @@ def build_controlled_web_fallback(query: str, gemini_client=None) -> dict:
         "is_web_fallback": False
     }
 
+def _get_sector_guidance(query: str) -> str:
+    """Identifica o setor municipal competente para orientar o munícipe sem sobrecarregar a Ouvidoria Geral."""
+    q = query.lower()
+
+    if any(k in q for k in ["ônibus", "onibus", "transporte", "itinerário", "itinerario", "linha", "linhas", "tarifa zero", "passe livre", "táxi", "taxi", "van", "vans", "multa", "trânsito", "transito", "vistoria", "permissão", "permissao"]):
+        return (
+            "Para orientações sobre transporte coletivo, linhas de ônibus, permissões ou trânsito, consulte o órgão responsável:\n"
+            "• **Órgão Responsável:** Secretaria Municipal de Transportes e Serviços Públicos (SMTSP)\n"
+            "• **Atendimento Presencial:** Av. Brig. Lima e Silva, 1618 - 25 de Agosto, Duque de Caxias - RJ\n"
+            "• **E-mail:** **smtsp@duquedecaxias.rj.gov.br**\n"
+            "• **Reclamações ou Ouvidoria:** Se houver falha, atraso ou descumprimento de linha, registre manifestação na **Ouvidoria Geral** pelo telefone **(21) 2652-3835** ou app **Colab**."
+        )
+
+    if any(k in q for k in ["saúde", "saude", "médico", "medico", "consulta", "exame", "remédio", "remedio", "medicamento", "posto de saúde", "ubs", "usf", "upa", "hospital", "clínica da família"]):
+        return (
+            "Para consultas, exames, medicamentos ou atendimento de saúde:\n"
+            "• **Porta de Entrada (SUS):** Compareça à sua **Unidade Básica de Saúde (UBS/USF)** com documento de identidade e Cartão SUS para consulta e regulação via SISREG;\n"
+            "• **Urgências e Emergências:** Procure a **UPA 24h** ou **UPH** mais próxima ou acione o **SAMU (192)**;\n"
+            "• **Reclamações:** Em caso de atraso na regulação, fale com a **Ouvidoria da Saúde** pelo aplicativo **Colab**."
+        )
+
+    if any(k in q for k in ["escola", "creche", "matrícula", "matricula", "vaga escolar", "ensino", "fundec"]):
+        return (
+            "Para vagas escolares, matrículas ou cursos:\n"
+            "• **Escolas e Creches Municipais:** Consulte o portal de matrículas da **Secretaria Municipal de Educação (SME)** (`matricula.duquedecaxias.rj.gov.br`);\n"
+            "• **Cursos e Qualificação:** Consulte a **FUNDEC** (`fundec.rj.gov.br`)."
+        )
+
+    if any(k in q for k in ["iptu", "itbi", "iss", "tributo", "imposto", "taxa", "dívida ativa", "divida ativa", "certidão negativa", "certidao negativa"]):
+        return (
+            "Para emissão de guias, 2ª via ou esclarecimentos tributários:\n"
+            "• **Secretaria Municipal de Fazenda (SMF):** Acesse o Portal do Contribuinte (`servicos.duquedecaxias.rj.gov.br`);\n"
+            "• **Atendimento Presencial:** Praça Roberto Silveira, 31 - Centro (segunda a sexta, das 9h às 17h)."
+        )
+
+    if any(k in q for k in ["buraco", "asfalto", "tapa-buraco", "drenagem", "bueiro", "esgoto", "lâmpada", "lampada", "iluminação"]):
+        return (
+            "Para serviços de zeladoria urbana, pavimentação ou reparo de iluminação pública:\n"
+            "• **Aplicativo Colab:** Registre o pedido diretamente em `duquedecaxias.colab.re` (Secretaria Municipal de Obras e Defesa Civil);\n"
+            "• **Iluminação Pública:** Subsecretaria de Iluminação Pública pelo telefone **(21) 2961-9000**."
+        )
+
+    # Caso genérico
+    return (
+        "Para obter orientação oficial ou registrar sua solicitação:\n"
+        f"• **Ouvidoria Geral de Duque de Caxias:** Telefone **{OUVIDORIA_CONTACTS['telefone']}** | E-mail: **{OUVIDORIA_CONTACTS['email']}**\n"
+        f"• **Aplicativo:** **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))\n"
+        "• **Portal da Prefeitura:** `duquedecaxias.rj.gov.br`"
+    )
+
 def build_fallback_guidance(query: str) -> str:
     """Retorna orientação contextual quando a base de conhecimento não contém a resposta."""
     query_lower = query.lower()
     
     # Se a pergunta menciona ouvidoria, reclamação ou problema, direciona diretamente
-    if any(k in query_lower for k in ["ouvidoria", "reclamação", "reclamacao", "denunciar", "registrar", "colab"]):
+    if any(k in query_lower for k in ["ouvidoria", "reclamação", "reclamacao", "denunciar", "denúncia", "denuncia", "elogio", "sugestão", "sugestao", "colab"]):
         lines = [
-            "Para registrar sua solicitação, utilize os canais oficiais da **Ouvidoria Geral de Duque de Caxias**:\n",
-            f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**"
-        ]
-        if OUVIDORIA_CONTACTS.get('whatsapp'):
-            lines.append(f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**")
-        lines.extend([
+            "Para registrar sua solicitação, reclamação ou denúncia, utilize os canais oficiais da **Ouvidoria Geral de Duque de Caxias**:\n",
+            f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**",
             f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**",
-            f"• Presencial: **{OUVIDORIA_CONTACTS['presencial']}**",
-            f"• Aplicativo: **Colab** (baixe no celular ou acesse [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))"
-        ])
+            f"• Atendimento Presencial: **{OUVIDORIA_CONTACTS['presencial']}**",
+            f"• Aplicativo: **Colab** ([{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']}))"
+        ]
         return "\n".join(lines)
     
-    # Resposta genérica de redirecionamento quando não encontra informações
+    # Encaminhamento orientado ao setor responsável
     lines = [
-        "Desculpe, não encontrei informações sobre esse assunto específico na minha base de conhecimento oficial.\n",
-        "Para registrar sua manifestação ou esclarecer sua dúvida, fale diretamente com a **Ouvidoria Geral de Duque de Caxias**:\n",
-        f"• Telefone: **{OUVIDORIA_CONTACTS['telefone']}**"
+        "Desculpe, não encontrei uma resposta direta sobre esse assunto na minha base oficial de serviços.\n",
+        _get_sector_guidance(query)
     ]
-    if OUVIDORIA_CONTACTS.get('whatsapp'):
-        lines.append(f"• WhatsApp: **{OUVIDORIA_CONTACTS['whatsapp']}**")
-    lines.extend([
-        f"• E-mail: **{OUVIDORIA_CONTACTS['email']}**",
-        f"• Presencial: **{OUVIDORIA_CONTACTS['presencial']}**",
-        f"• Online: aplicativo **Colab** ou site [{OUVIDORIA_CONTACTS['colab_url_clean']}]({OUVIDORIA_CONTACTS['colab_url']})."
-    ])
     return "\n".join(lines)
 
 def is_query_too_vague(query: str) -> bool:
