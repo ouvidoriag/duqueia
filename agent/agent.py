@@ -79,6 +79,7 @@ class DuqueIAAgent:
             DuqueIAAgent._session_state[conversation_id] = sess
         return sess.setdefault("manifestation", {
             "active": False,
+            "awaiting_field": None,
             "tipo": "geral",
             "problema": None,
             "localizacao": None,

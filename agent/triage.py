@@ -252,6 +252,17 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         if not last_assistant_turn and len(history) > 0:
             last_assistant_turn = history[-1].lower()
 
+        # Retomada explícita de manifestação pausada (ex: "Quero voltar ao buraco", "Quero voltar à reclamação")
+        if re.search(r"\b(?:quero\s+)?voltar\s+(?:ao|à|a|para\s+o|para\s+a)\s+(?:buraco|reclamação|reclamacao|manifestação|manifestacao|atendimento|denúncia|denuncia|assunto\s+anterior)\b", query_lower):
+            return {
+                "intent": "OUVIDORIA_MANIFESTACAO",
+                "tipo_manifestacao": "reclamacao",
+                "confidence": 0.95,
+                "needs_clarification": False,
+                "reason": "Retomada explícita de manifestação/coleta anterior.",
+                "source": "FAST_GATE"
+            }
+
         # Continuidade prioritária de Coleta / Manifestação Ativa (APENAS quando o turno anterior foi uma pergunta explícita de coleta)
         is_explicit_collection_prompt = any(w in last_assistant_turn for w in [
             "qual problema ou assunto você deseja relatar",
@@ -267,13 +278,15 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
         is_operational_q = any(p in query_lower for p in [
             "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
             "você abre", "voce abre", "você registra", "voce registra", "abre pra mim",
+            "você consegue abrir", "voce consegue abrir", "consegue abrir por mim",
             "mas aí eu marco", "mas ai eu marco", "eu marco o quê", "eu marco o que",
             "marco o quê", "marco o que", "qual categoria", "qual tema"
         ])
         is_conversational_or_meta = any(p in query_lower for p in [
             "conversar", "conversa", "bate-papo", "bate papo",
             "você faz", "voce faz", "o que você", "o que voce", "oq você", "oq voce",
-            "quem é você", "quem e voce", "deixa isso", "esquece", "outro assunto", "mudar de assunto"
+            "quem é você", "quem e voce", "deixa isso", "esquece", "outro assunto", "mudar de assunto",
+            "na verdade"
         ])
         starts_indep_q = any(query_lower.startswith(p) for p in INDEPENDENT_QUESTION_PREFIXES)
         if (

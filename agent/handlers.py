@@ -334,56 +334,78 @@ class CollectorHandler(BaseHandler):
         q_raw = (query or "").strip()
         q_low = q_raw.lower()
         state = agent.get_manifestation_state(conversation_id) if hasattr(agent, "get_manifestation_state") else {
-            "active": False, "tipo": "geral", "problema": None, "localizacao": None, "via_publica": False
+            "active": False, "awaiting_field": None, "tipo": "geral", "problema": None, "localizacao": None, "via_publica": False
         }
         if tipo and tipo != "geral":
             state["tipo"] = tipo
 
         is_op_question = any(p in q_low for p in [
             "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
-            "você abre", "voce abre", "você registra", "voce registra", "abre pra mim"
+            "você abre", "voce abre", "você registra", "voce registra", "abre pra mim",
+            "você consegue abrir", "voce consegue abrir", "consegue abrir por mim"
         ])
         is_category_question = any(p in q_low for p in [
             "mas aí eu marco", "mas ai eu marco", "eu marco o quê", "eu marco o que",
             "marco o quê", "marco o que", "qual categoria", "qual tema"
         ])
+        is_resume_request = bool(re.search(
+            r"\b(?:quero\s+)?voltar\s+(?:ao|à|a|para\s+o|para\s+a)\s+(?:buraco|reclamação|reclamacao|manifestação|manifestacao|atendimento|denúncia|denuncia|assunto\s+anterior)\b",
+            q_low,
+        ))
+        is_intent_opening = bool(re.fullmatch(
+            r"(?:eu\s+)?(?:quero|queria|gostaria\s+de|preciso|vou)\s+(?:abrir|fazer|registrar|iniciar)\s+(?:uma\s+|um\s+)?(?:manifestação|manifestacao|reclamação|reclamacao|denúncia|denuncia|sugestão|sugestao|elogio|chamado)\.?!?",
+            q_low,
+        ))
         op_prefix = (
             "Não consigo registrar o protocolo diretamente no sistema — o envio oficial é feito por você no aplicativo **Colab**, "
             "mas posso deixar a categoria e o texto prontos para você enviar.\n\n"
             if is_op_question else ""
         )
 
-        # Detecta menção genérica à via pública ("era sobre rua") sem especificar o problema
-        if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
-            state["via_publica"] = True
+        # Se for apenas abertura de intenção ("Queria abrir uma manifestação"), NÃO extrai problema nem endereço
+        if not is_intent_opening and not is_resume_request:
+            # Detecta menção genérica à via pública ("era sobre rua") sem especificar o problema
+            if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
+                state["via_publica"] = True
 
-        # Detecta localização (ex: "Rua A", "Rua A, Centro", "Av. Brasil") — nunca aceita perguntas ou conversa casual
-        loc_match = re.search(
-            r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+[^\n?!.;]+)",
-            q_raw,
-            re.IGNORECASE,
-        )
-        if loc_match and not any(w in q_low for w in ["sobre rua", "na rua", "da rua", "minha rua", "buraco"]):
-            state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
-        elif history and not state.get("localizacao") and not is_op_question and not is_category_question and "?" not in q_raw:
-            last_ai = next((h.lower() for h in reversed(history) if "duque ia:" in h.lower()), "")
-            if any(w in last_ai for w in ["nome da rua", "rua e o bairro", "qual o bairro", "endereço"]):
-                if not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda", "conversar", "faz oq"]):
-                    state["localizacao"] = q_raw.rstrip(".,!?")
+            # Detecta localização explícita (ex: "Rua A", "Rua A, Centro", "Av. Brasil")
+            loc_match = re.search(
+                r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+[^\n?!.;]+)",
+                q_raw,
+                re.IGNORECASE,
+            )
+            is_invalid_loc = any(w in q_low for w in [
+                "sobre rua", "na rua", "da rua", "minha rua", "buraco",
+                "manifestação", "manifestacao", "reclamação", "reclamacao",
+                "conversar", "faz oq", "você", "voce"
+            ])
+            if loc_match and not is_invalid_loc and "?" not in q_raw:
+                state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
+            elif (
+                state.get("active")
+                and state.get("awaiting_field") == "localizacao"
+                and not state.get("localizacao")
+                and not is_op_question
+                and not is_category_question
+                and "?" not in q_raw
+                and not is_invalid_loc
+                and not any(w in q_low for w in ["lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"])
+                and len(q_raw) >= 3
+            ):
+                state["localizacao"] = q_raw.rstrip(".,!?")
 
-        # Detecta problema concreto (exige palavra-chave concreta de problema; nunca assume conversa genérica como problema)
-        _PROBLEM_KEYWORDS = [
-            "buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao",
-            "lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz",
-            "lixo", "entulho", "capina", "roçagem", "rocagem", "mato",
-            "bueiro", "drenagem", "esgoto", "alagamento", "enchente",
-            "árvore", "arvore", "poda", "calçada", "calcada",
-            "barulho", "som alto", "mau atendimento", "atendimento", "médico", "medico",
-            "remédio", "remedio", "medicamento", "água", "agua", "servidor", "escola", "creche"
-        ]
-        if any(pk in q_low for pk in _PROBLEM_KEYWORDS):
-            # Extrai descrição limpa do problema
-            state["problema"] = q_raw.rstrip(".,!?")
+            # Detecta problema concreto (exige palavra-chave concreta de problema; nunca assume frase de intenção como problema)
+            _PROBLEM_KEYWORDS = [
+                "buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao",
+                "lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz",
+                "lixo", "entulho", "capina", "roçagem", "rocagem", "mato",
+                "bueiro", "drenagem", "esgoto", "alagamento", "enchente",
+                "árvore", "arvore", "poda", "calçada", "calcada",
+                "barulho", "som alto", "mau atendimento", "atendimento", "médico", "medico",
+                "remédio", "remedio", "medicamento", "água", "agua", "servidor", "escola", "creche"
+            ]
+            if any(pk in q_low for pk in _PROBLEM_KEYWORDS):
+                state["problema"] = q_raw.rstrip(".,!?")
 
         if hasattr(agent, "update_manifestation_state"):
             agent.update_manifestation_state(conversation_id, **state)
@@ -392,7 +414,7 @@ class CollectorHandler(BaseHandler):
         local_atual = state.get("localizacao")
 
         # Passo 1 da coleta: falta identificar o problema concreto
-        if not problema_atual and (triage_info.get("needs_clarification") or is_op_question or state.get("via_publica") or local_atual):
+        if not problema_atual and (is_intent_opening or is_resume_request or triage_info.get("needs_clarification") or is_op_question or state.get("via_publica") or local_atual):
             if local_atual:
                 answer = f"{op_prefix}Qual é o problema que você deseja relatar em **{local_atual}** (ex: buraco no asfalto, poste apagado, lixo ou bueiro)?"
             elif state.get("via_publica"):
@@ -400,7 +422,7 @@ class CollectorHandler(BaseHandler):
             else:
                 answer = f"{op_prefix}Qual problema ou assunto você deseja relatar?"
             if hasattr(agent, "update_manifestation_state"):
-                agent.update_manifestation_state(conversation_id, active=True)
+                agent.update_manifestation_state(conversation_id, active=True, awaiting_field="problema")
             return {
                 "answer": answer,
                 "sources": [],
@@ -422,7 +444,7 @@ class CollectorHandler(BaseHandler):
         if needs_loc and not local_atual and not is_category_question:
             answer = f"{op_prefix}Entendi (**{problema_atual}**). Qual é a **rua e o bairro** (ou ponto de referência) onde está o problema?"
             if hasattr(agent, "update_manifestation_state"):
-                agent.update_manifestation_state(conversation_id, active=True)
+                agent.update_manifestation_state(conversation_id, active=True, awaiting_field="localizacao")
             return {
                 "answer": answer,
                 "sources": [],

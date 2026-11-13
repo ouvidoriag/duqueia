@@ -77,6 +77,28 @@ def main():
     assert "buraco" in results2[3][3].lower() or "rua" in results2[3][3].lower(), f"Turno 4 não reconheceu reclamação de buraco: {results2[3]}"
     assert "iptu" in results2[4][3].lower(), f"Turno 5 não mudou de assunto para IPTU: {results2[4]}"
 
+    # Fluxo 3: Sequência obrigatória de 7 turnos + retomada após mudança de assunto
+    cid3 = f"flow_7turnos_{int(time.time())}"
+    turns3 = [
+        "Olá",
+        "Queria abrir uma manifestação",
+        "Buraco",
+        "Rua A, Centro",
+        "Você consegue abrir por mim?",
+        "Na verdade quero falar de IPTU",
+        "Quero voltar ao buraco",
+    ]
+    results3 = list(run_flow(agent, cid3, turns3))
+
+    assert results3[0][2] == "saudacao", f"F3 Turno 1 deveria ser saudacao: {results3[0]}"
+    assert "queria abrir" not in results3[1][3].lower(), f"F3 Turno 2 tratou intenção como endereço: {results3[1][3]}"
+    assert "assunto" in results3[1][3].lower() or "problema" in results3[1][3].lower(), f"F3 Turno 2 não perguntou assunto/problema: {results3[1][3]}"
+    assert "rua" in results3[2][3].lower() and "bairro" in results3[2][3].lower(), f"F3 Turno 3 não pediu rua e bairro: {results3[2][3]}"
+    assert "rua a, centro" in results3[3][3].lower() and "queria abrir" not in results3[3][3].lower(), f"F3 Turno 4 não preservou Rua A, Centro ou vazou intenção: {results3[3][3]}"
+    assert ("não consigo" in results3[4][3].lower() or "colab" in results3[4][3].lower()) and "rua a, centro" in results3[4][3].lower(), f"F3 Turno 5 não respondeu capacidade ou perdeu Rua A, Centro: {results3[4][3]}"
+    assert "iptu" in results3[5][3].lower(), f"F3 Turno 6 não mudou para IPTU: {results3[5]}"
+    assert "buraco" in results3[6][3].lower() and "rua a, centro" in results3[6][3].lower(), f"F3 Turno 7 não retomou buraco + Rua A, Centro: {results3[6][3]}"
+
     print("\n✅ TODOS OS TESTES DE CONTINUIDADE E CONVERSA NATURAL PASSARAM COM 100% DE SUCESSO!")
 
 
