@@ -1957,3 +1957,58 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-13 09:41:41,Quem é a vice prefeita?,0.00,0.00,0.47,0.0000,0,0.00000000
 2026-11-13 09:41:43,Quem é Aline do Aureo?,0.00,0.00,1543.05,0.0000,0,0.00000000
 2026-11-13 09:41:44,Quem é Aline Ferreira Batista Ribeiro?,0.00,0.00,1487.68,0.0000,0,0.00000000
+2026-11-13 10:03:25,quem é netinho reis,0.00,0.00,123.73,0.0000,0,0.00000000
+2026-11-13 10:03:25,quem é o prefeito,0.00,0.00,0.31,0.0000,0,0.00000000
+2026-11-13 10:03:25,quem é o secretário de obras,0.00,0.00,0.21,0.0000,0,0.00000000
+2026-11-13 10:03:25,quem é boquinha,0.00,0.00,5.99,0.0000,0,0.00000000
+2026-11-13 10:03:31,Quem é a vice-prefeita de Duque de Caxias?,0.00,0.00,33.79,0.0000,0,0.00000000
+2026-11-13 10:03:31,Quem é a vice prefeita?,0.00,0.00,0.47,0.0000,0,0.00000000
+2026-11-13 10:03:34,Quem é Aline do Aureo?,0.00,0.00,2946.15,0.0000,0,0.00000000
+2026-11-13 10:03:36,Quem é Aline Ferreira Batista Ribeiro?,0.00,0.00,1394.66,0.0000,0,0.00000000
+2026-11-13 10:06:43,Quais cursos gratuitos da FUNDEC e vagas de emprego no Sine Caxias existem?,0.96,4510.38,4663.63,1.0000,717,0.00014230
+2026-11-13 10:06:50,Tem uma árvore encostada nos fios de alta tensão na minha rua; quem poda?,2970.33,2841.57,7120.33,1.0000,2209,0.00020680
+2026-11-13 10:06:59,Quero podar uma árvore dentro do meu quintal particular; quais documentos preciso levar?,750.19,6079.68,8610.26,1.0000,2217,0.00025840
+2026-11-13 10:07:05,Tem um terreno abandonado cheio de mato e lixo aqui perto; quem fiscaliza?,799.96,4303.28,5110.16,1.0000,1502,0.00016410
+2026-11-13 10:07:12,Acho que quebrei o pé caindo na escada; para qual hospital público de Caxias devo ir?,663.61,4302.33,4973.27,1.0000,3351,0.00030780
+2026-11-13 10:07:16,Apareceu um gambá no meu quintal; a proteção animal resgata?,656.23,3235.04,3896.44,1.0000,1415,0.00015550
+2026-11-13 10:07:21,Minha rua está sem água há dias e a Águas do Rio não resolve; a prefeitura faz o quê?,638.35,4469.51,5112.22,1.0000,2737,0.00026330
+2026-11-13 10:07:27,Igreja ou templo religioso precisa de alvará ou tem imunidade em Duque de Caxias?,1018.23,4369.87,5392.62,1.0000,2149,0.00023180
+2026-11-13 10:07:32,Como faço para recorrer de uma multa de trânsito municipal em Duque de Caxias e qual o prazo?,648.76,4985.93,5640.00,1.0000,2480,0.00025620
+2026-11-13 10:07:38,Posso pedir cópia de contrato de limpeza urbana e denunciar nepotismo no mesmo protocolo?,872.10,4999.72,5877.05,1.0000,2443,0.00025660
+2026-11-13 10:07:45,Onde consigo acompanhamento com nutricionista para emagrecer pelo SUS em Caxias?,967.15,4087.81,6813.15,1.0000,3382,0.00032980
+2026-11-13 10:07:52,A lâmpada do poste na minha rua queimou; falo direto com a Ouvidoria ou tem outro canal?,682.38,5764.77,6450.73,1.0000,2061,0.00022860
+2026-11-13 10:07:56,Estou esperando há meses uma consulta com especialista no SISREG pela UBS; como acompanhar?,584.86,3854.78,4442.95,1.0000,3197,0.00028360
+2026-11-13 10:08:08,Minha casa alagou na chuva e perdi móveis; onde peço aluguel social e cesta básica?,1365.01,4569.34,7248.20,1.0000,3416,0.00033470
+2026-11-13 10:08:09,Qual a diferença entre o que faz a Secretaria de Obras e a de Urbanismo?,0.00,0.00,13.47,0.0000,0,0.00000000
+2026-11-13 10:08:16,Meu avô acamado não consegue ir buscar remédio contínuo que está em falta no posto; como proceder?,934.54,5044.95,6031.47,1.0000,3046,0.00029080
+2026-11-13 10:08:20,Quero ir na Fazenda consultar se o alvará do comércio do meu vizinho está regular; posso?,695.79,3327.57,4028.71,1.0000,2301,0.00021690
+2026-11-13 10:09:01,Qual a diferença entre o que faz a Secretaria de Obras e a de Urbanismo?,0.00,0.00,17.01,0.0000,0,0.00000000
+2026-11-13 10:09:31,Qual a diferença entre o que faz a Secretaria de Obras e a de Urbanismo?,3688.21,3929.35,8203.30,1.0000,1300,0.00014620
+2026-11-13 10:09:35,quem é netinho reis,0.00,0.00,74.79,0.0000,0,0.00000000
+2026-11-13 10:09:35,quem é o prefeito,0.00,0.00,0.18,0.0000,0,0.00000000
+2026-11-13 10:09:36,quem é o secretário de obras,0.00,0.00,0.20,0.0000,0,0.00000000
+2026-11-13 10:09:36,quem é boquinha,0.00,0.00,4.38,0.0000,0,0.00000000
+2026-11-13 10:09:57,Quais cursos gratuitos da FUNDEC e vagas de emprego no Sine Caxias existem?,0.35,5652.93,5735.38,1.0000,718,0.00014260
+2026-11-13 10:10:03,Tem uma árvore encostada nos fios de alta tensão na minha rua; quem poda?,2263.15,3648.04,5931.15,0.9825,2441,0.00022960
+2026-11-13 10:10:07,Quero podar uma árvore dentro do meu quintal particular; quais documentos preciso levar?,678.09,3476.89,4162.30,1.0000,1940,0.00019410
+2026-11-13 10:10:15,Tem um terreno abandonado cheio de mato e lixo aqui perto; quem fiscaliza?,512.11,7690.82,8206.65,1.0000,1535,0.00017400
+2026-11-13 10:10:23,Acho que quebrei o pé caindo na escada; para qual hospital público de Caxias devo ir?,697.34,3985.50,4688.64,1.0000,3335,0.00030300
+2026-11-13 10:10:31,Apareceu um gambá no meu quintal; a proteção animal resgata?,3042.99,4567.43,7615.67,1.0000,1407,0.00015310
+2026-11-13 10:10:37,Minha rua está sem água há dias e a Águas do Rio não resolve; a prefeitura faz o quê?,743.48,4837.46,5588.30,1.0000,2738,0.00026360
+2026-11-13 10:10:42,Igreja ou templo religioso precisa de alvará ou tem imunidade em Duque de Caxias?,981.05,4560.59,5545.69,1.0000,2146,0.00023090
+2026-11-13 10:10:49,Como faço para recorrer de uma multa de trânsito municipal em Duque de Caxias e qual o prazo?,844.24,5247.27,6133.72,1.0000,2458,0.00024960
+2026-11-13 10:10:59,Posso pedir cópia de contrato de limpeza urbana e denunciar nepotismo no mesmo protocolo?,1333.85,8422.30,9764.79,1.0000,2381,0.00023800
+2026-11-13 10:11:04,Onde consigo acompanhamento com nutricionista para emagrecer pelo SUS em Caxias?,697.44,4155.17,4869.82,1.0000,2284,0.00023040
+2026-11-13 10:11:10,A lâmpada do poste na minha rua queimou; falo direto com a Ouvidoria ou tem outro canal?,642.49,5158.84,5805.70,1.0000,1970,0.00020130
+2026-11-13 10:11:14,Estou esperando há meses uma consulta com especialista no SISREG pela UBS; como acompanhar?,763.62,3891.67,4662.48,1.0000,3215,0.00028900
+2026-11-13 10:11:20,Minha casa alagou na chuva e perdi móveis; onde peço aluguel social e cesta básica?,576.20,3969.24,4555.08,1.0000,2183,0.00023660
+2026-11-13 10:11:26,Qual a diferença entre o que faz a Secretaria de Obras e a de Urbanismo?,642.95,4916.48,5563.21,1.0000,1326,0.00015400
+2026-11-13 10:11:33,Meu avô acamado não consegue ir buscar remédio contínuo que está em falta no posto; como proceder?,1378.55,4375.29,5759.35,1.0000,3121,0.00031330
+2026-11-13 10:11:37,Quero ir na Fazenda consultar se o alvará do comércio do meu vizinho está regular; posso?,776.23,4042.66,4822.99,1.0000,2336,0.00022740
+2026-11-13 10:18:34,Quais cursos gratuitos da FUNDEC e vagas de emprego no Sine Caxias existem?,0.20,5047.40,5159.90,1.0000,708,0.00013960
+2026-11-13 10:18:43,Igreja ou templo religioso precisa de alvará ou tem imunidade em Duque de Caxias?,5034.46,3631.89,8672.10,1.0000,2093,0.00021500
+2026-11-13 10:18:50,Minha casa alagou na chuva e perdi móveis; onde peço aluguel social e cesta básica?,597.25,5376.93,5981.37,1.0000,2273,0.00026360
+2026-11-13 10:18:56,Quero ir na Fazenda consultar se o alvará do comércio do meu vizinho está regular; posso?,592.25,4523.67,5123.34,1.0000,2386,0.00024240
+2026-11-13 10:19:02,Quantas vagas exatas estão abertas hoje no Sine Caxias para pedreiro?,579.11,3421.70,6119.84,0.9425,2806,0.00024380
+2026-11-13 10:25:24,Quais cursos gratuitos da FUNDEC e vagas de emprego no Sine Caxias existem?,0.55,5726.71,5882.36,1.0000,722,0.00014380
+2026-11-13 10:25:31,Quantas vagas exatas estão abertas hoje no Sine Caxias para pedreiro?,4426.04,3205.13,7647.70,0.9443,2266,0.00021640

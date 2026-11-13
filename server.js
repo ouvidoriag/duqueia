@@ -11,18 +11,18 @@ const staticCache = new Map();
 // ── Mimetypes de arquivos estáticos ──────────────────────────────────────────
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
-  '.ico':  'image/x-icon',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
+  '.ico': 'image/x-icon',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.svg':  'image/svg+xml',
-  '.mp3':  'audio/mpeg',
+  '.svg': 'image/svg+xml',
+  '.mp3': 'audio/mpeg',
   '.webm': 'audio/webm',
-  '.wav':  'audio/wav',
-  '.ogg':  'audio/ogg',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg',
 };
 
 
@@ -148,7 +148,7 @@ function cleanupOldAudioFiles() {
             fs.unlinkSync(filePath);
             deletedCount++;
           }
-        } catch (_) {}
+        } catch (_) { }
       }
     } catch (err) {
       console.error(`[Audio Cleanup Error] Falha ao verificar diretório ${dir}:`, err.message);
@@ -400,30 +400,30 @@ const server = http.createServer((req, res) => {
   }
 
   let workerReloadTimer = null;
-/**
- * Reinicia graciosamente os workers Python para recarregar dados ou código atualizado.
- * Suporta debounce para evitar múltiplos reloads caso ocorram webhooks em lote.
- */
-function reloadPythonWorkers(delayMs = 0) {
-  if (delayMs > 0) {
-    if (workerReloadTimer) clearTimeout(workerReloadTimer);
-    workerReloadTimer = setTimeout(() => {
-      reloadPythonWorkers(0);
-    }, delayMs);
-    return;
-  }
-  const currentCount = workerPool.length;
-  console.log(`[WorkerPool] Reiniciando ${currentCount} workers Python graciosamente para recarregar dados/código...`);
-  for (const w of workerPool) {
-    try {
-      w.process.kill('SIGTERM');
-    } catch (e) {
-      try { w.process.kill('SIGKILL'); } catch (_) {}
+  /**
+   * Reinicia graciosamente os workers Python para recarregar dados ou código atualizado.
+   * Suporta debounce para evitar múltiplos reloads caso ocorram webhooks em lote.
+   */
+  function reloadPythonWorkers(delayMs = 0) {
+    if (delayMs > 0) {
+      if (workerReloadTimer) clearTimeout(workerReloadTimer);
+      workerReloadTimer = setTimeout(() => {
+        reloadPythonWorkers(0);
+      }, delayMs);
+      return;
+    }
+    const currentCount = workerPool.length;
+    console.log(`[WorkerPool] Reiniciando ${currentCount} workers Python graciosamente para recarregar dados/código...`);
+    for (const w of workerPool) {
+      try {
+        w.process.kill('SIGTERM');
+      } catch (e) {
+        try { w.process.kill('SIGKILL'); } catch (_) { }
+      }
     }
   }
-}
 
-// ── Health Check ────────────────────────────────────────────────────────
+  // ── Health Check ────────────────────────────────────────────────────────
   if ((req.url === '/health' || req.url.endsWith('/health')) && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -468,7 +468,7 @@ function reloadPythonWorkers(delayMs = 0) {
     req.on('data', chunk => { rawBody += chunk.toString('utf-8'); });
     req.on('end', () => {
       const signature = req.headers['x-hub-signature-256'] || req.headers['x-signature'] || req.headers['x-hub-signature'];
-      
+
       if (!verifyHmacSignature(rawBody, signature, DUQUE_IA_WEBHOOK_SECRET)) {
         console.warn('[Webhook GSE] Assinatura HMAC inválida ou ausente. Rejeitando requisição.');
         res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -490,7 +490,7 @@ function reloadPythonWorkers(delayMs = 0) {
       // Despacha assincronamente para o processador Python (scripts/webhook_processor.py)
       const pyScript = path.join(__dirname, 'scripts', 'webhook_processor.py');
       const proc = spawn(PYTHON_PATH, [pyScript], { stdio: ['pipe', 'pipe', 'pipe'] });
-      
+
       let stdoutData = '';
       let stderrData = '';
       proc.stdout.on('data', d => { stdoutData += d.toString(); });
@@ -664,7 +664,7 @@ function reloadPythonWorkers(delayMs = 0) {
                   };
                 });
               }
-            } catch (_) {}
+            } catch (_) { }
           }
         }
       }
@@ -754,8 +754,8 @@ function reloadPythonWorkers(delayMs = 0) {
             error: false,
             query: message
           };
-          fs.appendFile(path.join(metricsDir, 'requests.jsonl'), JSON.stringify(metricRecord) + '\n', () => {});
-        } catch (_) {}
+          fs.appendFile(path.join(metricsDir, 'requests.jsonl'), JSON.stringify(metricRecord) + '\n', () => { });
+        } catch (_) { }
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(responseData));
@@ -808,7 +808,7 @@ function reloadPythonWorkers(delayMs = 0) {
           secretaria: secretaria,
           timestamp: nowIso
         };
-        fs.appendFile(path.join(metricsDir, 'feedback.jsonl'), JSON.stringify(record) + '\n', () => {});
+        fs.appendFile(path.join(metricsDir, 'feedback.jsonl'), JSON.stringify(record) + '\n', () => { });
 
         // 2. Grava na tabela chat_feedback em data/db/telemetry.db
         try {
@@ -816,9 +816,9 @@ function reloadPythonWorkers(delayMs = 0) {
           const dbPath = path.join(__dirname, 'data', 'db', 'telemetry.db');
           if (fs.existsSync(dbPath)) {
             const db = new DatabaseSync(dbPath);
-            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN question TEXT;'); } catch (_) {}
-            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN bot_response TEXT;'); } catch (_) {}
-            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN secretaria TEXT;'); } catch (_) {}
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN question TEXT;'); } catch (_) { }
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN bot_response TEXT;'); } catch (_) { }
+            try { db.exec('ALTER TABLE chat_feedback ADD COLUMN secretaria TEXT;'); } catch (_) { }
 
             const stmt = db.prepare(`
               INSERT INTO chat_feedback (session_id, feedback_type, comment, topic, question, bot_response, secretaria, created_at)
@@ -920,7 +920,7 @@ function reloadPythonWorkers(delayMs = 0) {
           const fileRecords = [];
           for (const line of lines) {
             if (line.trim()) {
-              try { fileRecords.push(JSON.parse(line)); } catch (_) {}
+              try { fileRecords.push(JSON.parse(line)); } catch (_) { }
             }
           }
           stats.total = fileRecords.length;
@@ -1049,9 +1049,9 @@ function reloadPythonWorkers(delayMs = 0) {
         const responseRecords = isAdmin
           ? rawRecords
           : rawRecords.map(r => ({
-              ...r,
-              query: '[PROTEGIDO - LGPD]'
-            }));
+            ...r,
+            query: '[PROTEGIDO - LGPD]'
+          }));
 
         res.writeHead(200, {
           'Content-Type': 'application/json; charset=utf-8',
