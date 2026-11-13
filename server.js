@@ -399,7 +399,31 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── Health Check ────────────────────────────────────────────────────────
+  let workerReloadTimer = null;
+/**
+ * Reinicia graciosamente os workers Python para recarregar dados ou código atualizado.
+ * Suporta debounce para evitar múltiplos reloads caso ocorram webhooks em lote.
+ */
+function reloadPythonWorkers(delayMs = 0) {
+  if (delayMs > 0) {
+    if (workerReloadTimer) clearTimeout(workerReloadTimer);
+    workerReloadTimer = setTimeout(() => {
+      reloadPythonWorkers(0);
+    }, delayMs);
+    return;
+  }
+  const currentCount = workerPool.length;
+  console.log(`[WorkerPool] Reiniciando ${currentCount} workers Python graciosamente para recarregar dados/código...`);
+  for (const w of workerPool) {
+    try {
+      w.process.kill('SIGTERM');
+    } catch (e) {
+      try { w.process.kill('SIGKILL'); } catch (_) {}
+    }
+  }
+}
+
+// ── Health Check ────────────────────────────────────────────────────────
   if ((req.url === '/health' || req.url.endsWith('/health')) && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -427,15 +451,9 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    console.log('[WorkerPool] Sinal de reinicialização autorizado recebido. Reiniciando workers Python...');
+    console.log('[WorkerPool] Sinal de reinicialização autorizado recebido.');
     const currentCount = workerPool.length;
-    for (const w of workerPool) {
-      try {
-        w.process.kill('SIGTERM');
-      } catch (e) {
-        try { w.process.kill('SIGKILL'); } catch (_) {}
-      }
-    }
+    reloadPythonWorkers(0);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       status: 'ok',
@@ -486,6 +504,8 @@ const server = http.createServer((req, res) => {
           } catch (_) {
             console.log(`[Webhook GSE] Processado: ${stdoutData.trim()}`);
           }
+          // Invalidação automática de cache: recarrega workers Python graciosamente
+          reloadPythonWorkers(500);
         } else {
           console.error(`[Webhook GSE] Erro ao processar evento (exit code ${code}):`, stderrData);
         }

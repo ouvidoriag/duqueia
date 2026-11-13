@@ -165,19 +165,26 @@ class GoldenSourceResolver:
     """Consulta diretamente a camada determinística de dados oficiais no SQLite."""
 
     _UNIDADES_CACHE = None
+    _UNIDADES_CACHE_MTIME = 0
 
     def __init__(self, db_path: str = DATABASE_MAIN):
         self.db_path = db_path
         self._ensure_cache()
 
     def _ensure_cache(self):
-        """Indexa as 443 unidades físicas em memória na primeira chamada (<2ms)."""
-        if GoldenSourceResolver._UNIDADES_CACHE is not None:
+        """Indexa as unidades físicas em memória e invalida automaticamente se o banco for modificado."""
+        try:
+            current_mtime = os.path.getmtime(self.db_path) if os.path.exists(self.db_path) else 0
+        except Exception:
+            current_mtime = 0
+
+        if GoldenSourceResolver._UNIDADES_CACHE is not None and current_mtime <= GoldenSourceResolver._UNIDADES_CACHE_MTIME:
             return
 
         unidades = []
         if not os.path.exists(self.db_path):
             GoldenSourceResolver._UNIDADES_CACHE = unidades
+            GoldenSourceResolver._UNIDADES_CACHE_MTIME = current_mtime
             return
 
         try:
@@ -200,6 +207,7 @@ class GoldenSourceResolver:
             conn.close()
         except Exception:
             GoldenSourceResolver._UNIDADES_CACHE = unidades
+            GoldenSourceResolver._UNIDADES_CACHE_MTIME = current_mtime
             return
 
         def get_unit_type(nl: str) -> str:
@@ -258,6 +266,7 @@ class GoldenSourceResolver:
             })
 
         GoldenSourceResolver._UNIDADES_CACHE = unidades
+        GoldenSourceResolver._UNIDADES_CACHE_MTIME = current_mtime
 
     def resolve(self, query: str) -> dict | None:
         detection = MunicipalEntityDetector.detect(query, db_path=self.db_path)

@@ -1410,10 +1410,14 @@ class AuthorityHandler(BaseHandler):
         q_clean = query.lower().strip()
         q_clean = re.sub(r'^[¿\?¡\!]+|[¿\?¡\!]+$', '', q_clean).strip() # remove pontuações finais/iniciais
 
-        # Strip prefixes
+        # Strip prefixes de perguntas garantindo fronteira de espaço para não cortar nomes (ex: Aline)
         for pattern in AUTHORITY_PATTERNS:
-            if q_clean.startswith(pattern):
-                q_clean = q_clean[len(pattern):].strip()
+            p_with_space = pattern + " "
+            if q_clean.startswith(p_with_space):
+                q_clean = q_clean[len(p_with_space):].strip()
+                break
+            elif q_clean == pattern:
+                q_clean = ""
                 break
 
         q_normalized = _normalize(q_clean)

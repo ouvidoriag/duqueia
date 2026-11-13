@@ -920,11 +920,27 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
             try:
                 main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
                 rows_unidades = query_db(main_db, """
-                    SELECT u.name, u.address, u.phone, u.working_hours, s.name
+                    SELECT u.name, u.address, u.phone, u.working_hours, s.name, s.code
                     FROM secretaria_unidades u
                     JOIN secretarias s ON u.secretaria_id = s.id
                 """)
-                for name, addr, phone, hours, sec_name in rows_unidades:
+                
+                is_health_q = any(k in q_sub_norm for k in ["saude", "saúde", "passando mal", "medico", "médico", "posto de saude", "posto de saúde", "hospital", "upa", "uph", "clinica", "clínica", "emergencia", "emergência", "pronto socorro", "samu", "insulina", "remedio", "remédio", "vacina", "cardiologista", "pediatra", "exame de sangue", "cirurgia", "pre-natal", "pré-natal"])
+                is_social_q = any(k in q_sub_norm for k in ["cras", "creas", "bolsa familia", "cadunico", "cadastro unico", "cesta basica", "vulnerabilidade", "assistencia social"])
+                is_pet_q = any(k in q_sub_norm for k in ["veterinario", "veterinaria", "cachorro", "gato", "pet", "animal", "castracao", "castramovel"])
+
+                for name, addr, phone, hours, sec_name, sec_code in rows_unidades:
+                    code_clean = (sec_code or "").upper().strip()
+                    name_lower = name.lower()
+
+                    # Blindagem temática: impede contaminação entre pastas distintas
+                    if is_health_q and code_clean == "SMASDH":
+                        continue
+                    if is_social_q and code_clean == "SMS":
+                        continue
+                    if is_pet_q and code_clean not in ["SMPA", "SMG"] and "veterin" not in name_lower:
+                        continue
+
                     structured_text = (
                         "[FONTE OFICIAL ESTRUTURADA]\n"
                         "Tipo: Unidade de Atendimento Local (Equipamento Público Municipal)\n"
