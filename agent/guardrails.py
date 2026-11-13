@@ -258,6 +258,24 @@ def sanitize_ouvidoria_whatsapp(text: str) -> str:
     return re.sub(r'\n{3,}', '\n\n', cleaned).strip()
 
 
+def normalize_markdown(text: str) -> str:
+    """Corrige quebras comuns de Markdown (listas misturadas, asteriscos soltos e linhas em branco)."""
+    if not text:
+        return text
+    # Remove marcador duplicado como "1. * **Item**" ou "* 1. **Item**"
+    fixed = re.sub(r'(?m)^(\s*\d+\.)\s+[\*\-•]\s+', r'\1 ', text)
+    fixed = re.sub(r'(?m)^(\s*)[\*\-•]\s+(\d+\.)\s+', r'\1\2 ', fixed)
+    # Normaliza bullets isolados para "* "
+    fixed = re.sub(r'(?m)^[ \t]*•[ \t]+', '* ', fixed)
+    # Fecha ** desbalanceado no final se houver quantidade ímpar
+    if fixed.count('**') % 2 != 0:
+        last_idx = fixed.rfind('**')
+        if last_idx != -1:
+            fixed = fixed[:last_idx] + fixed[last_idx + 2:]
+    fixed = re.sub(r'\n{3,}', '\n\n', fixed)
+    return fixed.strip()
+
+
 def check_output_guardrail(query: str, answer: str, gemini_client, context: str = None, history: list = None, triage_info: dict = None) -> bool:
     """
     Valida a resposta gerada pela IA contra alucinações, vazamento de PII (LGPD), ofensas e contatos falsos.
@@ -279,6 +297,10 @@ def check_output_guardrail(query: str, answer: str, gemini_client, context: str 
     if re.search(r'99824[-.\s]?5903', ans_lower):
         print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Número fictício 99824-5903 detectado.", file=sys.stderr)
         return False
+    for line in ans_lower.splitlines():
+        if "whatsapp" in line and "ouvidoria" in line and not any(neg in line for neg in ("não possui", "nao possui", "não tem", "nao tem", "não há", "nao ha")):
+            print("[OutputGuardrail] BLOQUEADO LOCALMENTE (0ms): Menção indevida de WhatsApp para a Ouvidoria.", file=sys.stderr)
+            return False
 
     # 2. Validação de Vazamento de CPF de Terceiros (RegEx LGPD)
     cpf_pattern = r'\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b'

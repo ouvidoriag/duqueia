@@ -243,23 +243,47 @@ def check_fast_gate(query: str, history: list = None) -> dict | None:
 
     # Desambiguação instantânea multi-turno (0ms) baseada no histórico recente
     if history:
+        is_intent_change = any(sig in query_lower for sig in INTENT_CHANGE_SIGNALS)
+        last_assistant_turn = ""
+        for turn in reversed(history):
+            if "DUQUE IA:" in turn or "DUQUE" in turn or "assistente:" in turn.lower():
+                last_assistant_turn = turn.lower()
+                break
+        if not last_assistant_turn and len(history) > 0:
+            last_assistant_turn = history[-1].lower()
+
+        # Continuidade prioritária de Coleta / Manifestação Ativa (antes de INDEPENDENT_TOPIC_KEYWORDS para não perder respostas curtas como "buraco")
+        is_manifestation_ctx = any(w in last_assistant_turn for w in [
+            "reclamação", "reclamacao", "manifestação", "manifestacao", "denúncia", "denuncia",
+            "qual é o assunto", "qual é o problema", "qual problema", "qual é a rua", "nome da rua",
+            "qual o bairro", "onde está o problema", "em qual secretaria", "em qual unidade",
+            "colab", "protocolo diretamente"
+        ])
+        is_operational_q = any(p in query_lower for p in [
+            "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
+            "você abre", "voce abre", "você registra", "voce registra", "abre pra mim",
+            "mas aí eu marco", "mas ai eu marco", "eu marco o quê", "eu marco o que",
+            "marco o quê", "marco o que", "qual categoria", "qual tema"
+        ])
+        starts_indep_q = any(query_lower.startswith(p) for p in INDEPENDENT_QUESTION_PREFIXES)
+        if not is_intent_change and is_manifestation_ctx and (is_operational_q or (len(query_lower.split()) <= 8 and not starts_indep_q)):
+            return {
+                "intent": "OUVIDORIA_MANIFESTACAO",
+                "tipo_manifestacao": "reclamacao",
+                "confidence": 0.95,
+                "needs_clarification": False,
+                "reason": "Continuação de fluxo ativo de coleta/orientação de manifestação.",
+                "source": "FAST_GATE"
+            }
+
         # Se o usuário estiver explicitamente mudando de assunto ou fazendo uma pergunta independente completa,
         # NÃO interceptar no Fast Gate de desambiguação multi-turno. Deixe fluir para triagem/resolução de entidade.
-        is_intent_change = any(sig in query_lower for sig in INTENT_CHANGE_SIGNALS)
         is_independent_query = (
             any(k in query_lower for k in INDEPENDENT_TOPIC_KEYWORDS) or
-            any(query_lower.startswith(p) for p in INDEPENDENT_QUESTION_PREFIXES)
+            starts_indep_q
         )
 
         if not is_intent_change and not is_independent_query:
-            # Avaliamos o último turno do assistente para garantir que o contexto imediato pede esclarecimento
-            last_assistant_turn = ""
-            for turn in reversed(history):
-                if "DUQUE IA:" in turn or "DUQUE" in turn or "assistente:" in turn.lower():
-                    last_assistant_turn = turn.lower()
-                    break
-            if not last_assistant_turn and len(history) > 0:
-                last_assistant_turn = history[-1].lower()
 
             # Desambiguação de Barulho / Som Alto
             is_noise_context = any(w in last_assistant_turn for w in [
@@ -586,6 +610,7 @@ def call_triage_llm(query: str, gemini_client, history: list = None) -> dict:
         "- Barulho sem local explícito = AMBIGUO_BARULHO (needs_clarification=true).\n"
         "- JURIDICO = Usar APENAS se o cidadão solicitar explicitamente que a IA formule petição jurídica, redija recurso/parecer legal ou elabore argumentos em ação judicial contra a prefeitura. Dúvidas sobre onde recorrer de multas municipais (JARI), prazos legais para recorrer de infrações, como consultar processos administrativos ou localização de secretarias NÃO são JURIDICO -> use RAG_GERAL.\n"
         "- Perguntas sobre QUEM É ou qual o nome do secretário/titular, prefeito ou vice = AUTORIDADE_PUBLICA (NÃO use para perguntas sobre o que faz uma secretaria ou diferença entre secretarias, que são RAG_GERAL).\n"
+        "- Perguntas operacionais durante atendimento ('você que vai abrir?', 'você registra?', 'mas aí eu marco o quê?') = OUVIDORIA_MANIFESTACAO (NÃO use AI_META_INFO para isso).\n"
         "- MEMORIA_CONVERSACIONAL = Perguntas reflexivas sobre o histórico do diálogo, primeira pergunta feita, respostas anteriores ou assuntos já conversados (ex: \"qual foi minha primeira pergunta?\", \"o que você me respondeu antes?\", \"repita a segunda resposta\", \"sobre o que estamos conversando?\").\n"
         "- CLARIFICACAO_RESPOSTA = Pedidos de explicação didática, simplificação da resposta anterior (ex: \"não entendi\", \"explique melhor\", \"ficou confuso\") ou frustração e desabafo com a IA (ex: \"não entendi a resposta. vai à merda\", \"robô burro\"). NUNCA use POSSIVEL_DENUNCIA para insatisfação ou ofensas direcionadas ao assistente virtual!\n"
         "- AI_META_INFO = Perguntas sobre funcionamento, limites, confiabilidade ou se a IA inventa informações, números de protocolos, telefones ou encaminhamentos para agradar (ex: \"você inventaria informações para me agradar?\", \"você inventa protocolos?\", \"como você funciona?\"). NUNCA encaminhe para secretarias aleatórias!\n\n"

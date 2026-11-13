@@ -34,6 +34,7 @@ from agent.guardrails import (
     check_legal_guardrail,
     check_output_guardrail,
     sanitize_ouvidoria_whatsapp,
+    normalize_markdown,
 )
 from agent.fallback import build_fallback_guidance, is_query_too_vague
 from agent.confidence import calibrate_confidence
@@ -67,6 +68,32 @@ class DuqueIAAgent:
     _session_versions: Dict[str, int] = {}
     _model_sessions: Dict[str, str] = {}
     _interaction_map: Dict[str, str] = {}
+
+    def get_manifestation_state(self, conversation_id: str) -> Dict[str, Any]:
+        """Retorna o estado estruturado da manifestação/coleta para a sessão atual."""
+        if not conversation_id:
+            return {"active": False, "tipo": "geral", "problema": None, "localizacao": None, "via_publica": False}
+        sess = DuqueIAAgent._session_state.setdefault(conversation_id, {})
+        if not isinstance(sess, dict):
+            sess = {}
+            DuqueIAAgent._session_state[conversation_id] = sess
+        return sess.setdefault("manifestation", {
+            "active": False,
+            "tipo": "geral",
+            "problema": None,
+            "localizacao": None,
+            "via_publica": False,
+        })
+
+    def update_manifestation_state(self, conversation_id: str, **kwargs) -> Dict[str, Any]:
+        """Atualiza campos do estado estruturado da manifestação na sessão."""
+        state = self.get_manifestation_state(conversation_id)
+        for k, v in kwargs.items():
+            if v is not None:
+                state[k] = v
+        if conversation_id:
+            DuqueIAAgent.save_session_to_db(conversation_id)
+        return state
 
     @classmethod
     def _init_session_db(cls):
@@ -624,8 +651,8 @@ class DuqueIAAgent:
             data = json.loads(res_str)
             data["conversation_id"] = cid
             
-            # Validação do Output Guardrail
-            answer = sanitize_ouvidoria_whatsapp(data.get("answer", ""))
+            # Validação do Output Guardrail e normalização final
+            answer = normalize_markdown(sanitize_ouvidoria_whatsapp(data.get("answer", "")))
             data["answer"] = answer
             last_context = getattr(self, "_last_context", None)
             triage_info = data.get("triage_info", None)

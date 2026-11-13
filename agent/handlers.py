@@ -328,12 +328,159 @@ class CollectorHandler(BaseHandler):
             rag_h = RagHandler()
             return rag_h.execute(query=query, triage_info=triage_info, agent=agent, conversation_id=conversation_id, start_time=start_time, history=history)
 
-        if triage_info.get("needs_clarification"):
-            answer = agent.gerar_esclarecimento_contextual(effective_query, triage_info)
+        # ---------------------------------------------------------------- #
+        # Estado estruturado da manifestação (continuidade multi-turno)     #
+        # ---------------------------------------------------------------- #
+        q_raw = (query or "").strip()
+        q_low = q_raw.lower()
+        state = agent.get_manifestation_state(conversation_id) if hasattr(agent, "get_manifestation_state") else {
+            "active": False, "tipo": "geral", "problema": None, "localizacao": None, "via_publica": False
+        }
+        if tipo and tipo != "geral":
+            state["tipo"] = tipo
+
+        is_op_question = any(p in q_low for p in [
+            "você que vai abrir", "voce que vai abrir", "você vai abrir", "voce vai abrir",
+            "você abre", "voce abre", "você registra", "voce registra", "abre pra mim"
+        ])
+        is_category_question = any(p in q_low for p in [
+            "mas aí eu marco", "mas ai eu marco", "eu marco o quê", "eu marco o que",
+            "marco o quê", "marco o que", "qual categoria", "qual tema"
+        ])
+        op_prefix = (
+            "Não consigo registrar o protocolo diretamente no sistema — o envio oficial é feito por você no aplicativo **Colab**, "
+            "mas posso deixar a categoria e o texto prontos para você enviar.\n\n"
+            if is_op_question else ""
+        )
+
+        # Detecta menção genérica à via pública ("era sobre rua") sem especificar o problema
+        if re.search(r"\b(?:rua|avenida|estrada|via)\b", q_low):
+            state["via_publica"] = True
+
+        # Detecta localização (ex: "Rua A", "Rua A, Centro", "Av. Brasil")
+        loc_match = re.search(
+            r"\b((?:rua|r\.|av\.?|avenida|travessa|alameda|estrada|rodovia|praça|praca)\s+[^\n?!.;]+)",
+            q_raw,
+            re.IGNORECASE,
+        )
+        if loc_match and not any(w in q_low for w in ["sobre rua", "na rua", "da rua", "buraco"]):
+            state["localizacao"] = loc_match.group(1).strip().rstrip(".,")
+        elif history and not state.get("localizacao") and not is_op_question and not is_category_question:
+            last_ai = next((h.lower() for h in reversed(history) if "duque ia:" in h.lower()), "")
+            if any(w in last_ai for w in ["nome da rua", "rua e o bairro", "qual o bairro", "endereço"]):
+                if not any(w in q_low for w in ["buraco", "lâmpada", "lampada", "poste", "lixo", "esgoto", "bueiro", "capina", "poda"]):
+                    state["localizacao"] = q_raw.rstrip(".,!?")
+
+        # Detecta problema concreto (ignora frases genéricas, perguntas operacionais e endereços puros)
+        _PROBLEM_KEYWORDS = [
+            "buraco", "tapa-buraco", "tapa buraco", "asfalto", "pavimentação", "pavimentacao",
+            "lâmpada", "lampada", "poste", "iluminação", "iluminacao", "luz",
+            "lixo", "entulho", "capina", "roçagem", "rocagem", "mato",
+            "bueiro", "drenagem", "esgoto", "alagamento", "enchente",
+            "árvore", "arvore", "poda", "calçada", "calcada",
+            "barulho", "som alto", "mau atendimento", "atendimento", "médico", "medico",
+            "remédio", "remedio", "medicamento", "água", "agua", "servidor", "escola", "creche"
+        ]
+        if any(pk in q_low for pk in _PROBLEM_KEYWORDS):
+            # Extrai descrição limpa do problema
+            state["problema"] = q_raw.rstrip(".,!?")
+        elif (
+            not is_op_question
+            and not is_category_question
+            and not re.fullmatch(r"(?:eu\s+)?quero\s+(?:abrir|fazer)\s+(?:uma\s+)?(?:reclamação|reclamacao|manifestação|manifestacao|denúncia|denuncia)\.?!?", q_low)
+            and not re.fullmatch(r"(?:era\s+)?sobre\s+(?:a\s+)?rua\.?!?", q_low)
+            and not loc_match
+            and len(q_raw) >= 4
+            and not triage_info.get("needs_clarification")
+            and state.get("localizacao") != q_raw.rstrip(".,!?")
+        ):
+            state["problema"] = q_raw.rstrip(".,!?")
+
+        if hasattr(agent, "update_manifestation_state"):
+            agent.update_manifestation_state(conversation_id, **state)
+
+        problema_atual = state.get("problema")
+        local_atual = state.get("localizacao")
+
+        # Passo 1 da coleta: falta identificar o problema concreto
+        if not problema_atual and (triage_info.get("needs_clarification") or is_op_question or state.get("via_publica") or local_atual):
+            if local_atual:
+                answer = f"{op_prefix}Qual é o problema que você deseja relatar em **{local_atual}** (ex: buraco no asfalto, poste apagado, lixo ou bueiro)?"
+            elif state.get("via_publica"):
+                answer = f"{op_prefix}Qual é o problema na rua que você deseja relatar (ex: buraco no asfalto, iluminação, lixo ou drenagem)?"
+            else:
+                answer = f"{op_prefix}Qual problema ou assunto você deseja relatar?"
+            if hasattr(agent, "update_manifestation_state"):
+                agent.update_manifestation_state(conversation_id, active=True)
             return {
                 "answer": answer,
                 "sources": [],
-                "confidence": triage_info.get("confidence", 0.8),
+                "confidence": triage_info.get("confidence", 0.85),
+                "intent_detected": f"ouvidoria_{tipo}",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(effective_query)
+                }
+            }
+
+        # Passo 2 da coleta: problema conhecido, mas falta localização (para demandas urbanas)
+        _NEEDS_LOCATION_KEYS = ["buraco", "asfalto", "poste", "lâmpada", "lampada", "lixo", "entulho", "capina", "mato", "bueiro", "esgoto", "poda", "árvore", "arvore", "calçada", "calcada"]
+        needs_loc = bool(problema_atual and any(k in problema_atual.lower() for k in _NEEDS_LOCATION_KEYS))
+        if needs_loc and not local_atual and not is_category_question:
+            answer = f"{op_prefix}Entendi (**{problema_atual}**). Qual é a **rua e o bairro** (ou ponto de referência) onde está o problema?"
+            if hasattr(agent, "update_manifestation_state"):
+                agent.update_manifestation_state(conversation_id, active=True)
+            return {
+                "answer": answer,
+                "sources": [],
+                "confidence": triage_info.get("confidence", 0.9),
+                "intent_detected": f"ouvidoria_{tipo}",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(effective_query)
+                }
+            }
+
+        # Passo 3: Problema e localização coletados (ou dúvida final de categoria no Colab) -> orientação completa
+        if problema_atual:
+            prob_low = problema_atual.lower()
+            if any(k in prob_low for k in ["buraco", "tapa-buraco", "tapa buraco", "asfalto", "paviment"]):
+                colab_tema = "Zeladoria Urbana → Pavimentação / Tapa-Buraco"
+            elif any(k in prob_low for k in ["lâmpada", "lampada", "poste", "ilumina"]):
+                colab_tema = "Zeladoria Urbana → Iluminação Pública"
+            elif any(k in prob_low for k in ["lixo", "entulho", "capina", "roçagem", "rocagem", "mato"]):
+                colab_tema = "Zeladoria Urbana → Limpeza Urbana"
+            elif any(k in prob_low for k in ["bueiro", "drenagem", "esgoto", "alagamento"]):
+                colab_tema = "Zeladoria Urbana → Drenagem / Bueiros"
+            elif any(k in prob_low for k in ["poda", "árvore", "arvore"]):
+                colab_tema = "Meio Ambiente → Poda de Árvores"
+            else:
+                colab_tema = "Ouvidoria / Solicitação de Serviço"
+
+            local_txt = f" na **{local_atual}**" if local_atual else ""
+            desc_local = f" localizado na {local_atual}, em Duque de Caxias" if local_atual else " em Duque de Caxias"
+            answer = (
+                f"{op_prefix}Para **{problema_atual}**{local_txt}, o pedido inicial deve ser registrado em **{colab_tema}** no aplicativo **Colab**.\n\n"
+                f"**Você pode usar esta descrição:**\n"
+                f"\"Solicito vistoria e reparo referente a {problema_atual}{desc_local}.\"\n\n"
+                f"Informe também um **ponto de referência** e, se possível, anexe uma **foto**.\n\n"
+                f"[Abrir solicitação no Colab]({OUVIDORIA_CONTACTS['colab_url']})\n\n"
+                f"*(A **Ouvidoria Geral** — telefone **{OUVIDORIA_CONTACTS['telefone']}** e e-mail **{OUVIDORIA_CONTACTS['email']}** — deve ser acionada apenas se a solicitação inicial não for atendida no prazo.)*"
+            )
+            if hasattr(agent, "update_manifestation_state"):
+                agent.update_manifestation_state(conversation_id, active=False)
+            return {
+                "answer": answer,
+                "sources": ["Carta de Serviços de Duque de Caxias / Colab"],
+                "confidence": 0.95,
                 "intent_detected": f"ouvidoria_{tipo}",
                 "triage_info": triage_info,
                 "metrics": {
