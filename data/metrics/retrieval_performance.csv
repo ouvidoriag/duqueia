@@ -2075,3 +2075,36 @@ timestamp,query,retrieval_time_ms,llm_time_ms,total_time_ms,similarity_score,tok
 2026-11-13 12:14:52,Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro?,553.95,3213.37,3773.26,1.0000,2160,0.00019500
 2026-11-13 12:14:58,Centro,586.39,3208.18,5026.32,1.0000,2191,0.00020310
 2026-11-13 12:15:02,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,881.57,2934.00,3819.36,0.9467,2421,0.00022210
+2026-11-13 12:16:03,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,2000.98,3041.83,5130.85,0.9467,2411,0.00021910
+2026-11-13 12:17:09,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,2135.15,2806.86,5037.91,0.9467,2442,0.00022840
+2026-11-13 12:23:16,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,2246.53,3643.77,5907.77,0.9467,2440,0.00022780
+2026-11-13 12:23:47,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,1975.49,4667.83,6721.71,0.9467,2568,0.00026620
+2026-11-13 12:24:48,A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?,1995.26,3397.05,5476.64,1.0000,1590,0.00016990
+2026-11-13 12:24:56,A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?,595.57,2744.98,3343.15,1.0000,1569,0.00016360
+2026-11-13 12:25:04,É só a lâmpada mesmo,602.23,3448.69,5248.95,1.0000,1754,0.00017560
+2026-11-13 12:25:08,Jardim Primavera,700.75,3308.69,4012.87,1.0000,2134,0.00019240
+2026-11-13 12:25:12,Centro,522.71,2890.99,3415.77,1.0000,2164,0.00019480
+2026-11-13 12:25:17,Que horas sai o ônibus de Saracuruna?,815.06,3705.59,4569.09,1.0000,1968,0.00019770
+2026-11-13 12:25:22,Como faço para legalizar ou renovar a permissão de transporte escolar em Duque de Caxias?,526.82,4283.95,4853.50,0.9467,2190,0.00021760
+2026-11-13 12:25:27,Esquece; quais ônibus passam por Xerém?,572.67,3013.48,4751.69,0.9800,2352,0.00020500
+2026-11-13 12:36:33,Jardim Primavera,2140.05,5186.77,7340.11,1.0000,2174,0.00020440
+2026-11-13 12:36:58,Jardim Primavera,2062.29,3129.91,5199.07,1.0000,2137,0.00019330
+2026-11-13 12:37:21,Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro? (bairro informado: Jardim Primavera),1970.47,2822.52,4905.44,1.0000,2118,0.00018760
+2026-11-13 12:37:39,Quais são os itinerários e os horários dos ônibus municipais que atendem o meu bairro? (bairro informado: Jardim Primavera),2458.92,5322.61,7931.59,1.0000,2162,0.00020080
+2026-11-13 12:41:01,A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?,2208.53,3173.75,5515.07,1.0000,1551,0.00015820
+2026-11-13 12:41:08,A lâmpada do poste da minha rua está queimada há dias: por onde peço o reparo da iluminação pública?,653.11,5264.76,5921.16,1.0000,1597,0.00017200
+2026-11-13 12:41:16,É só a lâmpada mesmo,523.70,3399.94,5566.80,1.0000,1733,0.00017260
+2026-11-13 12:41:22,Que horas sai o ônibus de Saracuruna?,643.75,4439.86,5092.49,1.0000,1987,0.00020340
+2026-11-13 12:42:29,Que horas sai o ônibus de Saracuruna?,2666.08,4281.82,7216.41,1.0000,1989,0.00020400
+2026-11-13 12:46:08,Quero reclamar de um buraco na minha rua,2326.49,4010.74,7843.02,1.0000,1892,0.00019000
+2026-11-13 12:46:14,Na verdade; deixa isso; quero saber sobre IPTU,742.56,4943.62,6505.77,1.0000,2256,0.00025080
+2026-11-13 12:46:28,Na verdade quero falar de IPTU,557.03,3287.48,5190.11,1.0000,2094,0.00020070
+2026-11-13 12:47:16,Tem uma lâmpada queimada no poste da minha rua,2664.99,4298.82,7047.86,1.0000,1475,0.00016330
+2026-11-13 12:47:22,Saracuruna,663.53,2803.23,3475.21,1.0000,2337,0.00020440
+2026-11-13 12:47:26,Como faço para conseguir permissão para transporte escolar?,501.48,3889.07,4438.58,0.9500,2128,0.00020710
+2026-11-13 12:53:59,Saracuruna,3012.47,4317.55,7337.03,1.0000,1923,0.00017810
+2026-11-13 12:54:26,Saracuruna,2290.40,4176.57,6471.90,1.0000,1952,0.00018680
+2026-11-13 12:55:08,Saracuruna,2645.11,5165.20,7817.10,1.0000,2167,0.00023190
+2026-11-13 12:55:38,Tem uma lâmpada queimada no poste da minha rua,2227.18,3485.27,5791.65,1.0000,1452,0.00015640
+2026-11-13 12:55:46,Saracuruna,669.58,5279.83,5952.96,1.0000,2145,0.00022530
+2026-11-13 12:55:50,Como faço para conseguir permissão para transporte escolar?,519.06,3617.07,4189.05,0.9400,2053,0.00019840

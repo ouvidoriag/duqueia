@@ -39,12 +39,19 @@ BOOST_RULES = [
     {
         "name": "transport_and_permits",
         "description": "Boost para concessões e permissões de transporte (transporte escolar, táxi, ônibus e vistorias)",
-        "query_terms": ["transporte escolar", "transporte por taxi", "transporte por táxi", "onibus", "ônibus", "tarifa zero", "permissao", "permissão", "vistoria anual", "legalizacao", "legalização"],
-        "source_contains": ["transporte", "vw_ia_servicos"],
+        "query_terms": [
+            "transporte escolar", "transporte por taxi", "transporte por táxi",
+            "onibus", "ônibus", "tarifa zero", "permissao", "permissão",
+            "vistoria anual", "legalizacao", "legalização", "itinerario", "itinerário",
+            "linhas de onibus", "linhas de ônibus", "linha de onibus", "linha de ônibus"
+        ],
+        "source_contains": ["transporte", "vw_ia_servicos", "linhas_tarifa_zero", "tarifa_zero"],
         "category_match": ["transporte", "transportes", "servicos_publicos", "carta_servicos"],
-        "boost": 0.40,
+        "boost": 0.45,
         "penalty_rules": [
-            {"category": "educacao", "penalty": -0.40}
+            {"category": "educacao", "penalty": -0.40},
+            {"category": "saude", "penalty": -0.45},
+            {"category": "assistencia_social", "penalty": -0.40}
         ]
     },
     {

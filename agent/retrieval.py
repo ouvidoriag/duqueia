@@ -283,7 +283,8 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
             if extra_kw not in search_words:
                 search_words.append(extra_kw)
 
-    if any(w in query_lower for w in ["matricula", "matrícula", "escola", "escolar", "creche"]):
+    if any(w in query_lower for w in ["matricula", "matrícula", "escola", "escolar", "creche"]) and "transporte" not in query_lower:
+        # (não expande para matrícula quando o assunto é "transporte escolar": são serviços distintos)
         for extra_kw in ["matrícula", "matricula", "unidades escolares", "escola"]:
             if extra_kw not in search_words:
                 search_words.append(extra_kw)
@@ -449,7 +450,9 @@ def retrieve_structured_service(db_path: str, query: str, query_keywords: list, 
                 
             structured_text = "\n".join(content_parts)
             base_score = 0.85 if (using_real and match_score >= 2.0) else 0.45
-            calibrated_score = min(base_score + (match_score * 0.05), 0.99)
+            # Escala não saturante (0.015/ponto): antes (0.05/ponto) qualquer serviço com match >= 2.8 virava 0.99
+            # e o ranking perdia a capacidade de distinguir o serviço mais específico dos apenas relacionados.
+            calibrated_score = min(base_score + (match_score * 0.015), 0.99)
             
             results.append({
                 "source": f"vw_ia_servicos (ID: {s_id})",
@@ -645,9 +648,11 @@ def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
         "geral", "informacao", "informações", "posso", "pode", "podem", "dos", "das", "aos",
         "rua", "bairro", "local", "aqui", "perto"
     }
+    KNOWN_LOCALITIES_SET = {"saracuruna", "xerem", "xerém", "primavera", "imbariê", "imbarie", "pantanal", "pilar", "paulista", "campos elyseos", "centenario", "centenário", "25 de agosto"}
     search_terms = [w.lower() for w in query_keywords if len(w) >= 3 and w.lower() not in stop_words]
     if not search_terms:
         return []
+    non_loc_terms = [t for t in search_terms if t not in KNOWN_LOCALITIES_SET]
 
     try:
         with get_db_connection(main_db) as conn:
@@ -668,6 +673,11 @@ def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
 
                 meta_matches = sum(1 for t in search_terms if t in meta_text)
                 cont_matches = sum(1 for t in search_terms if t in cont_text)
+
+                # Se a busca possui termos temáticos além de localidade, exige que pelo menos um termo temático
+                # coincida com a regra para evitar que 'Saracuruna' ative regras médicas de ortopedia
+                if non_loc_terms and not any(t in meta_text or t in cont_text for t in non_loc_terms):
+                    continue
 
                 # Uma regra canônica de governança deve bater com o tema/assunto/tags da busca,
                 # ou com pelo menos 2 termos do conteúdo (ou 100% se for termo único).
@@ -711,6 +721,137 @@ def retrieve_regras_negocio(query: str, query_keywords: list) -> list:
     except Exception as e:
         return []
 
+
+# --------------------------------------------------------------------------
+# LOCALIDADES CONHECIDAS (bairros/distritos) E LINHAS DO PROGRAMA TARIFA ZERO
+# --------------------------------------------------------------------------
+_KNOWN_PLACES_CACHE = None
+
+
+def _strip_accents(text: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", (text or "").lower()) if not unicodedata.combining(c))
+
+
+def get_known_places() -> list:
+    """Lista (normalizada, sem acentos) de bairros/distritos e apelidos da tabela bairros_distritos (somente leitura)."""
+    global _KNOWN_PLACES_CACHE
+    if _KNOWN_PLACES_CACHE is not None:
+        return _KNOWN_PLACES_CACHE
+    places = set()
+    try:
+        main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else None
+        if main_db:
+            with get_db_connection(main_db) as conn:
+                for nome, aliases in conn.execute("SELECT nome, aliases FROM bairros_distritos").fetchall():
+                    for raw in [nome] + re.split(r"[;,|]", aliases or ""):
+                        n = _strip_accents(raw).strip()
+                        if len(n) >= 4:
+                            places.add(n)
+    except Exception as e:
+        print(f"[Known Places Warning] {e}", file=sys.stderr)
+    _KNOWN_PLACES_CACHE = sorted(places, key=len, reverse=True)
+    return _KNOWN_PLACES_CACHE
+
+
+def find_mentioned_places(text: str) -> list:
+    """Retorna os bairros/localidades conhecidos citados no texto (o mais específico primeiro, sem sobreposição)."""
+    t = _strip_accents(text)
+    found = []
+    for p in get_known_places():
+        if re.search(rf"(?<![a-z0-9]){re.escape(p)}(?![a-z0-9])", t):
+            if not any(p in f for f in found):
+                found.append(p)
+    return found
+
+
+_TRANSPORT_LINE_TRIGGERS = ("onibus", "linha", "linhas", "itinerario", "tarifa zero", "circular", "coletivo")
+
+
+def retrieve_transport_lines(db_path: str, query: str) -> list:
+    """Recupera linhas/itinerários/horários publicados do Programa Tarifa Zero (tabela linhas_tarifa_zero).
+
+    Antes desta função a tabela era ingerida mas nunca consultada: perguntas sobre itinerários e horários
+    eram respondidas sem nenhum dado de linha. Os horários retornados são os PUBLICADOS (programados);
+    a base não contém localização em tempo real.
+    """
+    qn = _strip_accents(query)
+    if not any(t in qn for t in _TRANSPORT_LINE_TRIGGERS):
+        return []
+    main_db = DATABASE_MAIN if os.path.exists(DATABASE_MAIN) else db_path
+    try:
+        with get_db_connection(main_db) as conn:
+            rows = conn.execute(
+                "SELECT id, nome_linha, itinerario, horario, tarifa, base_legal FROM linhas_tarifa_zero ORDER BY id"
+            ).fetchall()
+    except Exception as e:
+        print(f"[Transport Lines Warning] {e}", file=sys.stderr)
+        return []
+    if not rows:
+        return []
+
+    mentioned = find_mentioned_places(query)
+    matched = []
+    for row in rows:
+        hay = _strip_accents(f"{row[1]} {row[2]}")
+        if any(p in hay for p in mentioned):
+            matched.append(row)
+
+    def _fmt_times(raw: str, full: bool) -> list:
+        out = []
+        try:
+            for dep in json.loads(raw or "[]"):
+                times = dep.get("horarios") or []
+                if not times:
+                    continue
+                if full:
+                    out.append(f"  - {dep.get('local_saida')}: {', '.join(times)}")
+                else:
+                    out.append(f"  - {dep.get('local_saida')}: {len(times)} saídas, de {times[0]} às {times[-1]}")
+        except Exception:
+            pass
+        return out
+
+    parts = [
+        "[FONTE OFICIAL ESTRUTURADA]",
+        "Tipo: Linhas e horários publicados do Programa Tarifa Zero (ônibus municipais gratuitos)",
+        "Confiabilidade: Máxima (Auditado)",
+        "Observação: horários e trajetos são os PUBLICADOS/programados; esta base não traz localização em tempo real dos ônibus.",
+        f"Total de linhas cadastradas: {len(rows)}. Tarifa: R$ 0,00. Base legal: {rows[0][5] or 'Decreto Municipal nº 8.120/2023'}.",
+        "",
+    ]
+    if mentioned:
+        parts.append(f"Localidade(s) citada(s) pelo cidadão: {', '.join(mentioned)}")
+    if matched:
+        full = len(matched) <= 3
+        parts.append(f"Linhas cujo nome ou itinerário passa por essa localidade ({len(matched)}):")
+        for r in matched:
+            parts.append(f"* Linha {r[0]} — {r[1]}")
+            parts.extend(_fmt_times(r[3], full))
+            if full and r[2]:
+                it = r[2].strip()
+                parts.append("  Trajeto (alguns logradouros): " + (it[:600].rsplit(",", 1)[0] + ", ..." if len(it) > 600 else it))
+        if not full:
+            parts.append("(Há muitas linhas para essa localidade; peça ao cidadão para indicar a linha ou o destino para detalhar os horários completos.)")
+    else:
+        if mentioned:
+            parts.append(
+                "Nenhuma linha cadastrada tem essa localidade no nome ou no itinerário publicado. "
+                "NÃO invente linha ou horário para essa localidade."
+            )
+        parts.append("Linhas cadastradas (nomes): " + "; ".join(f"{r[0]} {r[1]}" for r in rows))
+
+    score = 1.00 if matched else (0.95 if not mentioned else 0.85)
+    matched_ids = ",".join(r[0] for r in matched) if matched else "catalogo"
+    title_suffix = f" ({matched_ids})" if matched else " (Catálogo Geral)"
+    return [{
+        "source": f"linhas_tarifa_zero ({matched_ids})",
+        "category": "carta_servicos",
+        "content": "\n".join(parts),
+        "title": f"Linhas e horários do Programa Tarifa Zero{title_suffix}",
+        "semantic_score": score,
+        "similarity": score,
+        "chunk_keywords": mentioned,
+    }]
 def retrieve_fts_chunks(query: str, query_keywords: list, top_k: int = 5) -> list:
     """Busca direta no índice FTS5 (tabela chunks_fts) em vector.db com altíssima velocidade e suporte a acentos."""
     vec_db = DATABASE_VECTOR if os.path.exists(DATABASE_VECTOR) else None
@@ -891,6 +1032,8 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
     plan = planner._generate_offline_plan(query, history=None)
     
     plan_queries = plan.get("queries", [query])
+    if query not in plan_queries:
+        plan_queries = [query] + plan_queries
     plan_focus = plan.get("focus", ["general"])
     
     structured_candidates = []
@@ -920,6 +1063,10 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         struct_regras = retrieve_regras_negocio(q_sub, q_keywords)
         if struct_regras:
             structured_candidates.extend(struct_regras)
+
+        # B.2) Linhas, itinerários e horários publicados do Programa Tarifa Zero (tabela linhas_tarifa_zero)
+        if run_structured:
+            structured_candidates.extend(retrieve_transport_lines(db_path, q_sub))
 
         # C) Busca Estruturada de Unidades Físicas (CRAS/Equipamentos/Hospitais) na tabela secretaria_unidades
         if (run_geo or any(k in q_sub_norm for k in ["veterinario", "cachorro", "gato", "pet", "animal"])) and any(ind in q_sub_norm for ind in ["cras", "creas", "unidade", "posto", "atendimento", "equipamento", "onde fica", "onde fazer", "cadastro", "hospital", "upa", "ceam", "restaurante", "ciep", "escola", "clinica", "veterinario", "veterinaria", "cachorro", "gato", "pet", "animal", "zoonose"]):
@@ -1100,13 +1247,23 @@ def retrieve_context(query: str, db_path: str, using_real: bool, similarity_thre
         c["similarity"] = min(max(round(base_score * completeness, 4), 0.0), 1.0)
 
     # Ordena todos juntos garantindo prioridade para Regras Canônicas de Negócio relevantes,
-    # sem permitir que regras irrelevantes (< 0.70) fiquem acima de serviços diretos (>= 0.75)
+    # e para fontes estruturadas diretas (ex: linhas_tarifa_zero), sem permitir que regras irrelevantes
+    # (< 0.70) fiquem acima de serviços diretos (>= 0.75)
+    is_transport_q = any(t in query_normalized for t in ("onibus", "tarifa zero", "linha", "itinerario", "transporte"))
     def get_candidate_sort_key(c):
         cat = str(c.get("category", "")).lower()
         src = str(c.get("source", "")).lower()
         sim = c.get("similarity", 0.0)
         is_regra = 1 if ("regra" in cat or src.startswith("regras_negocio") or src.startswith("bancoduqueia (regra_")) else 0
-        if is_regra and sim >= 0.70:
+        is_transport_source = 1 if ("linhas_tarifa_zero" in src or "linhas_tarifa_zero" in cat) else 0
+
+        # Se a busca é sobre transporte/ônibus, neutraliza regras médicas ou de matrícula escolar
+        if is_transport_q and is_regra:
+            content_low = str(c.get("content", "")).lower()
+            if any(h in src or h in content_low for h in ("trauma", "ortopedia", "creche", "matricula", "cirurgia", "pre-natal")):
+                return (0, 0.10)
+
+        if (is_regra and sim >= 0.70) or (is_transport_source and is_transport_q and sim >= 0.70):
             tier = 3
         elif sim >= 0.75:
             tier = 2

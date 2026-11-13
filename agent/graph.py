@@ -158,6 +158,19 @@ class GraphContext:
 def node_fast_gate(state: AgentState, ctx: GraphContext) -> AgentState:
     """Camada 0: verifica regras de segurança locais sem LLM."""
     from agent.triage import check_fast_gate, _add_routing_metadata
+    from agent.handlers import _resolve_pending_bairro
+
+    # Resposta curta a uma pergunta de esclarecimento do bairro ("Centro", "Jardim Primavera"): não pode ser
+    # interceptada pela Golden Source (cartão de unidade) nem reclassificada isoladamente — segue direto ao RAG.
+    if _resolve_pending_bairro(state.query, state.history):
+        triage = _add_routing_metadata({
+            "intent": "RAG_GERAL",
+            "confidence": 0.95,
+            "needs_clarification": False,
+            "reason": "Resposta ao esclarecimento de bairro solicitado pela IA.",
+            "source": "CLARIFICATION_FOLLOWUP",
+        })
+        return state.with_update(triage_info=triage, next_node="tool_router")
 
     m_state = (
         ctx.agent.get_manifestation_state(state.conversation_id)
@@ -218,11 +231,17 @@ def node_triage(state: AgentState, ctx: GraphContext) -> AgentState:
     """Camada 1-2: Cache SQLite ou Classificador LLM."""
     from agent.triage import perform_triage
 
+    m_state = (
+        ctx.agent.get_manifestation_state(state.conversation_id)
+        if ctx.agent and hasattr(ctx.agent, "get_manifestation_state")
+        else None
+    )
     triage = perform_triage(
         db_path=ctx.agent.db_cache,
         query=state.query,
         gemini_client=ctx.agent.gemini_client,
-        history=state.history
+        history=state.history,
+        manifestation_state=m_state,
     )
     # Sempre passa pelo tool router após a triagem para enriquecer o contexto
     return state.with_update(

@@ -123,11 +123,21 @@ class SecurityHandler(BaseHandler):
                 ans = f"Sua solicitação envolve assuntos sensíveis ou denúncias que requerem atenção direta e sigilosa. Este canal informativo não processa esse tipo de demanda automaticamente. Por favor, registre formalmente sua manifestação na **Ouvidoria Geral de Duque de Caxias**: telefone **{OUVIDORIA_CONTACTS['telefone']}**, e-mail **{OUVIDORIA_CONTACTS['email']}** ou presencialmente na **{OUVIDORIA_CONTACTS['presencial']}**."
             intent_detected = "human_escalation"
         elif intent == "DEFESA_CIVIL_EMERGENCIA":
-            ans = (
-                "**Emergência de Defesa Civil**: Em casos de risco de desabamento, desabamento de imóvel, deslizamento de terra ou alagamento grave, a prioridade absoluta é garantir a sua segurança!\n\n"
-                "• **Telefones de Emergência 24h**: Ligue imediatamente para a **Defesa Civil pelo 199** ou **(21) 2676-8000**.\n"
-                "• **Acompanhamento no Colab**: Para solicitar vistoria técnica preventiva ou registro de ocorrência, acesse o aplicativo **Colab** no tema **Defesa Civil**."
-            )
+            q_low = query.lower()
+            if any(w in q_low for w in ["fio", "fiação", "fiacao", "faísca", "faisca", "curto", "choque", "inclinado", "poste caindo", "poste caído", "poste caido"]):
+                ans = (
+                    "**Atenção — Risco Elétrico / Emergência Imediata**:\n\n"
+                    "A prioridade absoluta é a sua segurança e a dos pedestres! Mantenha **distância segura** do local e **NUNCA** se aproxime ou toque em postes inclinados, fios caídos ou soltando faíscas.\n\n"
+                    "• **Concessionária de Energia (Light)**: Ligue imediatamente para a central de emergência pelo telefone **0800 021 0196** (atendimento 24h para interrupção de energia, risco elétrico e reparo de rede).\n"
+                    "• **Defesa Civil de Duque de Caxias**: Ligue para o **199** ou **(21) 2676-8000** para isolamento preventivo da área.\n"
+                    "• **Corpo de Bombeiros**: Caso haja princípio de incêndio, chamas ativas ou faíscas contínuas, ligue imediatamente para o **193**."
+                )
+            else:
+                ans = (
+                    "**Emergência de Defesa Civil**: Em casos de risco de desabamento, desabamento de imóvel, deslizamento de terra ou alagamento grave, a prioridade absoluta é garantir a sua segurança!\n\n"
+                    "• **Telefones de Emergência 24h**: Ligue imediatamente para a **Defesa Civil pelo 199** ou **(21) 2676-8000**.\n"
+                    "• **Acompanhamento no Colab**: Para solicitar vistoria técnica preventiva ou registro de ocorrência, acesse o aplicativo **Colab** no tema **Defesa Civil**."
+                )
             intent_detected = "defesa_civil_emergencia"
         elif intent == "SEGURANCA_PUBLICA_EMERGENCIA":
             ans = (
@@ -1170,13 +1180,18 @@ def _build_rag_system_instruction(effective_query: str, context_str: str, histor
         "9. **Anti-Vazamento de Metadados Internos e OCR**: NUNCA exponha nomes de arquivos técnicos, códigos de chunks (ex: 'carta_01237'), termos de scanner óptico (ex: 'OCR Óptico', 'Página 1 *(OCR Óptico)*') ou prefixos de pastas (ex: '07_Secretaria...'). Use SEMPRE o nome oficial e humanizado do órgão ou serviço público.",
         "10. **Proibição de WhatsApp para a Ouvidoria Geral**: A Ouvidoria Geral de Duque de Caxias NÃO POSSUI WhatsApp. O número (21) 99824-5903 NÃO EXISTE. É terminantemente proibido citar canal de WhatsApp para a Ouvidoria Geral. Os canais oficiais são exclusivamente: Telefone fixo (21) 2652-3835, e-mail ouvidoria@duquedecaxias.rj.gov.br e aplicativo Colab.",
         "11. **Honestidade Humanizada (Sem Tom Robótico)**: Quando o contexto não confirmar um dado em tempo real ou detalhe específico (ex: vagas abertas hoje, turmas com inscrições abertas, disponibilidade atual de benefício ou consulta pública específica), NUNCA use frases robóticas como 'não consta na base de dados consultada'. Em vez disso, seja natural e transparente (ex: 'Não consigo confirmar em tempo real as vagas abertas hoje, mas você pode conferir diretamente com...') e SEMPRE entregue os **sites, telefones, endereços ou canais oficiais** do tema presentes no contexto para que o cidadão consiga resolver.",
+        "12. **Use o que o contexto traz antes de encaminhar**: Se o contexto contiver o serviço, documentos, passos, custos, horários ou linhas pedidos, APRESENTE esses dados (são oficiais). Só diga que não tem a informação se ela realmente não estiver no contexto — e nesse caso diga o que falta de forma objetiva e indique o canal específico do órgão que consta no contexto.",
+        "13. **Ouvidoria NÃO é canal genérico**: Não encaminhe à Ouvidoria Geral como destino padrão. Cite-a apenas quando (a) o cidadão quer registrar manifestação (reclamação, denúncia, sugestão, elogio), (b) já abriu a solicitação no setor competente e o prazo venceu, ou (c) o contexto não traz nenhum outro canal. Quando o contexto trouxer a secretaria, o endereço, o e-mail ou o passo a passo do serviço, entregue ESSES canais.",
+        "14. **Esclarecimentos e correções do cidadão**: Se a mensagem atual apenas corrige ou detalha a anterior (ex.: 'mas o problema é no X', 'na verdade é Y'), NÃO repita as instruções já dadas. Reconheça o esclarecimento em uma frase e (i) se a distinção muda o órgão responsável ou o procedimento (duas competências diferentes no contexto), faça UMA pergunta curta de desambiguação listando as alternativas; ou (ii) responda apenas o que mudou.",
+        "15. **Informação essencial ausente**: Se a resposta depende de um dado que o cidadão não informou (bairro, tipo do problema, a qual documento se refere) e o contexto não permite responder sem ele, faça uma pergunta curta pedindo esse dado, em vez de despejar um procedimento genérico.",
+        "16. **Segurança primeiro**: Se o relato indicar risco imediato (fios caídos ou expostos, faíscas, poste caindo, choque, incêndio), a primeira orientação é manter distância e acionar o serviço de emergência adequado (**Bombeiros 193**, **Defesa Civil 199** e, para rede elétrica, a concessionária **Light 0800 021 0196**) antes de qualquer procedimento administrativo.",
     ]
 
     domain_rules = []
 
     if any(k in haystack for k in ("ônibus", "onibus", "itinerário", "itinerario", "tarifa zero", "linha", "linhas", "transporte", "van", "vans")):
         domain_rules.append(
-            "- **Linhas e Itinerários de Ônibus / Transporte Coletivo**: Diferencie com clareza **itinerários e linhas regulares** de **localização por GPS em tempo real**. NUNCA comece dizendo de forma negativa que 'não tem acesso a horários em tempo real' ou empurrando o munícipe diretamente para a Ouvidoria Geral. Apresente as linhas municipais e trajetos conhecidos no contexto e oriente o contato com a **Secretaria Municipal de Transportes e Serviços Públicos (SMTSP)** e empresas operadoras para confirmação de tabelas horárias vigentes."
+            "- **Linhas e Itinerários de Ônibus / Transporte Coletivo**: Diferencie com clareza **itinerários e linhas regulares publicados** de **localização por GPS em tempo real**. NUNCA comece dizendo de forma negativa que 'não tem acesso a horários em tempo real' ou empurrando o munícipe diretamente para a Ouvidoria Geral. Se o contexto trouxer linhas, horários e trajetos (fonte linhas_tarifa_zero), APRESENTE-os de forma resumida (linha, pontos de saída, primeiro/último horário e horários completos quando poucos) e deixe claro que são os horários publicados. Se o contexto disser que nenhuma linha cadastrada passa pela localidade, diga isso com clareza, NÃO invente linha ou horário, e ofereça listar as linhas cadastradas ou verificar outro bairro/destino; para confirmação de tabelas vigentes oriente a **Secretaria Municipal de Transportes e Serviços Públicos (SMTSP)**."
         )
 
     if any(k in haystack for k in ("emprego", "vaga", "sine", "concurso", "edital", "processo seletivo", "fundec", "curso", "trabalho")):
@@ -1242,7 +1257,7 @@ def _build_rag_system_instruction(effective_query: str, context_str: str, histor
 
     if any(k in haystack for k in ("lâmpada", "lampada", "poste", "iluminação", "iluminacao", "buraco", "tapa-buraco", "canteiro", "zeladoria", "asfalto")):
         domain_rules.append(
-            "- **Zeladoria Urbana vs Ouvidoria**: Lâmpadas apagadas, postes com defeito, canteiros danificados ou buracos são serviços primários de **Zeladoria Urbana** (abertos no app Colab). A Ouvidoria Geral só deve ser acionada caso a solicitação de zeladoria não seja atendida no prazo."
+            "- **Zeladoria Urbana vs Ouvidoria**: Lâmpadas apagadas, postes com defeito, canteiros danificados ou buracos são serviços primários de **Zeladoria Urbana** (abertos no app Colab). A Ouvidoria Geral só deve ser acionada caso a solicitação de zeladoria não seja atendida no prazo. Em iluminação, distinga **lâmpada/luminária queimada** (Zeladoria/Colab) de **defeito na estrutura ou na rede elétrica** (poste caído, inclinado ou danificado, fios expostos, faíscas, transformador — competência da concessionária **Light**; havendo risco imediato, afaste-se e acione Bombeiros 193 / Defesa Civil 199). Quando o cidadão disser apenas que 'o problema é no poste' sem deixar claro qual dos casos, pergunte UMA vez qual é, em vez de repetir o procedimento."
         )
 
     if any(k in haystack for k in ("sisreg", "consulta", "exame", "especialista", "regulação", "regulacao", "demora", "marcação", "marcacao", "ubs", "posto")):
@@ -1300,17 +1315,91 @@ def _build_rag_system_instruction(effective_query: str, context_str: str, histor
     return instruction
 
 
+_LOCATION_REF_RE = re.compile(
+    r"\b(?:meu|nosso)\s+bairro\b|\bminha\s+(?:regi[aã]o|[aá]rea|localidade)\b|\bperto\s+de\s+mim\b|"
+    r"\bonde\s+(?:eu\s+)?moro\b|\bpr[oó]xim[oa]\s+(?:de\s+)?(?:mim|casa)\b",
+    re.IGNORECASE,
+)
+_BAIRRO_QUESTION_MARKER = "qual é o seu **bairro**"
+
+
+def _history_user_turns(history: list) -> list:
+    return [h.split(":", 1)[1].strip() for h in (history or []) if h.lower().startswith("munícipe:")]
+
+
+def _missing_location_question(query: str, history: list) -> str | None:
+    """Se a pergunta depende do bairro do cidadão ('meu bairro', 'perto de mim') e ele ainda não o informou
+    (nem nesta mensagem nem nos turnos recentes), devolve uma pergunta curta de esclarecimento; senão None."""
+    from agent.retrieval import find_mentioned_places
+    if not _LOCATION_REF_RE.search(query or ""):
+        return None
+    recent = [query] + _history_user_turns(history)[-4:]
+    if any(find_mentioned_places(t) for t in recent):
+        return None
+    q = (query or "").lower()
+    if any(k in q for k in ("ônibus", "onibus", "linha", "itinerário", "itinerario", "tarifa zero")):
+        hint = "Com ele eu consigo ver quais linhas municipais passam por aí e os horários publicados."
+    elif any(k in q for k in ("upa", "posto", "hospital", "saúde", "saude", "ubs", "clínica", "clinica")):
+        hint = "Com ele eu consigo indicar a unidade de saúde mais próxima."
+    elif any(k in q for k in ("escola", "creche", "matrícula", "matricula")):
+        hint = "Com ele eu consigo indicar escolas e creches da sua região."
+    else:
+        hint = "Com ele eu consigo buscar a informação certa para a sua região."
+    return f"Claro! Para te ajudar melhor, {_BAIRRO_QUESTION_MARKER}? {hint}"
+
+
+def _resolve_pending_bairro(query: str, history: list) -> str | None:
+    """Se o turno anterior da IA perguntou o bairro e o cidadão respondeu curto, reconstrói a pergunta original
+    anexando o bairro informado. Retorna a query combinada ou None."""
+    if not history or len((query or "").split()) > 6:
+        return None
+    turns = list(history)
+    for i in range(len(turns) - 1, -1, -1):
+        low = turns[i].lower()
+        if low.startswith("duque ia:") or low.startswith("duque:"):
+            if _BAIRRO_QUESTION_MARKER not in low:
+                return None
+            for j in range(i - 1, -1, -1):
+                if turns[j].lower().startswith("munícipe:"):
+                    original = turns[j].split(":", 1)[1].strip()
+                    return f"{original} (bairro informado: {query.strip().rstrip('.!?')})"
+            return None
+    return None
+
+
 class RagHandler(BaseHandler):
     """Handler principal para consultas informativas via RAG."""
     def execute(self, query: str, triage_info: dict, agent, conversation_id: str, start_time: float, history: list) -> dict:
         from agent.router import QueryAnalyzer
         
+        # Esclarecimento de informação essencial ausente (ex.: "meu bairro" sem o bairro informado)
+        missing_q = _missing_location_question(query, history)
+        if missing_q:
+            elapsed_m = time.time() - start_time
+            return {
+                "answer": missing_q,
+                "sources": [],
+                "confidence": 0.9,
+                "intent_detected": "clarification_missing_slot",
+                "triage_info": triage_info,
+                "metrics": {
+                    "retrieval_time_ms": 0,
+                    "llm_time_ms": 0,
+                    "total_time_ms": round(elapsed_m * 1000, 2),
+                    "tokens_used": 0,
+                    "keywords": extract_query_keywords(query)
+                }
+            }
+
         # A1: Usa rewritten_query já gerada pela triagem (fusão Triage+Rewriter = -1 chamada LLM)
         # Só chama o rewriter separado se a triagem não veio do LLM (ex: FAST_GATE, SQLITE_CACHE)
         effective_query = query
         triage_source = triage_info.get("source", "")
         triage_rewritten = triage_info.get("rewritten_query", "")
-        if triage_rewritten and triage_rewritten.strip() and triage_source == "GEMINI_LLM":
+        pending_merged = _resolve_pending_bairro(query, history)
+        if pending_merged:
+            effective_query = pending_merged
+        elif triage_rewritten and triage_rewritten.strip() and triage_source == "GEMINI_LLM":
             effective_query = triage_rewritten.strip()
         elif history:
             effective_query = rewrite_query_with_history(query, history, agent.gemini_client)

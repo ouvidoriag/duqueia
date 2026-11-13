@@ -110,7 +110,8 @@ AMBIGUITY_FAST_PATTERNS = [
 ]
 
 DEFESA_CIVIL_FAST_PATTERNS = [
-    (r"\b(?:desabando|desabamento|casa\s+(?:está\s+)?desabando|casa\s+(?:está\s+)?caindo|risco\s+de\s+desabamento|deslizamento|barranco\s+caindo|alagamento\s+grave)\b", "DEFESA_CIVIL_EMERGENCIA", "Ocorrência grave de emergência de Defesa Civil detectada localmente.")
+    (r"\b(?:desabando|desabamento|casa\s+(?:está\s+)?desabando|casa\s+(?:está\s+)?caindo|risco\s+de\s+desabamento|deslizamento|barranco\s+caindo|alagamento\s+grave)\b", "DEFESA_CIVIL_EMERGENCIA", "Ocorrência grave de emergência de Defesa Civil detectada localmente."),
+    (r"\b(?:fios?\s+(?:ca[íi]dos?|soltos?|partidos?)|soltando\s+fa[íi]scas?|fa[íi]scas?\s+no\s+poste|curto[- ]circuito|poste\s+(?:caindo|ca[íi]do|quase\s+caindo|inclinado|torto))\b", "DEFESA_CIVIL_EMERGENCIA", "Emergência de risco elétrico / fiação caída ou poste inclinado na via pública.")
 ]
 
 SEGURANCA_PUBLICA_FAST_PATTERNS = [
@@ -295,23 +296,35 @@ def check_fast_gate(query: str, history: list = None, manifestation_state: dict 
                 "source": "FAST_GATE"
             }
 
-        has_prior_manifestation = any(
-            w in t.lower()
-            for t in history
-            for w in [
-                "zeladoria urbana", "solicito vistoria", "abrir solicitação no colab",
-                "qual é a rua e o bairro", "qual problema ou assunto", "qual é o **bairro**",
-                "qual é o bairro", "quer que eu já prepare", "posso montar a orientação"
-            ]
-        )
-        if has_prior_manifestation and any(p in query_lower for p in [
-            "fica na ", "fica no ", "é na ", "e na ", "é no ", "e no ",
-            "o bairro é", "o bairro e", "bairro é", "bairro e", "no bairro ",
+        # A existência de uma coleta de manifestação é decidida pelo ESTADO ESTRUTURADO da sessão, e não por
+        # marcadores textuais no histórico: respostas informativas do RAG também citam "Zeladoria Urbana"/"Colab"
+        # e não representam uma coleta em andamento (isso causava sequestro indevido de esclarecimentos).
+        if manifestation_state is not None:
+            st = manifestation_state
+            has_prior_manifestation = bool(st.get("problema") or st.get("localizacao") or st.get("awaiting_field"))
+            awaiting_loc = st.get("awaiting_field") in ("localizacao", "bairro")
+        else:
+            has_prior_manifestation = any(
+                w in t.lower()
+                for t in history
+                for w in [
+                    "qual é a rua e o bairro", "qual problema ou assunto", "qual é o bairro",
+                    "quer que eu já prepare", "solicito vistoria e reparo"
+                ]
+            )
+            awaiting_loc = any(w in last_assistant_turn for w in ["qual é a rua e o bairro", "qual é o bairro", "qual é o **bairro**"])
+        manifestation_update_patterns = [
+            "fica na ", "fica no ",
+            "o bairro é", "o bairro e", "no bairro ",
             "prepara o texto", "texto certinho", "qual endereço você", "qual endereco voce",
-            "me ajuda a fazer", "ajuda a fazer",
+            "me ajuda a fazer a solicita", "ajuda a fazer a solicita",
             "outra reclamação", "outra reclamacao", "nova reclamação", "nova reclamacao",
-            "começar outra", "comecar outra", "sobre iluminação", "sobre iluminacao"
-        ]):
+            "começar outra", "comecar outra",
+        ]
+        if awaiting_loc:
+            # Só interpretamos "é na/no/em ..." como resposta de localização quando a coleta pergunta o local
+            manifestation_update_patterns += ["é na ", "é no ", "é em ", "e na ", "e no "]
+        if has_prior_manifestation and any(p in query_lower for p in manifestation_update_patterns):
             return {
                 "intent": "OUVIDORIA_MANIFESTACAO",
                 "tipo_manifestacao": "reclamacao",
@@ -464,7 +477,8 @@ def check_fast_gate(query: str, history: list = None, manifestation_state: dict 
             # Desambiguação de Iluminação Pública vs Residencial vs Estrutura do Poste
             is_light_context = any(w in last_assistant_turn for w in [
                 "falta de energia elétrica dentro da sua residência", "iluminação pública (como um poste",
-                "poste ou lâmpada", "ambiguo_luz", "poste apagado", "lâmpada queimada", "iluminação pública"
+                "poste ou lâmpada", "ambiguo_luz", "poste apagado", "lâmpada queimada", "iluminação pública",
+                "tipo de problema no poste", "problema no poste", "poste danificado", "fios caídos"
             ])
             if is_light_context:
                 # Se o munícipe esclarece que o problema é no poste em si ou nega a lâmpada
@@ -476,6 +490,15 @@ def check_fast_gate(query: str, history: list = None, manifestation_state: dict 
                     "fios soltos", "fio solto", "faísca", "faisca", "curto circuito", "curto-circuito"
                 ])
                 if is_pole_structure_or_hazard:
+                    # Se descreve perigo iminente (fio solto, faísca, inclinado), segue direto para Defesa Civil
+                    if any(h in query_lower for h in ["fio", "faísca", "faisca", "inclinado", "caído", "caido", "curto"]):
+                        return {
+                            "intent": "DEFESA_CIVIL_EMERGENCIA",
+                            "confidence": 1.0,
+                            "needs_clarification": False,
+                            "reason": "Emergência de risco elétrico / fiação caída ou poste inclinado na via pública.",
+                            "source": "FAST_GATE"
+                        }
                     return {
                         "intent": "AMBIGUO_POSTE",
                         "confidence": 1.0,
@@ -484,7 +507,7 @@ def check_fast_gate(query: str, history: list = None, manifestation_state: dict 
                         "reason": "Munícipe esclarece que a falha é na estrutura do poste ou rede elétrica, e não na lâmpada.",
                         "source": "FAST_GATE"
                     }
-                elif any(w in query_lower for w in ["poste", "rua", "fora", "apagado", "apagada", "quebrada", "pública", "publica", "na rua"]):
+                elif any(w in query_lower for w in ["lâmpada", "lampada", "apagad", "quebrad", "poste", "rua", "fora", "pública", "publica", "na rua", "só a lâmpada", "so a lampada"]):
                     return {
                         "intent": "RAG_GERAL",
                         "confidence": 1.0,
@@ -791,10 +814,10 @@ def get_triage_fallback(reason: str) -> dict:
 # --------------------------------------------------------------------------
 # ENTRY POINT PRINCIPAL DA TRIAGEM
 # --------------------------------------------------------------------------
-def perform_triage(db_path: str, query: str, gemini_client, history: list = None) -> dict:
+def perform_triage(db_path: str, query: str, gemini_client, history: list = None, manifestation_state: dict = None) -> dict:
     """Orquestra as camadas de triagem (Fast Gate, Cache e LLM)."""
     # 1. Camada 0: Fast Gate (Regras Locais)
-    fast_res = check_fast_gate(query, history=history)
+    fast_res = check_fast_gate(query, history=history, manifestation_state=manifestation_state)
     if fast_res:
         return _add_routing_metadata(fast_res)
         

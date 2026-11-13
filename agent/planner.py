@@ -179,8 +179,20 @@ OFFLINE_RULES = [
         "focus": ["address", "phone"]
     },
     {
+        "intent": "transport_info",
+        "triggers": [
+            r"\bonibus\b", r"\bônibus\b", r"\btarifa zero\b", r"\blinha\b", r"\blinhas\b",
+            r"\bitinerario\b", r"\bitinerários\b", r"\bhorario de onibus\b", r"\bhorarios\b"
+        ],
+        "queries": [
+            "Linhas e horários do Programa Tarifa Zero",
+            "Secretaria Municipal de Transportes e Serviços Públicos"
+        ],
+        "focus": ["transport", "schedule"]
+    },
+    {
         "intent": "general_info",
-        "triggers": [r"\bdistrito\b", r"\bbairro\b", r"\bhistoria\b", r"\borigem\b", r"\bprefeito\b", r"\bcidade\b"],
+        "triggers": [r"\bdistrito\b", r"\bdistritos\b", r"\bbairros da cidade\b", r"\bhistoria\b", r"\borigem\b", r"\bprefeito\b", r"\bcidade\b"],
         "queries": ["a_cidade.md", "prefeito.md", "Duque de Caxias"],
         "focus": ["general"]
     }
@@ -294,6 +306,8 @@ class SemanticRecoveryPlanner:
             if locality_queries:
                 # Coloca queries de localidade no início para priorizar unidades físicas próximas
                 matched_rule["queries"] = locality_queries + matched_rule["queries"]
+            if query not in matched_rule["queries"]:
+                matched_rule["queries"].append(query)
             return matched_rule
 
         if locality_queries:

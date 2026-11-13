@@ -19,8 +19,8 @@ def calculate_completeness_score(candidate: dict) -> float:
     content = candidate.get("content", "")
     source = str(candidate.get("source", ""))
 
-    # 0. Regras Canônicas de Negócio (GOVERNANÇA MÁXIMA E OBRIGATÓRIA - AUDITADO)
-    if "regra" in category.lower() or "regras_negocio" in source.lower():
+    # 0. Regras Canônicas de Negócio e Linhas de Transporte Oficiais (GOVERNANÇA MÁXIMA E OBRIGATÓRIA - AUDITADO)
+    if "regra" in category.lower() or "regras_negocio" in source.lower() or "linhas_tarifa_zero" in source.lower():
         return 1.00
 
     # 1. Chunks descritivos de Markdown ou FAQ auditados (ex: lacunas_dados_resolvidas.md)

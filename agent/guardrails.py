@@ -12,6 +12,7 @@ OFFICIAL_CANONICAL_PHONES = {
     "26523835",     # Ouvidoria Geral (Telefone Fixo Oficial - Ouvidoria NÃO tem WhatsApp)
     "26764444",     # Defesa Civil Caxias
     "26732203",     # Defesa Civil Caxias
+    "26768000",     # Defesa Civil Caxias (Plantão)
     "27734550",     # IPMDC Caxias
     "22531177",     # Disque Denúncia RJ
     "36566697",     # Obras / Serviços

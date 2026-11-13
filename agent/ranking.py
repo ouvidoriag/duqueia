@@ -47,9 +47,12 @@ class CandidateRanker:
                             cand.add_explanation(f"Penalidade [{rule_name}]: {pen_val:.2f} (categoria {pen_cat})")
 
             # 2. Regra de Localidade (Localidade exata mencionada)
+            is_transport_q = any(t in query_norm for t in ["onibus", "ônibus", "itinerario", "itinerário", "linha", "linhas", "transporte"])
             for loc in KNOWN_LOCALITIES:
                 loc_norm = ''.join(c for c in unicodedata.normalize('NFKD', loc.lower()) if not unicodedata.combining(c))
                 if loc_norm in query_norm:
+                    if is_transport_q and cand.category in ("saude", "assistencia_social", "educacao"):
+                        continue
                     content_norm = ''.join(c for c in unicodedata.normalize('NFKD', cand.content.lower()) if not unicodedata.combining(c))
                     title_norm = ''.join(c for c in unicodedata.normalize('NFKD', cand.title.lower()) if not unicodedata.combining(c))
                     if loc_norm in content_norm or loc_norm in title_norm:
@@ -69,8 +72,9 @@ class CandidateRanker:
             # 4. Trava de Segurança: Garante intervalo [0.0, 1.0]
             cand.retrieval_score = min(max(round(cand.retrieval_score, 4), 0.0), 1.0)
 
-        # Ordena decrecente pelo retrieval_score
-        candidates.sort(key=lambda x: x.retrieval_score, reverse=True)
+        # Ordena decrescente pelo retrieval_score; empates (scores saturados em 1.0 pelos boosts) são desfeitos
+        # pelo score semântico/estruturado original, que preserva a especificidade do match.
+        candidates.sort(key=lambda x: (x.retrieval_score, x.semantic_score), reverse=True)
         return candidates
 
     @staticmethod

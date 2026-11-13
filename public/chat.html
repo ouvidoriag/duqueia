@@ -1442,29 +1442,87 @@
     // Formatação de Markdown institucional
     function formatMarkdown(text) {
       if (!text) return '';
-      let html = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
 
-      // Negrito e Itálico
-      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-      // Telefones municipais destacados (ex: 2652-3835)
-      html = html.replace(/\b(\(?21\)?\s*9?\d{4}[-\s]?\d{4})\b/g, '<a href="tel:$1"><strong>$1</strong></a>');
+      // Formatação inline (já sobre texto escapado): links, URLs soltas, negrito, itálico e telefones.
+      const inline = (s) => {
+        const stash = [];
+        const keep = (html) => { stash.push(html); return '\u0000' + (stash.length - 1) + '\u0000'; };
 
-      // Parágrafos e listas
-      const paragraphs = html.split('\n\n');
-      return paragraphs.map(p => {
-        const trimmed = p.trim();
-        if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || trimmed.startsWith('• ')) {
-          const items = trimmed.split(/\n[-*•]\s+/);
-          items[0] = items[0].replace(/^[-*•]\s+/, '');
-          return '<ul>' + items.map(li => `<li>${li.trim()}</li>`).join('') + '</ul>';
+        // [texto](url) — somente http(s) / mailto / tel (bloqueia javascript:)
+        s = s.replace(/\[([^\]]+)\]\(((?:https?:\/\/|mailto:|tel:)[^\s)]+)\)/g,
+          (m, label, url) => keep(`<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`));
+        // URLs soltas
+        s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<)]+[^\s<).,;!?])/g,
+          (m, pre, url) => pre + keep(`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`));
+        // Negrito e itálico (itálico exige *texto* colado, sem espaço interno, para não colidir com marcadores de lista)
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/(^|[^\w*])\*(?!\s)([^*\n]+?)(?<!\s)\*(?![\w*])/g, '$1<em>$2</em>');
+        // Telefones (ex: (21) 2652-3835)
+        s = s.replace(/(^|[^\w>"])(\(?21\)?\s*9?\d{4}[-\s]?\d{4})(?!\d)/g,
+          (m, pre, ph) => pre + `<a href="tel:${ph.replace(/[^\d+]/g, '')}"><strong>${ph}</strong></a>`);
+
+        return s.replace(/\u0000(\d+)\u0000/g, (m, i) => stash[+i]);
+      };
+
+      const lines = esc(text).replace(/\r/g, '').split('\n');
+      const out = [];
+      const stack = []; // pilha de listas abertas: { type: 'ul'|'ol', indent }
+      let para = [];
+
+      const flushPara = () => {
+        if (para.length) { out.push('<p>' + para.map(inline).join('<br>') + '</p>'); para = []; }
+      };
+      const closeListsTo = (indent) => {
+        while (stack.length && stack[stack.length - 1].indent > indent) {
+          out.push('</li></' + stack.pop().type + '>');
         }
-        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
-      }).join('');
+      };
+      const closeAllLists = () => closeListsTo(-1);
+
+      for (const rawLine of lines) {
+        const line = rawLine.replace(/\t/g, '    ');
+        if (!line.trim()) { flushPara(); closeAllLists(); continue; }
+
+        const heading = line.match(/^\s{0,3}(#{1,4})\s+(.+)$/);
+        if (heading) {
+          flushPara(); closeAllLists();
+          out.push('<p><strong>' + inline(heading[2].trim()) + '</strong></p>');
+          continue;
+        }
+
+        const li = line.match(/^(\s*)([-*•]|\d+[.)])\s+(.*)$/);
+        if (li) {
+          flushPara();
+          const indent = li[1].length;
+          const type = /\d/.test(li[2]) ? 'ol' : 'ul';
+          const top = stack[stack.length - 1];
+          if (!top || indent > top.indent) {
+            out.push('<' + type + '><li>');
+            stack.push({ type, indent });
+          } else {
+            closeListsTo(indent);
+            const cur = stack[stack.length - 1];
+            if (cur && cur.indent === indent && cur.type === type) {
+              out.push('</li><li>');
+            } else {
+              if (cur) out.push('</li></' + stack.pop().type + '>');
+              out.push('<' + type + '><li>');
+              stack.push({ type, indent });
+            }
+          }
+          out.push(inline(li[3].trim()));
+          continue;
+        }
+
+        // Linha comum: continuação do item de lista aberto ou parágrafo
+        if (stack.length && /^\s+/.test(line)) { out.push('<br>' + inline(line.trim())); continue; }
+        closeAllLists();
+        para.push(line.trim());
+      }
+      flushPara(); closeAllLists();
+      return out.join('');
     }
 
     function nowTime() {

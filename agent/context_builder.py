@@ -109,6 +109,7 @@ class ContextBuilder:
                     "original_sources": [src],
                     "category": cand.category,
                     "max_score": cand.retrieval_score,
+                    "semantic": cand.semantic_score,
                     "contents": [cand.content.strip()],
                     "candidate_obj": cand
                 }
@@ -166,35 +167,68 @@ class ContextBuilder:
 
         ordered_sources.sort(key=source_sort_key, reverse=True)
 
+        # 4. Montagem do contexto sob orçamento de caracteres.
+        # Problema corrigido: antes, as regras canônicas (tier 3) consumiam o orçamento primeiro e o primeiro bloco
+        # que não coubesse interrompia TODA a montagem (break), descartando serviços oficiais menores e mais
+        # relevantes que ainda caberiam (ex.: "Legalização de transporte escolar" ficava fora do contexto).
+        # Agora: (a) os melhores serviços/fontes DIRETAS (não-regra) têm vagas reservadas; (b) blocos grandes são
+        # limitados; (c) um bloco que não cabe é pulado (continue) em vez de encerrar a montagem.
+        def _is_regra_src(data: Dict) -> bool:
+            cat_l = str(data.get("category", "")).lower()
+            src_l = ContextBuilder.clean_metadata_and_ocr(str(data.get("source", ""))).lower()
+            return "regra" in cat_l or src_l.startswith("regras_negocio") or src_l.startswith("bancoduqueia (regra_")
+
+        def _render_block(src_key: str, cap: int) -> Tuple[str, str]:
+            data = grouped_sources[src_key]
+            merged = ContextBuilder.clean_metadata_and_ocr("\n\n".join(data["contents"]))
+            src_name_l = ContextBuilder.clean_metadata_and_ocr(str(data["source"]))
+            if _is_regra_src(data):
+                header_l = f"--- [DIRETRIZ DE GOVERNANÇA MÁXIMA E OBRIGATÓRIA] FONTE: {src_name_l} | PRIORIDADE: MÁXIMA ---"
+            else:
+                header_l = f"--- FONTE: {src_name_l} | CATEGORIA: {data['category']} | SCORE: {data['max_score']:.2f} ---"
+            if len(merged) > cap:
+                cut = merged[:cap]
+                nl = cut.rfind("\n")
+                merged = (cut[:nl] if nl > cap * 0.6 else cut).rstrip() + "\n[...conteúdo truncado por limite de contexto...]"
+            return f"{header_l}\n{merged}", src_name_l
+
+        MAX_BLOCK_CHARS = 2200
+        PROTECTED_BLOCK_CHARS = 3200
+        PROTECTED_SLOTS = 2
+        PROTECTED_MIN_SCORE = 0.70
+
+        direct_sources = [s for s in ordered_sources if not _is_regra_src(grouped_sources[s])]
+        direct_sources.sort(
+            key=lambda s: (grouped_sources[s]["max_score"], grouped_sources[s].get("semantic", 0.0)),
+            reverse=True,
+        )
+        protected = [s for s in direct_sources if grouped_sources[s]["max_score"] >= PROTECTED_MIN_SCORE][:PROTECTED_SLOTS]
+
+        selected: Dict[str, Tuple[str, str]] = {}
+        budget = max_context_chars
+        for s in protected:
+            block, name_l = _render_block(s, PROTECTED_BLOCK_CHARS)
+            selected[s] = (block, name_l)
+            budget -= len(block)
+
+        for s in ordered_sources:
+            if s in selected:
+                continue
+            block, name_l = _render_block(s, MAX_BLOCK_CHARS)
+            if len(block) > budget:
+                continue
+            selected[s] = (block, name_l)
+            budget -= len(block)
+
         context_blocks = []
         sources_used = []
         final_candidates = []
-        current_chars = 0
-
-        for src in ordered_sources:
-            data = grouped_sources[src]
-            merged_content = ContextBuilder.clean_metadata_and_ocr("\n\n".join(data["contents"]))
-            
-            cat = data.get("category", "").lower()
-            src_name = ContextBuilder.clean_metadata_and_ocr(str(data["source"]))
-            is_regra = "regra" in cat or src_name.startswith("regras_negocio") or src_name.startswith("bancoduqueia (regra_")
-            
-            if is_regra:
-                header = f"--- [DIRETRIZ DE GOVERNANÇA MÁXIMA E OBRIGATÓRIA] FONTE: {src_name} | PRIORIDADE: MÁXIMA ---"
-            else:
-                header = f"--- FONTE: {src_name} | CATEGORIA: {data['category']} | SCORE: {data['max_score']:.2f} ---"
-
-            block_text = f"{header}\n{merged_content}"
-            
-            # Limita orçamento total de caracteres para não explodir o prompt
-            if current_chars + len(block_text) > max_context_chars and len(context_blocks) >= 2:
-                # Se já temos pelo menos 2 blocos essenciais, interrompe para não inchar o contexto
-                break
-
-            context_blocks.append(block_text)
-            sources_used.append(src_name)
-            final_candidates.append(data["candidate_obj"])
-            current_chars += len(block_text)
+        for s in ordered_sources:  # mantém a ordem de prioridade (regras canônicas primeiro)
+            if s in selected:
+                block, name_l = selected[s]
+                context_blocks.append(block)
+                sources_used.append(name_l)
+                final_candidates.append(grouped_sources[s]["candidate_obj"])
 
         context_text = "\n\n".join(context_blocks)
         return context_text, sources_used, final_candidates
